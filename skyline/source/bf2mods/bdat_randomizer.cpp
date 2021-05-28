@@ -29,12 +29,12 @@ namespace bf2mods {
 			int new_n = (util::nnRand<int16_t>() % Bdat::getIdCount(bdatData)) + Bdat::getIdTop(bdatData);
 			auto message = Bdat::getMSTextBak(bdatData, new_n);
 
-			skyline::logger::s_Instance->LogFormat("Bdat %d overridden to %d", n, new_n);
+			//skyline::logger::s_Instance->LogFormat("Bdat %d overridden to %d", n, new_n);
 
 			//skyline::logger::s_Instance->LogFormat("Uhhhh %p %p", Bdat::getIdCount, Bdat::getIdTop);
 			//skyline::logger::s_Instance->LogFormat("For %p: Count = %d, Top = %d", bdatData,  Bdat::getIdCount(bdatData), Bdat::getIdTop(bdatData));
 
-			// ditto ^^ comment 
+			// ditto ^^ comment
 			//return PossibleThings[rand() % (sizeof(PossibleThings)/sizeof(char*))];
 			return message;
 		}
@@ -51,7 +51,7 @@ namespace bf2mods {
 		util::ResolveSymbol<decltype(Bdat::getIdCount)>(&Bdat::getIdCount, "_ZN4Bdat10getIdCountEPh");
 		util::ResolveSymbol<decltype(Bdat::getIdTop)>(&Bdat::getIdTop, "_ZN4Bdat8getIdTopEPh");
 
-		skyline::logger::s_Instance->LogFormat("ok done");
+		skyline::logger::s_Instance->LogFormat("Finished resolving Bdat:: symbols");
 
 		//skyline::logger::s_Instance->LogFormat("Uhhhh %p %p", Bdat::getIdCount, Bdat::getIdTop);
 

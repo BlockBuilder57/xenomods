@@ -4,4 +4,4 @@ namespace bf2mods {
 
 	void hook_party_selector();
 
-} // namespace ether::bf2
+} // namespace bf2mods

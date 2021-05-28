@@ -12,7 +12,7 @@ namespace bf2mods {
 		Plugin::init();
 
 		// hook stuff
-		//SetupBdatRandomizer();
+		SetupBdatRandomizer();
 		SetupDebugStuff();
 
 		// lazy

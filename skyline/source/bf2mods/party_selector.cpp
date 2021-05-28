@@ -1,6 +1,5 @@
 #include "party_selector.hpp"
 
-
 #include "bf2mods/stuff/utils/util.hpp"
 #include "skyline/logger/Logger.hpp"
 

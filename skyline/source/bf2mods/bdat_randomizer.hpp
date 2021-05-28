@@ -1,8 +1,5 @@
 #pragma once
 
-
-
-
 namespace bf2mods {
 
 	/**

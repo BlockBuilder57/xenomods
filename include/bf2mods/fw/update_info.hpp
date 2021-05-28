@@ -4,4 +4,4 @@ namespace fw {
 
 class UpdateInfo;
 
-}  // namespace fw
+} // namespace fw

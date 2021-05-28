@@ -2,9 +2,10 @@
 
 // This file is entirely by 3096 with only minor touchups.
 
+#include <bf2mods/stuff/utils/util.hpp>
 #include <map>
 
-#include "bf2mods/stuff/utils/debug_util.hpp"
+//#include "bf2mods/stuff/utils/debug_util.hpp"
 
 namespace ml {
 
@@ -233,19 +234,19 @@ GENERATE_SYM_HOOK(eventCamManUpdate, "_ZN5event10CamManager6updateEv", size_t, e
 }
 
 GENERATE_SYM_HOOK(eventCamFreeUpdate, "_ZN5event7CamFree6updateERKNS_9FrameInfoE", void, void* p_this) {
-	dbgutil::poorPersonsBreakpoint("eventCamFreeUpdate");
+	//dbgutil::poorPersonsBreakpoint("eventCamFreeUpdate");
 	return eventCamFreeUpdateBak(p_this);
 }
 
 GENERATE_SYM_HOOK(eventCamFreeOnKeyDown, "_ZN5event10BouManager17OnMouseButtonDownEPN2ml9EventViewE", int32_t,
 				  void* p_this, void* p_eventView) {
-	dbgutil::poorPersonsBreakpoint("eventCamFreeOnKeyDown");
+	//dbgutil::poorPersonsBreakpoint("eventCamFreeOnKeyDown");
 	return eventCamFreeOnKeyDownBak(p_this, p_eventView);
 }
 
 GENERATE_SYM_HOOK(eventManagerOnKeyDown, "_ZN5event7Manager9OnKeyDownEPN2ml9EventViewE", int32_t,
 				  event::Manager* p_this, void* p_eventView) {
-	dbgutil::poorPersonsBreakpoint("eventManagerOnKeyDown");
+	//dbgutil::poorPersonsBreakpoint("eventManagerOnKeyDown");
 	return 0;
 }
 
@@ -262,8 +263,8 @@ GENERATE_SYM_HOOK(setAutoReduction, "_ZN2ml5DrMan16setAutoReductionEb", u64, voi
 }
 
 void logX(InlineCtx* ctx) {
-	dbgutil::logRegistersX(ctx);
-	dbgutil::poorPersonsBreakpoint("log x");
+	//dbgutil::logRegistersX(ctx);
+	//dbgutil::poorPersonsBreakpoint("log x");
 }
 
 void testhook() {

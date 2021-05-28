@@ -5,8 +5,8 @@
 namespace fw {
 
 class Document {
-   public:
-    InputManager& getInputManager() const;
+public:
+  InputManager &getInputManager() const;
 };
 
-}  // namespace fw
+} // namespace fw
