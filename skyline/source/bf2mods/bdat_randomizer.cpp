@@ -23,18 +23,24 @@ namespace bf2mods {
 
 		std::uint64_t (*getIdTop)(std::uint8_t*);
 
+		std::uint64_t (*getSheetName)(std::uint8_t*);
+
 		GENERATE_SYM_HOOK(getMSText, "_ZN4Bdat9getMSTextEPhi", char*, std::uint8_t* bdatData, int n) {
-			// skyline::logger::s_Instance->LogFormat("Bdat::getMSText(bdat: %p, n: %d)", bdatData, n);
+			//skyline::logger::s_Instance->LogFormat("Bdat::getMSText(bdat: %p, n: %d)", bdatData, n);
 
 			int new_n = (util::nnRand<int16_t>() % Bdat::getIdCount(bdatData)) + Bdat::getIdTop(bdatData);
 			auto message = Bdat::getMSTextBak(bdatData, new_n);
+
+			// sets the text to the name of the bdat sheet
+			//auto message = Bdat::getSheetName(bdatData);
+
 
 			//skyline::logger::s_Instance->LogFormat("Bdat %d overridden to %d", n, new_n);
 
 			//skyline::logger::s_Instance->LogFormat("Uhhhh %p %p", Bdat::getIdCount, Bdat::getIdTop);
 			//skyline::logger::s_Instance->LogFormat("For %p: Count = %d, Top = %d", bdatData,  Bdat::getIdCount(bdatData), Bdat::getIdTop(bdatData));
 
-			// ditto ^^ comment
+			// 6th grader part 2
 			//return PossibleThings[rand() % (sizeof(PossibleThings)/sizeof(char*))];
 			return message;
 		}
@@ -50,6 +56,7 @@ namespace bf2mods {
 
 		util::ResolveSymbol<decltype(Bdat::getIdCount)>(&Bdat::getIdCount, "_ZN4Bdat10getIdCountEPh");
 		util::ResolveSymbol<decltype(Bdat::getIdTop)>(&Bdat::getIdTop, "_ZN4Bdat8getIdTopEPh");
+		util::ResolveSymbol<decltype(Bdat::getSheetName)>(&Bdat::getSheetName, "_ZN4Bdat12getSheetNameEPh");
 
 		skyline::logger::s_Instance->LogFormat("Finished resolving Bdat:: symbols");
 

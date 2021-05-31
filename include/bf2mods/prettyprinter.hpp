@@ -42,6 +42,14 @@ _PRETTYPRINTER_GENERATE_SSTREAMABLE(double)
 _PRETTYPRINTER_GENERATE_SSTREAMABLE(std::string)
 _PRETTYPRINTER_GENERATE_SSTREAMABLE(std::string_view)
 
+template<>
+struct prettyprinter<bool> {
+
+  inline static std::string format(const bool& v) { return (v ? "true" : "false"); }
+  inline static std::string_view type_name() { return "bool"; }
+  
+};
+
 #undef _PRETTYPRINTER_GENERATE_SSTREAMABLE
 
 /**

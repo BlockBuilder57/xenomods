@@ -22,3 +22,9 @@
 #define STATIC_ASSERT_SIZE(type, size)                                         \
   static_assert(sizeof(type) == size,                                          \
                 STRINGIFY(type) " should have size " STRINGIFY(size));
+
+
+template<class T>
+constexpr T* symbol(void* address) {
+  return static_cast<T*>(address);
+}

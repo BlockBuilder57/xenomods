@@ -1,0 +1,7 @@
+%rename link                old_link
+
+*link:
+%(old_link) --shared --gc-sections --build-id=sha1
+
+*startfile:
+crti%O%s crtbegin%O%s

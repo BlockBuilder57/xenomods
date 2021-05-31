@@ -27,7 +27,15 @@ namespace bf2mods {
 
 	namespace fw::debug {
 
-		void (*drawFont)(int x, int y, mm::Col4* color, const char* fmt, ...);
+		auto temp = reinterpret_cast<void*>(0x71016c2780);
+
+		bool (*drawFont)(int x, int y, mm::Col4* color, const char* fmt, ...);
+
+		GENERATE_SYM_HOOK(drawCompareZ, "_ZN2fw5debug12drawCompareZEb", void, bool val) {
+			
+			skyline::logger::s_Instance->LogFormat("fw::debug::drawCompareZ(%s) -> forcing to false", format_with_typename(val).c_str());
+			drawCompareZBak(false);
+		}
 
 	}
 
@@ -42,6 +50,7 @@ namespace bf2mods {
 			GENERATE_SYM_HOOK(isExecModeDebug, "_ZN2gf9GfManager15isExecModeDebugEv", bool, void* _this) {
 				return true;
 			}
+
 
 		} // namespace GfManager
 
@@ -156,9 +165,14 @@ namespace bf2mods {
 		// this one is hacky but i do not give a rats fucking cock
 		//gf::GfBdatMaplist::getMaplistresourceHook();
 
-		gf::GfGameUtilSkipTravel::isEnableSkipTravelHook();
+		//gf::GfGameUtilSkipTravel::isEnableSkipTravelHook();
 
 		gf::GfMoveJumpControler_calcAngularVelocityHook();
+
+
+		fw::debug::drawCompareZHook();
+
+		//ml::DebDraw_getCacheDrawHook();
 	}
 
 } // namespace bf2mods

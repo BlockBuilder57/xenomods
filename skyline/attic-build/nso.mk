@@ -11,7 +11,8 @@ $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/de
 endif
 
 TOPDIR ?= $(CURDIR)
-include $(DEVKITPRO)/libnx/switch_rules
+#include $(DEVKITPRO)/libnx/switch_rules
+include $(TOPDIR)/switch_rules
 
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
@@ -45,7 +46,7 @@ endif
 CXXFLAGS	:= $(CFLAGS) -std=c++20 -fno-rtti -fomit-frame-pointer -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -enable-libstdcxx-allocator=new -fpermissive 
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS  =  -specs=../switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -Wl,--version-script=$(TOPDIR)/exported.txt -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -nodefaultlibs
+LDFLAGS  =  -specs=../linkerscripts/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -Wl,--version-script=$(TOPDIR)/exported.txt -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -nodefaultlibs
 
 
 LIBS	:= -lgcc -lstdc++ -u malloc
@@ -128,9 +129,9 @@ all: $(BUILD)
 
 $(BUILD):
 	@echo "${SOURCES}"
-	@echo "${CPPFILES}"
+	@echo "${SFILES}"
 	@echo "${CXXFLAGS}"
-	@[ -d $@ ] || mkdir -p $@
+	-mkdir -p $@
 	@cp $(LINKERSCRIPTS)/syms.ld $(LINKERSCRIPTS)/symstemp.ld # This is required because you can't pass a variable to the .specs
 	$(MAKE) -C $(BUILD) -f $(CURDIR)/$(MAKE_NSO)
 	@rm -f $(LINKERSCRIPTS)/symstemp.ld
@@ -151,11 +152,11 @@ DEPENDS	:=	$(OFILES:.o=.d)
 # main targets
 #---------------------------------------------------------------------------------
 %.nso: %.elf
-	@elf2nso $< $@
+	@$(DEVKITPRO)/tools/bin/elf2nso $< $@
 	@echo built ... $(notdir $@)
 
 %.nro: %.elf
-	@elf2nro $< $@ $(NROFLAGS)
+	@$(DEVKITPRO)/tools/bin/elf2nro $< $@ $(NROFLAGS)
 	@echo built ... $(notdir $@)
 
 #---------------------------------------------------------------------------------

@@ -58,3 +58,11 @@ __nx_mod0:
     .word  0
     .word  0
     .word  __nx_module_runtime  - __nx_mod0
+
+// lifted from upstream libnx switch_crt0.s
+//.section .bss.__stack_top, "aw", %nobits
+//.global __stack_top
+//.align 3
+
+//__stack_top:
+//    .space 8

@@ -22,5 +22,6 @@ Once you've done that, simply place all the files from the skyline/patch-bf2 dir
 
 ## Credits
 
-All the Skyline peeps (sorry we couldn't do anything nicer, but at least document your plugin garbage lol)
-3096 for the initial ether repository
+All the Skyline peeps (sorry we couldn't do anything nicer, but at least document your plugin code lol)
+
+3096 for the initial ether repository (and for helping as well)

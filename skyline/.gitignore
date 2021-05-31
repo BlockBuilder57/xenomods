@@ -12,7 +12,6 @@
 *.nam
 *.nro
 *.o
-*.txt
 *.til
 *.pchtxt
 *.ips
@@ -23,6 +22,7 @@ release/
 lib/
 linkerscripts/symstemp.ld
 skyline_patch*/
-scripts/.idea/*
+.idea/
 !exported.txt
 patch-*/
+cmake-build-*/
