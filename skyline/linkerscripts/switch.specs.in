@@ -1,0 +1,8 @@
+# i hate this
+%rename link                old_link
+
+*link:
+%(old_link) -T @SKYLINE_LINKERSCRIPTS_DIR@/application.ld @SKYLINE_LINKERSCRIPTS_DIR@/syms.ld --shared --gc-sections --build-id=sha1
+
+*startfile:
+crti%O%s crtbegin%O%s

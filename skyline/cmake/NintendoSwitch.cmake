@@ -69,10 +69,10 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Shared libs not available for target")
 
-set(ARCH "-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec")
+set(ARCH "-march=armv8-a -mtune=cortex-a57 -mtp=soft  -ftls-model=local-exec")
 set(CMAKE_ASM_FLAGS "-x assembler-with-cpp -g ${ARCH}")
-set(CMAKE_C_FLAGS "${ARCH} -D__SWITCH__ -D__SKYLINE__ -fomit-frame-pointer -ffunction-sections -isystem ${DEVKITPRO}/libnx/include -I${PROJECT_SOURCE_DIR}/libs/libeiffel/include")
+set(CMAKE_C_FLAGS "-fPIC ${ARCH} -D__SWITCH__ -D__SKYLINE__ -fomit-frame-pointer -ffunction-sections -isystem ${DEVKITPRO}/libnx/include -I${PROJECT_SOURCE_DIR}/libs/libeiffel/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-rtti -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -fpermissive")
-set(CMAKE_EXE_LINKER_FLAGS "-specs=${PROJECT_SOURCE_DIR}/linkerscripts/switch.specs -Wl,-T,${PROJECT_SOURCE_DIR}/linkerscripts/application.ld,${PROJECT_SOURCE_DIR}/linkerscripts/syms.ld -Wl,--version-script=${PROJECT_SOURCE_DIR}/exported.txt -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -nodefaultlibs")
+set(CMAKE_EXE_LINKER_FLAGS "-v -specs=${PROJECT_BINARY_DIR}/switch.specs -Wl,--version-script=${PROJECT_SOURCE_DIR}/exported.txt -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -L ${DEVKITPRO}/portlibs/switch/lib -L ${DEVKITPRO}/libnx/lib")
 
 
