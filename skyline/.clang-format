@@ -14,6 +14,8 @@ IndentWidth: 4
 SpacesInSquareBrackets: false
 
 UseTab: Always
+PointerAlignment: Left
+DerivePointerAlignment: false
 
 IndentPPDirectives: BeforeHash
 

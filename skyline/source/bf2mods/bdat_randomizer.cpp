@@ -1,4 +1,5 @@
 #include "bdat_randomizer.hpp"
+#include "plugin.hpp"
 
 #include "bf2mods/stuff/utils/util.hpp"
 #include "skyline/logger/Logger.hpp"
@@ -23,17 +24,25 @@ namespace bf2mods {
 
 		std::uint64_t (*getIdTop)(std::uint8_t*);
 
-		std::uint64_t (*getSheetName)(std::uint8_t*);
+		char* (*getSheetName)(std::uint8_t*);
 
 		GENERATE_SYM_HOOK(getMSText, "_ZN4Bdat9getMSTextEPhi", char*, std::uint8_t* bdatData, int n) {
 			//skyline::logger::s_Instance->LogFormat("Bdat::getMSText(bdat: %p, n: %d)", bdatData, n);
+			char* message;
 
-			int new_n = (util::nnRand<int16_t>() % Bdat::getIdCount(bdatData)) + Bdat::getIdTop(bdatData);
-			auto message = Bdat::getMSTextBak(bdatData, new_n);
-
-			// sets the text to the name of the bdat sheet
-			//auto message = Bdat::getSheetName(bdatData);
-
+			switch (Plugin::getSharedStatePtr()->options.bdat.scrambleType) {
+				case SharedState::Options::BdatOptions::ScrambleType::ScrambleIndex:
+					// scrambles the index of the ms text sheet
+					message = Bdat::getMSTextBak(bdatData, (util::nnRand<int16_t>() % Bdat::getIdCount(bdatData)) + Bdat::getIdTop(bdatData));
+					break;
+				case SharedState::Options::BdatOptions::ScrambleType::ShowSheetName:
+					message = Bdat::getSheetName(bdatData);
+					break;
+				case SharedState::Options::BdatOptions::ScrambleType::Off:
+				default:
+					message = Bdat::getMSTextBak(bdatData, n);
+					break;
+			}
 
 			//skyline::logger::s_Instance->LogFormat("Bdat %d overridden to %d", n, new_n);
 

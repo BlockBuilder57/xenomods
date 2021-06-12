@@ -1,10 +1,11 @@
 #pragma once
 
-#include "bf2mods/fw/camera.hpp"
 #include "utils.hpp"
+#include "prettyprinter.hpp"
 
 #ifdef __SKYLINE__
 #include "nn/hid.hpp"
+
 #else
 #include <switch.h>
 #endif
@@ -12,41 +13,63 @@
 namespace bf2mods {
 
 #ifdef __SKYLINE__
-using HidControllerKeyData = nn::hid::HidControllerKeys;
+	using HidControllerKeyData = nn::hid::HidControllerKeys;
 #else
-using HidControllerKeyData = HidControllerKeys;
+	using HidControllerKeyData = HidControllerKeys;
 #endif
 
-STATIC_ASSERT_SIZE(HidControllerKeyData, 4);
+	STATIC_ASSERT_SIZE(HidControllerKeyData, 4);
 
-struct SharedState {
-  struct Options {
-    bool disableVisionBgm;
+	struct SharedState {
+		struct Options {
+			struct BdatOptions {
+				enum class ScrambleType : std::uint8_t {
+					Off,
+					ScrambleIndex,
+					ShowSheetName,
+					Count
+				} scrambleType;
 
-    struct FreeCamOptions {
-      fw::DEBUG_CAMERA freeCamType;
-      struct KeyMap {
-        HidControllerKeyData toggle;
-        HidControllerKeyData forward;
-        HidControllerKeyData backward;
-        HidControllerKeyData zoomIn;
-        HidControllerKeyData zoomOut;
-        HidControllerKeyData fovIncrease;
-        HidControllerKeyData fovDecrease;
-        HidControllerKeyData bankLeft;
-        HidControllerKeyData bankRight;
-        HidControllerKeyData teleport;
-      } keyMap;
-    } freeCam;
+				bool mapListResourceOverride;
+			} bdat;
 
-  } options;
+			struct Gameplay {
+				bool disableFallDamage;
+				float movementSpeedMult;
+			} game;
 
-  struct FreeCamState {
-    bool isToggledOn;
-  } freeCam;
-};
+		} options;
+
+		int mapjumpId;
+		int testInt;
+
+		bool moonJump;
+	};
 
 #define ALIGN_UP(x, a) (((x) + ((a)-1)) & ~((a)-1))
-static constexpr auto SHARED_MEM_SIZE = ALIGN_UP(sizeof(SharedState), 0x1000);
+	static constexpr auto SHARED_MEM_SIZE = ALIGN_UP(sizeof(SharedState), 0x1000);
+
+	template<>
+	struct Prettyprinter<SharedState::Options::BdatOptions::ScrambleType> {
+		inline static std::string format(const SharedState::Options::BdatOptions::ScrambleType &opt) {
+			std::stringstream ss;
+			switch (opt) {
+				case SharedState::Options::BdatOptions::ScrambleType::ScrambleIndex:
+					ss << "Scramble Index";
+					break;
+				case SharedState::Options::BdatOptions::ScrambleType::ShowSheetName:
+					ss << "Show Bdat Sheet Name";
+					break;
+				case SharedState::Options::BdatOptions::ScrambleType::Off:
+				default:
+					ss << "Disabled";
+					break;
+			}
+			return ss.str();
+		}
+
+		inline static std::string_view type_name() { return "BdatOptions::ScrambleType"; }
+
+	};
 
 } // namespace bf2mods

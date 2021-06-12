@@ -1,3 +1,6 @@
+#ifndef BF2MODS_PRETTYPRINTER
+#define BF2MODS_PRETTYPRINTER
+
 #include <sstream>
 #include <string>
 
@@ -6,18 +9,21 @@ namespace bf2mods {
 /**
  * A prettyprinter.
  */
-template <class T, typename = void> struct prettyprinter {
+template <class T, typename = void> struct Prettyprinter {
   using _nope = void;
 
   // inline static std::string format(const T&) { return "formatted"; }
-  // Prettyprints the given value.
+  // Prettyprints the given value, returning a string.
 
   // inline static std::string_view type_name() { return "T"; }
-  // Returns the typename of the value.
+  // Returns the typename of the value, returning a string_view.
+  // This is permitted to be read only, and in fact, should be read only.
 };
 
+// Generate a base implementation for types which are already
+// printable with std::stringstream (and ultimately the base IOStreams library)
 #define _PRETTYPRINTER_GENERATE_SSTREAMABLE(T)                                 \
-  template <> struct prettyprinter<T> {                                        \
+  template <> struct Prettyprinter<T> {                                        \
     inline static std::string format(const T &value) {                         \
       std::stringstream ss;                                                    \
       ss << value;                                                             \
@@ -42,8 +48,11 @@ _PRETTYPRINTER_GENERATE_SSTREAMABLE(double)
 _PRETTYPRINTER_GENERATE_SSTREAMABLE(std::string)
 _PRETTYPRINTER_GENERATE_SSTREAMABLE(std::string_view)
 
+/**
+ * Specialization of prettyprinter for the bool type.
+ */
 template<>
-struct prettyprinter<bool> {
+struct Prettyprinter<bool> {
 
   inline static std::string format(const bool& v) { return (v ? "true" : "false"); }
   inline static std::string_view type_name() { return "bool"; }
@@ -58,7 +67,19 @@ struct prettyprinter<bool> {
  */
 template <class T> inline std::string format_with_typename(const T &t) {
   std::stringstream ss;
-  ss << prettyprinter<T>::type_name() << ' ' << prettyprinter<T>::format(t);
+  ss << Prettyprinter<T>::type_name() << ' ' << Prettyprinter<T>::format(t);
   return ss.str();
 }
+
+/**
+ * Plain formats a value.
+ * Essentially a fancy wrapper for Prettyprinter<T>::format().
+ */
+template <class T>
+inline std::string format(const T& t) {
+  return Prettyprinter<T>::format(t);
+}
+
 } // namespace bf2mods
+
+#endif

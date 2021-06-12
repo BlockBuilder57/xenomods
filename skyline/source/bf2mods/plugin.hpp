@@ -22,7 +22,7 @@ namespace bf2mods {
 		SlPluginMeta m_pluginMeta;
 
 		SharedMemory m_sharedMemStruct;
-		SharedState* mp_sharedState;
+		SharedState* m_sharedState;
 
 		void setDefaultOptions_();
 		void sharedStateInit_();
@@ -37,7 +37,7 @@ namespace bf2mods {
 		}
 
 		inline bf2mods::SharedState* getSharedStatePtr_() const {
-			return mp_sharedState;
+			return m_sharedState;
 		}
 
 	   public:
