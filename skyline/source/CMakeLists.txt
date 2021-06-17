@@ -16,6 +16,9 @@ set(_SKYLINE_SOURCES
 	bf2mods/plugin.cpp
 	bf2mods/plugin_main.cpp
 
+	bf2mods/stuff/utils/debug_util.cpp
+	bf2mods/stuff/utils/util.cpp
+
 	nvn/pfnc.cpp
 
 	skyline/efl/service.cpp
@@ -52,7 +55,7 @@ set(_SKYLINE_SOURCES
 
 
 
-		)
+	)
 
 # this isn't a part of skyline but we're continuing the hacky way of getting it to work for the time being
 # but hey, at least i made it techinically a seperate target, right?

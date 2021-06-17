@@ -86,6 +86,8 @@ namespace mm {
 	};
 	static_assert(sizeof(Vec3) == 0xC, "size 0xC");
 
+	using Transform = Vec3;
+
 	struct Quat {
 		float a;
 		float b;
