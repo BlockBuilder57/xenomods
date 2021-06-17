@@ -11,8 +11,10 @@ set(_SKYLINE_SOURCES
 	operator.cpp
 
 	bf2mods/bdat_randomizer.cpp
+	bf2mods/bf2logger.cpp
 	bf2mods/debug_stuff.cpp
 	bf2mods/party_selector.cpp
+	bf2mods/player_movement.cpp
 	bf2mods/plugin.cpp
 	bf2mods/plugin_main.cpp
 
@@ -61,8 +63,10 @@ set(_SKYLINE_SOURCES
 # but hey, at least i made it techinically a seperate target, right?
 set(_BF2MODS_SOURCES
 	bf2mods/bdat_randomizer.cpp
+	bf2mods/bf2logger.cpp
 	bf2mods/debug_stuff.cpp
 	bf2mods/party_selector.cpp
+	bf2mods/player_movement.cpp
 	bf2mods/plugin.cpp
 	bf2mods/plugin_main.cpp	
 )

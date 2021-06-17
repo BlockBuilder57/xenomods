@@ -28,11 +28,11 @@ namespace bf2mods {
 		m_sharedState->options.bdat.scrambleType = SharedState::Options::BdatOptions::ScrambleType::Off;
 		m_sharedState->options.bdat.mapListResourceOverride = false;
 
-		m_sharedState->options.game.disableFallDamage = false;
+		m_sharedState->options.game.disableFallDamage = true;
 		m_sharedState->options.game.movementSpeedMult = 1.f;
 
 		m_sharedState->mapjumpId = 1;
-		m_sharedState->testInt = 1;
+		m_sharedState->testInt = 0;
 
 		m_sharedState->moonJump = false;
 	}

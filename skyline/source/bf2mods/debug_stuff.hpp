@@ -6,6 +6,8 @@ namespace fw {
 	namespace debug {
 		extern bool (*drawAxis)(const mm::Mat44* transform, float scale);
 		extern bool (*drawFont)(int x, int y, const mm::Col4* color, const char* fmt, ...);
+		extern int (*drawFontGetWidth)(const char* fmt, ...);
+		extern int (*drawFontGetHeight)(const char* fmt, ...);
 		extern void (*drawCompareZ)(bool compare);
 	}
 }
@@ -50,8 +52,6 @@ namespace gf {
 }
 
 namespace bf2mods {
-
-
 
 	void DoMapJump(unsigned int mapjumpId);
 	void PlaySE(unsigned int soundEffect);

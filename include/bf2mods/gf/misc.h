@@ -62,8 +62,38 @@ namespace gf {
 	};
 
 	struct MsgObjectGetVelocity {
-		INSERT_PADDING_BYTES(16)
+		INSERT_PADDING_BYTES(16);
 		mm::Vec3 velocity;
+	};
+
+	namespace pc {
+
+		struct FallDamagePlugin { /* Player controller fall damage */
+			void* vtable;
+			void* pluginPtr;
+			void* attachObj;
+			float fallMaxHeight;
+			float probablyAnotherFloat;
+			void* alsoTheAttachObjMaybe;
+		};
+
+	} // namespace pc
+
+	struct PlayerCameraTarget {
+		INSERT_PADDING_BYTES(32);
+		mm::Vec3 moverPos;
+		INSERT_PADDING_BYTES(22);
+		bool inAir;
+		bool bool0x43;
+		bool aboveWalkableGround;
+		bool inBattleCamera;
+		bool groundSwimmable;
+		bool bool0x47;
+		float surfaceHeight;
+		float maybeHeight2;
+		mm::Vec3 surfaceNormal;
+		float maybeHeight3;
+		mm::Vec3 lowerVector;
 	};
 
 } // namespace gf

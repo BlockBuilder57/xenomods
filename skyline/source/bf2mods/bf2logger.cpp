@@ -1,4 +1,4 @@
-#include "bf2logger.h"
+#include "bf2logger.hpp"
 
 #include "debug_stuff.hpp" // fw::debug
 #include "skyline/logger/Logger.hpp"
