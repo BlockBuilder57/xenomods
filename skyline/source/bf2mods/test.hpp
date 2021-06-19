@@ -106,6 +106,7 @@ namespace event {
 	   public:
 		void drawInfo();
 		void setSyncFreeCam(bool, bool);
+		bool isPlayCancel() const;
 	};
 
 } // namespace event
@@ -116,8 +117,9 @@ GENERATE_SYM_HOOK(eventManagerUpdate, "_ZN5event7Manager6updateEv", void, event:
 	// if (not bruh) {
 	//     bruh = true;
 	// }
-	p_this->drawInfo();
-	// p_this->setSyncFreeCam(true, true);
+	if (!p_this->isPlayCancel())
+		p_this->drawInfo();
+	//p_this->setSyncFreeCam(true, true);
 	return eventManagerUpdateBak(p_this);
 }
 
@@ -268,7 +270,7 @@ void logX(InlineCtx* ctx) {
 }
 
 void testhook() {
-	// eventManagerUpdateHook();
+	eventManagerUpdateHook();
 	mlDevKeyboardGetVkHoldHook();
 	eventCamManUpdateHook();
 	eventCamFreeUpdateHook();

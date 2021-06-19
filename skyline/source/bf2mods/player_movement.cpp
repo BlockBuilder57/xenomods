@@ -9,7 +9,7 @@
 #include "skyline/logger/Logger.hpp"
 
 #include <bf2mods/prettyprinter.hpp>
-#include <bf2mods/gf/misc.h>
+#include <bf2mods/gf/player_controller.hpp>
 
 namespace gf {
 

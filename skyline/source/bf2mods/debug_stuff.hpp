@@ -53,6 +53,8 @@ namespace gf {
 
 namespace bf2mods {
 
+	extern int bgmTrackIndex;
+
 	void DoMapJump(unsigned int mapjumpId);
 	void PlaySE(unsigned int soundEffect);
 	void PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect);
