@@ -82,6 +82,7 @@ add_executable(skyline ${_SKYLINE_SOURCES})
 target_include_directories(skyline PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(skyline PUBLIC ${PROJECT_SOURCE_DIR}/../include)
 target_include_directories(skyline PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(skyline PUBLIC ${PROJECT_SOURCE_DIR}/build)
 
 target_link_options(skyline PUBLIC -u malloc)
 #target_link_libraries(skyline bf2mods)

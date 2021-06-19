@@ -41,6 +41,14 @@ namespace fw {
 
 } // namespace fw
 
+namespace tl {
+
+	namespace TitleMain {
+		void (*returnTitle)(/*SAVESLOT*/unsigned int slot);
+	} // namespace TitleMain
+
+} // namespace tl
+
 namespace mm {
 
 	namespace MMStdBase {
@@ -133,6 +141,10 @@ namespace bf2mods {
 		gf::GfMenuObjUtil::playSE(soundEffect);
 	}
 
+	void ReturnTitle(unsigned int slot) {
+		tl::TitleMain::returnTitle(slot);
+	}
+
 	void SetupDebugStuff() {
 		mm::MMStdBase::mmAssertHook();
 
@@ -165,6 +177,7 @@ namespace bf2mods {
 		// Resolve some game framework symbols
 		util::ResolveSymbol<decltype(gf::GfPlayFactory::createSkipTravel)>(&gf::GfPlayFactory::createSkipTravel, "_ZN2gf13GfPlayFactory16createSkipTravelEj");
 		util::ResolveSymbol<decltype(gf::GfMenuObjUtil::playSE)>(&gf::GfMenuObjUtil::playSE, "_ZN2gf13GfMenuObjUtil6playSEEj");
+		util::ResolveSymbol<decltype(tl::TitleMain::returnTitle)>(&tl::TitleMain::returnTitle, "_ZN2tl9TitleMain11returnTitleEN2gf8SAVESLOTE");
 	}
 
 } // namespace bf2mods

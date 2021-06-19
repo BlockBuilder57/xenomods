@@ -29,7 +29,10 @@ patch-$(CODE_NAME)/:
 	mkdir -pv $@
 
 skyline:
+	/mingw64/bin/cmake -P $(SCRIPTS_DIR)/gittag.cmake
+
 	$(MAKE) all -f $(MAKE_NSO) MAKE_NSO=$(MAKE_NSO) BUILD=$(BUILD_DIR) TARGET=$(NAME)
+	
 # this automatically packages up into a patch-$(CODENAME) dir
 	cp skyline.nso patch-$(CODE_NAME)/$(SUBSDK_NAME)
 	cp $(CODE_NAME).npdm patch-$(CODE_NAME)/main.npdm

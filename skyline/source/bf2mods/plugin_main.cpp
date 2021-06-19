@@ -7,6 +7,7 @@
 #include "player_movement.hpp"
 #include "bdat_randomizer.hpp"
 #include "test.hpp"
+
 #include <bf2mods/mm/math_types.hpp>
 
 namespace fw {
@@ -28,6 +29,8 @@ namespace fw {
 
 		static constexpr auto KEY_MOONJUMP = nn::hid::KEY_R | nn::hid::KEY_B;
 		static constexpr auto KEY_DISABLE_FALL_DAMAGE = nn::hid::KEY_A;
+
+		static constexpr auto KEY_RETURN_TO_TITLE = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR;
 
 		auto btnHeld = [](std::uint64_t combo, std::uint64_t buttons) -> bool {
 			return (buttons & combo) == combo;
@@ -126,6 +129,11 @@ namespace fw {
 			if(btnDown(KEY_PLAYSE, curP2Buttons, prevP2Buttons)) {
 				bf2mods::g_Logger->LogInfo("Sound effect %d (0x%x)", bf2mods::Plugin::getSharedStatePtr()->mapjumpId, bf2mods::Plugin::getSharedStatePtr()->mapjumpId);
 				bf2mods::PlaySE(bf2mods::Plugin::getSharedStatePtr()->mapjumpId);
+			}
+
+			if (btnDown(KEY_RETURN_TO_TITLE, curP2Buttons, prevP2Buttons)) {
+				bf2mods::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
+				bf2mods::ReturnTitle(-1);
 			}
 		}
 

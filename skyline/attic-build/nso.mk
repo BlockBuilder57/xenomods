@@ -27,7 +27,7 @@ TARGET		?=	$(notdir $(CURDIR))
 BUILD		?=	build
 SOURCES		:= 	source $(filter-out %.c %.cpp %.s,$(wildcard source/* source/*/* source/*/*/* source/*/*/*/*))
 DATA		:=	data
-INCLUDES	:=	include libs/libeiffel/include ../include
+INCLUDES	:=	include libs/libeiffel/include ../include build
 
 #---------------------------------------------------------------------------------
 # options for code generation

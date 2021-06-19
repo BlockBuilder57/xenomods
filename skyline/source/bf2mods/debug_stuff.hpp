@@ -58,6 +58,7 @@ namespace bf2mods {
 	void DoMapJump(unsigned int mapjumpId);
 	void PlaySE(unsigned int soundEffect);
 	void PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect);
+	void ReturnTitle(unsigned int slot);
 
 	template<typename... Args> bool DrawDebugFont(int x, int y, const char* fmt, Args... args);
 

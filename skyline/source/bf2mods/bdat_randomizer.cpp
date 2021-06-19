@@ -1,8 +1,11 @@
 #include "bdat_randomizer.hpp"
 #include "plugin.hpp"
 
+#include "nn/oe.h"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "skyline/logger/Logger.hpp"
+
+#include <version.h>
 
 namespace bf2mods {
 
@@ -26,9 +29,30 @@ namespace bf2mods {
 
 		char* (*getSheetName)(std::uint8_t*);
 
-		GENERATE_SYM_HOOK(getMSText, "_ZN4Bdat9getMSTextEPhi", char*, std::uint8_t* bdatData, int n) {
+		GENERATE_SYM_HOOK(getMSText, "_ZN4Bdat9getMSTextEPhi", const char*, std::uint8_t* bdatData, int n) {
 			//skyline::logger::s_Instance->LogFormat("Bdat::getMSText(bdat: %p, n: %d)", bdatData, n);
-			char* message;
+			const char* sheetName;
+			const char* message;
+
+			sheetName = Bdat::getSheetName(bdatData);
+
+			if (strcmp(sheetName, "menu_ms") == 0) {
+				// I don't like hardcoding these but they don't seem to change between versions
+				// it's unfortunately nicer (imo) than doing a string comparison
+				if (n == 1830) {
+					//nn::oe::DisplayVersion displayVersion;
+					//nn::oe::GetDisplayVersion(&displayVersion);
+
+					std::stringstream ss;
+					ss << "(" << version::tagDirty << ") ";
+
+					return ss.str().c_str();
+				}
+				else if (n == 1610) {
+					// it says "Loading" in the japanese version too so I'm not allowed to moan about hardcoding this
+					return "Loading (modded)";
+				}
+			}
 
 			switch (Plugin::getSharedStatePtr()->options.bdat.scrambleType) {
 				case SharedState::Options::BdatOptions::ScrambleType::ScrambleIndex:
@@ -36,7 +60,7 @@ namespace bf2mods {
 					message = Bdat::getMSTextBak(bdatData, (util::nnRand<int16_t>() % Bdat::getIdCount(bdatData)) + Bdat::getIdTop(bdatData));
 					break;
 				case SharedState::Options::BdatOptions::ScrambleType::ShowSheetName:
-					message = Bdat::getSheetName(bdatData);
+					message = sheetName;
 					break;
 				case SharedState::Options::BdatOptions::ScrambleType::Off:
 				default:
