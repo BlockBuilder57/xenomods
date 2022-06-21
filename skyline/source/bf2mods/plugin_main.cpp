@@ -6,6 +6,7 @@
 #include "debug_stuff.hpp"
 #include "player_movement.hpp"
 #include "bdat_randomizer.hpp"
+#include "menu_viewer.hpp"
 #include "test.hpp"
 
 #include <bf2mods/mm/math_types.hpp>
@@ -31,6 +32,9 @@ namespace fw {
 		static constexpr auto KEY_DISABLE_FALL_DAMAGE = nn::hid::KEY_A;
 
 		static constexpr auto KEY_RETURN_TO_TITLE = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR;
+
+		static constexpr auto KEY_LAYER_OPEN = nn::hid::KEY_R | nn::hid::KEY_PLUS;
+		static constexpr auto KEY_LAYER_CLOSE = nn::hid::KEY_R | nn::hid::KEY_MINUS;
 
 		auto btnHeld = [](std::uint64_t combo, std::uint64_t buttons) -> bool {
 			return (buttons & combo) == combo;
@@ -107,16 +111,28 @@ namespace fw {
 				bf2mods::Plugin::getSharedStatePtr()->options.game.disableFallDamage = !bf2mods::Plugin::getSharedStatePtr()->options.game.disableFallDamage;
 				bf2mods::g_Logger->LogInfo("Disable fall damage: %s", bf2mods::format(bf2mods::Plugin::getSharedStatePtr()->options.game.disableFallDamage).c_str());
 			}
+
+			if (btnDown(KEY_LAYER_OPEN, curP2Buttons, prevP2Buttons)) {
+				bf2mods::g_Logger->LogInfo("Opening layer %u", bf2mods::Plugin::getSharedStatePtr()->mapjumpId);
+				bf2mods::OpenLayer(bf2mods::Plugin::getSharedStatePtr()->mapjumpId);
+			}
+			if (btnDown(KEY_LAYER_CLOSE, curP2Buttons, prevP2Buttons)) {
+				bf2mods::g_Logger->LogInfo("Closing layer %u", bf2mods::Plugin::getSharedStatePtr()->mapjumpId);
+				bf2mods::CloseLayer(bf2mods::Plugin::getSharedStatePtr()->mapjumpId);
+			}
 		}
 		else {
 			if(btnDown(KEY_MAPJUMP_INC, curP2Buttons, prevP2Buttons)) {
 				bf2mods::Plugin::getSharedStatePtr()->mapjumpId++;
+				if (bf2mods::Plugin::getSharedStatePtr()->mapjumpId >= 298)
+					bf2mods::Plugin::getSharedStatePtr()->mapjumpId = 1;
+
 				bf2mods::g_Logger->LogInfo("MapJump++, now %d", bf2mods::Plugin::getSharedStatePtr()->mapjumpId);
 			}
 			if(btnDown(KEY_MAPJUMP_DEC, curP2Buttons, prevP2Buttons)) {
 				bf2mods::Plugin::getSharedStatePtr()->mapjumpId--;
 				if (bf2mods::Plugin::getSharedStatePtr()->mapjumpId <= 0)
-					bf2mods::Plugin::getSharedStatePtr()->mapjumpId = 1;
+					bf2mods::Plugin::getSharedStatePtr()->mapjumpId = 297;
 
 				bf2mods::g_Logger->LogInfo("MapJump--, now %d", bf2mods::Plugin::getSharedStatePtr()->mapjumpId);
 			}
@@ -156,6 +172,7 @@ namespace bf2mods {
 		SetupDebugStuff();
 		SetupPlayerMovementHooks();
 		SetupBdatRandomizer();
+		SetupMenuViewer();
 
 		// lazy
 		testhook();

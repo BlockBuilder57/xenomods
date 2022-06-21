@@ -44,6 +44,7 @@ namespace bf2mods {
 		int testInt;
 
 		bool moonJump;
+		bool layerOverwrite;
 	};
 
 #define ALIGN_UP(x, a) (((x) + ((a)-1)) & ~((a)-1))
