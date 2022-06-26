@@ -43,7 +43,7 @@ namespace mm {
 			y *= rhs;
 			z *= rhs;
 			return *this;
-		}
+                }
 
 		inline float LengthSqu() const { return std::sqrt(x * x + y * y + z * z); }
 		inline float XZLengthSqu() const { return std::sqrt(x * x + z * z); }

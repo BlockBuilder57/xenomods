@@ -3,13 +3,14 @@
 #include "skyline/efl/service.hpp"
 
 // all parts here
-#include "debug_stuff.hpp"
-#include "player_movement.hpp"
-#include "bdat_randomizer.hpp"
-#include "menu_viewer.hpp"
-#include "test.hpp"
-
 #include <bf2mods/mm/math_types.hpp>
+
+#include "bdat_randomizer.hpp"
+#include "camera_tools.hpp"
+#include "debug_stuff.hpp"
+#include "menu_viewer.hpp"
+#include "player_movement.hpp"
+#include "test.hpp"
 
 namespace fw {
 
@@ -173,6 +174,7 @@ namespace bf2mods {
 		SetupPlayerMovementHooks();
 		SetupBdatRandomizer();
 		SetupMenuViewer();
+		SetupCameraTools();
 
 		// lazy
 		testhook();

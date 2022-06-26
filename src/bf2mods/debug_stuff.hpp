@@ -9,6 +9,9 @@ namespace fw {
 		extern int (*drawFontGetWidth)(const char* fmt, ...);
 		extern int (*drawFontGetHeight)(const char* fmt, ...);
 		extern void (*drawCompareZ)(bool compare);
+
+		extern unsigned (*drawArrow)(const mm::Vec3& vStart, const mm::Vec3& vEnd, const mm::Col4& color);
+		extern unsigned (*drawLine)(const mm::Vec3& vStart, const mm::Vec3& vEnd, const mm::Col4& color);
 	}
 }
 

@@ -12,6 +12,7 @@ set(_SKYLINE_SOURCES
 
 	bf2mods/bdat_randomizer.cpp
 	bf2mods/bf2logger.cpp
+	bf2mods/camera_tools.cpp
 	bf2mods/debug_stuff.cpp
 	bf2mods/party_selector.cpp
 	bf2mods/player_movement.cpp
@@ -88,6 +89,8 @@ target_include_directories(skyline PUBLIC ${PROJECT_SOURCE_DIR}/build)
 
 target_link_options(skyline PUBLIC -u malloc)
 #target_link_libraries(skyline bf2mods)
+
+target_link_libraries(skyline PUBLIC glm::glm)
 
 # in this house we use c++20
 set_property(TARGET skyline PROPERTY CXX_STANDARD 20)

@@ -25,9 +25,9 @@ include $(TOPDIR)/switch_rules
 # NOTE: TARGET and BUILD are now passed from parent Makefile
 TARGET		?=	$(notdir $(CURDIR))
 BUILD		?=	build
-SOURCES		:= 	source $(filter-out %.c %.cpp %.s,$(wildcard source/* source/*/* source/*/*/* source/*/*/*/*))
+SOURCES		:= 	src $(filter-out %.c %.cpp %.s,$(wildcard src/* src/*/* src/*/*/* src/*/*/*/*))
 DATA		:=	data
-INCLUDES	:=	include libs/libeiffel/include ../include build
+INCLUDES	:=	include libs/libeiffel/include build
 
 #---------------------------------------------------------------------------------
 # options for code generation

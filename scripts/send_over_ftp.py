@@ -30,6 +30,11 @@ def ensuredirectory(connection, root, path):
         connection.mkd(f'{root}/{path}')
 
 
+def send_file(conn, filename, out):
+    print(f'Sending {filename} to FTP path "{conn.pwd()}/{out}"')
+    conn.storbinary(f'STOR {out}', open(filename, 'rb'))
+
+
 FTPD_PORT = 5000
 
 
@@ -51,18 +56,16 @@ if __name__ == "__main__":
     ftp.connect(consoleIP, FTPD_PORT)
     print('Connected!')
 
+    ftp.login() # anonymous logon
+
+    # Ensure required directories exist on the console
     ensuredirectory(ftp, '/atmosphere', 'contents')
     ensuredirectory(ftp, '/atmosphere/contents', program_id)
     ensuredirectory(ftp, f'/atmosphere/contents/{program_id}', 'exefs')
 
-    binaryPath = f'{os.path.basename(os.getcwd())}.nso'
-    print(binaryPath)
-    if os.path.isfile(binaryPath):
-        sdPath = f'/atmosphere/contents/{program_id}/exefs/{subsdk_name}'
-        print(f'Sending {sdPath}')
-        ftp.storbinary(f'STOR {sdPath}', open(binaryPath, 'rb'))
+    ftp.cwd(f'/atmosphere/contents/{program_id}/exefs')
+    ##print(f'current working directory on ftp site is {ftp.pwd()}')
 
-        metaPath = f'{code_name}.npdm'
-        sdPath = f'/atmosphere/contents/{program_id}/exefs/main.npdm'
-        print(f'Sending {sdPath}')
-        ftp.storbinary(f'STOR {sdPath}', open(metaPath, 'rb'))
+    # Send Gucci Mane
+    send_file(ftp, './skyline.nso', f'./{subsdk_name}')
+    send_file(ftp, f'./{code_name}.npdm', f'./main.npdm')

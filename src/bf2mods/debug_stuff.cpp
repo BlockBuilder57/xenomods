@@ -25,6 +25,9 @@ namespace fw {
 		int (*drawFontGetHeight)(const char* fmt, ...);
 		void (*drawCompareZ)(bool compare);
 
+		unsigned (*drawArrow)(const mm::Vec3& vStart, const mm::Vec3& vEnd, const mm::Col4& color);
+		unsigned (*drawLine)(const mm::Vec3& vStart, const mm::Vec3& vEnd, const mm::Col4& color);
+
 	}
 
 	namespace PadManager {
@@ -40,6 +43,26 @@ namespace fw {
 	}
 
 } // namespace fw
+
+namespace ml {
+
+	namespace DrMdlMan {
+
+		/*uint8_t(*headerChek)(const char* buffer);
+
+		GENERATE_SYM_HOOK(createMdl, "_ZN2ml8DrMdlMan9createMdlEPKvPKci", void*, void* that, char* model_buffer, const char* model_path, int unknown) {
+			bf2mods::g_Logger->LogInfo("Loading model \"%s\" - magic %c%c%c%c, chek %d", model_path, model_buffer[0], model_buffer[1], model_buffer[2], model_buffer[3], headerChek(model_buffer));
+			return createMdlBak(that, model_buffer, model_path, unknown);
+		}
+
+		GENERATE_SYM_HOOK(createInstantMdl, "_ZN2ml8DrMdlMan16createInstantMdlEPKvPKci", void*, void* that, char* model_buffer, const char* model_path, int unknown) {
+			bf2mods::g_Logger->LogInfo("Loading instant model \"%s\"", model_path);
+			return createMdlBak(that, model_buffer, model_path, unknown);
+		}*/
+
+	}
+
+}
 
 namespace tl {
 
@@ -156,6 +179,10 @@ namespace bf2mods {
 		util::ResolveSymbol<decltype(fw::debug::drawFontGetHeight)>(&fw::debug::drawFontGetHeight, "_ZN2fw5debug17drawFontGetHeightEv");
 		util::ResolveSymbol<decltype(fw::debug::drawCompareZ)>(&fw::debug::drawCompareZ, "_ZN2fw5debug12drawCompareZEb");
 
+
+		util::ResolveSymbol<decltype(fw::debug::drawArrow)>(&fw::debug::drawArrow, "_ZN2fw5debug9drawArrowERKN2mm4Vec3ES4_RKNS1_4Col4E");
+		util::ResolveSymbol<decltype(fw::debug::drawLine)>(&fw::debug::drawLine, "_ZN2fw5debug8drawLineERKN2mm4Vec3ES4_RKNS1_4Col4E");
+
 		//util::ResolveSymbol<void(*)()>(&cxa_pure_virtual, "__cxa_pure_virtual");
 
 		/*uintptr_t cxa_pure_virtual;
@@ -170,6 +197,10 @@ namespace bf2mods {
 
 		util::ResolveSymbol<decltype(fw::PadManager::enableDebugDraw)>(&fw::PadManager::enableDebugDraw, "_ZN2fw10PadManager15enableDebugDrawEb");
 		fw::PadManager::updateHook();
+
+		//util::ResolveSymbol<decltype(ml::DrMdlMan::headerChek)>(&ml::DrMdlMan::headerChek, "_ZN2ml8DrMdlMan10headerChekEPKv");
+		//ml::DrMdlMan::createMdlHook();
+		//ml::DrMdlMan::createInstantMdlHook();
 
 		//event::MovieManager_makePathHook();
 		gf::BgmTrack_updateHook();

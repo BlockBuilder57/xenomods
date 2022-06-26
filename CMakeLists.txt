@@ -13,4 +13,4 @@ set(SKYLINE_LINKERSCRIPTS_DIR "${PROJECT_SOURCE_DIR}/linkerscripts")
 configure_file(${PROJECT_SOURCE_DIR}/linkerscripts/switch.specs.in ${PROJECT_BINARY_DIR}/switch.specs)
 
 
-add_subdirectory(source)
+add_subdirectory(src)
