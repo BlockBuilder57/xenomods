@@ -1,23 +1,19 @@
 _notes/
 
-# temporary staging directory from skyline/bf2mods make stuff
-patch-*/
 .idea/
+cmake-build-*/
+
 .vscode/
 .vs/
 
-# temp for skyline buildsystem
+# generic build directory
 build/
 
-# below is not temporary if you remove it your cock will be lit on fire with hand sanitizer
-cmake-build-*/
-
-# temporary skyline buildsystem (binaries go in the repo root for some reason)
+# some just in case stuff
 *.elf
 *.nso
-
-# """"generated"""" by best value skyline buildsystem
-linkerscripts/symstemp.ld
-
-# don't push or your cock gets also burned with hand sanitizer
+*.pfs0
+*.nacp
 *.npdm
+*.nam
+*.nro

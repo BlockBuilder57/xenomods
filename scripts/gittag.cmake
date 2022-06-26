@@ -4,7 +4,7 @@
 #
 
 # the output version filename relative to the PWD of the script
-set(VERSION_FILENAME "build/version.h")
+set(VERSION_FILENAME "version.h")
 
 # execute all the things we need
 execute_process(COMMAND git describe --tags --always OUTPUT_VARIABLE GIT_TAG OUTPUT_STRIP_TRAILING_WHITESPACE)

@@ -71,8 +71,11 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Shared libs not available for target")
 
 set(ARCH "-march=armv8-a -mtune=cortex-a57 -mtp=soft  -ftls-model=local-exec")
 set(CMAKE_ASM_FLAGS "-x assembler-with-cpp -g ${ARCH}")
-set(CMAKE_C_FLAGS "-fPIC ${ARCH} -D__SWITCH__ -D__SKYLINE__ -fomit-frame-pointer -ffunction-sections -isystem ${DEVKITPRO}/libnx/include -I${PROJECT_SOURCE_DIR}/libs/libeiffel/include")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-rtti -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -fpermissive")
-set(CMAKE_EXE_LINKER_FLAGS "-v -specs=${PROJECT_BINARY_DIR}/switch.specs -Wl,--version-script=${PROJECT_SOURCE_DIR}/exported.txt -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -L ${DEVKITPRO}/portlibs/switch/lib -L ${DEVKITPRO}/libnx/lib")
+set(CMAKE_C_FLAGS "${ARCH} -D__SWITCH__ -D__SKYLINE__ -fomit-frame-pointer -ffunction-sections -isystem ${DEVKITPRO}/libnx/include -I${PROJECT_SOURCE_DIR}/libs/libeiffel/include")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-rtti -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -fpermissive ")
 
-
+# This is an undocumented variable intended to be used for (ironically enough) these kind of platform/toolchain files.
+# Anything specified here always ends up last in the linker command line.
+# For some reason, unknown to me, -lgcc and -lstdc++ HAVE to be at the end, or the binary doesn't ever link properly.
+# Don't ask me. Ask the linker gods. They might know.
+set(CMAKE_CXX_STANDARD_LIBRARIES "-lgcc -lstdc++ -u malloc")

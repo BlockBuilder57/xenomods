@@ -21,13 +21,13 @@ else()
 	message(FATAL_ERROR "npdmtool not found")
 endif()
 
-function(add_npdm target json_file)
+function(add_npdm target json_file output_file)
 		add_custom_command(TARGET ${target}
 				PRE_BUILD
-				COMMAND ${NPDMTOOL} ${json_file} ${CMAKE_CURRENT_BINARY_DIR}/main.npdm
+				COMMAND ${NPDMTOOL} ${json_file} ${CMAKE_CURRENT_BINARY_DIR}/${output_file}.npdm
 				WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 				VERBATIM
-				COMMENT "Making NPDM ${CMAKE_CURRENT_BINARY_DIR}/main.npdm from ${json_file}"
+				COMMENT "Making NPDM ${CMAKE_CURRENT_BINARY_DIR}/${output_file}.npdm from ${json_file}"
 		)
 endfunction()
 
