@@ -34,7 +34,7 @@ static skyline::utils::Task* after_romfs_task = new skyline::utils::Task { []() 
 	skyline::logger::s_Instance->LogFormat("[skyline_main] Mounted SD (0x%x)", rc);
 
 	// Setup bf2mods code.
-	bf2mods::SetupEverything();
+	bf2mods::bf2mods_main();
 } };
 
 void stub() {

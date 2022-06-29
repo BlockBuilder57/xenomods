@@ -4,8 +4,6 @@
 #include <string>
 
 #include "ModuleObject.hpp"
-#include "alloc.h"
-#include "mem.h"
 #include "nn/crypto.h"
 #include "nn/fs.h"
 #include "nn/nn.h"

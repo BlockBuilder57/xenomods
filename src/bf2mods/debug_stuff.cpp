@@ -96,16 +96,6 @@ namespace event {
 
 } // namespace event
 
-template<class T, class Y>
-constexpr T ub_cast(Y y) {
-	union {
-		T t;
-		Y y;
-	} u { .y = y };
-
-	return u.t;
-}
-
 namespace gf {
 
 	GENERATE_SYM_HOOK(BgmTrack_update, "_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE", void, gf::BgmTrack* this_pointer, void* updateInfo) {

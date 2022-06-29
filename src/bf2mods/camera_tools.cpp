@@ -73,12 +73,13 @@ namespace bf2mods::CameraTools {
 		// RStick hold: X: roll left/right
 
 		// lazy usings
-		auto freecamState = &bf2mods::Plugin::getSharedStatePtr()->freecam;
 		using enum bf2mods::Keybind;
 		using bf2mods::p1Cur;
 		using bf2mods::p1Prev;
 		using bf2mods::p2Cur;
 		using bf2mods::p2Prev;
+
+		auto freecamState = &bf2mods::Plugin::getSharedStatePtr()->freecam;
 
 		mm::Vec3 pos {};
 		mm::Quat rot {};
@@ -91,16 +92,14 @@ namespace bf2mods::CameraTools {
 		// essentially walking back the matrix to get world space instead of local space
 		glm::decompose(glm::inverse(freecamState->matrix), scale, rot, pos, skew, perspective);
 
-
-
 		mm::Vec2 lStick = p2Cur.LAxis;
 		mm::Vec2 rStick = p2Cur.RAxis;
 
 		// deadzone
 		if(glm::length(lStick) < 0.15f)
-			lStick = glm::zero<mm::Vec3>();
+			lStick = glm::zero<mm::Vec2>();
 		if(glm::length(rStick) < 0.15f)
-			rStick = glm::zero<mm::Vec3>();
+			rStick = glm::zero<mm::Vec2>();
 
 		// movement
 		mm::Vec3 move {};

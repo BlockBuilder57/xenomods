@@ -6,11 +6,21 @@
 
 namespace bf2mods {
 
+	// TODO: Either fix stuff about this class or just trash it and start anew
+	// 	with our skyline rebuild
+
 	class Plugin {
+
+	   public:
+		BF2MODS_DISALLOW_MOVE(Plugin, "shouldn't copy singleton class");
+		BF2MODS_DISALLOW_COPY(Plugin, "shouldn't copy singleton class");
+
 	   private:
 		Plugin();
-		Plugin(const Plugin&) = delete;
 		~Plugin();
+
+		// TODO: singletons might be useful, and I just so happen to have a COFU-using
+		// 	(see: Literally this function) singleton class lying around.
 
 		static inline Plugin& getInstance() {
 			static Plugin s_instance;

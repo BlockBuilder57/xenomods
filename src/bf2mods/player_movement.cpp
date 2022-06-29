@@ -30,13 +30,13 @@ namespace gf {
 				//71001b0964 fw::Framework::update()+1c8
 			}
 
-			if (bf2mods::Plugin::getSharedStatePtr()->options.game.movementSpeedMult == 1.0f)
+			if (bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult == 1.0f)
 				return;
 
-			pcProperty->velocityDelta *= bf2mods::Plugin::getSharedStatePtr()->options.game.movementSpeedMult;
+			pcProperty->velocityDelta *= bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult;
 
 			if(mm::Vec3XZLength(pcProperty->velocityDelta) > 8.f) {
-				mm::Vec3 normalized = mm::Vec3XZNormalized(pcProperty->velocityDelta) * 8.f * bf2mods::Plugin::getSharedStatePtr()->options.game.movementSpeedMult;
+				mm::Vec3 normalized = mm::Vec3XZNormalized(pcProperty->velocityDelta) * 8.f * bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult;
 				pcProperty->velocityDelta.x = normalized.x;
 				pcProperty->velocityDelta.z = normalized.z;
 			}
@@ -59,14 +59,14 @@ namespace gf {
 		GENERATE_SYM_HOOK(FallDistancePlugin_calcDistance, "_ZNK2gf2pc18FallDistancePlugin12calcDistanceERKN2mm4Vec3E", float, FallDamagePlugin* this_pointer, mm::Vec3* vec) {
 			float height = FallDistancePlugin_calcDistanceBak(this_pointer, vec);
 			//bf2mods::g_Logger->LogInfo("FallDistancePlugin::calcDistance called, would return %.2f", height);
-			return bf2mods::Plugin::getSharedStatePtr()->options.game.disableFallDamage ? 0.f : height;
+			return bf2mods::Plugin::getSharedStatePtr()->options.disableFallDamage ? 0.f : height;
 		}
 
 		// Can't figure out how to properly set the actual max height, but this will do
 		// Forcibly disables fall damage when any movement state tries to enable or disable it
 		GENERATE_SYM_HOOK(StateUtil_setFallDamageDisable, "_ZN2gf2pc9StateUtil20setFallDamageDisableERNS_15GfComBehaviorPcEb", void, void* GfComBehaviorPc, bool param_2) {
 			//bf2mods::g_Logger->LogInfo("StateUtil::setFallDamageDisable(GfComBehaviorPc: %p, bool: %s)", GfComBehaviorPc, bf2mods::format(param_2).c_str());
-			StateUtil_setFallDamageDisableBak(GfComBehaviorPc, bf2mods::Plugin::getSharedStatePtr()->options.game.disableFallDamage ? true : param_2);
+			StateUtil_setFallDamageDisableBak(GfComBehaviorPc, bf2mods::Plugin::getSharedStatePtr()->options.disableFallDamage ? true : param_2);
 		}
 
 	} // namespace pc
