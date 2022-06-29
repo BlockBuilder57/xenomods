@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     # Ensure required directories exist on the console; if not, create them
     EnsureDirectory('/atmosphere', 'contents')
-    EnsureDirectory('/atmosphere/contents', program_id)
+    EnsureDirectory('/atmosphere/contents', titleid)
     EnsureDirectory(f'/atmosphere/contents/{titleid}', 'exefs')
 
     ftpConnection.cwd(f'/atmosphere/contents/{titleid}/exefs')

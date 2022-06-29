@@ -89,7 +89,7 @@ if(NOT " ${BF2MODS_SWITCH_IP}" STREQUAL " ")
 
 	add_custom_command(TARGET bf2mods
 			POST_BUILD
-			COMMAND python ${PROJECT_SOURCE_DIR}/scripts/send_over_ftp.py --switchip ${BF2MODS_SWITCH_IP} --json ${PROJECT_SOURCE_DIR}/npdm/${BF2MODS_CODENAME}.json
+			COMMAND python ../scripts/send_over_ftp.py --switchip ${BF2MODS_SWITCH_IP} --json ${PROJECT_SOURCE_DIR}/npdm/${BF2MODS_CODENAME}.json
 			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 			USES_TERMINAL
 			VERBATIM
