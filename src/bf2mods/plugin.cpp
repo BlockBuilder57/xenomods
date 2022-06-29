@@ -31,6 +31,11 @@ namespace bf2mods {
 		m_sharedState->options.game.disableFallDamage = true;
 		m_sharedState->options.game.movementSpeedMult = 1.f;
 
+		m_sharedState->freecam.isOn = false;
+		m_sharedState->freecam.matrix = mm::Mat44{};
+		m_sharedState->freecam.fov = 45.f;
+		m_sharedState->freecam.camSpeed = 1.f;
+
 		m_sharedState->mapjumpId = 1;
 		m_sharedState->testInt = 0;
 

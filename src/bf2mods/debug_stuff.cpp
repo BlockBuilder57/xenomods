@@ -171,6 +171,8 @@ namespace bf2mods {
 	void SetupDebugStuff() {
 		mm::MMStdBase::mmAssertHook();
 
+		g_Logger->LogInfo("Resolving fw::debug::draw* hooks...");
+
 		// Load debug draw functions. Once this is setup the g_Logger can be used
 		// !!!!!! TODO !!!!!! MOVE THIS INTO SEPARATE FILES PER SUBSYSTEM
 		util::ResolveSymbol<decltype(fw::debug::drawAxis)>(&fw::debug::drawAxis, "_ZN2fw5debug8drawAxisERKN2mm5Mat44Ef");
@@ -193,7 +195,7 @@ namespace bf2mods {
 			g_Logger->LogFatal("NOT FINE NOT FINE");
 		}*/
 
-		g_Logger->LogMessage(Logger::Severity::Info, "Setting up debug stuff...");
+		g_Logger->LogInfo("Setting up debug stuff...");
 
 		util::ResolveSymbol<decltype(fw::PadManager::enableDebugDraw)>(&fw::PadManager::enableDebugDraw, "_ZN2fw10PadManager15enableDebugDrawEb");
 		fw::PadManager::updateHook();

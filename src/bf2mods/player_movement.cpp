@@ -35,8 +35,8 @@ namespace gf {
 
 			pcProperty->velocityDelta *= bf2mods::Plugin::getSharedStatePtr()->options.game.movementSpeedMult;
 
-			if(pcProperty->velocityDelta.XZLengthSqu() > 8.f) {
-				mm::Vec3 normalized = pcProperty->velocityDelta.XZNormalized() * 8.f * bf2mods::Plugin::getSharedStatePtr()->options.game.movementSpeedMult;
+			if(mm::Vec3XZLength(pcProperty->velocityDelta) > 8.f) {
+				mm::Vec3 normalized = mm::Vec3XZNormalized(pcProperty->velocityDelta) * 8.f * bf2mods::Plugin::getSharedStatePtr()->options.game.movementSpeedMult;
 				pcProperty->velocityDelta.x = normalized.x;
 				pcProperty->velocityDelta.z = normalized.z;
 			}
@@ -89,6 +89,8 @@ namespace gf {
 namespace bf2mods {
 
 	void SetupPlayerMovementHooks() {
+		g_Logger->LogInfo("Setting up player movement hooks...");
+
 		gf::pc::MoveUtilField_updateMoveJumpHook();
 		gf::pc::MoveUtilField_updateMoveRunHook();
 		gf::pc::MoveUtilField_updateMoveSwimHook();

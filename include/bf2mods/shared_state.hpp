@@ -1,13 +1,13 @@
 #pragma once
 
-#include "utils.hpp"
+#include "bf2mods/mm/math_types.hpp"
 #include "prettyprinter.hpp"
-
+#include "utils.hpp"
 #ifdef __SKYLINE__
-#include "nn/hid.hpp"
+	#include "nn/hid.hpp"
 
 #else
-#include <switch.h>
+	#include <switch.h>
 #endif
 
 namespace bf2mods {
@@ -21,6 +21,11 @@ namespace bf2mods {
 	STATIC_ASSERT_SIZE(HidControllerKeyData, 4);
 
 	struct SharedState {
+		explicit SharedState();
+
+		// Reset to default settings (called by constructor to initialize)
+		void DefaultSettings();
+
 		struct Options {
 			struct BdatOptions {
 				enum class ScrambleType : std::uint8_t {
@@ -40,11 +45,18 @@ namespace bf2mods {
 
 		} options;
 
+		struct Freecam {
+			bool isOn;
+			mm::Mat44 matrix;
+			float fov;
+			float camSpeed { 1 };
+		} freecam;
+
 		int mapjumpId;
 		int testInt;
 
 		bool moonJump;
-		bool layerOverwrite;
+		//bool layerOverwrite;
 	};
 
 #define ALIGN_UP(x, a) (((x) + ((a)-1)) & ~((a)-1))
@@ -52,9 +64,9 @@ namespace bf2mods {
 
 	template<>
 	struct Prettyprinter<SharedState::Options::BdatOptions::ScrambleType> {
-		inline static std::string format(const SharedState::Options::BdatOptions::ScrambleType &opt) {
+		inline static std::string format(const SharedState::Options::BdatOptions::ScrambleType& opt) {
 			std::stringstream ss;
-			switch (opt) {
+			switch(opt) {
 				case SharedState::Options::BdatOptions::ScrambleType::ScrambleIndex:
 					ss << "Scramble Index";
 					break;
@@ -69,8 +81,9 @@ namespace bf2mods {
 			return ss.str();
 		}
 
-		inline static std::string_view type_name() { return "BdatOptions::ScrambleType"; }
-
+		inline static std::string_view type_name() {
+			return "BdatOptions::ScrambleType";
+		}
 	};
 
 } // namespace bf2mods

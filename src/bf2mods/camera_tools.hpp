@@ -4,8 +4,9 @@
 
 #pragma once
 
-namespace bf2mods {
+namespace bf2mods::CameraTools {
 
+	void DoFreeCameraMovement();
 	void SetupCameraTools();
 
 } // namespace bf2mods

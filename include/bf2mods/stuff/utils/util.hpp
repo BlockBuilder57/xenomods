@@ -86,7 +86,7 @@ namespace util {
     ReturnType name##Replace(__VA_OPT__(__VA_ARGS__))
 
 #define CLASS_METHOD_RETURN_TYPE(ClassName, methodName, ...) \
-    std::result_of<decltype (&ClassName::methodName)(ClassName __VA_OPT__(, __VA_ARGS__))>::type
+    std::invoke_result_t<decltype (&ClassName::methodName)(ClassName __VA_OPT__(, __VA_ARGS__))>
 
 #define GENERATE_CLASS_HOOK(ClassName, methodName, ...)                                                      \
     CLASS_METHOD_RETURN_TYPE(ClassName, methodName __VA_OPT__(, __VA_ARGS__))                                \
@@ -105,7 +105,7 @@ namespace util {
     methodName##Replace(ClassName* p_this __VA_OPT__(, __VA_ARGS__))
 
 #define CLASS_OVERLOADED_METHOD_RETURN_TYPE(ClassName, methodPtr, ...) \
-    std::result_of<decltype(methodPtr)(ClassName __VA_OPT__(, __VA_ARGS__))>::type
+    std::invoke_result_t<decltype(methodPtr)(ClassName __VA_OPT__(, __VA_ARGS__))>
 
 #define GENERATE_CLASS_HOOK_NAMED(hookName, ClassName, methodName, ...)                                   \
     auto (ClassName::*hookName##Addr)(__VA_ARGS__) = &ClassName::methodName;                              \

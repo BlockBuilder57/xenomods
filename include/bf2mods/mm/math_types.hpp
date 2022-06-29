@@ -3,6 +3,10 @@
 #include <bf2mods/prettyprinter.hpp>
 #include <cmath>
 
+#include <glm/vec3.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/mat4x4.hpp>
+
 namespace mm {
 
 	struct Pnt {
@@ -10,101 +14,29 @@ namespace mm {
 		int y;
 	};
 
-	struct Vec3 {
-		float x;
-		float y;
-		float z;
-
-		static const Vec3 zero;
-
-		inline Vec3 &operator+=(const Vec3 &rhs) {
-			x += rhs.x;
-			y += rhs.y;
-			z += rhs.z;
-			return *this;
-		}
-
-		inline Vec3 &operator-=(const Vec3 &rhs) {
-			x -= rhs.x;
-			y -= rhs.y;
-			z -= rhs.z;
-			return *this;
-		}
-
-		inline Vec3 &operator*=(const Vec3 &rhs) {
-			x *= rhs.x;
-			y *= rhs.y;
-			z *= rhs.z;
-			return *this;
-		}
-
-		inline Vec3 &operator*=(const float &rhs) {
-			x *= rhs;
-			y *= rhs;
-			z *= rhs;
-			return *this;
-                }
-
-		inline float LengthSqu() const { return std::sqrt(x * x + y * y + z * z); }
-		inline float XZLengthSqu() const { return std::sqrt(x * x + z * z); }
-
-		inline void NormalizeInPlace() {
-			float length = LengthSqu();
-			x /= length;
-			y /= length;
-			z /= length;
-		}
-		inline void XZNormalizeInPlace() {
-			float length = LengthSqu();
-			x /= length;
-			z /= length;
-		}
-
-		/**
-		 * Returns a new Vec3 which is normalized.
-		 */
-		inline Vec3 Normalized() {
-			Vec3 other = *this;
-			other.NormalizeInPlace();
-			return other;
-		}
-		inline Vec3 XZNormalized() {
-			Vec3 other = *this;
-			other.XZNormalizeInPlace();
-			return other;
-		}
-
-		inline Vec3 operator+(const Vec3 &rhs) const {
-			return Vec3{x + rhs.x, y + rhs.y, z + rhs.z};
-		}
-		inline Vec3 operator-(const Vec3 &rhs) const {
-			return Vec3{x - rhs.x, y - rhs.y, z - rhs.z};
-		}
-		inline Vec3 operator*(const float &rhs) {
-			return Vec3{x * rhs, y * rhs, z * rhs};
-		}
-	};
+	using Vec2 = glm::vec2;
+	using Vec3 = glm::vec3;
+	using Transform = Vec3;
 	static_assert(sizeof(Vec3) == 0xC, "size 0xC");
 
-	using Transform = Vec3;
+	constexpr float Vec3XZLength(const Vec3& src) { return std::sqrt(src.x * src.x + src.z * src.z); }
 
-	struct Quat {
-		float a;
-		float b;
-		float c;
-		float d;
+	constexpr void Vec3XZNormalizeInPlace(Vec3& src) {
+		float length = Vec3XZLength(src);
+		src.x /= length;
+		src.z /= length;
+	}
+	constexpr Vec3 Vec3XZNormalized(const Vec3& src) {
+		Vec3 other = src;
+		Vec3XZNormalizeInPlace(other);
+		return other;
+	}
 
-		static const Quat zero;
-	};
 
-	struct Mat44 {
-		float M11, M12, M13, M14;
-		float M21, M22, M23, M24;
-		float M31, M32, M33, M34;
-		float M41, M42, M43, M44;
 
-		static const Mat44 identity;
-	};
+	using Quat = glm::quat;
+
+	using Mat44 = glm::mat4;
 	static_assert(sizeof(Mat44) == 0x40, "[mm::Mat44] size 0x40");
 
 	/**
@@ -131,8 +63,11 @@ namespace bf2mods {
 	 */
 	template<>
 	struct Prettyprinter<mm::Vec3> {
-		inline static std::string format(const mm::Vec3 &vec3) {
+		inline static std::string format(const mm::Vec3 &vec3, const int precision = -1) {
 			std::stringstream ss;
+
+			if (precision > 0)
+				ss.precision(precision);
 
 			auto PrintComponentWithName = [&ss](char c, const float &coord) {
 				ss << c << ": " << coord;
@@ -149,10 +84,44 @@ namespace bf2mods {
 			ss << ' ';
 			PrintComponentWithName('Z', vec3.z);
 			ss << ')';
+
 			return ss.str();
 		}
 
 		inline static std::string_view type_name() { return "mm::Vec3"; }
+	};
+
+	template<>
+	struct Prettyprinter<mm::Mat44> {
+		inline static std::string format(const mm::Mat44 &mat, const int precision = -1) {
+			std::stringstream ss;
+
+			if (precision > 0)
+				ss.precision(precision);
+
+			ss << '(';
+			ss << mat[0][0] << ',';
+			ss << mat[0][1] << ',';
+			ss << mat[0][2] << ',';
+			ss << mat[0][3] << ", ";
+			ss << mat[1][0] << ',';
+			ss << mat[1][1] << ',';
+			ss << mat[1][2] << ',';
+			ss << mat[1][3] << ", ";
+			ss << mat[2][0] << ',';
+			ss << mat[2][1] << ',';
+			ss << mat[2][2] << ',';
+			ss << mat[2][3] << ", ";
+			ss << mat[3][0] << ',';
+			ss << mat[3][1] << ',';
+			ss << mat[3][2] << ',';
+			ss << mat[3][3];
+			ss << ')';
+
+			return ss.str();
+		}
+
+		inline static std::string_view type_name() { return "mm::Mat44"; }
 	};
 
 } // namespace bf2mods

@@ -46,8 +46,8 @@ if __name__ == "__main__":
         sys.exit(-1)
 
     program_id = sys.argv[2]
-    code_name = sys.argv[3]
-    subsdk_name = sys.argv[4]
+#    code_name = sys.argv[3]
+    subsdk_name = sys.argv[3]
 
     curDir = os.curdir
 
@@ -68,4 +68,4 @@ if __name__ == "__main__":
 
     # Send Gucci Mane
     send_file(ftp, './skyline.nso', f'./{subsdk_name}')
-    send_file(ftp, f'./{code_name}.npdm', f'./main.npdm')
+    send_file(ftp, f'./main.npdm', f'./main.npdm')

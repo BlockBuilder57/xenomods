@@ -1,6 +1,7 @@
 #include "bdat_randomizer.hpp"
 
 #include <version.h>
+#include "bf2logger.hpp"
 
 #include "bf2mods/stuff/utils/util.hpp"
 #include "nn/oe.h"
@@ -81,18 +82,11 @@ namespace Bdat {
 namespace bf2mods {
 
 	void SetupBdatRandomizer() {
-		skyline::logger::s_Instance->LogFormat("Setting up BDAT randomizer...");
-
-		// resolve any engine symbols we need (would be nice to have a static function object do that but meh)
-		skyline::logger::s_Instance->LogFormat("Resolving Bdat:: symbols...");
+		g_Logger->LogInfo("Setting up BDAT randomizer...");
 
 		util::ResolveSymbol<decltype(Bdat::getIdCount)>(&Bdat::getIdCount, "_ZN4Bdat10getIdCountEPh");
 		util::ResolveSymbol<decltype(Bdat::getIdTop)>(&Bdat::getIdTop, "_ZN4Bdat8getIdTopEPh");
 		util::ResolveSymbol<decltype(Bdat::getSheetName)>(&Bdat::getSheetName, "_ZN4Bdat12getSheetNameEPh");
-
-		skyline::logger::s_Instance->LogFormat("Finished resolving Bdat:: symbols");
-
-		//skyline::logger::s_Instance->LogFormat("Uhhhh %p %p", Bdat::getIdCount, Bdat::getIdTop);
 
 		// Hook stuff
 		Bdat::getMSTextHook();

@@ -15,7 +15,7 @@ add_executable(skyline
 		bf2mods/plugin.cpp
 		bf2mods/plugin_main.cpp
 
-		bf2mods/stuff/utils/debug_util.cpp
+        bf2mods/stuff/utils/debug_util.cpp
 		bf2mods/stuff/utils/util.cpp
 
 		crt0.s
@@ -73,7 +73,7 @@ set_target_properties(skyline PROPERTIES
 target_include_directories(skyline PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(skyline PUBLIC ${PROJECT_BINARY_DIR}/)
 
-#target_link_libraries(skyline PUBLIC glm::glm)
+target_link_libraries(skyline PUBLIC glm::glm)
 
 # NPDM/NSO output.
 add_npdm(skyline ${PROJECT_SOURCE_DIR}/npdm/bf2.json main)
