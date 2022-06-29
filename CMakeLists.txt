@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
+
+if(" ${CMAKE_SOURCE_DIR}" STREQUAL " ${CMAKE_BINARY_DIR}")
+	message(FATAL_ERROR "NO NO NO NO NO. Please use a distinct binary directory.")
+endif()
+
 project(skyline)
 
 
@@ -6,6 +11,14 @@ project(skyline)
 enable_language(C)
 enable_language(CXX)
 enable_language(ASM)
+
+option(BF2MODS_ENABLE_FTP OFF "enable ftp transfer")
+
+# If no codename was set default to bf2
+if(" ${BF2MODS_CODENAME}" STREQUAL " ")
+	set(BF2MODS_CODENAME "bf2")
+endif()
+
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(MakeNso)
@@ -21,3 +34,6 @@ set_source_files_properties(${PROJECT_BINARY_DIR}/version.h PROPERTIES GENERATED
 add_subdirectory(vendor/glm)
 
 add_subdirectory(src)
+
+message(STATUS "Bf2mods Buildtype: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Bf2mods Codename: ${BF2MODS_CODENAME}")

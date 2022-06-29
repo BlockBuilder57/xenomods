@@ -1,4 +1,4 @@
-add_executable(skyline
+add_executable(bf2mods
 		main.cpp
 		module.cpp
 		operator.cpp
@@ -18,16 +18,17 @@ add_executable(skyline
         bf2mods/stuff/utils/debug_util.cpp
 		bf2mods/stuff/utils/util.cpp
 
+		# runtime source (which we use to get executed)
 		crt0.s
 		crti.c
 		cxa.c
 
-
+		# hook source code
 		skyline/inlinehook/And64InlineHook.cpp
 		skyline/inlinehook/controlledpages.cpp
 		skyline/inlinehook/memcpy_controlled.cpp
 
-		# deprecated sources
+		# deprecated sources which will slowly be removed
 		nvn/pfnc.cpp
 
 		skyline/efl/service.cpp
@@ -57,11 +58,13 @@ add_executable(skyline
 		skyline/nx/kernel/svc.s
 		)
 
-add_dependencies(skyline __bf2mods_gittag)
+add_dependencies(bf2mods __bf2mods_gittag)
 
-set_target_properties(skyline PROPERTIES
+set_target_properties(bf2mods PROPERTIES
 		CXX_STANDARD 20
 		CXX_STANDARD_REQUIRED ON
+
+		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 
 		# We need to trick cmake into making this generate PIC code and link as a
 		# PIC binary, because we can't use add_library(xxx SHARED).
@@ -70,11 +73,26 @@ set_target_properties(skyline PROPERTIES
 		LINK_FLAGS "-fPIC -specs=${PROJECT_BINARY_DIR}/switch.specs -Wl,-Map,bf2mods.map -Wl,--version-script=${PROJECT_SOURCE_DIR}/linkerscripts/exported.txt -nodefaultlibs -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -L ${DEVKITPRO}/portlibs/switch/lib -L ${DEVKITPRO}/libnx/lib"
 )
 
-target_include_directories(skyline PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(skyline PUBLIC ${PROJECT_BINARY_DIR}/)
+target_include_directories(bf2mods PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(bf2mods PUBLIC ${PROJECT_BINARY_DIR}/)
 
-target_link_libraries(skyline PUBLIC glm::glm)
+target_link_libraries(bf2mods PUBLIC glm::glm)
 
 # NPDM/NSO output.
-add_npdm(skyline ${PROJECT_SOURCE_DIR}/npdm/bf2.json main)
-add_nso_target(skyline)
+add_npdm(bf2mods ${PROJECT_SOURCE_DIR}/npdm/${BF2MODS_CODENAME}.json main)
+add_nso_target(bf2mods)
+
+# FTP transfer
+
+if(NOT " ${BF2MODS_SWITCH_IP}" STREQUAL " ")
+	message(STATUS "Enabling FTP transfer")
+
+	add_custom_command(TARGET bf2mods
+			POST_BUILD
+			COMMAND python ${PROJECT_SOURCE_DIR}/scripts/send_over_ftp.py --switchip ${BF2MODS_SWITCH_IP} --json ${PROJECT_SOURCE_DIR}/npdm/${BF2MODS_CODENAME}.json
+			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+			USES_TERMINAL
+			VERBATIM
+			COMMENT "Sending bf2mods to console"
+			)
+endif()
