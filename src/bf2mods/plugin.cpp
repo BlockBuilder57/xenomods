@@ -1,14 +1,22 @@
 #include "plugin.hpp"
 
-#include <string.h>
+#include <cstring>
 
 #include "skyline/logger/Logger.hpp"
 //#include "camera.hpp"
 
 namespace bf2mods {
 
+	void Options::Reset() {
+		bdatScrambleType = Options::BdatScrambleType::Off;
+		//bdatMapListResourceOverride = false;
+
+		disableFallDamage = true;
+		movementSpeedMult = 1.f;
+	}
+
 	Plugin::Plugin() {
-		strcpy(m_pluginMeta.name, PLUGIN_NAME);
+		std::strcpy(m_pluginMeta.name, PLUGIN_NAME);
 		m_pluginMeta.version = PLUGIN_VERSION;
 		m_pluginMeta.apiVersion = API_VERSION;
 
@@ -20,24 +28,18 @@ namespace bf2mods {
 		sharedStateInit_();
 	}
 
-	Plugin::~Plugin() {
-	}
+	Plugin::~Plugin() = default;
 
 	void Plugin::setDefaultOptions_() {
 		// default shared state options
-		m_sharedState->options.bdat.scrambleType = SharedState::Options::BdatOptions::ScrambleType::Off;
-		m_sharedState->options.bdat.mapListResourceOverride = false;
-
-		m_sharedState->options.game.disableFallDamage = true;
-		m_sharedState->options.game.movementSpeedMult = 1.f;
+		m_sharedState->options.Reset();
 
 		m_sharedState->freecam.isOn = false;
-		m_sharedState->freecam.matrix = mm::Mat44{};
+		m_sharedState->freecam.matrix = mm::Mat44 {};
 		m_sharedState->freecam.fov = 45.f;
 		m_sharedState->freecam.camSpeed = 1.f;
 
 		m_sharedState->mapjumpId = 1;
-		m_sharedState->testInt = 0;
 
 		m_sharedState->moonJump = false;
 	}

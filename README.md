@@ -1,26 +1,43 @@
 ## bf2mods
 
-Some mod code by [modeco80](https://github.com/modeco80) and [BlockBuilder57](https://github.com/BlockBuilder57) (with special guest [3096](https://github.com/3096)) for Xenoblade 2 / Torna.
+Some mod code by [modeco80](https://github.com/modeco80) and [BlockBuilder57](https://github.com/BlockBuilder57) for Xenoblade 2 / Torna. Based off [Ether](https://github.com/3096/ether) by 3096/dualie.
 
-Includes a custom fork of a [custom fork](https://github.com/3096/skyline/tree/xde) of [Skyline](https://github.com/skyline-dev/skyline/), made by much smarter people than us.
+As such, this includes a custom fork of a [custom fork](https://github.com/3096/skyline/tree/xde) of [Skyline](https://github.com/skyline-dev/skyline/), made by many people much smarter people than us.
+
+
+## Installation instructions (LayeredFS)
+
+In /atmosphere/contents/<TITLE_ID>/ make a exefs directory. In there, place the latest `main` exefs version with symbols.
+
+Latest compatible exefs versions:
+
+| Game                           | Title ID                                       | Last Working Version         |
+|--------------------------------|:-----------------------------------------------|------------------------------|
+| Xenoblade 2                    | 0100E95004038000<br/>(0100F3400332C000 for JP) | 2.0.0 (or Torna 1.0.2)       |
+| Xenoblade 2: Torna             | 0100C9F009F7A000                               | 1.0.2 (or XB2 2.0.0)         |
+
+Once you've done that, simply copy the main.npdm and subsdk1 files to the exefs directory.
 
 ## Build Instructions
 
 - Install devKitPro with Switch development features.
-- Clone this repository with --recursive.
-- (Temporary until CMake port works) Move the files in `skyline/attic-build` out into `skyline` folder.
-- Run `make`.
-- ...
-- Profit! (patch-bf2 directory in skyline/ will contain things needed to be installed)
+- Clone this repository with `--recursive`.
+- Run the following commands:
 
-## Installation instructions (LayeredFS)
+```bash
+$ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release --toolchain cmake/NintendoSwitch.cmake 
+$ cd build
+$ make -j4
+# ...
+# profit?
+```
 
-In /atmosphere/contents/<BF2_TITLE_ID>/ make a exefs directory. In there, place the 2.0.0 ExeFS.
+Once built, copy bf2mods.nso (as `subsdk1`) and main.npdm from build/src to the LayeredFS exefs directory.
 
-Once you've done that, simply place all the files from the skyline/patch-bf2 directory into the exefs directory (overwriting any conflicts).. and tada!
+For those with sys-ftpd installed, adding `-DBF2MODS_SWITCH_IP=<ip>` to the CMake command will automatically copy the files to your console when builds finish.
 
 ## Credits
 
-All the Skyline peeps (sorry we couldn't do anything nicer, but at least document your plugin code lol)
+All the contributors and maintainers of Skyline
 
-3096 for the initial ether repository (and for helping as well)
+3096 for the initial ether repository, and for graciously allowing their event freecam to be published. And for helping out with some other code as well!

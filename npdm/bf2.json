@@ -1,8 +1,8 @@
 {
 	"name": "Application",
-	"title_id": "0x0100e95004038800",
-	"title_id_range_min": "0x0100e95004038800",
-	"title_id_range_max": "0x0100e95004038805",
+	"title_id": "0x0100e95004038000",
+	"title_id_range_min": "0x0100e95004038000",
+	"title_id_range_max": "0x0100e95004038005",
 	"main_thread_stack_size": "0x00100000",
 	"main_thread_priority": 44,
 	"default_cpu_id": 0,

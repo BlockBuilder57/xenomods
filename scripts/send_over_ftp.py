@@ -1,20 +1,23 @@
 # Author:  shadowninja108
 # Copyright 2019 (c) The Starlight Project
 
-
-from ftplib import FTP
+import argparse
 import os
 import sys
+import json
+from ftplib import FTP
 
+ftpConnection = None
 
-def listdirs(connection, _path):
+def ListDirs(_path):
     file_list, dirs, nondirs = [], [], []
     try:
-        connection.cwd(_path)
+        ftpConnection.cwd(_path)
     except:
         return []
 
-    connection.retrlines('LIST', lambda x: file_list.append(x.split()))
+    ftpConnection.retrlines('LIST', lambda x: file_list.append(x.split()))
+
     for info in file_list:
         ls_type, name = info[0], info[-1]
         if ls_type.startswith('d'):
@@ -24,48 +27,72 @@ def listdirs(connection, _path):
     return dirs
 
 
-def ensuredirectory(connection, root, path):
+def EnsureDirectory(root, path):
     print(f"Ensuring {os.path.join(root, path)} exists...")
-    if path not in listdirs(connection, root):
-        connection.mkd(f'{root}/{path}')
+
+    if path not in ListDirs(root):
+        ftpSite.mkd(f'{root}/{path}')
 
 
-def send_file(conn, filename, out):
-    print(f'Sending {filename} to FTP path "{conn.pwd()}/{out}"')
-    conn.storbinary(f'STOR {out}', open(filename, 'rb'))
+def SendFile(filename, out):
+    print(f'Sending {filename} to FTP path "{ftpConnection.pwd()}/{out}"')
+    ftpConnection.storbinary(f'STOR {out}', open(filename, 'rb'))
 
 
-FTPD_PORT = 5000
+# bail (printing a message beforehand) and exit
+def Bail(message):
+    print(f'Error: {message}')
+    sys.exit(1)
 
 
 if __name__ == "__main__":
-    consoleIP = sys.argv[1]
-    if '.' not in consoleIP:
-        print(sys.argv[0],
-              "ERROR: Please specify with `IP=[Your console's IP]`")
-        sys.exit(-1)
+    parser = argparse.ArgumentParser(description='Send and update bf2mods binary output to Switch console, via FTP.')
 
-    program_id = sys.argv[2]
-#    code_name = sys.argv[3]
-    subsdk_name = sys.argv[3]
+    # stuff we gather from
+    parser.add_argument('--json', dest='path', required=True, type=str, help='path to npdmtool JSON file to gather information from')
+    parser.add_argument('--subsdk', dest='subsdk_name', required=False, type=str, default="subsdk1", help='subsdk name (default \'subsdk1\')')
 
-    curDir = os.curdir
+    # ftp site arguments
+    parser.add_argument('--switchip', dest='ip', required=True, type=str, help='Switch IP')
+    parser.add_argument('--switchport', dest='port', required=False, type=int, default=5000, help='Switch FTP port (default 5000)')
 
-    ftp = FTP()
-    print(f'Connecting to {consoleIP}... ', end='')
-    ftp.connect(consoleIP, FTPD_PORT)
+    args = parser.parse_args()
+
+    if '.' not in args.ip:
+        Bail("Invalid Switch IP address provided")
+
+    if not os.path.exists(args.path):
+        Bail("JSON file doesn't exist")
+
+    file = open(args.path, mode='r')
+
+    # additionaly if it doesn't have json data, it probably shouldn't be used either, bail there too.
+    try:
+        jsondata = json.loads(file.read())
+    except:
+        Bail("JSON file contains invalid data")
+
+    file.close()
+
+    titleid = jsondata['title_id'][2:].upper()
+
+    print(f"Gathered title id is {titleid}")
+
+    ftpConnection = FTP()
+    print(f'Connecting to Switch console @ {args.ip}:{args.port} ...', end='')
+    ftpConnection.connect(args.ip, args.port)
+
     print('Connected!')
 
-    ftp.login() # anonymous logon
+    ftpConnection.login()
 
-    # Ensure required directories exist on the console
-    ensuredirectory(ftp, '/atmosphere', 'contents')
-    ensuredirectory(ftp, '/atmosphere/contents', program_id)
-    ensuredirectory(ftp, f'/atmosphere/contents/{program_id}', 'exefs')
+    # Ensure required directories exist on the console; if not, create them
+    EnsureDirectory('/atmosphere', 'contents')
+    EnsureDirectory('/atmosphere/contents', titleid)
+    EnsureDirectory(f'/atmosphere/contents/{titleid}', 'exefs')
 
-    ftp.cwd(f'/atmosphere/contents/{program_id}/exefs')
-    ##print(f'current working directory on ftp site is {ftp.pwd()}')
+    ftpConnection.cwd(f'/atmosphere/contents/{titleid}/exefs')
 
-    # Send Gucci Mane
-    send_file(ftp, './skyline.nso', f'./{subsdk_name}')
-    send_file(ftp, f'./main.npdm', f'./main.npdm')
+    # Send bf2mods to the console
+    SendFile('./bf2mods.nso', f'{args.subsdk_name}')
+    SendFile('./main.npdm', 'main.npdm')

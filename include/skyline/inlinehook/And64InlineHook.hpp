@@ -36,7 +36,6 @@ extern "C" {
 #include "../nx/kernel/jit.h"
 #include "../nx/result.h"
 #include "../utils/utils.h"
-#include "alloc.h"
 #include "mem.h"
 
 long long int llabs(long long int n);

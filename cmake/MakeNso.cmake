@@ -24,21 +24,20 @@ endif()
 function(add_npdm target json_file output_file)
 		add_custom_command(TARGET ${target}
 				PRE_BUILD
-				COMMAND ${NPDMTOOL} ${json_file} ${CMAKE_CURRENT_BINARY_DIR}/${output_file}.npdm
-				WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+				COMMAND ${NPDMTOOL} ${json_file} ${output_file}.npdm
+				WORKING_DIRECTORY $<TARGET_FILE_DIR:${target}>
 				VERBATIM
-				COMMENT "Making NPDM ${CMAKE_CURRENT_BINARY_DIR}/${output_file}.npdm from ${json_file}"
+				COMMENT "Making NPDM ${output_file}.npdm from ${json_file}"
 		)
 endfunction()
 
 function(add_nso_target target)
-	get_filename_component(target_we ${target} NAME_WE)
 	add_custom_command(TARGET ${target}
 				POST_BUILD
-				COMMAND ${ELF2NSO} ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.elf ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.nso
+				COMMAND ${ELF2NSO} $<TARGET_FILE_DIR:${target}>/${target}.elf $<TARGET_FILE_DIR:${target}>/${target}.nso
 				USES_TERMINAL
 				VERBATIM
-				COMMENT "Running Elf2nso on ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.elf to make ${target_we}.nso"
+				COMMENT "Running Elf2nso on ${target}.elf to make ${target}.nso"
     )
 	#add_dependencies
 endfunction()

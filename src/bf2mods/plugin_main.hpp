@@ -4,7 +4,7 @@
 
 namespace bf2mods {
 
-	enum Keybind : std::uint64_t {
+	enum class Keybind : std::uint64_t {
 		CLEAR_TCPLOG = nn::hid::KEY_PLUS,
 		BDAT_SCRAMBLETYPE_TOGGLE = nn::hid::KEY_X,
 
@@ -43,21 +43,23 @@ namespace bf2mods {
 	extern HidInput p2Cur;
 	extern HidInput p2Prev;
 
-	inline static bool btnHeld (std::uint64_t combo, std::uint64_t buttons) {
-		return (buttons & combo) == combo;
+	// TODO: make these members of hidinput, and probably store current/previous there (removing the need for "prev" instances).
+
+	inline static bool btnHeld (Keybind combo, std::uint64_t buttons) {
+		return (buttons & underlying_value(combo)) == underlying_value(combo);
 	}
 
-	inline static bool btnUp (std::uint64_t combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
-		return (curButtons & combo) == combo && (prevButtons & combo) != combo;
+	inline static bool btnUp (Keybind combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
+		return (curButtons & underlying_value(combo)) == underlying_value(combo) && (prevButtons & underlying_value(combo)) != underlying_value(combo);
 	}
 
-	inline static bool btnDown (std::uint64_t combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
-		return (curButtons & combo) != combo && (prevButtons & combo) == combo;
+	inline static bool btnDown (Keybind combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
+		return (curButtons & underlying_value(combo)) != underlying_value(combo) && (prevButtons & underlying_value(combo)) == underlying_value(combo);
 	}
 
 	/**
- 	 * Called from our modified skyline because Skyline's plugin system sucks huge garbage.
+ 	 * Called from our modified skyline when ready.
  	 */
-	void SetupEverything();
+	void bf2mods_main();
 
 } // namespace bf2mods

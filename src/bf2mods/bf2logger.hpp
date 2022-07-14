@@ -7,15 +7,20 @@
 #include <string>
 #include <vector>
 
+#include <bf2mods/utils.hpp>
+
 namespace bf2mods {
 
 	/**
 	 * Debug console/logger thing.
 	 * This shows up on the physical screen as well as
-	 * the Skyline logger console.
+	 * the Skyline TCP console.
 	 */
 	struct Logger {
 		Logger();
+
+		BF2MODS_DISALLOW_COPY(Logger, "only one instance of the logger is allowed");
+		BF2MODS_DISALLOW_MOVE(Logger, "only one instance of the logger is allowed");
 
 		/**
 		 * Severity enumeration.
@@ -59,18 +64,22 @@ namespace bf2mods {
 		inline void LogDebug(const char* fmt, Args... args) {
 			LogMessage(Severity::Debug, fmt, std::forward<Args>(args)...);
 		}
+
 		template<class ...Args>
 		inline void LogInfo(const char* fmt, Args... args) {
 			LogMessage(Severity::Info, fmt, std::forward<Args>(args)...);
 		}
+
 		template<class ...Args>
 		inline void LogWarning(const char* fmt, Args... args) {
 			LogMessage(Severity::Warning, fmt, std::forward<Args>(args)...);
 		}
+
 		template<class ...Args>
 		inline void LogError(const char* fmt, Args... args) {
 			LogMessage(Severity::Error, fmt, std::forward<Args>(args)...);
 		}
+
 		template<class ...Args>
 		inline void LogFatal(const char* fmt, Args... args) {
 			LogMessage(Severity::OopsOuchMyBonesTheyHaveFallenHelpNoNoNONONO, fmt, std::forward<Args>(args)...);
