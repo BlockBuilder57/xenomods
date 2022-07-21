@@ -7,12 +7,12 @@ namespace util {
 			uintptr_t addr;
 
 			if (R_SUCCEEDED(nn::ro::LookupSymbol(&addr, name))) {
-				skyline::logger::s_Instance->LogFormat("[bf2mods.ResolveBase] Resolved \"%s\" successfully to %p\n",
+				skyline::logger::s_Instance->LogFormat("[bf2mods.ResolveBase] Resolved \"%s\" successfully to %p",
 				                                       name, addr);
 				*Output = reinterpret_cast<void*>(addr);
 				return true;
 			} else {
-				skyline::logger::s_Instance->LogFormat("[bf2mods.ResolveBase] Failed to look \"%s\" up!\n", name);
+				skyline::logger::s_Instance->LogFormat("[bf2mods.ResolveBase] Failed to look \"%s\" up!", name);
 				// Set the output pointer to a obviously invalid value,
 				// so that in errors (if this ends up getting called/used)
 				// the error will show 0xDEADDEAD

@@ -78,6 +78,10 @@ target_include_directories(bf2mods PUBLIC ${PROJECT_BINARY_DIR}/)
 
 target_link_libraries(bf2mods PUBLIC glm::glm)
 
+target_compile_definitions(bf2mods PUBLIC
+	__BF2MODS_CODENAME_${BF2MODS_CODENAME}
+)
+
 # NPDM/NSO output.
 add_npdm(bf2mods ${PROJECT_SOURCE_DIR}/npdm/${BF2MODS_CODENAME}.json main)
 add_nso_target(bf2mods)

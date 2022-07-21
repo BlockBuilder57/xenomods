@@ -37,6 +37,14 @@
 #define BF2MODS_DISALLOW_MOVE(T, reason) T(T&&) = delete;
 #define BF2MODS_DISALLOW_COPY(T, reason) T(const T&) = delete;
 
+// Preprocessor macro beautifier for testing
+// what codename we are compiling for.
+//
+// This can be used to gate off code
+// for one particular codename.
+// Intended to be used in expressions.
+#define BF2MODS_CODENAME(cn) defined __BF2MODS_CODENAME_##cn
+
 namespace bf2mods {
 	// FIXME: const/by-value versions?
 
