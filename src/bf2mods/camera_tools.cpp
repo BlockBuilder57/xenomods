@@ -104,7 +104,9 @@ namespace bf2mods::CameraTools {
 		// movement
 		mm::Vec3 move {};
 		if(btnHeld(FREECAM_FOVHOLD, p2Cur.Buttons)) {
-			freecamState->fov += -lStick.y * 0.25f; // modify fov
+			// holding down the button, so modify fov
+			// note: game hard crashes during rendering when |fov| >= 180, it needs clamping
+			freecamState->fov = std::clamp(freecamState->fov + -lStick.y * 0.25f, -179.f, 179.f);
 		} else {
 			move = { lStick.x, 0, -lStick.y };
 			move = rot * move; // rotate movement to local space
@@ -122,11 +124,16 @@ namespace bf2mods::CameraTools {
 
 		// rotation
 		mm::Vec3 look {};
+		float lookMult = 3.f;
+
+		// slow the camera down at lower fovs
+		if(std::abs(freecamState->fov) < 45.f)
+			lookMult *= freecamState->fov / 45.f;
+
 		if(btnHeld(FREECAM_ROLLHOLD, p2Cur.Buttons))
 			look = { 0, 0, -rStick.x * 0.25f }; // only roll
 		else
-			look = { rStick.y, -rStick.x, 0 }; // pitch and yaw
-		look *= 3.f;
+			look = { rStick.y * lookMult, -rStick.x * lookMult, 0 }; // pitch and yaw
 
 		// yaw is in world space
 		float yawDeg = glm::radians(look.y);
