@@ -21,11 +21,13 @@
 
 namespace ml {
 
-	GENERATE_SYM_HOOK(ScnObjCam_setViewMatrix, "_ZN2ml9ScnObjCam13setViewMatrixERKN2mm5Mat44E", void, ScnObjCam* this_pointer, mm::Mat44& matrix) {
+	template<auto backupFunction>
+	void FreecamUpdateMatrix(ScnObjCam* this_pointer, mm::Mat44& matrix) {
+
 		if(this_pointer->ScnPtr != nullptr) {
 			if(this_pointer != this_pointer->ScnPtr->getCam(-1)) {
 				// not our active cam, move on
-				ScnObjCam_setViewMatrixBak(this_pointer, matrix);
+				(*backupFunction)(this_pointer, matrix);
 				return;
 			}
 		}
@@ -36,11 +38,19 @@ namespace ml {
 			freecamState->matrix = matrix; // put current cam info into the state
 
 		if(freecamState->isOn)
-			ScnObjCam_setViewMatrixBak(this_pointer, freecamState->matrix);
+			(*backupFunction)(this_pointer, freecamState->matrix);
 		else
-			ScnObjCam_setViewMatrixBak(this_pointer, matrix);
+			(*backupFunction)(this_pointer, matrix);
 
 		//fw::debug::drawFont(0, 0, &mm::Col4::White, "mat: %s", bf2mods::Prettyprinter<mm::Mat44>::format(this_pointer->AttrTransformPtr[1].weirdMatrix, 3).c_str());
+	}
+
+	GENERATE_SYM_HOOK(ScnObjCam_setViewMatrix, "_ZN2ml9ScnObjCam13setViewMatrixERKN2mm5Mat44E", void, ScnObjCam* this_pointer, mm::Mat44& matrix) {
+		FreecamUpdateMatrix<&ScnObjCam_setViewMatrixBak>(this_pointer, matrix);
+	}
+
+	GENERATE_SYM_HOOK(ScnObjCam_setWorldMatrix, "_ZN2ml9ScnObjCam14setWorldMatrixERKN2mm5Mat44E", void, ScnObjCam* this_pointer, mm::Mat44& matrix) {
+		FreecamUpdateMatrix<&ScnObjCam_setWorldMatrixBak>(this_pointer, matrix);
 	}
 
 	GENERATE_SYM_HOOK(ScnObjCam_updateFovNearFar, "_ZN2ml9ScnObjCam16updateFovNearFarEv", void, ScnObjCam* this_pointer) {
@@ -88,9 +98,13 @@ namespace bf2mods::CameraTools {
 		glm::vec4 perspective {};
 
 		// decompose existing matrix
-		// remember: the inverse of the matrix is needed to get the true positions
-		// essentially walking back the matrix to get world space instead of local space
+#if BF2MODS_CODENAME(bfsw)
+		glm::decompose(freecamState->matrix, scale, rot, pos, skew, perspective);
+#else
+		// remember: the inverse of the matrix is needed to get the world positions
+		// essentially walking back the matrix to get world space instead of local (camera) space
 		glm::decompose(glm::inverse(freecamState->matrix), scale, rot, pos, skew, perspective);
+#endif
 
 		mm::Vec2 lStick = p2Cur.LAxis;
 		mm::Vec2 rStick = p2Cur.RAxis;
@@ -159,7 +173,9 @@ namespace bf2mods::CameraTools {
 		mm::Mat44 newmat = glm::mat4(1.f);
 		newmat = glm::translate(newmat, pos + move);
 		newmat = glm::rotate(newmat, angle, axis);
-		newmat = glm::inverse(newmat);
+#if !BF2MODS_CODENAME(bfsw)
+		newmat = glm::inverse(newmat); // convert back to local space
+#endif
 
 		freecamState->matrix = newmat;
 	}
@@ -167,7 +183,11 @@ namespace bf2mods::CameraTools {
 	void SetupCameraTools() {
 		g_Logger->LogInfo("Setting up camera tools...");
 
+#if BF2MODS_CODENAME(bfsw)
+		ml::ScnObjCam_setWorldMatrixHook();
+#else
 		ml::ScnObjCam_setViewMatrixHook();
+#endif
 		ml::ScnObjCam_updateFovNearFarHook();
 	}
 

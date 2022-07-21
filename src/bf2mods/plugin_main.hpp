@@ -58,6 +58,11 @@ namespace bf2mods {
 	}
 
 	/**
+ 	 * Called on each Framework update.
+ 	 */
+	void update();
+
+	/**
  	 * Called from our modified skyline when ready.
  	 */
 	void bf2mods_main();

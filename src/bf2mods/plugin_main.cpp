@@ -18,14 +18,30 @@ namespace fw {
 
 	GENERATE_SYM_HOOK(Framework_update, "_ZN2fw9Framework6updateEv", void, void* that) {
 		Framework_updateBak(that);
+		bf2mods::update();
+	}
 
+	GENERATE_SYM_HOOK(FrameworkUpdater_updateStd, "_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE", void, void* Document, void* FrameworkController) {
+		FrameworkUpdater_updateStdBak(Document, FrameworkController);
+		bf2mods::update();
+	}
+
+} // namespace fw
+
+namespace bf2mods {
+
+	HidInput p1Cur {};
+	HidInput p1Prev {};
+	HidInput p2Cur {};
+	HidInput p2Prev {};
+
+	void update() {
 		// lazy
 		using enum bf2mods::Keybind;
 		using bf2mods::p1Cur;
 		using bf2mods::p1Prev;
 		using bf2mods::p2Cur;
 		using bf2mods::p2Prev;
-
 
 		// Read controllers
 		p1Cur.Buttons = 0ul;
@@ -55,6 +71,15 @@ namespace fw {
 		//int buttonsP2Width = fw::debug::drawFontGetWidth("%xh - P2", p2Cur.Buttons);
 		//fw::debug::drawFont(1280-buttonsP1Width-5, 5, &mm::Col4::White, "%xh - P1", p1Cur.Buttons);
 		//fw::debug::drawFont(1280-buttonsP2Width-5, 5+16, &mm::Col4::White, "%xh - P2", p2Cur.Buttons);
+
+		/*
+		 * Enforce some things on first update
+		 */
+		static bool hasUpdated;
+		if(!hasUpdated) {
+			nn::hid::SetSupportedNpadStyleSet(3);
+			hasUpdated = true;
+		}
 
 		/*
 		 * Check buttons
@@ -152,27 +177,25 @@ namespace fw {
 		bf2mods::g_Logger->Draw();
 	}
 
-} // namespace fw
-
-namespace bf2mods {
-
-	HidInput p1Cur {};
-	HidInput p1Prev {};
-	HidInput p2Cur {};
-	HidInput p2Prev {};
-
 	void bf2mods_main() {
 		Plugin::init();
 
 		// hook stuff
 		SetupDebugStuff();
-		SetupPlayerMovementHooks();
 		SetupBdatRandomizer();
-		SetupMenuViewer();
 		CameraTools::SetupCameraTools();
 
+#if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
+		SetupPlayerMovementHooks();
+		SetupMenuViewer();
+#endif
+
 		// for debug keys
+#if !BF2MODS_CODENAME(bfsw)
 		fw::Framework_updateHook();
+#else
+		fw::FrameworkUpdater_updateStdHook();
+#endif
 	}
 
 } // namespace bf2mods
