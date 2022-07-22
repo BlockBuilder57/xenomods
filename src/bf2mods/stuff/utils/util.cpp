@@ -6,9 +6,9 @@ namespace util {
 		bool ResolveBase(void** Output, const char* name) {
 			uintptr_t addr;
 
-			if (R_SUCCEEDED(nn::ro::LookupSymbol(&addr, name))) {
+			if(R_SUCCEEDED(nn::ro::LookupSymbol(&addr, name))) {
 				skyline::logger::s_Instance->LogFormat("[bf2mods.ResolveBase] Resolved \"%s\" successfully to %p",
-				                                       name, addr);
+													   name, addr);
 				*Output = reinterpret_cast<void*>(addr);
 				return true;
 			} else {
@@ -24,15 +24,15 @@ namespace util {
 		void nnRandBase(void* input, std::size_t size) {
 			nn::os::GenerateRandomBytes(input, size);
 		}
-	}
+	} // namespace detail
 
 	FpsLogger::FpsLogger()
-			: m_lastSecondTick(armGetSystemTick()) {
+		: m_lastSecondTick(armGetSystemTick()) {
 	}
 
 	void FpsLogger::tick() {
 		auto curTick = armGetSystemTick();
-		if (curTick - m_lastSecondTick > armGetSystemTickFreq()) {
+		if(curTick - m_lastSecondTick > armGetSystemTickFreq()) {
 			LOG("%d fps", m_frameCount);
 			m_frameCount = 0;
 			m_lastSecondTick = armGetSystemTick();
@@ -41,5 +41,4 @@ namespace util {
 		}
 	}
 
-}
-
+} // namespace util

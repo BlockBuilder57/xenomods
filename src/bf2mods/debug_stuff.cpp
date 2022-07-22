@@ -1,48 +1,29 @@
 #include "debug_stuff.hpp"
 
+#include <bf2mods/fw/debug.hpp>
+#include <bf2mods/game/mapjump.hpp>
+#include <bf2mods/game/scripts.hpp>
+#include <bf2mods/gf/bgm.hpp>
+#include <bf2mods/mm/math_types.hpp>
+#include <bf2mods/stuff/utils/debug_util.hpp>
+#include <bf2mods/tl/title.hpp>
+#include <map>
+
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
-#include "plugin.hpp"
-#include "skyline/logger/Logger.hpp"
 
-//#include <bf2mods/prettyprinter.hpp>
+#if BF2MODS_CODENAME(bfsw)
+namespace game {
 
-#include <bf2mods/mm/math_types.hpp>
-#include <bf2mods/stuff/utils/debug_util.hpp>
-#include <bf2mods/gf/bgm.hpp>
-#include <map>
+	GENERATE_SYM_HOOK(SeqUtil_requestMapJump, "_ZN4game7SeqUtil14requestMapJumpERKN2fw8DocumentERKNS_16MapJumpSetupInfoE", void, void* Document, MapJumpSetupInfo* sInfo) {
+		SeqUtil_requestMapJumpBak(Document, sInfo);
 
-void(* cxa_pure_virtual)();
-
-namespace fw {
-
-	namespace debug {
-
-		bool (*drawAxis)(const mm::Mat44* transform, float scale);
-		bool (*drawFont)(int x, int y, const mm::Col4* color, const char* fmt, ...);
-		int (*drawFontGetWidth)(const char* fmt, ...);
-		int (*drawFontGetHeight)(const char* fmt, ...);
-		void (*drawCompareZ)(bool compare);
-
-		unsigned (*drawArrow)(const mm::Vec3& vStart, const mm::Vec3& vEnd, const mm::Col4& color);
-		unsigned (*drawLine)(const mm::Vec3& vStart, const mm::Vec3& vEnd, const mm::Col4& color);
-
+		bf2mods::g_Logger->LogInfo("setup: %02u, %02u, %s, %s, %s", sInfo->chapter, sInfo->location, bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->maybeVec).c_str(), bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->jump_pos).c_str(), bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->jump_rot).c_str());
 	}
 
-	namespace PadManager {
-
-		void (*enableDebugDraw)(bool enable);
-
-		GENERATE_SYM_HOOK(update, "_ZN2fw10PadManager6updateERKNS_10UpdateInfoE", void, void* this_pointer, void* updateInfo) {
-			updateBak(this_pointer, updateInfo);
-			enableDebugDraw(true);
-			bf2mods::bgmTrackIndex = 0;
-		}
-
-	}
-
-} // namespace fw
+} // namespace game
+#endif
 
 namespace ml {
 
@@ -62,15 +43,7 @@ namespace ml {
 
 	}
 
-}
-
-namespace tl {
-
-	namespace TitleMain {
-		void (*returnTitle)(/*SAVESLOT*/unsigned int slot);
-	} // namespace TitleMain
-
-} // namespace tl
+} // namespace ml
 
 namespace mm {
 
@@ -116,15 +89,17 @@ namespace gf {
 			bf2mods::g_Logger->LogInfo("it's %s", barack_obama);
 		}*/
 
-		if (this_pointer->isPlaying()) {
+		const int height = fw::debug::drawFontGetHeight();
+
+		if(this_pointer->isPlaying()) {
 			//mm::mtl::FixStr<64> fixStr;
 			//memcpy(&fixStr.buffer, "asscafe", sizeof("asscafe"));
 			//this_pointer->makePlayFileName(&fixStr);
 
-			fw::debug::drawFont(0, (720) - (bf2mods::bgmTrackIndex++ * 16) - 16, &mm::Col4::White, "%s: %s %.1f/%.1f, looping: %s", trackName, this_pointer->getPlayingBgmFileName() , this_pointer->getPlayTime(), this_pointer->getTotalTime(), bf2mods::format(this_pointer->isLoop()).c_str());
-		}
-		else {
-			//fw::debug::drawFont(1280/2, (720/2) + (bf2mods::bgmTrackTest++ * 16), &mm::Col4::White, "not playing");
+			fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "%s: %s %.1f/%.1f, looping: %s", trackName, this_pointer->getPlayingBgmFileName(), this_pointer->getPlayTime(), this_pointer->getTotalTime(), bf2mods::format(this_pointer->isLoop()).c_str());
+		} else {
+			// uncomment if you want every BgmTrack instance to show this
+			//fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "not playing");
 		}
 	}
 
@@ -138,69 +113,72 @@ namespace gf {
 
 } // namespace gf
 
-namespace bf2mods {
+namespace bf2mods::DebugStuff {
 
 	int bgmTrackIndex = 0;
 
 	void DoMapJump(unsigned int mapjumpId) {
+#if !BF2MODS_CODENAME(bfsw)
 		gf::GfPlayFactory::createSkipTravel(mapjumpId);
 		gf::GfMenuObjUtil::playSE(gf::GfMenuObjUtil::SEIndex::mapjump);
+#else
+		game::MapJumpSetupInfo info;
+
+		if (fw::document == nullptr) {
+			g_Logger->LogError("can't do a map jump cause no doc ptr!");
+			return;
+		}
+
+		g_Logger->LogInfo("going to make info");
+		game::SeqUtil::makeMapJumpSetupInfoFromLandmark(info, *fw::document, mapjumpId);
+		g_Logger->LogInfo("made info, going to request jump");
+		game::SeqUtil::requestMapJump(*fw::document, info);
+		g_Logger->LogInfo("jump requested");
+#endif
 	}
 
 	void PlaySE(unsigned int soundEffect) {
+#if !BF2MODS_CODENAME(bfsw)
 		gf::GfMenuObjUtil::playSE((gf::GfMenuObjUtil::SEIndex)soundEffect);
+#endif
 	}
 	void PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect) {
+#if !BF2MODS_CODENAME(bfsw)
 		gf::GfMenuObjUtil::playSE(soundEffect);
+#endif
 	}
 
 	void ReturnTitle(unsigned int slot) {
-		tl::TitleMain::returnTitle(slot);
+#if !BF2MODS_CODENAME(bfsw)
+		tl::TitleMain::returnTitle((gf::SAVESLOT)slot);
+#else
+		if (fw::document == nullptr) {
+			g_Logger->LogError("can't return to title cause no doc ptr!");
+			return;
+		}
+		game::SeqUtil::returnTitle(*fw::document);
+#endif
 	}
 
-	void SetupDebugStuff() {
-		mm::MMStdBase::mmAssertHook();
-
-		g_Logger->LogInfo("Resolving fw::debug::draw* hooks...");
-
-		// Load debug draw functions. Once this is setup the g_Logger can be used
-		// !!!!!! TODO !!!!!! MOVE THIS INTO SEPARATE FILES PER SUBSYSTEM
-		util::ResolveSymbol<decltype(fw::debug::drawAxis)>(&fw::debug::drawAxis, "_ZN2fw5debug8drawAxisERKN2mm5Mat44Ef");
-		util::ResolveSymbol<decltype(fw::debug::drawFont)>(&fw::debug::drawFont, "_ZN2fw5debug8drawFontEiiRKN2mm4Col4EPKcz");
-		util::ResolveSymbol<decltype(fw::debug::drawFontGetWidth)>(&fw::debug::drawFontGetWidth, "_ZN2fw5debug16drawFontGetWidthEPKcz");
-		util::ResolveSymbol<decltype(fw::debug::drawFontGetHeight)>(&fw::debug::drawFontGetHeight, "_ZN2fw5debug17drawFontGetHeightEv");
-		util::ResolveSymbol<decltype(fw::debug::drawCompareZ)>(&fw::debug::drawCompareZ, "_ZN2fw5debug12drawCompareZEb");
-
-
-		util::ResolveSymbol<decltype(fw::debug::drawArrow)>(&fw::debug::drawArrow, "_ZN2fw5debug9drawArrowERKN2mm4Vec3ES4_RKNS1_4Col4E");
-		util::ResolveSymbol<decltype(fw::debug::drawLine)>(&fw::debug::drawLine, "_ZN2fw5debug8drawLineERKN2mm4Vec3ES4_RKNS1_4Col4E");
-
-		//util::ResolveSymbol<void(*)()>(&cxa_pure_virtual, "__cxa_pure_virtual");
-
-		/*uintptr_t cxa_pure_virtual;
-
-		if (R_SUCCEEDED(nn::ro::LookupSymbol(&cxa_pure_virtual, "__cxa_pure_virtual"))) {
-			g_Logger->LogWarning("we're good");
-		} else {
-			g_Logger->LogFatal("NOT FINE NOT FINE");
-		}*/
-
+	void Setup() {
 		g_Logger->LogInfo("Setting up debug stuff...");
 
-		util::ResolveSymbol<decltype(fw::PadManager::enableDebugDraw)>(&fw::PadManager::enableDebugDraw, "_ZN2fw10PadManager15enableDebugDrawEb");
-		fw::PadManager::updateHook();
+		mm::MMStdBase::mmAssertHook();
 
 		//util::ResolveSymbol<decltype(ml::DrMdlMan::headerChek)>(&ml::DrMdlMan::headerChek, "_ZN2ml8DrMdlMan10headerChekEPKv");
 		//ml::DrMdlMan::createMdlHook();
 		//ml::DrMdlMan::createInstantMdlHook();
 
+#if BF2MODS_CODENAME(bfsw)
+		game::SeqUtil_requestMapJumpHook();
+#else
 		//event::MovieManager_makePathHook();
 		gf::BgmTrack_updateHook();
 
 		// Resolve some game framework symbols
 		util::ResolveSymbol<decltype(gf::GfPlayFactory::createSkipTravel)>(&gf::GfPlayFactory::createSkipTravel, "_ZN2gf13GfPlayFactory16createSkipTravelEj");
 		util::ResolveSymbol<decltype(gf::GfMenuObjUtil::playSE)>(&gf::GfMenuObjUtil::playSE, "_ZN2gf13GfMenuObjUtil6playSEEj");
-		util::ResolveSymbol<decltype(tl::TitleMain::returnTitle)>(&tl::TitleMain::returnTitle, "_ZN2tl9TitleMain11returnTitleEN2gf8SAVESLOTE");
+#endif
 	}
 
-} // namespace bf2mods
+} // namespace bf2mods::DebugStuff

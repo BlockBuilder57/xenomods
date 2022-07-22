@@ -2,12 +2,11 @@
 #define BF2MODS_LOGGER_H
 
 #include <array>
+#include <bf2mods/utils.hpp>
 #include <cstdarg>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <bf2mods/utils.hpp>
 
 namespace bf2mods {
 
@@ -60,27 +59,27 @@ namespace bf2mods {
 			LogMessage(severity, strBuf);
 		}
 
-		template<class ...Args>
+		template<class... Args>
 		inline void LogDebug(const char* fmt, Args... args) {
 			LogMessage(Severity::Debug, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class ...Args>
+		template<class... Args>
 		inline void LogInfo(const char* fmt, Args... args) {
 			LogMessage(Severity::Info, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class ...Args>
+		template<class... Args>
 		inline void LogWarning(const char* fmt, Args... args) {
 			LogMessage(Severity::Warning, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class ...Args>
+		template<class... Args>
 		inline void LogError(const char* fmt, Args... args) {
 			LogMessage(Severity::Error, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class ...Args>
+		template<class... Args>
 		inline void LogFatal(const char* fmt, Args... args) {
 			LogMessage(Severity::OopsOuchMyBonesTheyHaveFallenHelpNoNoNONONO, fmt, std::forward<Args>(args)...);
 		}
@@ -115,7 +114,6 @@ namespace bf2mods {
 			Severity severity;
 		};
 
-
 		/**
 		 * The max amount of logger lines.
 		 * Cause we don't hardcode around here.
@@ -125,7 +123,7 @@ namespace bf2mods {
 		 * The lifetime in frames of logger lines.
 		 * Xenoblade runs at 30fps (or at least tries to) and 5 seconds sounds like a good length.
 		 */
-		constexpr static auto LINE_LIFETIME = 5*30;
+		constexpr static auto LINE_LIFETIME = 5 * 30;
 		/**
 		 * When the alpha fadeout of the line starts.
 		 */

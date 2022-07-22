@@ -1,25 +1,15 @@
 #include "bdat_randomizer.hpp"
 
 #include <version.h>
-#include "bf2logger.hpp"
 
+#include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
+#include <bf2mods/bdat/bdat.hpp>
 #include "nn/oe.h"
 #include "plugin.hpp"
-#include "skyline/logger/Logger.hpp"
 
 // Bdat syms & hooks
 namespace Bdat {
-
-	// These functions aren't hooked by us;
-	// instead we *resolve* them when starting up
-	// so we can just use them as is, just as if we were game code.
-
-	std::uint64_t (*getIdCount)(std::uint8_t*);
-
-	std::uint64_t (*getIdTop)(std::uint8_t*);
-
-	char* (*getSheetName)(std::uint8_t*);
 
 	GENERATE_SYM_HOOK(getMSText, "_ZN4Bdat9getMSTextEPhi", const char*, std::uint8_t* bdatData, int n) {
 		//skyline::logger::s_Instance->LogFormat("Bdat::getMSText(bdat: %p, n: %d)", bdatData, n);
@@ -59,17 +49,13 @@ namespace Bdat {
 	// todo more stuff to randomize more things
 } // namespace Bdat
 
-namespace bf2mods {
+namespace bf2mods::BdatRandomizer {
 
-	void SetupBdatRandomizer() {
+	void Setup() {
 		g_Logger->LogInfo("Setting up BDAT randomizer...");
-
-		util::ResolveSymbol<decltype(Bdat::getIdCount)>(&Bdat::getIdCount, "_ZN4Bdat10getIdCountEPh");
-		util::ResolveSymbol<decltype(Bdat::getIdTop)>(&Bdat::getIdTop, "_ZN4Bdat8getIdTopEPh");
-		util::ResolveSymbol<decltype(Bdat::getSheetName)>(&Bdat::getSheetName, "_ZN4Bdat12getSheetNameEPh");
 
 		// Hook stuff
 		Bdat::getMSTextHook();
 	}
 
-} // namespace bf2mods
+} // namespace bf2mods::BdatRandomizer

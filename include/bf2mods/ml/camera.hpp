@@ -10,14 +10,14 @@
 namespace ml {
 
 	struct AttrTransform {
-		mm::Vec3 pos; //0x4
-		INSERT_PADDING_BYTES(0x4) //0xc
+		mm::Vec3 pos;							//0x4
+		INSERT_PADDING_BYTES(0x4)				//0xc
 		INSERT_PADDING_BYTES(sizeof(mm::Vec3)); //0x10
-		INSERT_PADDING_BYTES(0x4) //0x1c
-		INSERT_PADDING_BYTES(0x50) //0x20
-		mm::Mat44 CamInverseMatrix; //0x70
-		mm::Mat44 weirdMatrix; //0xb0
-		mm::Vec3 eulerAngles; //0xf0
+		INSERT_PADDING_BYTES(0x4)				//0x1c
+		INSERT_PADDING_BYTES(0x50)				//0x20
+		mm::Mat44 CamInverseMatrix;				//0x70
+		mm::Mat44 weirdMatrix;					//0xb0
+		mm::Vec3 eulerAngles;					//0xf0
 	};
 
 	// This seems to be a struct that continues AttrTransform
@@ -34,9 +34,9 @@ namespace ml {
 	class ScnObjCam {
 	   public:
 		INSERT_PADDING_BYTES(0x8)
-		Scn* ScnPtr{};
+		Scn* ScnPtr {};
 		INSERT_PADDING_BYTES(0x70)
-		AttrTransformInheriter* AttrTransformPtr{};
+		AttrTransformInheriter* AttrTransformPtr {};
 	};
 
 	class Scn {

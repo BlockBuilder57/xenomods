@@ -1,10 +1,9 @@
 #include "bf2logger.hpp"
 
-#include "debug_stuff.hpp" // fw::debug
+#include <bf2mods/fw/debug.hpp>
 #include "skyline/logger/Logger.hpp"
 
 namespace bf2mods {
-
 
 	template<>
 	struct Prettyprinter<Logger::Severity> {
@@ -30,8 +29,9 @@ namespace bf2mods {
 			return ss.str();
 		}
 
-		inline static std::string_view type_name() { return "Logger::Severity"; }
-
+		inline static std::string_view type_name() {
+			return "Logger::Severity";
+		}
 	};
 
 	static mm::Col4 ColorForSeverity(const Logger::Severity& severity) {
@@ -75,7 +75,7 @@ namespace bf2mods {
 			auto& msg = lines[i];
 
 			// check lifetime greater than 0, but also decrement it for next time
-			if (msg.lifetime-- > 0)
+			if(msg.lifetime-- > 0)
 				DrawInternal(i, 5 + 0, 5 + (i * 16));
 			else
 				// erase the current index but decrement i so we try again with the next one
@@ -87,19 +87,18 @@ namespace bf2mods {
 		mm::Col4 colMain = ColorForSeverity(lines[index].severity);
 		mm::Col4 colBack = mm::Col4::Black;
 
-		if (lines[index].lifetime == 0) {
+		if(lines[index].lifetime == 0) {
 			// this shouldn't happen but better to be safe
 			colMain.a = 0.f;
 			colBack.a = 0.f;
-		}
-		else if (lines[index].lifetime <= FADEOUT_START) {
+		} else if(lines[index].lifetime <= FADEOUT_START) {
 			// make the text fade out before it gets removed
 			colMain.a = lines[index].lifetime / (float)FADEOUT_START;
 			colBack.a = lines[index].lifetime / (float)FADEOUT_START;
 		}
 
-		fw::debug::drawFont(x + 1, y + 1, &colBack, "[%s] %s", format(lines[index].severity).c_str(), lines[index].text.c_str());
-		fw::debug::drawFont(x, y, &colMain, "[%s] %s", format(lines[index].severity).c_str(), lines[index].text.c_str());
+		fw::debug::drawFont(x + 1, y + 1, colBack, "[%s] %s", format(lines[index].severity).c_str(), lines[index].text.c_str());
+		fw::debug::drawFont(x, y, colMain, "[%s] %s", format(lines[index].severity).c_str(), lines[index].text.c_str());
 	}
 
 	void Logger::AddMessageInternal(Severity severity, const std::string& message) {
@@ -107,17 +106,15 @@ namespace bf2mods {
 
 		std::size_t slot = lines.size() - 1;
 
-		if (slot < 0)
+		if(slot < 0)
 			slot = 0;
 
-		if (slot >= 0 && lines.size() < Logger::MAX_LINES) {
+		if(slot >= 0 && lines.size() < Logger::MAX_LINES) {
 			// if we have a slot and lines is not full, add one
-			lines.push_back({
-				.text = message,
-				.lifetime = Logger::LINE_LIFETIME,
-				.severity = severity
-			});
-		} else if (!lines.empty()) {
+			lines.push_back({ .text = message,
+							  .lifetime = Logger::LINE_LIFETIME,
+							  .severity = severity });
+		} else if(!lines.empty()) {
 			// otherwise, erase the oldest one
 			lines.erase(lines.begin());
 		}

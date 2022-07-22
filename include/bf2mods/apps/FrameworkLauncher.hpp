@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "../utils.hpp"
 #include "../ml/camera.hpp"
+#include "../utils.hpp"
 
 namespace apps {
 

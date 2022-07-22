@@ -1,14 +1,13 @@
 // moved into a new TU because it should have been that way in the first place
 
-#include <bf2mods/stuff/utils/debug_util.hpp>
-
 #include <cxxabi.h>
 
+#include <bf2mods/stuff/utils/debug_util.hpp>
+#include <bf2mods/stuff/utils/hid.hpp>
 #include <list>
 #include <sstream>
 #include <unordered_map>
 
-#include <bf2mods/stuff/utils/hid.hpp>
 #include "nn/diag.h"
 #include "nn/hid.hpp"
 #include "skyline/logger/Logger.hpp"
@@ -20,28 +19,28 @@ extern "C" uint64_t __module_start;
 namespace dbgutil {
 
 	std::array<uintptr_t, MAX_TRACE_SIZE> getStackTrace() {
-		auto result = std::array<uintptr_t, MAX_TRACE_SIZE>{0};
+		auto result = std::array<uintptr_t, MAX_TRACE_SIZE> { 0 };
 		nn::diag::GetBacktrace(result.data(), MAX_TRACE_SIZE);
 		return result;
 	}
 
 	std::string getSymbol(uintptr_t address) {
-		std::array<char, 0x100> symbolStrBuffer{0};
+		std::array<char, 0x100> symbolStrBuffer { 0 };
 		nn::diag::GetSymbolName(symbolStrBuffer.data(), symbolStrBuffer.size(), address);
 
-		if (!(strlen(symbolStrBuffer.data()) > 0)) {
+		if(!(strlen(symbolStrBuffer.data()) > 0)) {
 			return "";
 		}
 
-		auto symbolAddress = uintptr_t{};
-		if (R_FAILED(nn::ro::LookupSymbol(&symbolAddress, symbolStrBuffer.data()))) {
+		auto symbolAddress = uintptr_t {};
+		if(R_FAILED(nn::ro::LookupSymbol(&symbolAddress, symbolStrBuffer.data()))) {
 			return "nn::ro::LookupSymbol failed";
 		}
 
 		int rc;
 		auto demangledStrBuffer = abi::__cxa_demangle(symbolStrBuffer.data(), nullptr, nullptr, &rc);
 
-		switch (rc) {
+		switch(rc) {
 			case 0: // no error
 				// abi::__cxa_demangle succeeded, so we copy the data from the buffer it returned
 				// and then free() as ABI docs say to do.
@@ -63,19 +62,19 @@ namespace dbgutil {
 	}
 
 	void logStackTrace() {
-		for (auto address : getStackTrace()) {
-			if (!address) {
+		for(auto address : getStackTrace()) {
+			if(!address) {
 				break;
 			}
 
 			auto symbolStrBuffer = getSymbol(address);
 
-			if ((size_t) address > (size_t) &__module_start) {
-				LOG("skyline+%lx %s", (size_t) address - (size_t) &__module_start, symbolStrBuffer.data());
-			} else if ((size_t) address > skyline::utils::g_MainTextAddr) {
-				LOG("%lx %s", (size_t) address - skyline::utils::g_MainTextAddr + TEXT_OFFSET, symbolStrBuffer.data());
+			if((size_t)address > (size_t)&__module_start) {
+				LOG("skyline+%lx %s", (size_t)address - (size_t)&__module_start, symbolStrBuffer.data());
+			} else if((size_t)address > skyline::utils::g_MainTextAddr) {
+				LOG("%lx %s", (size_t)address - skyline::utils::g_MainTextAddr + TEXT_OFFSET, symbolStrBuffer.data());
 			} else {
-				LOG("main-%lx %s", skyline::utils::g_MainTextAddr - (size_t) address, symbolStrBuffer.data());
+				LOG("main-%lx %s", skyline::utils::g_MainTextAddr - (size_t)address, symbolStrBuffer.data());
 			}
 		}
 	}
@@ -83,19 +82,19 @@ namespace dbgutil {
 	void logRegistersX(InlineCtx* ctx) {
 		constexpr auto REGISTER_COUNT = sizeof(ctx->registers) / sizeof(ctx->registers[0]);
 
-		for (auto i = 0u; i < REGISTER_COUNT; i++) {
+		for(auto i = 0u; i < REGISTER_COUNT; i++) {
 			LOG("X%d: %lx", i, ctx->registers[i].x);
 		}
 	}
 
 	void logMemory(void* address, size_t len) {
 #ifndef NOLOG
-		static const char NIBBLE_LOOKUP[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-		                                     '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+		static const char NIBBLE_LOOKUP[] = { '0', '1', '2', '3', '4', '5', '6', '7',
+											  '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 		uint8_t* addressAsBytes = static_cast<uint8_t*>(address);
 		char printBuffer[len * 3];
-		for (auto i = 0u; i < len; i++) {
+		for(auto i = 0u; i < len; i++) {
 			auto printBufferOffset = i * 3;
 			printBuffer[printBufferOffset] = NIBBLE_LOOKUP[addressAsBytes[i] >> 4];
 			printBuffer[printBufferOffset + 1] = NIBBLE_LOOKUP[addressAsBytes[i] & 0xF];
@@ -117,35 +116,35 @@ namespace dbgutil {
 		constexpr auto DISABLE_BREAK_POINTS_KEY = nn::hid::KEY_LSTICK | nn::hid::KEY_RSTICK;
 
 		static auto breakpointIsDisabled = false;
-		if (breakpointIsDisabled) {
+		if(breakpointIsDisabled) {
 			return;
 		}
 
-		auto npadScanner = util::NpadScanner{.useHandheldStyle = true, .npadId = nn::hid::CONTROLLER_PLAYER_1};
+		auto npadScanner = util::NpadScanner { .useHandheldStyle = true, .npadId = nn::hid::CONTROLLER_PLAYER_1 };
 		npadScanner.scanInput(); // prepare privButtons
 
 		LOG("breakpoint reached: %s", msg.c_str());
 
-		while (true) {
+		while(true) {
 			npadScanner.scanInput();
 
-			if (npadScanner.keyState.Buttons & CONTINUE_HOLD_KEY) {
+			if(npadScanner.keyState.Buttons & CONTINUE_HOLD_KEY) {
 				LOG("breakpoint ignored");
 				break;
 			}
 
-			if (npadScanner.keyComboJustPressed(CONTINUE_ONCE_KEY)) {
+			if(npadScanner.keyComboJustPressed(CONTINUE_ONCE_KEY)) {
 				LOG("breakpoint continued");
 				break;
 			}
 
-			if (npadScanner.keyComboJustPressed(DISABLE_BREAK_POINTS_KEY)) {
+			if(npadScanner.keyComboJustPressed(DISABLE_BREAK_POINTS_KEY)) {
 				LOG("all breakpoints disabled");
 				breakpointIsDisabled = true;
 				break;
 			}
 
-			if (npadScanner.keyComboJustPressed(LOG_BT_KEY)) {
+			if(npadScanner.keyComboJustPressed(LOG_BT_KEY)) {
 				logStackTrace();
 			}
 

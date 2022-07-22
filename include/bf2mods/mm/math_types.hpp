@@ -2,10 +2,9 @@
 
 #include <bf2mods/prettyprinter.hpp>
 #include <cmath>
-
-#include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 
 namespace mm {
 
@@ -19,7 +18,9 @@ namespace mm {
 	using Transform = Vec3;
 	static_assert(sizeof(Vec3) == 0xC, "size 0xC");
 
-	constexpr float Vec3XZLength(const Vec3& src) { return std::sqrt(src.x * src.x + src.z * src.z); }
+	constexpr float Vec3XZLength(const Vec3& src) {
+		return std::sqrt(src.x * src.x + src.z * src.z);
+	}
 
 	constexpr void Vec3XZNormalizeInPlace(Vec3& src) {
 		float length = Vec3XZLength(src);
@@ -31,8 +32,6 @@ namespace mm {
 		Vec3XZNormalizeInPlace(other);
 		return other;
 	}
-
-
 
 	using Quat = glm::quat;
 
@@ -63,13 +62,13 @@ namespace bf2mods {
 	 */
 	template<>
 	struct Prettyprinter<mm::Vec3> {
-		inline static std::string format(const mm::Vec3 &vec3, const int precision = -1) {
+		inline static std::string format(const mm::Vec3& vec3, const int precision = -1) {
 			std::stringstream ss;
 
-			if (precision > 0)
+			if(precision > 0)
 				ss.precision(precision);
 
-			auto PrintComponentWithName = [&ss](char c, const float &coord) {
+			auto PrintComponentWithName = [&ss](char c, const float& coord) {
 				ss << c << ": " << coord;
 			};
 
@@ -88,15 +87,17 @@ namespace bf2mods {
 			return ss.str();
 		}
 
-		inline static std::string_view type_name() { return "mm::Vec3"; }
+		inline static std::string_view type_name() {
+			return "mm::Vec3";
+		}
 	};
 
 	template<>
 	struct Prettyprinter<mm::Mat44> {
-		inline static std::string format(const mm::Mat44 &mat, const int precision = -1) {
+		inline static std::string format(const mm::Mat44& mat, const int precision = -1) {
 			std::stringstream ss;
 
-			if (precision > 0)
+			if(precision > 0)
 				ss.precision(precision);
 
 			ss << '(';
@@ -121,7 +122,9 @@ namespace bf2mods {
 			return ss.str();
 		}
 
-		inline static std::string_view type_name() { return "mm::Mat44"; }
+		inline static std::string_view type_name() {
+			return "mm::Mat44";
+		}
 	};
 
 } // namespace bf2mods

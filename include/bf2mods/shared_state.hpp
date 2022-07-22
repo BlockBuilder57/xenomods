@@ -40,7 +40,6 @@ namespace bf2mods {
 
 		bool disableFallDamage;
 		float movementSpeedMult;
-
 	};
 
 	// TODO: remove the notion of "shared state" since we don't really need it at the moment.

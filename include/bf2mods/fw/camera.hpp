@@ -8,8 +8,8 @@ namespace fw {
 	struct Camera {
 		INSERT_PADDING_BYTES(64);
 		mm::Vec3 position;
-                int unk;
+		int unk;
 		mm::Vec3 lookAt;
 	};
 
-}
+} // namespace fw

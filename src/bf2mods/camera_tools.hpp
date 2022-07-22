@@ -7,6 +7,6 @@
 namespace bf2mods::CameraTools {
 
 	void DoFreeCameraMovement();
-	void SetupCameraTools();
+	void Setup();
 
-} // namespace bf2mods
+} // namespace bf2mods::CameraTools

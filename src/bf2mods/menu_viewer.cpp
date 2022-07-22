@@ -1,16 +1,14 @@
 #include "menu_viewer.hpp"
 
 #include "bf2logger.hpp"
-
 #include "bf2mods/stuff/utils/util.hpp"
-#include "skyline/logger/Logger.hpp"
 #include "plugin.hpp"
-
+#include "skyline/logger/Logger.hpp"
 
 namespace gf {
 
 	class GfMenuTypes {
-	public:
+	   public:
 		struct Param {
 			uintptr_t field_0x0;
 			uintptr_t field_0x8;
@@ -38,7 +36,7 @@ namespace gf {
 		static void (*ctor)(void* this_pointer, unsigned int param_1);
 	};
 
-	template <typename T>
+	template<typename T>
 	void** GetVTable(T* obj) {
 		return *((void***)obj);
 	}
@@ -60,46 +58,45 @@ namespace gf {
 	}
 	 */
 
-
 } // namespace gf
 
 namespace ui {
 
 	GENERATE_SYM_HOOK(UIManager_createLayer, "_ZN2ui9UIManager11createLayerEj", void*, void* this_pointer, unsigned int param_1) {
 		bf2mods::g_Logger->LogInfo("UIManager::createLayer(%p, %u)", this_pointer, param_1);
-		bf2mods::UIManagerPtr = this_pointer;
+		bf2mods::MenuViewer::UIManagerPtr = this_pointer;
 		return UIManager_createLayerBak(this_pointer, param_1);
 	}
 
 	GENERATE_SYM_HOOK(UIManager_releaseLayer, "_ZN2ui9UIManager12releaseLayerEj", void, void* this_pointer, unsigned int param_1) {
 		bf2mods::g_Logger->LogInfo("UIManager::releaseLayer(%p, %u)", this_pointer, param_1);
-		bf2mods::UIManagerPtr = this_pointer;
+		bf2mods::MenuViewer::UIManagerPtr = this_pointer;
 		UIManager_releaseLayerBak(this_pointer, param_1);
 	}
 	GENERATE_SYM_HOOK(UIManager_terminateLayer, "_ZN2ui9UIManager14terminateLayerEjb", void, void* this_pointer, unsigned int param_1, bool param_2) {
 		bf2mods::g_Logger->LogInfo("UIManager::terminateLayer(%p, %u, %s)", this_pointer, param_1, bf2mods::format(param_2).c_str());
-		bf2mods::UIManagerPtr = this_pointer;
+		bf2mods::MenuViewer::UIManagerPtr = this_pointer;
 		UIManager_terminateLayerBak(this_pointer, param_1, param_2);
 	}
 
 } // namespace ui
 
-namespace bf2mods {
+namespace bf2mods::MenuViewer {
 
 	void* UIManagerPtr;
 
 	void OpenLayer(unsigned int layer) {
-		if (UIManagerPtr != nullptr)
+		if(UIManagerPtr != nullptr)
 			ui::UIManager_createLayerBak(UIManagerPtr, layer);
 	}
 	void CloseLayer(unsigned int layer) {
-		if (UIManagerPtr != nullptr) {
+		if(UIManagerPtr != nullptr) {
 			ui::UIManager_releaseLayerBak(UIManagerPtr, layer);
 			ui::UIManager_terminateLayerBak(UIManagerPtr, layer, false);
 		}
 	}
 
-	void SetupMenuViewer() {
+	void Setup() {
 		g_Logger->LogInfo("Setting up menu viewer...");
 
 		//gf::GfMenuManager_getGameVersionStringHook();
@@ -114,4 +111,4 @@ namespace bf2mods {
 		//ui::UIManager_terminateLayerHook();
 	}
 
-} // namespace bf2mods
+} // namespace bf2mods::MenuViewer

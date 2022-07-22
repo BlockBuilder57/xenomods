@@ -1,19 +1,19 @@
 #pragma once
 
-#include <bf2mods/stuff/utils/util.hpp>
 #include <bf2mods/mm/fixstr.hpp>
+#include <bf2mods/stuff/utils/util.hpp>
 #include <map>
 
 namespace gf {
 
 	class BgmTrack {
-	public:
+	   public:
 		struct VfTable {
 			//std::intptr_t padding[2]; // all 0x00 filler
-			void(BgmTrack::*Dtor)();
-			void(BgmTrack::*DeletingDtor)();
+			void (BgmTrack::*Dtor)();
+			void (BgmTrack::*DeletingDtor)();
 			char* (BgmTrack::*GetTrackName)();
-		}* vtable;
+		} * vtable;
 		//void** vtable;
 		INSERT_PADDING_BYTES(20);
 		char playingBgmFileName[64];
@@ -42,7 +42,5 @@ namespace gf {
 	class BgmGimmick : BgmTrack {
 		bool makePlayFileName(mm::mtl::FixStr<64>* fixStr) const;
 	};
-
-
 
 } // namespace gf

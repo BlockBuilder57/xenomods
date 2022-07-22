@@ -1,8 +1,8 @@
 #ifndef STUFF_DEBUG_UTIL
 #define STUFF_DEBUG_UTIL
 
-#include <string>
 #include <array>
+#include <string>
 
 #include "hid.hpp"
 #include "nn/diag.h"
@@ -31,13 +31,11 @@ namespace dbgutil {
 
 	void logStackTrace();
 
-
 	void logRegistersX(InlineCtx* ctx);
 
 	void logMemory(void* address, size_t len);
 
 	void poorPersonsBreakpoint(std::string msg);
-
 
 	void addFileHandleToWatch(nn::fs::FileHandle fileHandle, const char* path);
 

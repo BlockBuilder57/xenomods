@@ -2,25 +2,12 @@
 
 #include <bf2mods/mm/math_types.hpp>
 
-namespace fw {
-	namespace debug {
-		extern bool (*drawAxis)(const mm::Mat44* transform, float scale);
-		extern bool (*drawFont)(int x, int y, const mm::Col4* color, const char* fmt, ...);
-		extern int (*drawFontGetWidth)(const char* fmt, ...);
-		extern int (*drawFontGetHeight)(const char* fmt, ...);
-		extern void (*drawCompareZ)(bool compare);
-
-		extern unsigned (*drawArrow)(const mm::Vec3& vStart, const mm::Vec3& vEnd, const mm::Col4& color);
-		extern unsigned (*drawLine)(const mm::Vec3& vStart, const mm::Vec3& vEnd, const mm::Col4& color);
-	}
-}
-
 namespace gf {
 	namespace GfMenuObjUtil {
 		/*
 		 * Anything (lower|camel)case has an unknown real name
 		 */
-		enum SEIndex: unsigned int {
+		enum SEIndex : unsigned int {
 			Decide = 1,
 			Cancel = 2,
 			menuopen = 3,
@@ -51,20 +38,18 @@ namespace gf {
 			textBubbleClose = 56,
 			textBubbleThought = 57
 		};
-	}
-}
+	} // namespace GfMenuObjUtil
+} // namespace gf
 
-namespace bf2mods {
+namespace bf2mods::DebugStuff {
 
 	extern int bgmTrackIndex;
 
 	void DoMapJump(unsigned int mapjumpId);
 	void PlaySE(unsigned int soundEffect);
 	void PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect);
-	void ReturnTitle(unsigned int slot);
+	void ReturnTitle(unsigned int slot = -1);
 
-	template<typename... Args> bool DrawDebugFont(int x, int y, const char* fmt, Args... args);
+	void Setup();
 
-	void SetupDebugStuff();
-
-} // namespace bf2mods
+} // namespace bf2mods::DebugStuff

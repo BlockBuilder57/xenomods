@@ -1,15 +1,15 @@
 #include "player_movement.hpp"
 
-#include "bf2logger.hpp"
-#include "debug_stuff.hpp"
-#include "bf2mods/stuff/utils/util.hpp"
+#include <bf2mods/gf/player_controller.hpp>
+#include <bf2mods/prettyprinter.hpp>
 #include <bf2mods/stuff/utils/debug_util.hpp>
+
+#include "bf2logger.hpp"
+#include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
+#include "debug_stuff.hpp"
 #include "plugin.hpp"
 #include "skyline/logger/Logger.hpp"
-
-#include <bf2mods/prettyprinter.hpp>
-#include <bf2mods/gf/player_controller.hpp>
 
 namespace gf {
 
@@ -30,7 +30,7 @@ namespace gf {
 				//71001b0964 fw::Framework::update()+1c8
 			}
 
-			if (bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult == 1.0f)
+			if(bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult == 1.0f)
 				return;
 
 			pcProperty->velocityDelta *= bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult;
@@ -86,9 +86,9 @@ namespace gf {
 
 } // namespace gf
 
-namespace bf2mods {
+namespace bf2mods::PlayerMovement {
 
-	void SetupPlayerMovementHooks() {
+	void Setup() {
 		g_Logger->LogInfo("Setting up player movement hooks...");
 
 		gf::pc::MoveUtilField_updateMoveJumpHook();
@@ -101,4 +101,4 @@ namespace bf2mods {
 		gf::PlayerCameraTarget_writeTargetInfoHook();
 	}
 
-} // namespace bf2mods
+} // namespace bf2mods::PlayerMovement

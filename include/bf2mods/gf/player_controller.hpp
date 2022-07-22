@@ -6,7 +6,7 @@
 namespace gf {
 
 	class GfMoveJumpControler {
-	public:
+	   public:
 		struct Packet { // we only care abt stuff here
 			mm::Vec3 velSomething;
 		};
@@ -24,14 +24,14 @@ namespace gf {
 		 * \param name Name of the variable to set
 		 * \param value The value to set that variable to
 		 */
-		void setVariable(const char *name, float value);
+		void setVariable(const char* name, float value);
 
 		/**
 		 * Get a float variable
 		 * \param name Ahem
 		 * \param result_value Pointer to where the result should be stored.
 		 */
-		void getVariable(const char *name, float *result_value);
+		void getVariable(const char* name, float* result_value);
 	};
 
 	struct GfComPropertyPc {
@@ -42,7 +42,7 @@ namespace gf {
 		/**
 		 * this is a hack
 		 */
-		inline GfComAsm *ComAsm() {
+		inline GfComAsm* ComAsm() {
 			// ghidra says
 			// *(GfComAsm **)(*(longlong *)&param_1->field_0x8 + 0x48);
 			// attempt to decompose
@@ -50,10 +50,10 @@ namespace gf {
 			// + 0x48 = inlined baseclass
 			//
 			// my c++brain (re-seperating this out into seperate expressions) says:
-			auto *funny = reinterpret_cast<std::uint8_t *>(
-					this->pad_bytes[0x8]); // pointer to some vtable like thing for bases
+			auto* funny = reinterpret_cast<std::uint8_t*>(
+			this->pad_bytes[0x8]); // pointer to some vtable like thing for bases
 			// idklol
-			return reinterpret_cast<GfComAsm *>(*funny + 0x48);
+			return reinterpret_cast<GfComAsm*>(*funny + 0x48);
 
 			// auto this_0x8 = reinterpret_cast<std::uint8_t**>((this + 0x8)); // this
 			// kinda looks fugly being seperate tbh return

@@ -6,7 +6,7 @@ namespace mm {
 
 		template<std::size_t size>
 		class FixStr {
-		public:
+		   public:
 			char buffer[size];
 			std::size_t m_nLen;
 

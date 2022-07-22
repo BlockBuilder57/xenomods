@@ -1,12 +1,7 @@
 #pragma once
 
-namespace bf2mods {
+namespace bf2mods::BdatRandomizer {
 
-	/**
-	 * Hook in the Bdat:: randomizer.
-	 * 
-	 * Currently just breaks text lol
-	 */
-	void SetupBdatRandomizer();
+	void Setup();
 
-} // namespace bf2mods
+} // namespace bf2mods::BdatRandomizer

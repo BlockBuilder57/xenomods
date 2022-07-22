@@ -10,7 +10,6 @@ namespace bf2mods {
 	// 	with our skyline rebuild
 
 	class Plugin {
-
 	   public:
 		BF2MODS_DISALLOW_MOVE(Plugin, "shouldn't copy singleton class");
 		BF2MODS_DISALLOW_COPY(Plugin, "shouldn't copy singleton class");

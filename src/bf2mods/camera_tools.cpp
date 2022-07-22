@@ -23,7 +23,6 @@ namespace ml {
 
 	template<auto backupFunction>
 	void FreecamUpdateMatrix(ScnObjCam* this_pointer, mm::Mat44& matrix) {
-
 		if(this_pointer->ScnPtr != nullptr) {
 			if(this_pointer != this_pointer->ScnPtr->getCam(-1)) {
 				// not our active cam, move on
@@ -42,7 +41,7 @@ namespace ml {
 		else
 			(*backupFunction)(this_pointer, matrix);
 
-		//fw::debug::drawFont(0, 0, &mm::Col4::White, "mat: %s", bf2mods::Prettyprinter<mm::Mat44>::format(this_pointer->AttrTransformPtr[1].weirdMatrix, 3).c_str());
+		//fw::debug::drawFont(0, 0, mm::Col4::White, "mat: %s", bf2mods::Prettyprinter<mm::Mat44>::format(this_pointer->AttrTransformPtr[1].weirdMatrix, 3).c_str());
 	}
 
 	GENERATE_SYM_HOOK(ScnObjCam_setViewMatrix, "_ZN2ml9ScnObjCam13setViewMatrixERKN2mm5Mat44E", void, ScnObjCam* this_pointer, mm::Mat44& matrix) {
@@ -134,7 +133,7 @@ namespace bf2mods::CameraTools {
 		// multiply by cam speed
 		move *= freecamState->camSpeed;
 
-		//fw::debug::drawFont(500, 30, &mm::Col4::White, "fov is: %.2f", freecamState->fov);
+		//fw::debug::drawFont(500, 30, mm::Col4::White, "fov is: %.2f", freecamState->fov);
 
 		// rotation
 		mm::Vec3 look {};
@@ -180,7 +179,7 @@ namespace bf2mods::CameraTools {
 		freecamState->matrix = newmat;
 	}
 
-	void SetupCameraTools() {
+	void Setup() {
 		g_Logger->LogInfo("Setting up camera tools...");
 
 #if BF2MODS_CODENAME(bfsw)

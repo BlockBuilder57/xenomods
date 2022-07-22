@@ -33,7 +33,7 @@ namespace bf2mods {
 	};
 
 	struct HidInput {
-		std::uint64_t Buttons{};
+		std::uint64_t Buttons {};
 		mm::Vec2 LAxis;
 		mm::Vec2 RAxis;
 	};
@@ -45,15 +45,15 @@ namespace bf2mods {
 
 	// TODO: make these members of hidinput, and probably store current/previous there (removing the need for "prev" instances).
 
-	inline static bool btnHeld (Keybind combo, std::uint64_t buttons) {
+	inline static bool btnHeld(Keybind combo, std::uint64_t buttons) {
 		return (buttons & underlying_value(combo)) == underlying_value(combo);
 	}
 
-	inline static bool btnUp (Keybind combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
+	inline static bool btnUp(Keybind combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
 		return (curButtons & underlying_value(combo)) == underlying_value(combo) && (prevButtons & underlying_value(combo)) != underlying_value(combo);
 	}
 
-	inline static bool btnDown (Keybind combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
+	inline static bool btnDown(Keybind combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
 		return (curButtons & underlying_value(combo)) != underlying_value(combo) && (prevButtons & underlying_value(combo)) == underlying_value(combo);
 	}
 

@@ -2,8 +2,8 @@
 
 #include <bf2mods/mm/math_types.hpp>
 
-namespace bf2mods {
+namespace bf2mods::PlayerMovement {
 
-	void SetupPlayerMovementHooks();
+	void Setup();
 
-} // namespace bf2mods
+} // namespace bf2mods::PlayerMovement
