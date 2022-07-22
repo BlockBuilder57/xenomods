@@ -87,7 +87,7 @@ void skyline_main() {
 
 	// start task queue
 	skyline::utils::SafeTaskQueue* taskQueue = new skyline::utils::SafeTaskQueue(100);
-	taskQueue->startThread(20, 3, 0x4000);
+	taskQueue->startThread(20, 0, 0x4000);
 	taskQueue->push(new std::unique_ptr<skyline::utils::Task>(after_romfs_task));
 
 	// TODO: experiment more with NVN

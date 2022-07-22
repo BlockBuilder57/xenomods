@@ -74,9 +74,9 @@ if __name__ == "__main__":
 
     file.close()
 
-    titleid = jsondata['title_id'][2:].upper()
+    programid = jsondata['program_id'][2:].upper()
 
-    print(f"Gathered title id is {titleid}")
+    print(f"Gathered program id is {programid}")
 
     ftpConnection = FTP()
     print(f'Connecting to Switch console @ {args.ip}:{args.port} ...', end='')
@@ -88,10 +88,10 @@ if __name__ == "__main__":
 
     # Ensure required directories exist on the console; if not, create them
     EnsureDirectory('/atmosphere', 'contents')
-    EnsureDirectory('/atmosphere/contents', titleid)
-    EnsureDirectory(f'/atmosphere/contents/{titleid}', 'exefs')
+    EnsureDirectory('/atmosphere/contents', programid)
+    EnsureDirectory(f'/atmosphere/contents/{programid}', 'exefs')
 
-    ftpConnection.cwd(f'/atmosphere/contents/{titleid}/exefs')
+    ftpConnection.cwd(f'/atmosphere/contents/{programid}/exefs')
 
     # Send bf2mods to the console
     SendFile('./bf2mods.nso', f'{args.subsdk_name}')

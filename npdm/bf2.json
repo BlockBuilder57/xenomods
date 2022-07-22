@@ -1,37 +1,32 @@
 {
-	"name": "Application",
-	"title_id": "0x0100e95004038000",
-	"title_id_range_min": "0x0100e95004038000",
-	"title_id_range_max": "0x0100e95004038005",
-	"main_thread_stack_size": "0x00100000",
-	"main_thread_priority": 44,
-	"default_cpu_id": 0,
-	"process_category": 0,
-	"version": "0x00000000",
-	"is_retail": true,
-	"pool_partition": 0,
-	"is_64_bit": true,
-	"address_space_type": 3,
+	"name":	"Application",
+	"program_id":	"0x0100e95004038000",
+	"program_id_range_min":	"0x0100000000010000",
+	"program_id_range_max":	"0x01ffffffffffffff",
+	"main_thread_stack_size":	"0x00100000",
+	"main_thread_priority":	44,
+	"default_cpu_id":	0,
+	"version":	"0x00000000",
+	"is_retail":	true,
+	"pool_partition":	0,
+	"is_64_bit":	true,
+	"address_space_type":	3,
 	"filesystem_access": {
 		"permissions": "0xFFFFFFFFFFFFFFFF"
 	},
-	"service_access": [
-		"*"
-	],
-	"service_host": [],
-	"kernel_capabilities": [
-		{
-			"type": "kernel_flags",
-			"value": {
-				"highest_thread_priority": 59,
-				"lowest_thread_priority": 28,
-				"lowest_cpu_id": 0,
-				"highest_cpu_id": 3
+	"service_access": ["*"],
+	"service_host":	[],
+	"kernel_capabilities":	[{
+			"type":	"kernel_flags",
+			"value":	{
+				"highest_thread_priority":	59,
+				"lowest_thread_priority":	28,
+				"lowest_cpu_id":	0,
+				"highest_cpu_id":	2
 			}
-		},
-		{
-			"type": "syscalls",
-			"value": {
+		}, {
+			"type":	"syscalls",
+			"value":	{
 				"svcUnknown": "0x6e",
 				"svcSetHeapSize": "0x01",
 				"svcSetMemoryPermission": "0x02",
@@ -150,25 +145,20 @@
 				"svcSetResourceLimitLimitValue": "0x7e",
 				"svcCallSecureMonitor": "0x7f"
 			}
-		},
-		{
-			"type": "application_type",
-			"value": 1
-		},
-		{
-			"type": "min_kernel_version",
-			"value": "0x0091"
-		},
-		{
-			"type": "handle_table_size",
-			"value": 512
-		},
-		{
-			"type": "debug_flags",
-			"value": {
-				"allow_debug": true,
-				"force_debug": false
+		}, {
+			"type":	"application_type",
+			"value":	1
+		}, {
+			"type":	"min_kernel_version",
+			"value":	"0x0060"
+		}, {
+			"type":	"handle_table_size",
+			"value":	512
+		}, {
+			"type":	"debug_flags",
+			"value":	{
+				"allow_debug":	true,
+				"force_debug":	false
 			}
-		}
-	]
+		}]
 }

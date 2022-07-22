@@ -17,7 +17,13 @@ namespace bf2mods {
 		/**
 		 * Reset to default options.
 		 */
-		void Reset();
+		constexpr void Reset() {
+			bdatScrambleType = Options::BdatScrambleType::Off;
+
+			disableFallDamage = true;
+			movementSpeedMult = 1.f;
+			enableUIRendering = true;
+		}
 
 		BdatScrambleType bdatScrambleType;
 
@@ -52,12 +58,26 @@ namespace bf2mods {
 
 	struct Bf2ModsState {
 
-		explicit Bf2ModsState();
+		constexpr explicit Bf2ModsState() {
+			Reset();
+		}
 
 		/**
 		 * Reset to clean state.
 		 */
-		void Reset();
+		constexpr void Reset() {
+			// Reset options
+			options.Reset();
+
+			freecam.isOn = false;
+			freecam.matrix = mm::Mat44 {};
+			freecam.fov = 45.f;
+			freecam.camSpeed = 1.f;
+
+			mapjumpId = 1;
+
+			moonJump = false;
+		}
 
 		/**
 		 * Current options.
