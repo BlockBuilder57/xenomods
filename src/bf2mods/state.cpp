@@ -12,6 +12,7 @@ namespace bf2mods {
 
 		disableFallDamage = true;
 		movementSpeedMult = 1.f;
+		enableUIRendering = true;
 	}
 
 	Bf2ModsState::Bf2ModsState() {

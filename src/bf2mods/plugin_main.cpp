@@ -141,6 +141,11 @@ namespace bf2mods {
 				state.freecam.isOn = !state.freecam.isOn;
 				g_Logger->LogInfo("Toggling freecam: %s", bf2mods::format(state.freecam.isOn).c_str());
 			}
+
+			if(btnDown(UI_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+				state.options.enableUIRendering = !state.options.enableUIRendering;
+				g_Logger->LogInfo("UI rendering: %s", bf2mods::format(state.options.enableUIRendering).c_str());
+			}
 		} else {
 			if(btnDown(MAPJUMP_INC, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.mapjumpId++;
@@ -187,10 +192,10 @@ namespace bf2mods {
 		DebugStuff::Setup();
 		BdatRandomizer::Setup();
 		CameraTools::Setup();
-
-#if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
-		PlayerMovement::Setup();
 		MenuViewer::Setup();
+
+		PlayerMovement::Setup();
+#if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
 #endif
 
 		// for debug keys

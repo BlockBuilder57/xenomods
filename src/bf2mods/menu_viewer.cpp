@@ -81,6 +81,15 @@ namespace ui {
 
 } // namespace ui
 
+namespace layer {
+
+	GENERATE_SYM_HOOK(LayerManager_finalRender, "_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE", void, void* this_pointer, void* IDrDrawWorkInfo) {
+		if (bf2mods::GetState().options.enableUIRendering)
+			LayerManager_finalRenderBak(this_pointer, IDrDrawWorkInfo);
+	}
+
+}
+
 namespace bf2mods::MenuViewer {
 
 	void* UIManagerPtr;
@@ -109,6 +118,8 @@ namespace bf2mods::MenuViewer {
 		//ui::UIManager_createLayerHook();
 		//ui::UIManager_releaseLayerHook();
 		//ui::UIManager_terminateLayerHook();
+
+		layer::LayerManager_finalRenderHook();
 	}
 
 } // namespace bf2mods::MenuViewer

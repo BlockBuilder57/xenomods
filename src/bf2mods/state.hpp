@@ -23,6 +23,7 @@ namespace bf2mods {
 
 		bool disableFallDamage;
 		float movementSpeedMult;
+		bool enableUIRendering;
 	};
 
 	template<>
