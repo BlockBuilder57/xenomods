@@ -2,7 +2,7 @@
 
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "plugin.hpp"
+#include "state.hpp"
 #include "skyline/logger/Logger.hpp"
 
 namespace gf {

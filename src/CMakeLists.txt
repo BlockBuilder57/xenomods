@@ -12,8 +12,8 @@ add_executable(bf2mods
 		bf2mods/party_selector.cpp
 		bf2mods/player_movement.cpp
 		bf2mods/menu_viewer.cpp
-		bf2mods/plugin.cpp
 		bf2mods/plugin_main.cpp
+		bf2mods/state.cpp
 
         bf2mods/stuff/utils/debug_util.cpp
 		bf2mods/stuff/utils/util.cpp

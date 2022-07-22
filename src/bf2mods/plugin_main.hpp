@@ -1,6 +1,7 @@
 #pragma once
 
-#include "plugin.hpp"
+#include "state.hpp"
+#include <nn/hid.hpp>
 
 namespace bf2mods {
 

@@ -6,10 +6,13 @@
 #include "bf2mods/stuff/utils/util.hpp"
 #include <bf2mods/bdat/bdat.hpp>
 #include "nn/oe.h"
-#include "plugin.hpp"
+#include "state.hpp"
 
 // Bdat syms & hooks
 namespace Bdat {
+
+	static bool versionBufferPrepared = false;
+	static char bdatVersionBuffer[16] {};
 
 	GENERATE_SYM_HOOK(getMSText, "_ZN4Bdat9getMSTextEPhi", const char*, std::uint8_t* bdatData, int n) {
 		//skyline::logger::s_Instance->LogFormat("Bdat::getMSText(bdat: %p, n: %d)", bdatData, n);
@@ -22,10 +25,13 @@ namespace Bdat {
 				//nn::oe::DisplayVersion displayVersion;
 				//nn::oe::GetDisplayVersion(&displayVersion);
 
-				std::stringstream ss;
-				ss << "(" << bf2mods::version::tagDirty << ") ";
+				// TODO: probably use fmt
+				if(!versionBufferPrepared) {
+					std::snprintf(&bdatVersionBuffer[0], sizeof(bdatVersionBuffer) - 1, "(%s)", bf2mods::version::tagDirty);
+					versionBufferPrepared = true;
+				}
 
-				return ss.str().c_str();
+				return &bdatVersionBuffer[0];
 			} else if(n == 1610) {
 				// it says "Loading" in the japanese version too so I'm not allowed to moan about hardcoding this
 				return "Loading (modded)";
@@ -34,7 +40,7 @@ namespace Bdat {
 
 		using enum bf2mods::Options::BdatScrambleType;
 
-		switch(bf2mods::Plugin::getSharedStatePtr()->options.bdatScrambleType) {
+		switch(bf2mods::GetState().options.bdatScrambleType) {
 			case ScrambleIndex:
 				// scrambles the index of the ms text sheet
 				return Bdat::getMSTextBak(bdatData, (util::nnRand<int16_t>() % Bdat::getIdCount(bdatData)) + Bdat::getIdTop(bdatData));

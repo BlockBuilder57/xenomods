@@ -5,8 +5,9 @@
 #include <bf2mods/fw/document.hpp>
 #include <bf2mods/stuff/utils/debug_util.hpp>
 
+#include <version.h>
 #include "bf2logger.hpp"
-#include "plugin.hpp"
+#include "state.hpp"
 #include "skyline/efl/service.hpp"
 
 // all parts here
@@ -94,11 +95,11 @@ namespace bf2mods {
 		 * Check buttons
 		 */
 
-		auto sharedStatePtr = Plugin::getSharedStatePtr();
+		auto& state = GetState();
 
-		sharedStatePtr->moonJump = btnHeld(MOONJUMP, p1Cur.Buttons);
+		state.moonJump = btnHeld(MOONJUMP, p1Cur.Buttons);
 
-		if(sharedStatePtr->freecam.isOn)
+		if(state.freecam.isOn)
 			CameraTools::DoFreeCameraMovement();
 
 		bf2mods::DebugStuff::bgmTrackIndex = 0;
@@ -113,57 +114,57 @@ namespace bf2mods {
 			}
 
 			if(btnDown(BDAT_SCRAMBLETYPE_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
-				underlying_value(sharedStatePtr->options.bdatScrambleType) += 1;
+				underlying_value(state.options.bdatScrambleType) += 1;
 
-				if(sharedStatePtr->options.bdatScrambleType >= bf2mods::Options::BdatScrambleType::Count)
-					sharedStatePtr->options.bdatScrambleType = bf2mods::Options::BdatScrambleType::Off;
+				if(state.options.bdatScrambleType >= bf2mods::Options::BdatScrambleType::Count)
+					state.options.bdatScrambleType = bf2mods::Options::BdatScrambleType::Off;
 
-				g_Logger->LogInfo("Bdat scramble type set to %s", bf2mods::format(sharedStatePtr->options.bdatScrambleType).c_str());
+				g_Logger->LogInfo("Bdat scramble type set to %s", bf2mods::format(state.options.bdatScrambleType).c_str());
 			}
 
 			if(btnDown(MOVEMENT_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons)) {
-				sharedStatePtr->options.movementSpeedMult *= 2.0f;
-				g_Logger->LogInfo("Movement speed multiplier set to %.2f", sharedStatePtr->options.movementSpeedMult);
+				state.options.movementSpeedMult *= 2.0f;
+				g_Logger->LogInfo("Movement speed multiplier set to %.2f", state.options.movementSpeedMult);
 			}
 
 			if(btnDown(MOVEMENT_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons)) {
-				sharedStatePtr->options.movementSpeedMult *= 0.5f;
-				g_Logger->LogInfo("Movement speed multiplier set to %.2f", sharedStatePtr->options.movementSpeedMult);
+				state.options.movementSpeedMult *= 0.5f;
+				g_Logger->LogInfo("Movement speed multiplier set to %.2f", state.options.movementSpeedMult);
 			}
 
 			if(btnDown(DISABLE_FALL_DAMAGE, p2Cur.Buttons, p2Prev.Buttons)) {
-				sharedStatePtr->options.disableFallDamage = !sharedStatePtr->options.disableFallDamage;
-				g_Logger->LogInfo("Disable fall damage: %s", bf2mods::format(sharedStatePtr->options.disableFallDamage).c_str());
+				state.options.disableFallDamage = !state.options.disableFallDamage;
+				g_Logger->LogInfo("Disable fall damage: %s", bf2mods::format(state.options.disableFallDamage).c_str());
 			}
 
 			if(btnDown(FREECAM_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
-				sharedStatePtr->freecam.isOn = !sharedStatePtr->freecam.isOn;
-				g_Logger->LogInfo("Toggling freecam: %s", bf2mods::format(sharedStatePtr->freecam.isOn).c_str());
+				state.freecam.isOn = !state.freecam.isOn;
+				g_Logger->LogInfo("Toggling freecam: %s", bf2mods::format(state.freecam.isOn).c_str());
 			}
 		} else {
 			if(btnDown(MAPJUMP_INC, p2Cur.Buttons, p2Prev.Buttons)) {
-				sharedStatePtr->mapjumpId++;
-				if(sharedStatePtr->mapjumpId >= 298)
-					sharedStatePtr->mapjumpId = 1;
+				state.mapjumpId++;
+				if(state.mapjumpId >= 298)
+					state.mapjumpId = 1;
 
-				g_Logger->LogInfo("MapJump++, now %d", sharedStatePtr->mapjumpId);
+				g_Logger->LogInfo("MapJump++, now %d", state.mapjumpId);
 			}
 			if(btnDown(MAPJUMP_DEC, p2Cur.Buttons, p2Prev.Buttons)) {
-				sharedStatePtr->mapjumpId--;
-				if(sharedStatePtr->mapjumpId <= 0)
-					sharedStatePtr->mapjumpId = 297;
+				state.mapjumpId--;
+				if(state.mapjumpId <= 0)
+					state.mapjumpId = 297;
 
-				g_Logger->LogInfo("MapJump--, now %d", sharedStatePtr->mapjumpId);
+				g_Logger->LogInfo("MapJump--, now %d", state.mapjumpId);
 			}
 
 			if(btnDown(MAPJUMP_JUMP, p2Cur.Buttons, p2Prev.Buttons)) {
-				g_Logger->LogInfo("Attempting jump to MapJump %d", sharedStatePtr->mapjumpId);
-				DebugStuff::DoMapJump(sharedStatePtr->mapjumpId);
+				g_Logger->LogInfo("Attempting jump to MapJump %d", state.mapjumpId);
+				DebugStuff::DoMapJump(state.mapjumpId);
 			}
 
 			if(btnDown(PLAYSE, p2Cur.Buttons, p2Prev.Buttons)) {
-				g_Logger->LogInfo("Sound effect %d (0x%x)", sharedStatePtr->mapjumpId, sharedStatePtr->mapjumpId);
-				DebugStuff::PlaySE(sharedStatePtr->mapjumpId);
+				g_Logger->LogInfo("Sound effect %d (0x%x)", state.mapjumpId, state.mapjumpId);
+				DebugStuff::PlaySE(state.mapjumpId);
 			}
 
 			if(btnDown(RETURN_TO_TITLE, p2Cur.Buttons, p2Prev.Buttons)) {
@@ -180,7 +181,7 @@ namespace bf2mods {
 	}
 
 	void bf2mods_main() {
-		Plugin::init();
+		g_Logger->LogInfo("bf2mods - %s (built %s %s)", version::tagDirty, __DATE__, __TIME__);
 
 		// hook stuff
 		DebugStuff::Setup();

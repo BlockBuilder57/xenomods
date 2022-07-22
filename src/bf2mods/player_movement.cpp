@@ -8,7 +8,7 @@
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
 #include "debug_stuff.hpp"
-#include "plugin.hpp"
+#include "state.hpp"
 #include "skyline/logger/Logger.hpp"
 
 namespace gf {
@@ -16,7 +16,7 @@ namespace gf {
 	namespace pc {
 
 		void NormalizeMovementDeltas(gf::GfComPropertyPc* pcProperty) {
-			if(bf2mods::Plugin::getSharedStatePtr()->moonJump) {
+			if(bf2mods::GetState().moonJump) {
 				pcProperty->velocityActual.y = 8.f;
 				//dbgutil::logStackTrace();
 
@@ -30,13 +30,13 @@ namespace gf {
 				//71001b0964 fw::Framework::update()+1c8
 			}
 
-			if(bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult == 1.0f)
+			if(bf2mods::GetState().options.movementSpeedMult == 1.0f)
 				return;
 
-			pcProperty->velocityDelta *= bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult;
+			pcProperty->velocityDelta *= bf2mods::GetState().options.movementSpeedMult;
 
 			if(mm::Vec3XZLength(pcProperty->velocityDelta) > 8.f) {
-				mm::Vec3 normalized = mm::Vec3XZNormalized(pcProperty->velocityDelta) * 8.f * bf2mods::Plugin::getSharedStatePtr()->options.movementSpeedMult;
+				mm::Vec3 normalized = mm::Vec3XZNormalized(pcProperty->velocityDelta) * 8.f * bf2mods::GetState().options.movementSpeedMult;
 				pcProperty->velocityDelta.x = normalized.x;
 				pcProperty->velocityDelta.z = normalized.z;
 			}
@@ -59,21 +59,21 @@ namespace gf {
 		GENERATE_SYM_HOOK(FallDistancePlugin_calcDistance, "_ZNK2gf2pc18FallDistancePlugin12calcDistanceERKN2mm4Vec3E", float, FallDamagePlugin* this_pointer, mm::Vec3* vec) {
 			float height = FallDistancePlugin_calcDistanceBak(this_pointer, vec);
 			//bf2mods::g_Logger->LogInfo("FallDistancePlugin::calcDistance called, would return %.2f", height);
-			return bf2mods::Plugin::getSharedStatePtr()->options.disableFallDamage ? 0.f : height;
+			return bf2mods::GetState().options.disableFallDamage ? 0.f : height;
 		}
 
 		// Can't figure out how to properly set the actual max height, but this will do
 		// Forcibly disables fall damage when any movement state tries to enable or disable it
 		GENERATE_SYM_HOOK(StateUtil_setFallDamageDisable, "_ZN2gf2pc9StateUtil20setFallDamageDisableERNS_15GfComBehaviorPcEb", void, void* GfComBehaviorPc, bool param_2) {
 			//bf2mods::g_Logger->LogInfo("StateUtil::setFallDamageDisable(GfComBehaviorPc: %p, bool: %s)", GfComBehaviorPc, bf2mods::format(param_2).c_str());
-			StateUtil_setFallDamageDisableBak(GfComBehaviorPc, bf2mods::Plugin::getSharedStatePtr()->options.disableFallDamage ? true : param_2);
+			StateUtil_setFallDamageDisableBak(GfComBehaviorPc, bf2mods::GetState().options.disableFallDamage ? true : param_2);
 		}
 
 	} // namespace pc
 
 	GENERATE_SYM_HOOK(PlayerCameraTarget_writeTargetInfo, "_ZN2gf18PlayerCameraTarget15writeTargetInfoEv", void, gf::PlayerCameraTarget* this_pointer) {
 		PlayerCameraTarget_writeTargetInfoBak(this_pointer);
-		if(bf2mods::Plugin::getSharedStatePtr()->moonJump) {
+		if(bf2mods::GetState().moonJump) {
 			// makes the game always take the on ground path in gf::PlayerCamera::updateTracking
 			this_pointer->inAir = false;
 			// should stop the camera from suddenly jerking back to the maximum height moonjumped to

@@ -15,7 +15,7 @@
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "debug_stuff.hpp" // i'll get it sometime
-#include "plugin.hpp"
+#include "state.hpp"
 #include "plugin_main.hpp"
 #include "skyline/logger/Logger.hpp"
 
@@ -31,13 +31,13 @@ namespace ml {
 			}
 		}
 
-		auto freecamState = &bf2mods::Plugin::getSharedStatePtr()->freecam;
+		auto& freecamState = bf2mods::GetState().freecam;
 
-		if(!freecamState->isOn)
-			freecamState->matrix = matrix; // put current cam info into the state
+		if(!freecamState.isOn)
+			freecamState.matrix = matrix; // put current cam info into the state
 
-		if(freecamState->isOn)
-			(*backupFunction)(this_pointer, freecamState->matrix);
+		if(freecamState.isOn)
+			(*backupFunction)(this_pointer, freecamState.matrix);
 		else
 			(*backupFunction)(this_pointer, matrix);
 
@@ -55,12 +55,12 @@ namespace ml {
 	GENERATE_SYM_HOOK(ScnObjCam_updateFovNearFar, "_ZN2ml9ScnObjCam16updateFovNearFarEv", void, ScnObjCam* this_pointer) {
 		if(this_pointer->ScnPtr != nullptr) {
 			if(this_pointer == this_pointer->ScnPtr->getCam(-1)) {
-				auto freecamState = &bf2mods::Plugin::getSharedStatePtr()->freecam;
+				auto& freecamState = bf2mods::GetState().freecam;
 
-				if(freecamState->isOn)
-					this_pointer->AttrTransformPtr->fov = freecamState->fov; // put freecam info into the current camera
+				if(freecamState.isOn)
+					this_pointer->AttrTransformPtr->fov = freecamState.fov; // put freecam info into the current camera
 				else
-					freecamState->fov = this_pointer->AttrTransformPtr->fov; // get fov from current camera
+					freecamState.fov = this_pointer->AttrTransformPtr->fov; // get fov from current camera
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace bf2mods::CameraTools {
 		using bf2mods::p2Cur;
 		using bf2mods::p2Prev;
 
-		auto freecamState = &bf2mods::Plugin::getSharedStatePtr()->freecam;
+		auto freecamState = &bf2mods::GetState().freecam;
 
 		mm::Vec3 pos {};
 		mm::Quat rot {};
