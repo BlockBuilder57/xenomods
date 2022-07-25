@@ -124,7 +124,7 @@ namespace bf2mods::DebugStuff {
 #else
 		game::MapJumpSetupInfo info;
 
-		if (fw::document == nullptr) {
+		if(fw::document == nullptr) {
 			g_Logger->LogError("can't do a map jump cause no doc ptr!");
 			return;
 		}
@@ -152,7 +152,7 @@ namespace bf2mods::DebugStuff {
 #if !BF2MODS_CODENAME(bfsw)
 		tl::TitleMain::returnTitle((gf::SAVESLOT)slot);
 #else
-		if (fw::document == nullptr) {
+		if(fw::document == nullptr) {
 			g_Logger->LogError("can't return to title cause no doc ptr!");
 			return;
 		}
@@ -161,7 +161,7 @@ namespace bf2mods::DebugStuff {
 	}
 
 	void Setup() {
-		g_Logger->LogInfo("Setting up debug stuff...");
+		g_Logger->LogDebug("Setting up debug stuff...");
 
 		mm::MMStdBase::mmAssertHook();
 

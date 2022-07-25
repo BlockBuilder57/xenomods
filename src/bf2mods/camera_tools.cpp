@@ -180,7 +180,7 @@ namespace bf2mods::CameraTools {
 	}
 
 	void Setup() {
-		g_Logger->LogInfo("Setting up camera tools...");
+		g_Logger->LogDebug("Setting up camera tools...");
 
 #if BF2MODS_CODENAME(bfsw)
 		ml::ScnObjCam_setWorldMatrixHook();

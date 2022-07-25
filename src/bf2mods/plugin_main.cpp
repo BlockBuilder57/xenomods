@@ -30,7 +30,6 @@ namespace fw {
 		FrameworkUpdater_updateStdBak(doc, FrameworkController);
 
 		if (doc != nullptr && document == nullptr) {
-			bf2mods::g_Logger->LogInfo("got valid document ptr %p", doc);
 			document = doc;
 		}
 
@@ -186,8 +185,6 @@ namespace bf2mods {
 	}
 
 	void bf2mods_main() {
-		g_Logger->LogInfo("bf2mods - %s (built %s %s)", version::tagDirty, __DATE__, __TIME__);
-
 		// hook stuff
 		DebugStuff::Setup();
 		BdatRandomizer::Setup();
@@ -203,6 +200,12 @@ namespace bf2mods {
 		fw::Framework_updateHook();
 #else
 		fw::FrameworkUpdater_updateStdHook();
+#endif
+
+#if _DEBUG
+		g_Logger->LogInfo("bf2mods (debug) - %s initialized (built %s %s)", version::tagDirty, __DATE__, __TIME__);
+#else
+		g_Logger->LogInfo("bf2mods - %s initalized", version::tagDirty);
 #endif
 	}
 

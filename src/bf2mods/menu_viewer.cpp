@@ -106,7 +106,7 @@ namespace bf2mods::MenuViewer {
 	}
 
 	void Setup() {
-		g_Logger->LogInfo("Setting up menu viewer...");
+		g_Logger->LogDebug("Setting up menu viewer...");
 
 		//gf::GfMenuManager_getGameVersionStringHook();
 		//gf::GfMenuFullScreen_registLayerParamHook();

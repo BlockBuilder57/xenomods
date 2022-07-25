@@ -89,7 +89,7 @@ namespace gf {
 namespace bf2mods::PlayerMovement {
 
 	void Setup() {
-		g_Logger->LogInfo("Setting up player movement hooks...");
+		g_Logger->LogDebug("Setting up player movement hooks...");
 
 		gf::pc::MoveUtilField_updateMoveJumpHook();
 		gf::pc::MoveUtilField_updateMoveRunHook();

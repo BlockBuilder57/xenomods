@@ -58,7 +58,7 @@ namespace Bdat {
 namespace bf2mods::BdatRandomizer {
 
 	void Setup() {
-		g_Logger->LogInfo("Setting up BDAT randomizer...");
+		g_Logger->LogDebug("Setting up BDAT randomizer...");
 
 		// Hook stuff
 		Bdat::getMSTextHook();

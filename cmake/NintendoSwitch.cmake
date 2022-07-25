@@ -74,6 +74,11 @@ set(CMAKE_ASM_FLAGS "-x assembler-with-cpp -g ${ARCH}")
 set(CMAKE_C_FLAGS "${ARCH} -D__SWITCH__ -D__SKYLINE__ -fomit-frame-pointer -ffunction-sections -isystem ${DEVKITPRO}/libnx/include -I${PROJECT_SOURCE_DIR}/libs/libeiffel/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-rtti -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -fpermissive ")
 
+set(CMAKE_CXX_FLAGS_DEBUG "-D_DEBUG")
+
+# Cut off assert()
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG")
+
 # This is an undocumented variable intended to be used for (ironically enough) these kind of platform/toolchain files.
 # Anything specified here always ends up last in the linker command line.
 # For some reason, unknown to me, -lgcc and -lstdc++ HAVE to be at the end, or the binary doesn't ever link properly.

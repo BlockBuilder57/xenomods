@@ -33,7 +33,7 @@ namespace bf2mods {
 			 * Something terribly wrong has happened.
 			 * May precede a crash.
 			 */
-			OopsOuchMyBonesTheyHaveFallenHelpNoNoNONONO
+			Fatal
 		};
 
 		/**
@@ -42,7 +42,6 @@ namespace bf2mods {
 		void LogMessage(Severity severity, const std::string& message);
 
 		inline void LogMessage(Severity severity, const char* fmt, ...) {
-			//std::ostringstream ss;
 			char buffer[128];
 
 			va_list args;
@@ -50,13 +49,7 @@ namespace bf2mods {
 			vsprintf(buffer, fmt, args);
 			va_end(args);
 
-			std::string strBuf(buffer);
-
-			// fold expression using comma operator
-			//((ss << std::forward<Args>(args)), ...);
-
-			//LogMessage(ss.str());
-			LogMessage(severity, strBuf);
+			LogMessage(severity, std::string(buffer));
 		}
 
 		template<class... Args>
@@ -81,7 +74,7 @@ namespace bf2mods {
 
 		template<class... Args>
 		inline void LogFatal(const char* fmt, Args... args) {
-			LogMessage(Severity::OopsOuchMyBonesTheyHaveFallenHelpNoNoNONONO, fmt, std::forward<Args>(args)...);
+			LogMessage(Severity::Fatal, fmt, std::forward<Args>(args)...);
 		}
 
 		/**
@@ -94,7 +87,7 @@ namespace bf2mods {
 		 * Get whether Debug severity messages should be
 		 * printed to the physical screen.
 		 */
-		bool GetDebugEnabled() const;
+		[[nodiscard]] bool GetDebugEnabled() const;
 
 		/**
 		 * Set whether Debug severity messages should be
@@ -110,8 +103,8 @@ namespace bf2mods {
 		 */
 		struct LoggerMessage {
 			std::string text;
-			std::uint16_t lifetime;
-			Severity severity;
+			std::int16_t lifetime {};
+			Severity severity {};
 		};
 
 		/**
@@ -132,7 +125,7 @@ namespace bf2mods {
 		/**
 		 * Draw a message.
 		 */
-		void DrawInternal(std::size_t index, std::uint16_t x, std::uint16_t y) const;
+		void DrawInternal(LoggerMessage& msg, std::uint16_t x, std::uint16_t y) const;
 
 		/**
 		 * Add a message.
@@ -140,7 +133,6 @@ namespace bf2mods {
 		void AddMessageInternal(Severity severity, const std::string& message);
 
 		std::vector<LoggerMessage> lines;
-
 		bool debug_enabled = false;
 	};
 
