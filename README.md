@@ -1,6 +1,6 @@
 ## bf2mods
 
-Some mod code by [modeco80](https://github.com/modeco80) and [BlockBuilder57](https://github.com/BlockBuilder57) for all Xenoblade games on Switch. Based off [Ether](https://github.com/3096/ether) by 3096/dualie.
+Some mod code by [modeco80](https://github.com/modeco80) and [BlockBuilder57](https://github.com/BlockBuilder57) for all Xenoblade games on Switch. Based off [Ether Flow](https://github.com/3096/ether) by 3096/dualie.
 
 As such, this includes a custom fork of a [custom fork](https://github.com/3096/skyline/tree/xde) of [Skyline](https://github.com/skyline-dev/skyline/), made by many people much smarter people than us.
 
