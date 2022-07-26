@@ -143,6 +143,9 @@ namespace bf2mods {
 
 			if(btnDown(UI_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.options.enableUIRendering = !state.options.enableUIRendering;
+#if !BF2MODS_CODENAME(bfsw)
+				fw::PadManager::enableDebugDraw(state.options.enableUIRendering);
+#endif
 				g_Logger->LogInfo("UI rendering: %s", bf2mods::format(state.options.enableUIRendering).c_str());
 			}
 		} else {
@@ -191,8 +194,8 @@ namespace bf2mods {
 		CameraTools::Setup();
 		MenuViewer::Setup();
 
-		PlayerMovement::Setup();
 #if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
+		PlayerMovement::Setup();
 #endif
 
 		// for debug keys

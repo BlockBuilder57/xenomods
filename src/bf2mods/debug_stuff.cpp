@@ -12,6 +12,7 @@
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
+#include "state.hpp"
 
 #if BF2MODS_CODENAME(bfsw)
 namespace game {
@@ -74,6 +75,9 @@ namespace gf {
 	GENERATE_SYM_HOOK(BgmTrack_update, "_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE", void, gf::BgmTrack* this_pointer, void* updateInfo) {
 		BgmTrack_updateBak(this_pointer, updateInfo);
 
+		if(!bf2mods::GetState().options.enableUIRendering)
+			return;
+
 		char trackName[32];
 		memset(&trackName, 0, sizeof(trackName));
 		memcpy(&trackName, "BgmTrack", sizeof("BgmTrack"));
@@ -112,6 +116,25 @@ namespace gf {
 	}
 
 } // namespace gf
+
+namespace nn {
+
+	GENERATE_SYM_HOOK(hid_ShowControllerSupport, "_ZN2nn3hid21ShowControllerSupportEPNS0_27ControllerSupportResultInfoERKNS0_20ControllerSupportArgE", void, nn::hid::ControllerSupportResultInfo* resultInfo, nn::hid::ControllerSupportArg* supportArg) {
+		nn::hid::NpadFullKeyState p1State {};
+		nn::hid::GetNpadState(&p1State, nn::hid::CONTROLLER_PLAYER_1);
+
+		if(p1State.Flags & nn::hid::NpadFlags::NPAD_CONNECTED) {
+			// We have a player 1 at this point, so disable single-controller only mode
+			// That way if another controller is connected while the game is running, we can allow it to be P2
+			// Monolib actually passes the (according to switchbrew) default arguments to this,
+			// so we technically get 4 max controllers for free!
+			supportArg->mSingleMode = false;
+		}
+
+		hid_ShowControllerSupportBak(resultInfo, supportArg);
+	}
+
+} // namespace nn
 
 namespace bf2mods::DebugStuff {
 
@@ -168,6 +191,8 @@ namespace bf2mods::DebugStuff {
 		//util::ResolveSymbol<decltype(ml::DrMdlMan::headerChek)>(&ml::DrMdlMan::headerChek, "_ZN2ml8DrMdlMan10headerChekEPKv");
 		//ml::DrMdlMan::createMdlHook();
 		//ml::DrMdlMan::createInstantMdlHook();
+
+		nn::hid_ShowControllerSupportHook();
 
 #if BF2MODS_CODENAME(bfsw)
 		game::SeqUtil_requestMapJumpHook();
