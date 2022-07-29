@@ -209,6 +209,8 @@ namespace nn {
 		u64 GetThreadAvailableCoreMask();
 		void SetMemoryHeapSize(u64 size);
 
+		Result OutputDebugString(const char* str, size_t strlen);
+
 		namespace detail {
 			extern s32 g_CommandLineParameter;
 			extern char** g_CommandLineParameterArgv;

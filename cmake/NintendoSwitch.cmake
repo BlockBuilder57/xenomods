@@ -83,4 +83,4 @@ set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG")
 # Anything specified here always ends up last in the linker command line.
 # For some reason, unknown to me, -lgcc and -lstdc++ HAVE to be at the end, or the binary doesn't ever link properly.
 # Don't ask me. Ask the linker gods. They might know.
-set(CMAKE_CXX_STANDARD_LIBRARIES "-lgcc -lstdc++ -u malloc")
+set(CMAKE_CXX_STANDARD_LIBRARIES "-lgcc -lstdc++ -u malloc -u free -u fprintf")

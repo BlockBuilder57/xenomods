@@ -76,20 +76,20 @@ struct fmt::formatter<glm::vec3> : fmt::formatter<std::string> {
 	int precision = 0;
 
 	constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-
 		auto it = ctx.begin(), end = ctx.end();
-		if (it != end && isdigit(*it))  {
+		if(it != end && isdigit(*it)) {
 			auto p = *it++;
 
-			// cheap hack to make it a number
+			// cheap hack to make it a number, this means that
+			// any number over 9 won't work (but this is practical enough)
 			precision = p - '0';
 		} else {
-			ctx.on_error("invalid format");
+			// this SHOULD be an error
+			//ctx.on_error("invalid format");
 		}
 
-
 		// Check if reached the end of the range:
-		if (it != end && *it != '}')
+		if(it != end && *it != '}')
 			ctx.on_error("invalid format");
 
 		// Return an iterator past the end of the parsed range:
@@ -98,7 +98,7 @@ struct fmt::formatter<glm::vec3> : fmt::formatter<std::string> {
 
 	template<typename FormatContext>
 	inline auto format(const glm::vec3& glmVec, FormatContext& ctx) {
-		return fmt::format_to(ctx.out(), FMT_STRING("(X: {}, Y: {}, Z: {})"), precision, glmVec.x, glmVec.y, glmVec.z);
+		return fmt::format_to(ctx.out(), FMT_STRING("(X: {1:.{0}f}, Y: {2:.{0}f}, Z: {3:.{0}f})"), precision, glmVec.x, glmVec.y, glmVec.z);
 	}
 };
 
@@ -107,20 +107,20 @@ struct fmt::formatter<glm::mat4> : fmt::formatter<std::string> {
 	int precision = 0;
 
 	constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-
 		auto it = ctx.begin(), end = ctx.end();
-		if (it != end && isdigit(*it))  {
+		if(it != end && isdigit(*it)) {
 			auto p = *it++;
 
-			// cheap hack to make it a number
+			// cheap hack to make it a number, this means that
+			// any number over 9 won't work (but this is practical enough)
 			precision = p - '0';
 		} else {
-			ctx.on_error("invalid format");
+			// this SHOULD be an error
+			//ctx.on_error("invalid format");
 		}
 
-
 		// Check if reached the end of the range:
-		if (it != end && *it != '}')
+		if(it != end && *it != '}')
 			ctx.on_error("invalid format");
 
 		// Return an iterator past the end of the parsed range:
@@ -131,10 +131,10 @@ struct fmt::formatter<glm::mat4> : fmt::formatter<std::string> {
 	inline auto format(const glm::mat4& glmMat, FormatContext& ctx) {
 		// I don't get paid enough to do this - lily
 		return fmt::format_to(ctx.out(),
-							  FMT_STRING("( {1:.{0}f} {:.{0}f} {:.{0}f} {:.{0}f},"
-							  " {:.{0}f} {:.{0}f} {:.{0}f} {:.{0}f},"
-							  " {:.{0}f} {:.{0}f} {:.{0}f} {:.{0}f},"
-							  " {:.{0}f} {:.{0}f} {:.{0}f} {:.{0}f} )"),
+							  FMT_STRING("( {1:.{0}f} {2:.{0}f} {3:.{0}f} {4:.{0}f},"
+										 " {5:.{0}f} {6:.{0}f} {7:.{0}f} {8:.{0}f},"
+										 " {9:.{0}f} {10:.{0}f} {11:.{0}f} {12:.{0}f},"
+										 " {13:.{0}f} {14:.{0}f} {15:.{0}f} {16:.{0}f} )"),
 							  precision,
 							  glmMat[0][0], glmMat[0][1], glmMat[0][2], glmMat[0][3],
 							  glmMat[1][0], glmMat[1][1], glmMat[1][2], glmMat[1][3],
@@ -143,25 +143,23 @@ struct fmt::formatter<glm::mat4> : fmt::formatter<std::string> {
 	}
 };
 
+#if 0
 // Adapters to autocast from our ConvertTo<T, ...> types to
 // the GLM underlying types, reusing the GLM formatter code
 
 template<>
 struct fmt::formatter<mm::Vec3> : fmt::formatter<glm::vec3> {
-
 	template<typename FormatContext>
 	inline auto format(const mm::Vec3& vec, FormatContext& ctx) {
-		auto& glmVec = static_cast<const glm::vec3&>(vec);
-		return fmt::format_to(ctx.out(), FMT_STRING("{1:{0}}"), precision, glmVec);
+		return fmt::format_to(ctx.out(), FMT_STRING("{1:{0}}"), precision, static_cast<const glm::vec3&>(vec));
 	}
 };
 
 template<>
 struct fmt::formatter<mm::Mat44> : fmt::formatter<glm::mat4> {
-
 	template<typename FormatContext>
 	inline auto format(const mm::Mat44& mat, FormatContext& ctx) {
-		auto& glmMat = static_cast<const glm::mat4&>(mat);
-		return fmt::format_to(ctx.out(), FMT_STRING("{1:{0}}"), precision, glmMat);
+		return fmt::format_to(ctx.out(), FMT_STRING("{1:{0}}"), precision, static_cast<const glm::mat4&>(mat));
 	}
 };
+#endif

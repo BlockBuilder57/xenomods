@@ -198,7 +198,7 @@ namespace bf2mods::CameraTools {
 		float angle = glm::angle(rot);
 		glm::vec3 axis = glm::axis(rot);
 
-		bf2mods::g_Logger->LogInfo("euler: {}", glm::degrees(glm::eulerAngles(rot)));
+		//bf2mods::g_Logger->LogInfo("euler: {}", glm::degrees(glm::eulerAngles(rot)));
 
 		glm::mat4 newmat = glm::mat4(1.f);
 		newmat = glm::translate(newmat, pos + move);
