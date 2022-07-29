@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 #include <type_traits>
 
 #ifndef CONCATENATE
@@ -45,6 +46,8 @@
 // Intended to be used in expressions.
 #define BF2MODS_CODENAME(cn) defined __BF2MODS_CODENAME_##cn
 
+
+
 namespace bf2mods {
 	// FIXME: const/by-value versions?
 
@@ -68,5 +71,35 @@ namespace bf2mods {
 		return reinterpret_cast<std::underlying_type_t<std::remove_cvref_t<Enum>>>(e);
 	}
 #endif
+
+	template<class TConv, std::size_t Size>
+	struct ConvertTo {
+		static_assert(sizeof(TConv) == Size, "Converted type size and true object size must be the same");
+
+		// default (so we're literal)
+		constexpr ConvertTo() = default;
+
+		// init with type to copy into
+		constexpr ConvertTo(const TConv& tc) {
+			memcpy(&__byteRep[0], &tc, sizeof(TConv));
+		}
+
+		// convert into writable version
+		operator TConv&() {
+			return *reinterpret_cast<TConv*>(&__byteRep[0]);
+		}
+
+		// convert read only version
+		operator const TConv&() const {
+			return *reinterpret_cast<const TConv*>(&__byteRep[0]);
+		}
+
+		uint8_t __byteRep[Size];
+	};
+
+#define BF2MODS_CONVERTTO_TYPE(T, U, size) \
+    struct T : public bf2mods::ConvertTo<U, size> { \
+        using ConvertTo<U, size>::ConvertTo;  \
+    }
 
 } // namespace bf2mods

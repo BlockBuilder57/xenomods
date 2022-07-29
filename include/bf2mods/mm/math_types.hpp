@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bf2mods/prettyprinter.hpp>
+#include <bf2mods/utils.hpp>
 #include <cmath>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/mat4x4.hpp>
@@ -13,30 +14,41 @@ namespace mm {
 		int y;
 	};
 
-	using Vec2 = glm::vec2;
-	using Vec3 = glm::vec3;
+	BF2MODS_CONVERTTO_TYPE(Vec2, glm::vec2, sizeof(glm::vec2));
+
+	struct Vec3 : public bf2mods::ConvertTo<glm::vec3, sizeof(glm::vec3)> {
+		// We actually want to add members to Vec3 so
+		//BF2MODS_CONVERTTO_TYPE(Vec3, glm::vec3, sizeof(glm::vec3));
+		// won't work. Ugly using, but oh well.
+		using ConvertTo<glm::vec3, sizeof(glm::vec3)>::ConvertTo;
+
+		inline float XZLengthSqu() const {
+			glm::vec3 glm = *this;
+			return std::sqrt(glm.x * glm.x + glm.z * glm.z);
+		}
+
+		inline void XZNormalizeInPlace() {
+			glm::vec3 glm = *this;
+			float length = glm::length(glm);
+			glm.x /= length;
+			glm.z /= length;
+		}
+
+		inline Vec3 XZNormalized() {
+			Vec3 other = *this;
+			other.XZNormalizeInPlace();
+			return other;
+		}
+	};
 	using Transform = Vec3;
 	static_assert(sizeof(Vec3) == 0xC, "size 0xC");
 
-	constexpr float Vec3XZLength(const Vec3& src) {
-		return std::sqrt(src.x * src.x + src.z * src.z);
-	}
+	BF2MODS_CONVERTTO_TYPE(Quat, glm::quat, sizeof(glm::quat));
 
-	constexpr void Vec3XZNormalizeInPlace(Vec3& src) {
-		float length = Vec3XZLength(src);
-		src.x /= length;
-		src.z /= length;
-	}
-	constexpr Vec3 Vec3XZNormalized(const Vec3& src) {
-		Vec3 other = src;
-		Vec3XZNormalizeInPlace(other);
-		return other;
-	}
+	BF2MODS_CONVERTTO_TYPE(alignas(0x10) Mat44, glm::mat4, sizeof(glm::mat4));
 
-	using Quat = glm::quat;
-
-	using Mat44 = glm::mat4;
 	static_assert(sizeof(Mat44) == 0x40, "[mm::Mat44] size 0x40");
+	static_assert(alignof(mm::Mat44) == 0x10, "[mm::Mat44] align 0x10");
 
 	/**
 	 * Float RGBA color.
@@ -76,12 +88,13 @@ namespace bf2mods {
 			// yes it works
 			// so it sticks
 
+			glm::vec3 vec = vec3;
 			ss << '(';
-			PrintComponentWithName('X', vec3.x);
+			PrintComponentWithName('X', vec.x);
 			ss << ' ';
-			PrintComponentWithName('Y', vec3.y);
+			PrintComponentWithName('Y', vec.y);
 			ss << ' ';
-			PrintComponentWithName('Z', vec3.z);
+			PrintComponentWithName('Z', vec.z);
 			ss << ')';
 
 			return ss.str();
@@ -94,12 +107,13 @@ namespace bf2mods {
 
 	template<>
 	struct Prettyprinter<mm::Mat44> {
-		inline static std::string format(const mm::Mat44& mat, const int precision = -1) {
+		inline static std::string format(const mm::Mat44& mat44, const int precision = -1) {
 			std::stringstream ss;
 
 			if(precision > 0)
 				ss.precision(precision);
 
+			glm::mat4 mat;
 			ss << '(';
 			ss << mat[0][0] << ',';
 			ss << mat[0][1] << ',';

@@ -17,7 +17,7 @@ namespace gf {
 
 		void NormalizeMovementDeltas(gf::GfComPropertyPc* pcProperty) {
 			if(bf2mods::GetState().moonJump) {
-				pcProperty->velocityActual.y = 8.f;
+				static_cast<glm::vec3&>(pcProperty->velocityActual).y = 8.f;
 				//dbgutil::logStackTrace();
 
 				//---------- this function
@@ -33,12 +33,12 @@ namespace gf {
 			if(bf2mods::GetState().options.movementSpeedMult == 1.0f)
 				return;
 
-			pcProperty->velocityDelta *= bf2mods::GetState().options.movementSpeedMult;
+			static_cast<glm::vec3&>(pcProperty->velocityDelta) *= bf2mods::GetState().options.movementSpeedMult;
 
-			if(mm::Vec3XZLength(pcProperty->velocityDelta) > 8.f) {
-				mm::Vec3 normalized = mm::Vec3XZNormalized(pcProperty->velocityDelta) * 8.f * bf2mods::GetState().options.movementSpeedMult;
-				pcProperty->velocityDelta.x = normalized.x;
-				pcProperty->velocityDelta.z = normalized.z;
+			if(pcProperty->velocityDelta.XZLengthSqu() > 8.f) {
+				glm::vec3 normalized = static_cast<glm::vec3>(pcProperty->velocityDelta.XZNormalized()) * 8.f * bf2mods::GetState().options.movementSpeedMult;
+				normalized.y = static_cast<glm::vec3&>(pcProperty->velocityDelta).y;
+				pcProperty->velocityDelta = normalized;
 			}
 		}
 
@@ -77,11 +77,9 @@ namespace gf {
 			// makes the game always take the on ground path in gf::PlayerCamera::updateTracking
 			this_pointer->inAir = false;
 			// should stop the camera from suddenly jerking back to the maximum height moonjumped to
-			this_pointer->surfaceHeight = this_pointer->moverPos.y;
+			this_pointer->surfaceHeight = static_cast<glm::vec3&>(this_pointer->moverPos).y;
 			this_pointer->aboveWalkableGround = true;
 		}
-
-		// might be a good spot for freecam shenanigans?
 	}
 
 } // namespace gf

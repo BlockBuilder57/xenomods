@@ -64,8 +64,8 @@ namespace bf2mods {
 		auto updateHidInput = [&](nn::hid::NpadHandheldState& state, bf2mods::HidInput& cur) {
 			if(state.Flags & nn::hid::NpadFlags::NPAD_CONNECTED) {
 				cur.Buttons |= state.Buttons;
-				cur.LAxis = mm::Vec2 { static_cast<float>(state.LStickX) / 32768.f, static_cast<float>(state.LStickY) / 32768.f };
-				cur.RAxis = mm::Vec2 { static_cast<float>(state.RStickX) / 32768.f, static_cast<float>(state.RStickY) / 32768.f };
+				cur.LAxis = glm::vec2(static_cast<float>(state.LStickX) / 32768.f, static_cast<float>(state.LStickY) / 32768.f);
+				cur.RAxis = glm::vec2(static_cast<float>(state.RStickX) / 32768.f, static_cast<float>(state.RStickY) / 32768.f);
 			}
 		};
 

@@ -36,8 +36,8 @@ namespace bf2mods {
 
 	struct HidInput {
 		std::uint64_t Buttons {};
-		mm::Vec2 LAxis;
-		mm::Vec2 RAxis;
+		glm::vec2 LAxis;
+		glm::vec2 RAxis;
 	};
 
 	extern HidInput p1Cur;
