@@ -10,16 +10,16 @@ namespace gf {
 	   public:
 		struct VfTable {
 			//std::intptr_t padding[2]; // all 0x00 filler
-			void (BgmTrack::*Dtor)();
-			void (BgmTrack::*DeletingDtor)();
-			char* (BgmTrack::*GetTrackName)();
-		} * vtable;
+			void (*Dtor)();
+			void (*DeletingDtor)();
+			char* (*GetTrackName)(BgmTrack* this_pointer);
+		};
 		//void** vtable;
 		INSERT_PADDING_BYTES(20);
 		char playingBgmFileName[64];
 
 		char* getPlayingBgmFileName() const;
-		virtual bool makePlayFileName(mm::mtl::FixStr<64>* fixStr) const;
+		bool makePlayFileName(mm::mtl::FixStr<64>& fixStr) const;
 
 		float getPlayTime() const;
 		float getTotalTime() const;

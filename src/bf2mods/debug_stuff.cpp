@@ -70,6 +70,8 @@ namespace event {
 
 } // namespace event
 
+void (*__cxa_pure_virtual)();
+
 namespace gf {
 
 	GENERATE_SYM_HOOK(BgmTrack_update, "_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE", void, gf::BgmTrack* this_pointer, void* updateInfo) {
@@ -78,31 +80,31 @@ namespace gf {
 		if(!bf2mods::GetState().options.enableDebugRendering)
 			return;
 
-		char trackName[32]{};
-		memcpy(&trackName, "BgmTrack", sizeof("BgmTrack"));
-
-		// Oh no help
-
-		//bf2mods::g_Logger->LogInfo("virtual: {:p}", cxa_pure_virtual);
-		//bf2mods::g_Logger->LogInfo("track name: {:p}", ub_cast<void*>(this_pointer->vtable->GetTrackName));
-
-		/*if(ub_cast<void*>(this_pointer->vtable->GetTrackName) != cxa_pure_virtual) {
-			bf2mods::g_Logger->LogInfo("GetTrackName isn't pure virtual..");
-			const char* barack_obama = (this_pointer->*(this_pointer->vtable->GetTrackName))();
-			bf2mods::g_Logger->LogInfo("it's {}", barack_obama);
-		}*/
+		auto* vtable = reinterpret_cast<BgmTrack::VfTable*>(*(size_t**)this_pointer);
 
 		const int height = fw::debug::drawFontGetHeight();
 
 		if(this_pointer->isPlaying()) {
-			//mm::mtl::FixStr<64> fixStr;
-			//memcpy(&fixStr.buffer, "asscafe", sizeof("asscafe"));
-			//this_pointer->makePlayFileName(&fixStr);
+			mm::mtl::FixStr<64> bgmFileName {};
+			std::string trackName = "BgmTrack";
 
-			fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "%s", fmt::format("{}: {} {:.1f}/{:.1f}, looping: {}", trackName, this_pointer->getPlayingBgmFileName(), this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop()).c_str());
+			if(!this_pointer->makePlayFileName(bgmFileName)) {
+				// failed to make a filename, just fall back to playingBgmFileName
+				bgmFileName.set(this_pointer->playingBgmFileName);
+			}
+
+			if(reinterpret_cast<void*>(&vtable->GetTrackName) != reinterpret_cast<void*>(&__cxa_pure_virtual)) {
+				// not a pure virtual, so we can call this safely
+				trackName = vtable->GetTrackName(this_pointer);
+			}
+
+			fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "%s",
+								fmt::format("{}: {} {:.1f}/{:.1f}, looping: {}",
+											trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop())
+								.c_str());
 		} else {
-			// uncomment if you want every BgmTrack instance to show this
-			//fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "not playing");
+			// uncomment if you want every BgmTrack instance to show
+			//fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "%s", fmt::format("{}: not playing", vtable->GetTrackName(this_pointer)).c_str());
 		}
 	}
 
@@ -197,6 +199,9 @@ namespace bf2mods::DebugStuff {
 		game::SeqUtil_requestMapJumpHook();
 #else
 		//event::MovieManager_makePathHook();
+
+		util::ResolveSymbol<decltype(__cxa_pure_virtual)>(&__cxa_pure_virtual, "__cxa_pure_virtual");
+
 		gf::BgmTrack_updateHook();
 
 		// Resolve some game framework symbols

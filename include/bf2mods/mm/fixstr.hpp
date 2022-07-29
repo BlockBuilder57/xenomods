@@ -4,7 +4,7 @@ namespace mm {
 
 	namespace mtl {
 
-		template<std::size_t size>
+		template<int32_t size>
 		class FixStr {
 		   public:
 			char buffer[size];
@@ -22,6 +22,11 @@ namespace mm {
 				strcpy(fmt, buffer);
 				return fmt;
 			}*/
+
+			void set(const char* text) {
+				int length = strlen(text);
+				memcpy(&buffer[0], text, length);
+			}
 		};
 
 	} // namespace mtl
