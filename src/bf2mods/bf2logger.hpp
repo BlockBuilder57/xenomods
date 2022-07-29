@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include <fmt/format.h>
+
 namespace bf2mods {
 
 	/**
@@ -36,44 +38,35 @@ namespace bf2mods {
 			Fatal
 		};
 
-		/**
-		 * Log a unformatted message to all sinks.
-		 */
-		void LogMessage(Severity severity, const std::string& message);
+		void VLogMessage(Severity severity, fmt::string_view format, fmt::format_args args);
 
-		inline void LogMessage(Severity severity, const char* fmt, ...) {
-			char buffer[128];
-
-			va_list args;
-			va_start(args, fmt);
-			vsprintf(buffer, fmt, args);
-			va_end(args);
-
-			LogMessage(severity, std::string(buffer));
+		template<class FormatString, typename... Args>
+		inline void LogMessage(Severity severity, const FormatString& format, Args&&... args) {
+			VLogMessage(severity, format, fmt::make_format_args(args...));
 		}
 
 		template<class... Args>
-		inline void LogDebug(const char* fmt, Args... args) {
+		inline void LogDebug(fmt::string_view fmt, Args... args) {
 			LogMessage(Severity::Debug, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void LogInfo(const char* fmt, Args... args) {
+		inline void LogInfo(fmt::string_view fmt, Args... args) {
 			LogMessage(Severity::Info, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void LogWarning(const char* fmt, Args... args) {
+		inline void LogWarning(fmt::string_view fmt, Args... args) {
 			LogMessage(Severity::Warning, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void LogError(const char* fmt, Args... args) {
+		inline void LogError(fmt::string_view fmt, Args... args) {
 			LogMessage(Severity::Error, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void LogFatal(const char* fmt, Args... args) {
+		inline void LogFatal(fmt::string_view fmt, Args... args) {
 			LogMessage(Severity::Fatal, fmt, std::forward<Args>(args)...);
 		}
 
@@ -139,5 +132,24 @@ namespace bf2mods {
 	extern Logger* g_Logger;
 
 } // namespace bf2mods
+
+template<>
+struct fmt::formatter<bf2mods::Logger::Severity> : fmt::formatter<std::string_view> {
+	template<typename FormatContext>
+	inline auto format(bf2mods::Logger::Severity sev, FormatContext& ctx) {
+		using enum bf2mods::Logger::Severity;
+		std::string_view name = "unknown";
+
+		switch(sev) {
+			case Debug: name = "Debug"; break;
+			case Info: name = "Info"; break;
+			case Warning: name = "Warning"; break;
+			case Error: name = "Error"; break;
+			case Fatal: name = "Fatal"; break;
+		};
+
+		return formatter<std::string_view>::format(name, ctx);
+	}
+};
 
 #endif //BF2MODS_LOGGER_H

@@ -6,31 +6,6 @@
 
 namespace bf2mods {
 
-	template<>
-	struct Prettyprinter<Logger::Severity> {
-		inline static std::string format(const Logger::Severity& severity) {
-			std::stringstream ss;
-			switch(severity) {
-				case Logger::Severity::Debug:
-					return "Debug";
-				case Logger::Severity::Info:
-					return "Info";
-				case Logger::Severity::Warning:
-					return "Warning";
-				case Logger::Severity::Error:
-					return "Error";
-				case Logger::Severity::Fatal:
-					return "Fatal";
-				default:
-					assert(false && "You shouldn't get here!!!");
-			}
-		}
-
-		inline static std::string_view type_name() {
-			return "Logger::Severity";
-		}
-	};
-
 	static mm::Col4 ColorForSeverity(const Logger::Severity& severity) {
 		switch(severity) {
 			case Logger::Severity::Debug:
@@ -66,14 +41,17 @@ namespace bf2mods {
 		this->debug_enabled = debug_enabled;
 	}
 
-	void Logger::LogMessage(Severity severity, const std::string& message) {
-		skyline::logger::s_Instance->LogFormat("[bf2mods Console] [%s] %s", format(severity).c_str(), message.c_str());
+	void Logger::VLogMessage(Severity severity, fmt::string_view format, fmt::format_args args) {
+		auto formatted = fmt::vformat(format, args);
+
+		// by god I wish I didn't have to deal with this
+		skyline::logger::s_Instance->LogFormat("[bf2mods Console] [%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
 
 		// Don't post Debug severity messages if we shouldn't.
 		if(severity == Logger::Severity::Debug && !GetDebugEnabled())
 			return;
 
-		AddMessageInternal(severity, message);
+		AddMessageInternal(severity, formatted);
 	}
 
 	void Logger::Draw() {
@@ -103,8 +81,11 @@ namespace bf2mods {
 			colBack.a = msg.lifetime / (float)FADEOUT_START;
 		}
 
-		fw::debug::drawFont(x + 1, y + 1, colBack, "[%s] %s", format(msg.severity).c_str(), msg.text.c_str());
-		fw::debug::drawFont(x, y, colMain, "[%s] %s", format(msg.severity).c_str(), msg.text.c_str());
+		auto formatted = fmt::format("[{}] {}", msg.severity, msg.text);
+
+		// these are passed as an arg to avoid printf stack fuckery in the formatted message
+		fw::debug::drawFont(x + 1, y + 1, colBack, "%s", formatted.c_str());
+		fw::debug::drawFont(x, y, colMain, "%s", formatted.c_str());
 	}
 
 	void Logger::AddMessageInternal(Severity severity, const std::string& message) {
@@ -123,4 +104,5 @@ namespace bf2mods {
 	// The logger instance.
 	static Logger logger;
 	Logger* g_Logger = &logger;
+
 } // namespace bf2mods

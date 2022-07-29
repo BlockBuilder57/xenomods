@@ -1,6 +1,7 @@
 #pragma once
 
-#include <bf2mods/prettyprinter.hpp>
+#include <fmt/format.h>
+
 #include <bf2mods/utils.hpp>
 #include <cmath>
 #include <glm/gtc/type_ptr.hpp>
@@ -67,78 +68,100 @@ namespace mm {
 
 } // namespace mm
 
-namespace bf2mods {
+/**
+ * formatter specialization for mm::Vec3
+ */
+template<>
+struct fmt::formatter<glm::vec3> : fmt::formatter<std::string> {
+	int precision = 0;
 
-	/**
-	 * Prettyprinter specialization for mm::Vec3
-	 */
-	template<>
-	struct Prettyprinter<mm::Vec3> {
-		inline static std::string format(const mm::Vec3& vec3, const int precision = -1) {
-			std::stringstream ss;
+	constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
 
-			if(precision > 0)
-				ss.precision(precision);
+		auto it = ctx.begin(), end = ctx.end();
+		if (it != end && isdigit(*it))  {
+			auto p = *it++;
 
-			auto PrintComponentWithName = [&ss](char c, const float& coord) {
-				ss << c << ": " << coord;
-			};
-
-			// yes its jank
-			// yes it works
-			// so it sticks
-
-			glm::vec3 vec = vec3;
-			ss << '(';
-			PrintComponentWithName('X', vec.x);
-			ss << ' ';
-			PrintComponentWithName('Y', vec.y);
-			ss << ' ';
-			PrintComponentWithName('Z', vec.z);
-			ss << ')';
-
-			return ss.str();
+			// cheap hack to make it a number
+			precision = p - '0';
+		} else {
+			ctx.on_error("invalid format");
 		}
 
-		inline static std::string_view type_name() {
-			return "mm::Vec3";
-		}
-	};
 
-	template<>
-	struct Prettyprinter<mm::Mat44> {
-		inline static std::string format(const mm::Mat44& mat44, const int precision = -1) {
-			std::stringstream ss;
+		// Check if reached the end of the range:
+		if (it != end && *it != '}')
+			ctx.on_error("invalid format");
 
-			if(precision > 0)
-				ss.precision(precision);
+		// Return an iterator past the end of the parsed range:
+		return it;
+	}
 
-			glm::mat4 mat;
-			ss << '(';
-			ss << mat[0][0] << ',';
-			ss << mat[0][1] << ',';
-			ss << mat[0][2] << ',';
-			ss << mat[0][3] << ", ";
-			ss << mat[1][0] << ',';
-			ss << mat[1][1] << ',';
-			ss << mat[1][2] << ',';
-			ss << mat[1][3] << ", ";
-			ss << mat[2][0] << ',';
-			ss << mat[2][1] << ',';
-			ss << mat[2][2] << ',';
-			ss << mat[2][3] << ", ";
-			ss << mat[3][0] << ',';
-			ss << mat[3][1] << ',';
-			ss << mat[3][2] << ',';
-			ss << mat[3][3];
-			ss << ')';
+	template<typename FormatContext>
+	inline auto format(const glm::vec3& glmVec, FormatContext& ctx) {
+		return fmt::format_to(ctx.out(), FMT_STRING("(X: {}, Y: {}, Z: {})"), precision, glmVec.x, glmVec.y, glmVec.z);
+	}
+};
 
-			return ss.str();
+template<>
+struct fmt::formatter<glm::mat4> : fmt::formatter<std::string> {
+	int precision = 0;
+
+	constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+
+		auto it = ctx.begin(), end = ctx.end();
+		if (it != end && isdigit(*it))  {
+			auto p = *it++;
+
+			// cheap hack to make it a number
+			precision = p - '0';
+		} else {
+			ctx.on_error("invalid format");
 		}
 
-		inline static std::string_view type_name() {
-			return "mm::Mat44";
-		}
-	};
 
-} // namespace bf2mods
+		// Check if reached the end of the range:
+		if (it != end && *it != '}')
+			ctx.on_error("invalid format");
+
+		// Return an iterator past the end of the parsed range:
+		return it;
+	}
+
+	template<typename FormatContext>
+	inline auto format(const glm::mat4& glmMat, FormatContext& ctx) {
+		// I don't get paid enough to do this - lily
+		return fmt::format_to(ctx.out(),
+							  FMT_STRING("( {1:.{0}f} {:.{0}f} {:.{0}f} {:.{0}f},"
+							  " {:.{0}f} {:.{0}f} {:.{0}f} {:.{0}f},"
+							  " {:.{0}f} {:.{0}f} {:.{0}f} {:.{0}f},"
+							  " {:.{0}f} {:.{0}f} {:.{0}f} {:.{0}f} )"),
+							  precision,
+							  glmMat[0][0], glmMat[0][1], glmMat[0][2], glmMat[0][3],
+							  glmMat[1][0], glmMat[1][1], glmMat[1][2], glmMat[1][3],
+							  glmMat[2][0], glmMat[2][1], glmMat[2][2], glmMat[2][3],
+							  glmMat[3][0], glmMat[3][1], glmMat[3][2], glmMat[3][3]);
+	}
+};
+
+// Adapters to autocast from our ConvertTo<T, ...> types to
+// the GLM underlying types, reusing the GLM formatter code
+
+template<>
+struct fmt::formatter<mm::Vec3> : fmt::formatter<glm::vec3> {
+
+	template<typename FormatContext>
+	inline auto format(const mm::Vec3& vec, FormatContext& ctx) {
+		auto& glmVec = static_cast<const glm::vec3&>(vec);
+		return fmt::format_to(ctx.out(), FMT_STRING("{1:{0}}"), precision, glmVec);
+	}
+};
+
+template<>
+struct fmt::formatter<mm::Mat44> : fmt::formatter<glm::mat4> {
+
+	template<typename FormatContext>
+	inline auto format(const mm::Mat44& mat, FormatContext& ctx) {
+		auto& glmMat = static_cast<const glm::mat4&>(mat);
+		return fmt::format_to(ctx.out(), FMT_STRING("{1:{0}}"), precision, glmMat);
+	}
+};

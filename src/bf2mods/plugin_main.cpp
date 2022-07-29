@@ -118,32 +118,32 @@ namespace bf2mods {
 				if(state.options.bdatScrambleType >= bf2mods::Options::BdatScrambleType::Count)
 					state.options.bdatScrambleType = bf2mods::Options::BdatScrambleType::Off;
 
-				g_Logger->LogInfo("Bdat scramble type set to %s", bf2mods::format(state.options.bdatScrambleType).c_str());
+				g_Logger->LogInfo("Bdat scramble type set to {}", state.options.bdatScrambleType);
 			}
 
 			if(btnDown(MOVEMENT_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.options.movementSpeedMult *= 2.0f;
-				g_Logger->LogInfo("Movement speed multiplier set to %.2f", state.options.movementSpeedMult);
+				g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", state.options.movementSpeedMult);
 			}
 
 			if(btnDown(MOVEMENT_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.options.movementSpeedMult *= 0.5f;
-				g_Logger->LogInfo("Movement speed multiplier set to %.2f", state.options.movementSpeedMult);
+				g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", state.options.movementSpeedMult);
 			}
 
 			if(btnDown(DISABLE_FALL_DAMAGE, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.options.disableFallDamage = !state.options.disableFallDamage;
-				g_Logger->LogInfo("Disable fall damage: %s", bf2mods::format(state.options.disableFallDamage).c_str());
+				g_Logger->LogInfo("Disable fall damage: {}", state.options.disableFallDamage);
 			}
 
 			if(btnDown(FREECAM_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.freecam.isOn = !state.freecam.isOn;
-				g_Logger->LogInfo("Toggling freecam: %s", bf2mods::format(state.freecam.isOn).c_str());
+				g_Logger->LogInfo("Toggling freecam: {}", state.freecam.isOn);
 			}
 
 			if(btnDown(UI_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.options.enableUIRendering = !state.options.enableUIRendering;
-				g_Logger->LogInfo("UI rendering: %s", bf2mods::format(state.options.enableUIRendering).c_str());
+				g_Logger->LogInfo("UI rendering: {}", state.options.enableUIRendering);
 			}
 
 			if(btnDown(DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
@@ -151,7 +151,7 @@ namespace bf2mods {
 #if !BF2MODS_CODENAME(bfsw)
 				fw::PadManager::enableDebugDraw(state.options.enableDebugRendering);
 #endif
-				g_Logger->LogInfo("Debug rendering: %s", bf2mods::format(state.options.enableDebugRendering).c_str());
+				g_Logger->LogInfo("Debug rendering: {}", state.options.enableDebugRendering);
 			}
 		} else {
 			if(btnDown(MAPJUMP_INC, p2Cur.Buttons, p2Prev.Buttons)) {
@@ -159,23 +159,23 @@ namespace bf2mods {
 				if(state.mapjumpId >= 298)
 					state.mapjumpId = 1;
 
-				g_Logger->LogInfo("MapJump++, now %d", state.mapjumpId);
+				g_Logger->LogInfo("MapJump++, now {}", state.mapjumpId);
 			}
 			if(btnDown(MAPJUMP_DEC, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.mapjumpId--;
 				if(state.mapjumpId <= 0)
 					state.mapjumpId = 297;
 
-				g_Logger->LogInfo("MapJump--, now %d", state.mapjumpId);
+				g_Logger->LogInfo("MapJump--, now {}", state.mapjumpId);
 			}
 
 			if(btnDown(MAPJUMP_JUMP, p2Cur.Buttons, p2Prev.Buttons)) {
-				g_Logger->LogInfo("Attempting jump to MapJump %d", state.mapjumpId);
+				g_Logger->LogInfo("Attempting jump to MapJump {}", state.mapjumpId);
 				DebugStuff::DoMapJump(state.mapjumpId);
 			}
 
 			if(btnDown(PLAYSE, p2Cur.Buttons, p2Prev.Buttons)) {
-				g_Logger->LogInfo("Sound effect %d (0x%x)", state.mapjumpId, state.mapjumpId);
+				g_Logger->LogInfo("Sound effect {} (0x{:x})", state.mapjumpId, state.mapjumpId);
 				DebugStuff::PlaySE(state.mapjumpId);
 			}
 
@@ -211,9 +211,9 @@ namespace bf2mods {
 #endif
 
 #if _DEBUG
-		g_Logger->LogInfo("bf2mods (debug) - %s initialized (built %s %s)", version::tagDirty, __DATE__, __TIME__);
+		g_Logger->LogInfo("bf2mods (debug) - {} initialized (built {} {})", version::tagDirty, __DATE__, __TIME__);
 #else
-		g_Logger->LogInfo("bf2mods - %s initalized", version::tagDirty);
+		g_Logger->LogInfo("bf2mods - {} initalized", version::tagDirty);
 #endif
 	}
 

@@ -23,8 +23,6 @@ namespace bf2mods {
 
 		RETURN_TO_TITLE = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR,
 
-		//LAYER_OPEN = nn::hid::KEY_R | nn::hid::KEY_PLUS,
-		//LAYER_CLOSE = nn::hid::KEY_R | nn::hid::KEY_MINUS,
 		UI_RENDER_TOGGLE = nn::hid::KEY_Y,
 		DEBUG_RENDER_TOGGLE = nn::hid::KEY_B,
 

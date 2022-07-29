@@ -1,7 +1,6 @@
 #include "player_movement.hpp"
 
 #include <bf2mods/gf/player_controller.hpp>
-#include <bf2mods/prettyprinter.hpp>
 #include <bf2mods/stuff/utils/debug_util.hpp>
 
 #include "bf2logger.hpp"
@@ -58,14 +57,14 @@ namespace gf {
 		// FallDistance handles the animation+grunt the player makes when falling from a height
 		GENERATE_SYM_HOOK(FallDistancePlugin_calcDistance, "_ZNK2gf2pc18FallDistancePlugin12calcDistanceERKN2mm4Vec3E", float, FallDamagePlugin* this_pointer, mm::Vec3* vec) {
 			float height = FallDistancePlugin_calcDistanceBak(this_pointer, vec);
-			//bf2mods::g_Logger->LogInfo("FallDistancePlugin::calcDistance called, would return %.2f", height);
+			//bf2mods::g_Logger->LogInfo("FallDistancePlugin::calcDistance called, would return {:.2f}", height);
 			return bf2mods::GetState().options.disableFallDamage ? 0.f : height;
 		}
 
 		// Can't figure out how to properly set the actual max height, but this will do
 		// Forcibly disables fall damage when any movement state tries to enable or disable it
 		GENERATE_SYM_HOOK(StateUtil_setFallDamageDisable, "_ZN2gf2pc9StateUtil20setFallDamageDisableERNS_15GfComBehaviorPcEb", void, void* GfComBehaviorPc, bool param_2) {
-			//bf2mods::g_Logger->LogInfo("StateUtil::setFallDamageDisable(GfComBehaviorPc: %p, bool: %s)", GfComBehaviorPc, bf2mods::format(param_2).c_str());
+			//bf2mods::g_Logger->LogInfo("StateUtil::setFallDamageDisable(GfComBehaviorPc: {:p}, bool: {})", GfComBehaviorPc, param_2);
 			StateUtil_setFallDamageDisableBak(GfComBehaviorPc, bf2mods::GetState().options.disableFallDamage ? true : param_2);
 		}
 

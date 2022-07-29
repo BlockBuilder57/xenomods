@@ -20,7 +20,7 @@ namespace game {
 	GENERATE_SYM_HOOK(SeqUtil_requestMapJump, "_ZN4game7SeqUtil14requestMapJumpERKN2fw8DocumentERKNS_16MapJumpSetupInfoE", void, void* Document, MapJumpSetupInfo* sInfo) {
 		SeqUtil_requestMapJumpBak(Document, sInfo);
 
-		bf2mods::g_Logger->LogInfo("setup: %02u, %02u, %s, %s, %s", sInfo->chapter, sInfo->location, bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->maybeVec).c_str(), bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->jump_pos).c_str(), bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->jump_rot).c_str());
+		bf2mods::g_Logger->LogInfo("setup: {:02u}, {:02u}, {}, {}, {}", sInfo->chapter, sInfo->location, bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->maybeVec).c_str(), bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->jump_pos).c_str(), bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->jump_rot).c_str());
 	}
 
 } // namespace game
@@ -33,12 +33,12 @@ namespace ml {
 		/*uint8_t(*headerChek)(const char* buffer);
 
 		GENERATE_SYM_HOOK(createMdl, "_ZN2ml8DrMdlMan9createMdlEPKvPKci", void*, void* that, char* model_buffer, const char* model_path, int unknown) {
-			bf2mods::g_Logger->LogInfo("Loading model \"%s\" - magic %c%c%c%c, chek %d", model_path, model_buffer[0], model_buffer[1], model_buffer[2], model_buffer[3], headerChek(model_buffer));
+			bf2mods::g_Logger->LogInfo("Loading model \"{}\" - magic {:c}{:c}{:c}{:c}, chek {}", model_path, model_buffer[0], model_buffer[1], model_buffer[2], model_buffer[3], headerChek(model_buffer));
 			return createMdlBak(that, model_buffer, model_path, unknown);
 		}
 
 		GENERATE_SYM_HOOK(createInstantMdl, "_ZN2ml8DrMdlMan16createInstantMdlEPKvPKci", void*, void* that, char* model_buffer, const char* model_path, int unknown) {
-			bf2mods::g_Logger->LogInfo("Loading instant model \"%s\"", model_path);
+			bf2mods::g_Logger->LogInfo("Loading instant model \"{}\"", model_path);
 			return createMdlBak(that, model_buffer, model_path, unknown);
 		}*/
 
@@ -51,7 +51,7 @@ namespace mm {
 	namespace MMStdBase {
 
 		GENERATE_SYM_HOOK(mmAssert, "_ZN2mm9MMStdBase8mmAssertEPKcS2_j", void, const char* expr, const char* file, unsigned line) {
-			bf2mods::g_Logger->LogFatal("Caught Assert!!! Expr \"%s\" (%s : %d)", expr, file, line);
+			bf2mods::g_Logger->LogFatal("Caught Assert!!! Expr \"{}\" ({} : {})", expr, file, line);
 			mmAssertBak(expr, file, line);
 		}
 
@@ -64,7 +64,7 @@ namespace event {
 	/*GENERATE_SYM_HOOK(MovieManager_makePath, "_ZN5event12MovieManager8makePathERN2mm3mtl6FixStrILi256EEEPKc", bool, mm::mtl::FixStr<256>* param_1, char* param_2) {
 		//dbgutil::logStackTrace();
 
-		bf2mods::g_Logger->LogInfo("param_1: %s, param_2: %s", &param_1->buffer, param_2);
+		bf2mods::g_Logger->LogInfo("param_1: {}, param_2: {}", &param_1->buffer, param_2);
 		return MovieManager_makePathBak(param_1, param_2);
 	}*/
 
@@ -78,19 +78,18 @@ namespace gf {
 		if(!bf2mods::GetState().options.enableDebugRendering)
 			return;
 
-		char trackName[32];
-		memset(&trackName, 0, sizeof(trackName));
+		char trackName[32]{};
 		memcpy(&trackName, "BgmTrack", sizeof("BgmTrack"));
 
 		// Oh no help
 
-		//bf2mods::g_Logger->LogInfo("virtual: %p", cxa_pure_virtual);
-		//bf2mods::g_Logger->LogInfo("track name: %p", ub_cast<void*>(this_pointer->vtable->GetTrackName));
+		//bf2mods::g_Logger->LogInfo("virtual: {:p}", cxa_pure_virtual);
+		//bf2mods::g_Logger->LogInfo("track name: {:p}", ub_cast<void*>(this_pointer->vtable->GetTrackName));
 
 		/*if(ub_cast<void*>(this_pointer->vtable->GetTrackName) != cxa_pure_virtual) {
 			bf2mods::g_Logger->LogInfo("GetTrackName isn't pure virtual..");
 			const char* barack_obama = (this_pointer->*(this_pointer->vtable->GetTrackName))();
-			bf2mods::g_Logger->LogInfo("it's %s", barack_obama);
+			bf2mods::g_Logger->LogInfo("it's {}", barack_obama);
 		}*/
 
 		const int height = fw::debug::drawFontGetHeight();
@@ -100,7 +99,7 @@ namespace gf {
 			//memcpy(&fixStr.buffer, "asscafe", sizeof("asscafe"));
 			//this_pointer->makePlayFileName(&fixStr);
 
-			fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "%s: %s %.1f/%.1f, looping: %s", trackName, this_pointer->getPlayingBgmFileName(), this_pointer->getPlayTime(), this_pointer->getTotalTime(), bf2mods::format(this_pointer->isLoop()).c_str());
+			fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "%s", fmt::format("{}: {} {:.1f}/{:.1f}, looping: {}", trackName, this_pointer->getPlayingBgmFileName(), this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop()).c_str());
 		} else {
 			// uncomment if you want every BgmTrack instance to show this
 			//fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "not playing");

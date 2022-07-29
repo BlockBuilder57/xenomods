@@ -76,8 +76,9 @@ set_target_properties(bf2mods PROPERTIES
 target_include_directories(bf2mods PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(bf2mods PUBLIC ${PROJECT_BINARY_DIR}/)
 
+# TODO: I want to use fmt::fmt but it doesn't seem to respect fpic. so for now header only it is
 target_link_libraries(bf2mods PUBLIC
-		fmt::fmt
+		fmt::fmt-header-only
 		glm::glm
 		)
 

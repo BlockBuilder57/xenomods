@@ -1,8 +1,9 @@
 #pragma once
 
 #include "bf2mods/mm/math_types.hpp"
-#include "bf2mods/prettyprinter.hpp"
 #include "bf2mods/utils.hpp"
+
+#include <fmt/format.h>
 
 namespace bf2mods {
 
@@ -34,29 +35,7 @@ namespace bf2mods {
 		bool enableDebugRendering;
 	};
 
-	template<>
-	struct Prettyprinter<Options::BdatScrambleType> {
-		inline static std::string format(const Options::BdatScrambleType& opt) {
-			using enum Options::BdatScrambleType;
 
-			switch(opt) {
-				case ScrambleIndex:
-					return "Scramble Index";
-					break;
-				case ShowSheetName:
-					return "Show Bdat Sheet Name";
-					break;
-				case Off:
-				default:
-					return "Disabled";
-					break;
-			}
-		}
-
-		inline static std::string_view type_name() {
-			return "BdatOptions::ScrambleType";
-		}
-	};
 
 	struct Bf2ModsState {
 
@@ -107,3 +86,20 @@ namespace bf2mods {
 
 
 } // namespace bf2mods
+
+template<>
+struct fmt::formatter<bf2mods::Options::BdatScrambleType> : fmt::formatter<std::string_view> {
+	template<typename FormatContext>
+	inline auto format(bf2mods::Options::BdatScrambleType type, FormatContext& ctx) {
+		using enum bf2mods::Options::BdatScrambleType;
+		std::string_view name = "unknown";
+
+		switch(type) {
+			case ScrambleIndex: name = "Scramble Index"; break;
+			case ShowSheetName: name = "Show Bdat Sheet Name"; break;
+			case Off: name = "Disabled"; break;
+		};
+
+		return formatter<std::string_view>::format(name, ctx);
+	}
+};

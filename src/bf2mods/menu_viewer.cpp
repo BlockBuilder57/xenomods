@@ -24,11 +24,11 @@ namespace gf {
 	}*/
 
 	GENERATE_SYM_HOOK(GfMenuFullScreen_registLayerParam, "_ZN2gf16GfMenuFullScreen16registLayerParamEjRKNS_11GfMenuTypes5ParamE", void, unsigned int param_1, GfMenuTypes::Param* param_2) {
-		bf2mods::g_Logger->LogInfo("registLayerParam(uint: %u, Param: [%p, %p, %p, %p]", param_1, param_2->field_0x0, param_2->field_0x8, param_2->field_0x10, param_2->field_0x18);
+		bf2mods::g_Logger->LogInfo("registLayerParam(uint: {}, Param: [{:p}, {:p}, {:p}, {:p}]", param_1, param_2->field_0x0, param_2->field_0x8, param_2->field_0x10, param_2->field_0x18);
 		GfMenuFullScreen_registLayerParamBak(param_1, param_2);
 	}
 	GENERATE_SYM_HOOK(GfMenuFullScreen_registLayerObject, "_ZN2gf16GfMenuFullScreen17registLayerObjectEjj", void, unsigned int param_1, unsigned int param_2) {
-		bf2mods::g_Logger->LogInfo("registLayerObject(%u, %u)", param_1, param_2);
+		bf2mods::g_Logger->LogInfo("registLayerObject({}, {})", param_1, param_2);
 		GfMenuFullScreen_registLayerObjectBak(param_1, param_2);
 	}
 
@@ -60,27 +60,6 @@ namespace gf {
 
 } // namespace gf
 
-namespace ui {
-
-	GENERATE_SYM_HOOK(UIManager_createLayer, "_ZN2ui9UIManager11createLayerEj", void*, void* this_pointer, unsigned int param_1) {
-		bf2mods::g_Logger->LogInfo("UIManager::createLayer(%p, %u)", this_pointer, param_1);
-		bf2mods::MenuViewer::UIManagerPtr = this_pointer;
-		return UIManager_createLayerBak(this_pointer, param_1);
-	}
-
-	GENERATE_SYM_HOOK(UIManager_releaseLayer, "_ZN2ui9UIManager12releaseLayerEj", void, void* this_pointer, unsigned int param_1) {
-		bf2mods::g_Logger->LogInfo("UIManager::releaseLayer(%p, %u)", this_pointer, param_1);
-		bf2mods::MenuViewer::UIManagerPtr = this_pointer;
-		UIManager_releaseLayerBak(this_pointer, param_1);
-	}
-	GENERATE_SYM_HOOK(UIManager_terminateLayer, "_ZN2ui9UIManager14terminateLayerEjb", void, void* this_pointer, unsigned int param_1, bool param_2) {
-		bf2mods::g_Logger->LogInfo("UIManager::terminateLayer(%p, %u, %s)", this_pointer, param_1, bf2mods::format(param_2).c_str());
-		bf2mods::MenuViewer::UIManagerPtr = this_pointer;
-		UIManager_terminateLayerBak(this_pointer, param_1, param_2);
-	}
-
-} // namespace ui
-
 namespace layer {
 
 	GENERATE_SYM_HOOK(LayerManager_finalRender, "_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE", void, void* this_pointer, void* IDrDrawWorkInfo) {
@@ -93,17 +72,6 @@ namespace layer {
 namespace bf2mods::MenuViewer {
 
 	void* UIManagerPtr;
-
-	void OpenLayer(unsigned int layer) {
-		if(UIManagerPtr != nullptr)
-			ui::UIManager_createLayerBak(UIManagerPtr, layer);
-	}
-	void CloseLayer(unsigned int layer) {
-		if(UIManagerPtr != nullptr) {
-			ui::UIManager_releaseLayerBak(UIManagerPtr, layer);
-			ui::UIManager_terminateLayerBak(UIManagerPtr, layer, false);
-		}
-	}
 
 	void Setup() {
 		g_Logger->LogDebug("Setting up menu viewer...");
