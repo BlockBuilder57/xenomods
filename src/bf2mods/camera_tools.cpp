@@ -5,6 +5,7 @@
 #include "camera_tools.hpp"
 
 #include <bf2mods/apps/FrameworkLauncher.hpp>
+#include <bf2mods/event/manager.hpp>
 #include <bf2mods/fw/camera.hpp>
 #include <bf2mods/ml/camera.hpp>
 #include <bf2mods/mm/math_types.hpp>
@@ -23,7 +24,7 @@ namespace ml {
 
 	template<auto backupFunction>
 	void FreecamUpdateMatrix(ScnObjCam* this_pointer, mm::Mat44& matrix) {
-		auto& freecamState = bf2mods::GetState().freecam;
+		auto& state = bf2mods::GetState();
 		mm::Col4 camColor = mm::Col4::White;
 
 #if BF2MODS_CODENAME(bfsw)
@@ -43,15 +44,15 @@ namespace ml {
 			} else {
 				// the active camera!
 
-				if(!freecamState.isOn)
-					freecamState.matrix = trueMatrix; // put current cam matrix into the state
+				if(!state.freecam.isOn)
+					state.freecam.matrix = trueMatrix; // put current cam matrix into the state
 
-				if(freecamState.isOn) {
+				if(state.freecam.isOn) {
 					// use the matrix calculated in DoFreeCameraMovement
 #if BF2MODS_CODENAME(bfsw)
 					(*backupFunction)(this_pointer, freecamState.matrix);
 #else
-					mm::Mat44 inverse = glm::inverse(static_cast<const glm::mat4&>(freecamState.matrix));
+					mm::Mat44 inverse = glm::inverse(static_cast<const glm::mat4&>(state.freecam.matrix));
 					(*backupFunction)(this_pointer, inverse);
 #endif
 				} else {
@@ -59,7 +60,7 @@ namespace ml {
 				}
 			}
 
-			if(freecamState.isOn) {
+			if(state.options.enableDebugRendering && state.freecam.isOn) {
 				fw::debug::drawCompareZ(false);
 				fw::debug::drawCamera(trueMatrix, camColor);
 				fw::debug::drawCompareZ(true);
@@ -91,6 +92,19 @@ namespace ml {
 	}
 
 } // namespace ml
+
+#if !BF2MODS_CODENAME(bfsw)
+namespace event {
+
+	GENERATE_SYM_HOOK(Manager_update, "_ZN5event7Manager6updateEv", void, Manager* p_this) {
+		if(!p_this->isPlayCancel() && bf2mods::GetState().options.enableDebugRendering)
+			p_this->drawInfo();
+
+		return Manager_updateBak(p_this);
+	}
+
+} // namespace event
+#endif
 
 namespace bf2mods::CameraTools {
 
@@ -200,7 +214,9 @@ namespace bf2mods::CameraTools {
 		ml::ScnObjCam_setWorldMatrixHook();
 #else
 		ml::ScnObjCam_setViewMatrixHook();
+		event::Manager_updateHook();
 #endif
+
 		ml::ScnObjCam_updateFovNearFarHook();
 	}
 

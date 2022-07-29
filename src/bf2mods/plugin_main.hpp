@@ -25,7 +25,8 @@ namespace bf2mods {
 
 		//LAYER_OPEN = nn::hid::KEY_R | nn::hid::KEY_PLUS,
 		//LAYER_CLOSE = nn::hid::KEY_R | nn::hid::KEY_MINUS,
-		UI_TOGGLE = nn::hid::KEY_Y,
+		UI_RENDER_TOGGLE = nn::hid::KEY_Y,
+		DEBUG_RENDER_TOGGLE = nn::hid::KEY_B,
 
 		FREECAM_TOGGLE = nn::hid::KEY_LSTICK | nn::hid::KEY_RSTICK,
 		FREECAM_FOVHOLD = nn::hid::KEY_LSTICK,

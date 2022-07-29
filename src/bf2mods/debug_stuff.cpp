@@ -75,7 +75,7 @@ namespace gf {
 	GENERATE_SYM_HOOK(BgmTrack_update, "_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE", void, gf::BgmTrack* this_pointer, void* updateInfo) {
 		BgmTrack_updateBak(this_pointer, updateInfo);
 
-		if(!bf2mods::GetState().options.enableUIRendering)
+		if(!bf2mods::GetState().options.enableDebugRendering)
 			return;
 
 		char trackName[32];

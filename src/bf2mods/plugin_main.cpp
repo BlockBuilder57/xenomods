@@ -141,12 +141,17 @@ namespace bf2mods {
 				g_Logger->LogInfo("Toggling freecam: %s", bf2mods::format(state.freecam.isOn).c_str());
 			}
 
-			if(btnDown(UI_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+			if(btnDown(UI_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
 				state.options.enableUIRendering = !state.options.enableUIRendering;
-#if !BF2MODS_CODENAME(bfsw)
-				fw::PadManager::enableDebugDraw(state.options.enableUIRendering);
-#endif
 				g_Logger->LogInfo("UI rendering: %s", bf2mods::format(state.options.enableUIRendering).c_str());
+			}
+
+			if(btnDown(DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+				state.options.enableDebugRendering = !state.options.enableDebugRendering;
+#if !BF2MODS_CODENAME(bfsw)
+				fw::PadManager::enableDebugDraw(state.options.enableDebugRendering);
+#endif
+				g_Logger->LogInfo("Debug rendering: %s", bf2mods::format(state.options.enableDebugRendering).c_str());
 			}
 		} else {
 			if(btnDown(MAPJUMP_INC, p2Cur.Buttons, p2Prev.Buttons)) {

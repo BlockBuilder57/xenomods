@@ -23,6 +23,7 @@ namespace bf2mods {
 			disableFallDamage = true;
 			movementSpeedMult = 1.f;
 			enableUIRendering = true;
+			enableDebugRendering = true;
 		}
 
 		BdatScrambleType bdatScrambleType;
@@ -30,6 +31,7 @@ namespace bf2mods {
 		bool disableFallDamage;
 		float movementSpeedMult;
 		bool enableUIRendering;
+		bool enableDebugRendering;
 	};
 
 	template<>
