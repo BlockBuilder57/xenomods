@@ -31,7 +31,9 @@ configure_file(linkerscripts/switch.specs.in ${PROJECT_BINARY_DIR}/switch.specs)
 add_custom_target(__bf2mods_gittag COMMAND ${CMAKE_COMMAND} -P ${PROJECT_SOURCE_DIR}/scripts/gittag.cmake WORKING_DIRECTORY ${PROJECT_BINARY_DIR} SOURCES ${PROJECT_BINARY_DIR}/version.h)
 set_source_files_properties(${PROJECT_BINARY_DIR}/version.h PROPERTIES GENERATED TRUE)
 
+# Vendor libraries
 add_subdirectory(vendor/glm)
+add_subdirectory(vendor/fmt)
 
 add_subdirectory(src)
 
