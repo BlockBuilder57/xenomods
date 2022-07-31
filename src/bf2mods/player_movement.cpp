@@ -1,10 +1,10 @@
 #include "player_movement.hpp"
 
-#include <bf2mods/gf/player_controller.hpp>
-#include <bf2mods/stuff/utils/debug_util.hpp>
+#include <bf2mods/engine/gf/player_controller.hpp>
 
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
+#include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/utils.hpp"
 #include "debug_stuff.hpp"
 #include "state.hpp"

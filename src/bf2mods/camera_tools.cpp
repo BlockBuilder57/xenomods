@@ -4,17 +4,17 @@
 
 #include "camera_tools.hpp"
 
-#include <bf2mods/apps/FrameworkLauncher.hpp>
-#include <bf2mods/event/manager.hpp>
-#include <bf2mods/fw/camera.hpp>
-#include <bf2mods/ml/camera.hpp>
-#include <bf2mods/mm/math_types.hpp>
+#include <bf2mods/engine/apps/FrameworkLauncher.hpp>
+#include <bf2mods/engine/event/manager.hpp>
+#include <bf2mods/engine/fw/camera.hpp>
+#include <bf2mods/engine/fw/debug.hpp>
+#include <bf2mods/engine/ml/camera.hpp>
+#include <bf2mods/engine/mm/math_types.hpp>
 #include <bf2mods/stuff/utils/debug_util.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/mat4x4.hpp>
 
 #include "bf2logger.hpp"
-#include "bf2mods/fw/debug.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "plugin_main.hpp"
 #include "skyline/logger/Logger.hpp"

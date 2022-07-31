@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../mm/math_types.hpp"
-#include "../utils.hpp"
+#include "bf2mods/engine/mm/math_types.hpp"
+#include "bf2mods/utils.hpp"
 
 namespace fw {
 

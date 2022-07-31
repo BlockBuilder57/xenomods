@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bf2mods/mm/math_types.hpp>
+#include <bf2mods/engine/mm/math_types.hpp>
 
 namespace gf {
 	namespace GfMenuObjUtil {

@@ -1,13 +1,13 @@
 #include "plugin_main.hpp"
 
-#include <bf2mods/mm/math_types.hpp>
-#include <bf2mods/fw/debug.hpp>
-#include <bf2mods/fw/document.hpp>
-#include <bf2mods/stuff/utils/debug_util.hpp>
+#include <bf2mods/engine/mm/math_types.hpp>
+#include <bf2mods/engine/fw/debug.hpp>
+#include <bf2mods/engine/fw/document.hpp>
 
-#include <version.h>
+#include "version.h"
 #include "bf2logger.hpp"
 #include "state.hpp"
+#include "bf2mods/stuff/utils/debug_util.hpp"
 #include "skyline/efl/service.hpp"
 
 // all parts here

@@ -1,6 +1,6 @@
 #include "bf2logger.hpp"
 
-#include <bf2mods/fw/debug.hpp>
+#include <bf2mods/engine/fw/debug.hpp>
 
 #include "skyline/logger/Logger.hpp"
 

@@ -1,10 +1,10 @@
 #include "bdat_randomizer.hpp"
 
-#include <version.h>
+#include <bf2mods/engine/bdat/bdat.hpp>
 
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include <bf2mods/bdat/bdat.hpp>
+#include "version.h"
 #include "nn/oe.h"
 #include "state.hpp"
 

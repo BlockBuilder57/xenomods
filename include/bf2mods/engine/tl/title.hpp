@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <bf2mods/gf/savegame.hpp>
+#include "bf2mods/engine/gf/savegame.hpp"
 
 namespace tl {
 

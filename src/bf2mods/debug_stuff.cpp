@@ -1,15 +1,15 @@
 #include "debug_stuff.hpp"
 
-#include <bf2mods/fw/debug.hpp>
-#include <bf2mods/game/mapjump.hpp>
-#include <bf2mods/game/scripts.hpp>
-#include <bf2mods/gf/bgm.hpp>
-#include <bf2mods/mm/math_types.hpp>
-#include <bf2mods/stuff/utils/debug_util.hpp>
-#include <bf2mods/tl/title.hpp>
+#include <bf2mods/engine/fw/debug.hpp>
+#include <bf2mods/engine/game/mapjump.hpp>
+#include <bf2mods/engine/game/scripts.hpp>
+#include <bf2mods/engine/gf/bgm.hpp>
+#include <bf2mods/engine/mm/math_types.hpp>
+#include <bf2mods/engine/tl/title.hpp>
 #include <map>
 
 #include "bf2logger.hpp"
+#include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
 #include "state.hpp"
