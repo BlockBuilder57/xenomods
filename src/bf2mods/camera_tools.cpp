@@ -7,7 +7,6 @@
 #include <bf2mods/engine/apps/FrameworkLauncher.hpp>
 #include <bf2mods/engine/event/manager.hpp>
 #include <bf2mods/engine/fw/camera.hpp>
-#include <bf2mods/engine/fw/debug.hpp>
 #include <bf2mods/engine/ml/camera.hpp>
 #include <bf2mods/engine/mm/math_types.hpp>
 #include <bf2mods/stuff/utils/debug_util.hpp>
@@ -15,6 +14,7 @@
 #include <glm/mat4x4.hpp>
 
 #include "bf2logger.hpp"
+#include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "plugin_main.hpp"
 #include "skyline/logger/Logger.hpp"
@@ -50,7 +50,7 @@ namespace ml {
 				if(state.freecam.isOn) {
 					// use the matrix calculated in DoFreeCameraMovement
 #if BF2MODS_CODENAME(bfsw)
-					(*backupFunction)(this_pointer, freecamState.matrix);
+					(*backupFunction)(this_pointer, state.freecam.matrix);
 #else
 					mm::Mat44 inverse = glm::inverse(static_cast<const glm::mat4&>(state.freecam.matrix));
 					(*backupFunction)(this_pointer, inverse);
@@ -149,7 +149,7 @@ namespace bf2mods::CameraTools {
 		glm::vec3 move {};
 		if(btnHeld(FREECAM_FOVHOLD, p2Cur.Buttons)) {
 			// holding down the button, so modify fov
-			// note: game hard crashes during rendering when |fov| >= 180, it needs clamping
+			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
 			freecamState->fov = std::clamp(freecamState->fov + -lStick.y * 0.25f, -179.f, 179.f);
 		} else {
 			move = { lStick.x, 0, -lStick.y };
@@ -164,8 +164,6 @@ namespace bf2mods::CameraTools {
 		// multiply by cam speed
 		move *= freecamState->camSpeed;
 
-		//fw::debug::drawFont(500, 30, mm::Col4::White, "fov is: %.2f", freecamState->fov);
-
 		// rotation
 		glm::vec3 look {};
 		float lookMult = 3.f;
@@ -175,7 +173,7 @@ namespace bf2mods::CameraTools {
 			lookMult *= freecamState->fov / 45.f;
 
 		if(btnHeld(FREECAM_ROLLHOLD, p2Cur.Buttons))
-			look = { 0, 0, -rStick.x * 0.25f }; // only roll
+			look = { 0, 0, -rStick.x * 0.5f }; // only roll
 		else
 			look = { rStick.y * lookMult, -rStick.x * lookMult, 0 }; // pitch and yaw
 
@@ -198,7 +196,15 @@ namespace bf2mods::CameraTools {
 		float angle = glm::angle(rot);
 		glm::vec3 axis = glm::axis(rot);
 
-		//bf2mods::g_Logger->LogInfo("euler: {}", glm::degrees(glm::eulerAngles(rot)));
+#if 0
+		int yPos = 200;
+		const int height = fw::debug::drawFontGetHeight();
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "- freecam debug -");
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "pos: {:1}", pos);
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "rot: {:1}", glm::degrees(glm::eulerAngles(rot)));
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "speed: {:.3f}", freecamState->camSpeed);
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "fov: {:.1f}", freecamState->fov);
+#endif
 
 		glm::mat4 newmat = glm::mat4(1.f);
 		newmat = glm::translate(newmat, pos + move);

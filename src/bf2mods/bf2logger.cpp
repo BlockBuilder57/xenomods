@@ -1,7 +1,6 @@
 #include "bf2logger.hpp"
 
-#include <bf2mods/engine/fw/debug.hpp>
-
+#include "bf2mods/debug_wrappers.hpp"
 #include "skyline/logger/Logger.hpp"
 
 namespace bf2mods {
@@ -69,23 +68,17 @@ namespace bf2mods {
 
 	void Logger::DrawInternal(LoggerMessage& msg, std::uint16_t x, std::uint16_t y) const {
 		mm::Col4 colMain = ColorForSeverity(msg.severity);
-		mm::Col4 colBack = mm::Col4::Black;
 
 		if(msg.lifetime <= 0) {
 			// this shouldn't happen but better to be safe
 			colMain.a = 0.f;
-			colBack.a = 0.f;
 		} else if(msg.lifetime <= FADEOUT_START) {
 			// make the text fade out before it gets removed
 			colMain.a = msg.lifetime / (float)FADEOUT_START;
-			colBack.a = msg.lifetime / (float)FADEOUT_START;
 		}
 
-		auto formatted = fmt::format("[{}] {}", msg.severity, msg.text);
-
 		// these are passed as an arg to avoid printf stack fuckery in the formatted message
-		fw::debug::drawFont(x + 1, y + 1, colBack, "%s", formatted.c_str());
-		fw::debug::drawFont(x, y, colMain, "%s", formatted.c_str());
+		fw::debug::drawFontFmtShadow(x, y, colMain, "[{}] {}", msg.severity, msg.text);
 	}
 
 	void Logger::AddMessageInternal(Severity severity, const std::string& message) {

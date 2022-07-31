@@ -89,8 +89,12 @@ namespace mm {
 } // namespace mm
 
 /**
- * formatter specialization for mm::Vec3
+ * Formatter specializations for math types
+ *
+ * README IF CRASHING: this isn't a float formatter!
+ * If you're using {:.Nf}, don't! Use {:N}!
  */
+
 template<>
 struct fmt::formatter<glm::vec3> : fmt::formatter<std::string> {
 	int precision = 0;
@@ -163,6 +167,38 @@ struct fmt::formatter<glm::mat4> : fmt::formatter<std::string> {
 	}
 };
 
+template<>
+struct fmt::formatter<glm::quat> : fmt::formatter<std::string> {
+	int precision = 0;
+
+	constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+		auto it = ctx.begin(), end = ctx.end();
+		if(it != end && isdigit(*it)) {
+			auto p = *it++;
+
+			// cheap hack to make it a number, this means that
+			// any number over 9 won't work (but this is practical enough)
+			precision = p - '0';
+		} else {
+			// this SHOULD be an error
+			//ctx.on_error("invalid format");
+		}
+
+		// Check if reached the end of the range:
+		if(it != end && *it != '}')
+			ctx.on_error("invalid format");
+
+		// Return an iterator past the end of the parsed range:
+		return it;
+	}
+
+	template<typename FormatContext>
+	inline auto format(const glm::quat& glmQuat, FormatContext& ctx) {
+		return fmt::format_to(ctx.out(), FMT_STRING("(X: {1:.{0}f}, Y: {2:.{0}f}, Z: {3:.{0}f}, W: {4:.{0}f})"), precision, glmQuat.x, glmQuat.y, glmQuat.z, glmQuat.w);
+	}
+};
+
+#if 0
 // Adapters to autocast from our ConvertTo<T, ...> types to
 // the GLM underlying types, reusing the GLM formatter code
 
@@ -181,3 +217,4 @@ struct fmt::formatter<mm::Mat44> : fmt::formatter<glm::mat4> {
 		return fmt::format_to(ctx.out(), "{1:{0}}", precision, static_cast<const glm::mat4&>(mat));
 	}
 };
+#endif

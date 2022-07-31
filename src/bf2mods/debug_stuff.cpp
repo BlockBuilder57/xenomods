@@ -1,6 +1,5 @@
 #include "debug_stuff.hpp"
 
-#include <bf2mods/engine/fw/debug.hpp>
 #include <bf2mods/engine/game/mapjump.hpp>
 #include <bf2mods/engine/game/scripts.hpp>
 #include <bf2mods/engine/gf/bgm.hpp>
@@ -9,6 +8,7 @@
 #include <map>
 
 #include "bf2logger.hpp"
+#include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
@@ -20,7 +20,7 @@ namespace game {
 	GENERATE_SYM_HOOK(SeqUtil_requestMapJump, "_ZN4game7SeqUtil14requestMapJumpERKN2fw8DocumentERKNS_16MapJumpSetupInfoE", void, void* Document, MapJumpSetupInfo* sInfo) {
 		SeqUtil_requestMapJumpBak(Document, sInfo);
 
-		bf2mods::g_Logger->LogInfo("setup: {:02u}, {:02u}, {}, {}, {}", sInfo->chapter, sInfo->location, bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->maybeVec).c_str(), bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->jump_pos).c_str(), bf2mods::Prettyprinter<mm::Vec3>().format(sInfo->jump_rot).c_str());
+		//bf2mods::g_Logger->LogInfo("setup: {:02u}, {:02u}, {}, {}, {}", sInfo->chapter, sInfo->location, sInfo->maybeVec, sInfo->jump_pos, sInfo->jump_rot);
 	}
 
 } // namespace game
