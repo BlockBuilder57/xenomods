@@ -1,7 +1,11 @@
 #pragma once
 
-namespace bf2mods::BdatRandomizer {
+#include "bf2mods/UpdatableModule.hpp"
 
-	void Setup();
+namespace bf2mods {
 
-} // namespace bf2mods::BdatRandomizer
+	struct BdatRandomizer : public bf2mods::UpdatableModule {
+		void Initialize() override;
+	};
+
+} // namespace bf2mods

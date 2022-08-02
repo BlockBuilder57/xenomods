@@ -2,8 +2,8 @@
 
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "state.hpp"
 #include "skyline/logger/Logger.hpp"
+#include "state.hpp"
 
 namespace gf {
 
@@ -63,17 +63,15 @@ namespace gf {
 namespace layer {
 
 	GENERATE_SYM_HOOK(LayerManager_finalRender, "_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE", void, void* this_pointer, void* IDrDrawWorkInfo) {
-		if (bf2mods::GetState().options.enableUIRendering)
+		if(bf2mods::GetState().options.enableUIRendering)
 			LayerManager_finalRenderBak(this_pointer, IDrDrawWorkInfo);
 	}
 
-}
+} // namespace layer
 
-namespace bf2mods::MenuViewer {
+namespace bf2mods {
 
-	void* UIManagerPtr;
-
-	void Setup() {
+	void MenuViewer::Initialize() {
 		g_Logger->LogDebug("Setting up menu viewer...");
 
 		//gf::GfMenuManager_getGameVersionStringHook();
@@ -90,4 +88,6 @@ namespace bf2mods::MenuViewer {
 		layer::LayerManager_finalRenderHook();
 	}
 
-} // namespace bf2mods::MenuViewer
+	BF2MODS_REGISTER_MODULE(MenuViewer);
+
+} // namespace bf2mods

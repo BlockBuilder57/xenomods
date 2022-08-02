@@ -4,9 +4,9 @@
 
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "version.h"
 #include "nn/oe.h"
 #include "state.hpp"
+#include "version.h"
 
 // Bdat syms & hooks
 namespace Bdat {
@@ -55,13 +55,15 @@ namespace Bdat {
 	// todo more stuff to randomize more things
 } // namespace Bdat
 
-namespace bf2mods::BdatRandomizer {
+namespace bf2mods {
 
-	void Setup() {
+	void BdatRandomizer::Initialize() {
 		g_Logger->LogDebug("Setting up BDAT randomizer...");
 
 		// Hook stuff
 		Bdat::getMSTextHook();
 	}
 
-} // namespace bf2mods::BdatRandomizer
+	BF2MODS_REGISTER_MODULE(BdatRandomizer);
+
+} // namespace bf2mods

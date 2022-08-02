@@ -24,7 +24,7 @@ namespace ml {
 
 	template<auto backupFunction>
 	void FreecamUpdateMatrix(ScnObjCam* this_pointer, mm::Mat44& matrix) {
-		auto& state = bf2mods::GetState();
+		auto& freecam = bf2mods::CameraTools::Freecam;
 		mm::Col4 camColor = mm::Col4::White;
 
 #if BF2MODS_CODENAME(bfsw)
@@ -44,15 +44,15 @@ namespace ml {
 			} else {
 				// the active camera!
 
-				if(!state.freecam.isOn)
-					state.freecam.matrix = trueMatrix; // put current cam matrix into the state
+				if(!freecam.isOn)
+					freecam.matrix = trueMatrix; // put current cam matrix into the state
 
-				if(state.freecam.isOn) {
+				if(freecam.isOn) {
 					// use the matrix calculated in DoFreeCameraMovement
 #if BF2MODS_CODENAME(bfsw)
-					(*backupFunction)(this_pointer, state.freecam.matrix);
+					(*backupFunction)(this_pointer, freecam.matrix);
 #else
-					mm::Mat44 inverse = glm::inverse(static_cast<const glm::mat4&>(state.freecam.matrix));
+					mm::Mat44 inverse = glm::inverse(static_cast<const glm::mat4&>(freecam.matrix));
 					(*backupFunction)(this_pointer, inverse);
 #endif
 				} else {
@@ -60,7 +60,7 @@ namespace ml {
 				}
 			}
 
-			if(state.options.enableDebugRendering && state.freecam.isOn) {
+			if(bf2mods::GetState().options.enableDebugRendering && freecam.isOn) {
 				fw::debug::drawCompareZ(false);
 				fw::debug::drawCamera(trueMatrix, camColor);
 				fw::debug::drawCompareZ(true);
@@ -79,7 +79,7 @@ namespace ml {
 	GENERATE_SYM_HOOK(ScnObjCam_updateFovNearFar, "_ZN2ml9ScnObjCam16updateFovNearFarEv", void, ScnObjCam* this_pointer) {
 		if(this_pointer->ScnPtr != nullptr) {
 			if(this_pointer == this_pointer->ScnPtr->getCam(-1)) {
-				auto& freecamState = bf2mods::GetState().freecam;
+				auto& freecamState = bf2mods::CameraTools::Freecam;
 
 				if(freecamState.isOn)
 					this_pointer->AttrTransformPtr->fov = freecamState.fov; // put freecam info into the current camera
@@ -106,26 +106,26 @@ namespace event {
 } // namespace event
 #endif
 
-namespace bf2mods::CameraTools {
+namespace bf2mods {
 
-	// for future reference:
-	//auto seconds = nn::os::GetSystemTick()/19200000.;
+	CameraTools::FreecamState CameraTools::Freecam = {
+		.isOn = false,
+		.matrix = mm::Mat44 {},
+		.fov = 45.f,
+		.camSpeed = 1.f
+	};
 
-	void DoFreeCameraMovement() {
+	void CameraTools::DoFreeCameraMovement() {
 		// controls:
 		// Left stick: Y: forward/back, X: left/right
 		// Right stick: XY: Look movement
 		// LStick hold: Y: fov up/down
 		// RStick hold: X: roll left/right
 
-		// lazy usings
-		using enum bf2mods::Keybind;
-		using bf2mods::p1Cur;
-		using bf2mods::p1Prev;
-		using bf2mods::p2Cur;
-		using bf2mods::p2Prev;
+		// for future reference:
+		//auto seconds = nn::os::GetSystemTick()/19200000.;
 
-		auto freecamState = &bf2mods::GetState().freecam;
+		using enum bf2mods::Keybind;
 
 		glm::vec3 pos {};
 		glm::quat rot {};
@@ -134,7 +134,7 @@ namespace bf2mods::CameraTools {
 		glm::vec4 perspective {};
 
 		// decompose existing matrix
-		glm::decompose(static_cast<const glm::mat4&>(freecamState->matrix), scale, rot, pos, skew, perspective);
+		glm::decompose(static_cast<const glm::mat4&>(Freecam.matrix), scale, rot, pos, skew, perspective);
 
 		glm::vec2 lStick = p2Cur.LAxis;
 		glm::vec2 rStick = p2Cur.RAxis;
@@ -150,27 +150,27 @@ namespace bf2mods::CameraTools {
 		if(btnHeld(FREECAM_FOVHOLD, p2Cur.Buttons)) {
 			// holding down the button, so modify fov
 			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
-			freecamState->fov = std::clamp(freecamState->fov + -lStick.y * 0.25f, -179.f, 179.f);
+			Freecam.fov = std::clamp(Freecam.fov + -lStick.y * 0.25f, -179.f, 179.f);
 		} else {
 			move = { lStick.x, 0, -lStick.y };
 			move = rot * move; // rotate movement to local space
 		}
 
 		if(btnDown(FREECAM_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons))
-			freecamState->camSpeed *= 2.f;
+			Freecam.camSpeed *= 2.f;
 		else if(btnDown(FREECAM_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons))
-			freecamState->camSpeed /= 2.f;
+			Freecam.camSpeed /= 2.f;
 
 		// multiply by cam speed
-		move *= freecamState->camSpeed;
+		move *= Freecam.camSpeed;
 
 		// rotation
 		glm::vec3 look {};
 		float lookMult = 3.f;
 
 		// slow the camera down at lower fovs
-		if(std::abs(freecamState->fov) < 45.f)
-			lookMult *= freecamState->fov / 45.f;
+		if(std::abs(Freecam.fov) < 45.f)
+			lookMult *= Freecam.fov / 45.f;
 
 		if(btnHeld(FREECAM_ROLLHOLD, p2Cur.Buttons))
 			look = { 0, 0, -rStick.x * 0.5f }; // only roll
@@ -202,18 +202,18 @@ namespace bf2mods::CameraTools {
 		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "- freecam debug -");
 		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "pos: {:1}", pos);
 		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "rot: {:1}", glm::degrees(glm::eulerAngles(rot)));
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "speed: {:.3f}", freecamState->camSpeed);
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "fov: {:.1f}", freecamState->fov);
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "speed: {:.3f}", Freecam.camSpeed);
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "fov: {:.1f}", Freecam.fov);
 #endif
 
 		glm::mat4 newmat = glm::mat4(1.f);
 		newmat = glm::translate(newmat, pos + move);
 		newmat = glm::rotate(newmat, angle, axis);
 
-		freecamState->matrix = newmat;
+		Freecam.matrix = newmat;
 	}
 
-	void Setup() {
+	void CameraTools::Initialize() {
 		g_Logger->LogDebug("Setting up camera tools...");
 
 #if BF2MODS_CODENAME(bfsw)
@@ -226,4 +226,11 @@ namespace bf2mods::CameraTools {
 		ml::ScnObjCam_updateFovNearFarHook();
 	}
 
-} // namespace bf2mods::CameraTools
+	void CameraTools::Update() {
+		if(Freecam.isOn)
+			CameraTools::DoFreeCameraMovement();
+	}
+
+	BF2MODS_REGISTER_MODULE(CameraTools);
+
+} // namespace bf2mods

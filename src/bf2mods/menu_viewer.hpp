@@ -1,11 +1,11 @@
 #pragma once
 
-#include <cstdint>
+#include "bf2mods/UpdatableModule.hpp"
 
-namespace bf2mods::MenuViewer {
+namespace bf2mods {
 
-	extern void* UIManagerPtr;
+	struct MenuViewer : public bf2mods::UpdatableModule {
+		void Initialize() override;
+	};
 
-	void Setup();
-
-} // namespace bf2mods::MenuViewer
+} // namespace bf2mods

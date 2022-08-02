@@ -1,7 +1,9 @@
 #pragma once
 
-#include "state.hpp"
+#include <bf2mods/UpdatableModule.hpp>
 #include <nn/hid.hpp>
+
+#include "state.hpp"
 
 namespace bf2mods {
 
@@ -12,10 +14,10 @@ namespace bf2mods {
 		MOVEMENT_SPEED_UP = nn::hid::KEY_DUP,
 		MOVEMENT_SPEED_DOWN = nn::hid::KEY_DDOWN,
 
-		MAPJUMP_INC = nn::hid::KEY_DRIGHT | nn::hid::KEY_ZL,
-		MAPJUMP_DEC = nn::hid::KEY_DLEFT | nn::hid::KEY_ZL,
-		MAPJUMP_JUMP = nn::hid::KEY_DDOWN | nn::hid::KEY_ZL,
+		TEMPINT_INC = nn::hid::KEY_DRIGHT | nn::hid::KEY_ZL,
+		TEMPINT_DEC = nn::hid::KEY_DLEFT | nn::hid::KEY_ZL,
 
+		MAPJUMP_JUMP = nn::hid::KEY_DDOWN | nn::hid::KEY_ZL,
 		PLAYSE = nn::hid::KEY_MINUS | nn::hid::KEY_ZL,
 
 		MOONJUMP = nn::hid::KEY_R | nn::hid::KEY_B,
@@ -31,6 +33,8 @@ namespace bf2mods {
 		FREECAM_ROLLHOLD = nn::hid::KEY_RSTICK,
 		FREECAM_SPEED_UP = nn::hid::KEY_ZL,
 		FREECAM_SPEED_DOWN = nn::hid::KEY_L,
+
+		LOGGER_TEST = nn::hid::KEY_PLUS | nn::hid::KEY_R,
 	};
 
 	struct HidInput {

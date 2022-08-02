@@ -35,10 +35,7 @@ namespace bf2mods {
 		bool enableDebugRendering;
 	};
 
-
-
 	struct Bf2ModsState {
-
 		constexpr explicit Bf2ModsState() {
 			Reset();
 		}
@@ -50,12 +47,7 @@ namespace bf2mods {
 			// Reset options
 			options.Reset();
 
-			freecam.isOn = false;
-			freecam.matrix = mm::Mat44 {};
-			freecam.fov = 45.f;
-			freecam.camSpeed = 1.f;
-
-			mapjumpId = 1;
+			tempInt = 1;
 
 			moonJump = false;
 		}
@@ -63,27 +55,17 @@ namespace bf2mods {
 		/**
 		 * Current options.
 		 */
-		Options options{};
+		Options options {};
 
-		// declare this in camera_tools?
-		struct Freecam {
-			bool isOn;
-			mm::Mat44 matrix;
-			float fov;
-			float camSpeed;
-		} freecam{};
+		int tempInt {};
 
-		int mapjumpId{};
-
-		bool moonJump{};
+		bool moonJump {};
 	};
-
 
 	/**
 	 * Get singleton state.
 	 */
 	Bf2ModsState& GetState();
-
 
 } // namespace bf2mods
 

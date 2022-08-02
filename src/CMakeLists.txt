@@ -3,6 +3,8 @@ add_executable(bf2mods
 		module.cpp
 		operator.cpp
 
+		bf2mods/UpdatableModule.cpp
+
         bf2mods/engine/mm/math_types.cpp
 
 		bf2mods/bdat_randomizer.cpp

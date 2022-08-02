@@ -1,6 +1,6 @@
 /**
  * @file cxa.h
- * @brief One-Time Constru(X)tion API.
+ * @brief C++ ABI header. Shouldn't be here. Use llvm libc++abi or something from llvm4.0.1.
  */
 
 #pragma once
@@ -11,8 +11,8 @@
 extern "C" {
 #endif
 
-extern s32 __cxa_guard_acquire(u32* guard);
-extern void __cxa_guard_release(u32* guard);
+//extern s32 __cxa_guard_acquire(u32* guard);
+//extern void __cxa_guard_release(u32* guard);
 extern void __cxa_pure_virtual();
 void __cxa_atexit();
 

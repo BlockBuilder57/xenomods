@@ -3,6 +3,7 @@
 #include <bf2mods/engine/game/mapjump.hpp>
 #include <bf2mods/engine/game/scripts.hpp>
 #include <bf2mods/engine/gf/bgm.hpp>
+#include <bf2mods/engine/gf/play_factory.hpp>
 #include <bf2mods/engine/mm/math_types.hpp>
 #include <bf2mods/engine/tl/title.hpp>
 #include <map>
@@ -98,22 +99,12 @@ namespace gf {
 				trackName = vtable->GetTrackName(this_pointer);
 			}
 
-			fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "%s",
-								fmt::format("{}: {} {:.1f}/{:.1f}, looping: {}",
-											trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop())
-								.c_str());
+			fw::debug::drawFontFmtShadow(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White,
+								   "{}: {} {:.1f}/{:.1f}, looping: {}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop());
 		} else {
 			// uncomment if you want every BgmTrack instance to show
-			//fw::debug::drawFont(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "%s", fmt::format("{}: not playing", vtable->GetTrackName(this_pointer)).c_str());
+			//fw::debug::drawFontFmtShadow(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "{}: not playing", vtable->GetTrackName(this_pointer));
 		}
-	}
-
-	namespace GfPlayFactory {
-		void (*createSkipTravel)(unsigned int mapjumpId);
-	}
-
-	namespace GfMenuObjUtil {
-		int (*playSE)(SEIndex index);
 	}
 
 } // namespace gf
@@ -137,11 +128,11 @@ namespace nn {
 
 } // namespace nn
 
-namespace bf2mods::DebugStuff {
+namespace bf2mods {
 
-	int bgmTrackIndex = 0;
+	int DebugStuff::bgmTrackIndex = 0;
 
-	void DoMapJump(unsigned int mapjumpId) {
+	void DebugStuff::DoMapJump(unsigned int mapjumpId) {
 #if !BF2MODS_CODENAME(bfsw)
 		gf::GfPlayFactory::createSkipTravel(mapjumpId);
 		gf::GfMenuObjUtil::playSE(gf::GfMenuObjUtil::SEIndex::mapjump);
@@ -161,18 +152,18 @@ namespace bf2mods::DebugStuff {
 #endif
 	}
 
-	void PlaySE(unsigned int soundEffect) {
+	void DebugStuff::PlaySE(unsigned int soundEffect) {
 #if !BF2MODS_CODENAME(bfsw)
 		gf::GfMenuObjUtil::playSE((gf::GfMenuObjUtil::SEIndex)soundEffect);
 #endif
 	}
-	void PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect) {
+	void DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect) {
 #if !BF2MODS_CODENAME(bfsw)
 		gf::GfMenuObjUtil::playSE(soundEffect);
 #endif
 	}
 
-	void ReturnTitle(unsigned int slot) {
+	void DebugStuff::ReturnTitle(unsigned int slot) {
 #if !BF2MODS_CODENAME(bfsw)
 		tl::TitleMain::returnTitle((gf::SAVESLOT)slot);
 #else
@@ -184,7 +175,7 @@ namespace bf2mods::DebugStuff {
 #endif
 	}
 
-	void Setup() {
+	void DebugStuff::Initialize() {
 		g_Logger->LogDebug("Setting up debug stuff...");
 
 		mm::MMStdBase::mmAssertHook();
@@ -210,4 +201,9 @@ namespace bf2mods::DebugStuff {
 #endif
 	}
 
-} // namespace bf2mods::DebugStuff
+	void DebugStuff::Update() {
+		bgmTrackIndex = 0;
+	}
+
+	BF2MODS_REGISTER_MODULE(DebugStuff);
+} // namespace bf2mods

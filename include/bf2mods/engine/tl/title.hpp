@@ -8,8 +8,10 @@
 
 namespace tl {
 
-	namespace TitleMain {
-		void returnTitle(gf::SAVESLOT slot);
-	} // namespace TitleMain
+	class TitleMain {
+	   public:
+		static void returnTitle(gf::SAVESLOT slot);
+		unsigned int getChapterIdFromSaveData();
+	};
 
 } // namespace tl

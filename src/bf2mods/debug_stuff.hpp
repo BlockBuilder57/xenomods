@@ -1,55 +1,22 @@
 #pragma once
 
-#include <bf2mods/engine/mm/math_types.hpp>
+#include "bf2mods/UpdatableModule.hpp"
 
-namespace gf {
-	namespace GfMenuObjUtil {
-		/*
-		 * Anything (lower|camel)case has an unknown real name
-		 */
-		enum SEIndex : unsigned int {
-			Decide = 1,
-			Cancel = 2,
-			menuopen = 3,
-			menuclose = 4,
-			Tab = 5,
-			Cursor = 6,
-			error = 7,
-			setsomething = 8,
-			opendialog = 9,
-			sidedialog = 10,
-			Sort = 11,
-			OpenSubMenu = 12,
-			tabSubMenu = 13, // switching driver or blade stat display
-			CloseSubMenu = 14,
-			affinityUnlock = 15,
-			affinityUnlock2 = 16,
-			unknown1 = 17,
-			applyAuxCore = 18,
-			poppiswapApply = 19,
-			poppiswapCraft = 20,
+#include <bf2mods/engine/gf/menu_object.hpp>
 
-			mapjump = 23,
+namespace bf2mods {
 
-			purchase = 24,
-			notification = 29,
+	struct DebugStuff : public bf2mods::UpdatableModule {
+		static int bgmTrackIndex;
 
-			textBubbleOpen = 55,
-			textBubbleClose = 56,
-			textBubbleThought = 57
-		};
-	} // namespace GfMenuObjUtil
-} // namespace gf
+		static void DoMapJump(unsigned int mapjumpId);
+		static void PlaySE(unsigned int soundEffect);
+		static void PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect);
+		static void ReturnTitle(unsigned int slot = -1);
 
-namespace bf2mods::DebugStuff {
+		void Initialize() override;
+		bool NeedsUpdate() const override { return true; }
+		void Update() override;
+	};
 
-	extern int bgmTrackIndex;
-
-	void DoMapJump(unsigned int mapjumpId);
-	void PlaySE(unsigned int soundEffect);
-	void PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect);
-	void ReturnTitle(unsigned int slot = -1);
-
-	void Setup();
-
-} // namespace bf2mods::DebugStuff
+} // namespace bf2mods

@@ -3,12 +3,12 @@
 #include <bf2mods/engine/gf/player_controller.hpp>
 
 #include "bf2logger.hpp"
-#include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
+#include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
 #include "debug_stuff.hpp"
-#include "state.hpp"
 #include "skyline/logger/Logger.hpp"
+#include "state.hpp"
 
 namespace gf {
 
@@ -83,9 +83,9 @@ namespace gf {
 
 } // namespace gf
 
-namespace bf2mods::PlayerMovement {
+namespace bf2mods {
 
-	void Setup() {
+	void PlayerMovement::Initialize() {
 		g_Logger->LogDebug("Setting up player movement hooks...");
 
 		gf::pc::MoveUtilField_updateMoveJumpHook();
@@ -98,4 +98,8 @@ namespace bf2mods::PlayerMovement {
 		gf::PlayerCameraTarget_writeTargetInfoHook();
 	}
 
-} // namespace bf2mods::PlayerMovement
+#if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
+	BF2MODS_REGISTER_MODULE(PlayerMovement);
+#endif
+
+} // namespace bf2mods
