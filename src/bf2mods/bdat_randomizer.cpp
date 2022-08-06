@@ -4,6 +4,7 @@
 
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
+#include "plugin_main.hpp"
 #include "nn/oe.h"
 #include "state.hpp"
 #include "version.h"
@@ -62,6 +63,19 @@ namespace bf2mods {
 
 		// Hook stuff
 		Bdat::getMSTextHook();
+	}
+
+	void BdatRandomizer::Update() {
+		auto& state = GetState();
+
+		if(btnDown(Keybind::BDAT_SCRAMBLETYPE_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+			underlying_value(state.options.bdatScrambleType) += 1;
+
+			if(state.options.bdatScrambleType >= bf2mods::Options::BdatScrambleType::Count)
+				state.options.bdatScrambleType = bf2mods::Options::BdatScrambleType::Off;
+
+			g_Logger->LogInfo("Bdat scramble type set to {}", state.options.bdatScrambleType);
+		}
 	}
 
 	BF2MODS_REGISTER_MODULE(BdatRandomizer);

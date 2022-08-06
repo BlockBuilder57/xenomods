@@ -156,11 +156,6 @@ namespace bf2mods {
 			move = rot * move; // rotate movement to local space
 		}
 
-		if(btnDown(FREECAM_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons))
-			Freecam.camSpeed *= 2.f;
-		else if(btnDown(FREECAM_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons))
-			Freecam.camSpeed /= 2.f;
-
 		// multiply by cam speed
 		move *= Freecam.camSpeed;
 
@@ -227,8 +222,16 @@ namespace bf2mods {
 	}
 
 	void CameraTools::Update() {
+		if(btnDown(Keybind::FREECAM_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+			Freecam.isOn = !Freecam.isOn;
+			g_Logger->LogInfo("Toggling freecam: {}", Freecam.isOn);
+		} else if(btnDown(Keybind::FREECAM_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons))
+			Freecam.camSpeed *= 2.f;
+		else if(btnDown(Keybind::FREECAM_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons))
+			Freecam.camSpeed /= 2.f;
+
 		if(Freecam.isOn)
-			CameraTools::DoFreeCameraMovement();
+			DoFreeCameraMovement();
 	}
 
 	BF2MODS_REGISTER_MODULE(CameraTools);

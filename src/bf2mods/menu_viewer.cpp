@@ -2,6 +2,7 @@
 
 #include "bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
+#include "plugin_main.hpp"
 #include "skyline/logger/Logger.hpp"
 #include "state.hpp"
 
@@ -86,6 +87,15 @@ namespace bf2mods {
 		//ui::UIManager_terminateLayerHook();
 
 		layer::LayerManager_finalRenderHook();
+	}
+
+	void MenuViewer::Update() {
+		auto& state = GetState();
+
+		if(btnDown(Keybind::UI_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+			state.options.enableUIRendering = !state.options.enableUIRendering;
+			g_Logger->LogInfo("UI rendering: {}", state.options.enableUIRendering);
+		}
 	}
 
 	BF2MODS_REGISTER_MODULE(MenuViewer);

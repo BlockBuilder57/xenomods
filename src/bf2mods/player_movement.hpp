@@ -8,6 +8,8 @@ namespace bf2mods {
 
 	struct PlayerMovement : public bf2mods::UpdatableModule {
 		void Initialize() override;
+		bool NeedsUpdate() const override { return true; }
+		void Update() override;
 	};
 
 } // namespace bf2mods

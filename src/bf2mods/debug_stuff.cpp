@@ -202,7 +202,36 @@ namespace bf2mods {
 	}
 
 	void DebugStuff::Update() {
+		auto& state = GetState();
+
 		bgmTrackIndex = 0;
+
+		if(btnDown(Keybind::DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+			state.options.enableDebugRendering = !state.options.enableDebugRendering;
+#if !BF2MODS_CODENAME(bfsw)
+			fw::PadManager::enableDebugDraw(state.options.enableDebugRendering);
+#endif
+			g_Logger->LogInfo("Debug rendering: {}", state.options.enableDebugRendering);
+		}
+
+		else if(btnDown(Keybind::TEMPINT_INC, p2Cur.Buttons, p2Prev.Buttons)) {
+			state.tempInt++;
+			g_Logger->LogInfo("TempInt++, now {}", state.tempInt);
+		} else if(btnDown(Keybind::TEMPINT_DEC, p2Cur.Buttons, p2Prev.Buttons)) {
+			state.tempInt--;
+			g_Logger->LogInfo("TempInt--, now {}", state.tempInt);
+		} else if(btnDown(Keybind::MAPJUMP_JUMP, p2Cur.Buttons, p2Prev.Buttons)) {
+			g_Logger->LogInfo("Attempting jump to MapJump {}", state.tempInt);
+			DoMapJump(state.tempInt);
+		} else if(btnDown(Keybind::PLAYSE, p2Cur.Buttons, p2Prev.Buttons)) {
+			g_Logger->LogInfo("Sound effect {} (0x{:x})", state.tempInt, state.tempInt);
+			PlaySE(state.tempInt);
+		}
+
+		else if(btnDown(Keybind::RETURN_TO_TITLE, p2Cur.Buttons, p2Prev.Buttons)) {
+			PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
+			ReturnTitle(-1);
+		}
 	}
 
 	BF2MODS_REGISTER_MODULE(DebugStuff);

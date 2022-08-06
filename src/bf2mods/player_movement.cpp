@@ -7,6 +7,7 @@
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
 #include "debug_stuff.hpp"
+#include "plugin_main.hpp"
 #include "skyline/logger/Logger.hpp"
 #include "state.hpp"
 
@@ -96,6 +97,23 @@ namespace bf2mods {
 		gf::pc::StateUtil_setFallDamageDisableHook();
 
 		gf::PlayerCameraTarget_writeTargetInfoHook();
+	}
+
+	void PlayerMovement::Update() {
+		auto& state = GetState();
+
+		state.moonJump = btnHeld(Keybind::MOONJUMP, p1Cur.Buttons);
+
+		if(btnDown(Keybind::MOVEMENT_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons)) {
+			state.options.movementSpeedMult *= 2.0f;
+			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", state.options.movementSpeedMult);
+		} else if(btnDown(Keybind::MOVEMENT_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons)) {
+			state.options.movementSpeedMult /= 2.0f;
+			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", state.options.movementSpeedMult);
+		} else if(btnDown(Keybind::DISABLE_FALL_DAMAGE, p2Cur.Buttons, p2Prev.Buttons)) {
+			state.options.disableFallDamage = !state.options.disableFallDamage;
+			g_Logger->LogInfo("Disable fall damage: {}", state.options.disableFallDamage);
+		}
 	}
 
 #if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
