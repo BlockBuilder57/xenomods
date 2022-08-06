@@ -19,6 +19,10 @@ Latest compatible exefs versions:
 
 Once you've done that, simply copy the main.npdm and subsdk1 files to the exefs directory.
 
+## Usage
+
+Documentation for using the mod can be found in the [docs](docs) directory.
+
 ## Build Instructions
 
 - Install devKitPro with Switch development features.
