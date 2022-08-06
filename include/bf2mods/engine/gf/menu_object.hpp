@@ -41,6 +41,6 @@ namespace gf {
 			textBubbleThought = 57
 		};
 
-		void playSE(SEIndex index);
+		void playSE(unsigned int index);
 	} // namespace GfMenuObjUtil
 } // namespace gf

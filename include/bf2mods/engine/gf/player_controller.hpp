@@ -12,10 +12,14 @@ namespace gf {
 		};
 	};
 
+	enum AnimLayer : unsigned int {
+		Default
+	};
+
 	/**
 	 * Placeholder for Common Animation StateMachine stuff
 	 */
-	struct GfComAsm {
+	class GfComAsm {
 		// TODO: figure this garbage out
 		INSERT_PADDING_BYTES(392);
 
@@ -32,11 +36,17 @@ namespace gf {
 		 * \param result_value Pointer to where the result should be stored.
 		 */
 		void getVariable(const char* name, float* result_value);
+
+		char* getStateName(AnimLayer layer);
 	};
 
 	struct GfComPropertyPc {
-		uint8_t pad_bytes[128];
-		mm::Vec3 velocityDelta;
+		uint8_t pad_bytes[0x60];
+		mm::Vec2 inputReal;
+		INSERT_PADDING_BYTES(8);
+		mm::Vec2 inputDupe;
+		INSERT_PADDING_BYTES(8);
+		mm::Vec3 velocityWish;
 		mm::Vec3 velocityActual;
 
 		/**

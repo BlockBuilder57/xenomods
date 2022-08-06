@@ -11,7 +11,6 @@ namespace bf2mods {
 
 		static void DoMapJump(unsigned int mapjumpId);
 		static void PlaySE(unsigned int soundEffect);
-		static void PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect);
 		static void ReturnTitle(unsigned int slot = -1);
 
 		void Initialize() override;

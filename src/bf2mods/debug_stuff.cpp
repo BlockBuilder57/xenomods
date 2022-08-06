@@ -133,6 +133,12 @@ namespace bf2mods {
 	int DebugStuff::bgmTrackIndex = 0;
 
 	void DebugStuff::DoMapJump(unsigned int mapjumpId) {
+#if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
+		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, 297);
+#elif BF2MODS_CODENAME(bfsw)
+		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, 487);
+#endif
+
 #if !BF2MODS_CODENAME(bfsw)
 		gf::GfPlayFactory::createSkipTravel(mapjumpId);
 		gf::GfMenuObjUtil::playSE(gf::GfMenuObjUtil::SEIndex::mapjump);
@@ -153,11 +159,6 @@ namespace bf2mods {
 	}
 
 	void DebugStuff::PlaySE(unsigned int soundEffect) {
-#if !BF2MODS_CODENAME(bfsw)
-		gf::GfMenuObjUtil::playSE((gf::GfMenuObjUtil::SEIndex)soundEffect);
-#endif
-	}
-	void DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex soundEffect) {
 #if !BF2MODS_CODENAME(bfsw)
 		gf::GfMenuObjUtil::playSE(soundEffect);
 #endif
@@ -194,10 +195,6 @@ namespace bf2mods {
 		util::ResolveSymbol<decltype(__cxa_pure_virtual)>(&__cxa_pure_virtual, "__cxa_pure_virtual");
 
 		gf::BgmTrack_updateHook();
-
-		// Resolve some game framework symbols
-		util::ResolveSymbol<decltype(gf::GfPlayFactory::createSkipTravel)>(&gf::GfPlayFactory::createSkipTravel, "_ZN2gf13GfPlayFactory16createSkipTravelEj");
-		util::ResolveSymbol<decltype(gf::GfMenuObjUtil::playSE)>(&gf::GfMenuObjUtil::playSE, "_ZN2gf13GfMenuObjUtil6playSEEj");
 #endif
 	}
 

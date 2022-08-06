@@ -6,6 +6,7 @@
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
+#include "bf2mods/debug_wrappers.hpp"
 #include "debug_stuff.hpp"
 #include "plugin_main.hpp"
 #include "skyline/logger/Logger.hpp"
@@ -13,47 +14,31 @@
 
 namespace gf {
 
+	GENERATE_SYM_HOOK(GfComPropertyPc_writeBack, "_ZN2gf15GfComPropertyPc9writeBackEv", void, gf::GfComPropertyPc* this_pointer) {
+		GfComPropertyPc_writeBackBak(this_pointer);
+
+		// set the velocity for moonjump
+		if(bf2mods::GetState().moonJump)
+			static_cast<glm::vec3&>(this_pointer->velocityActual).y = 10.f;
+
+		// wish never carries a Y component
+		auto& wish = static_cast<glm::vec3&>(this_pointer->velocityWish);
+		auto& input = static_cast<glm::vec2&>(this_pointer->inputReal);
+
+		// if we're not inputting, just don't do anything
+		if (glm::length(input) > 0) {
+			wish *= bf2mods::GetState().options.movementSpeedMult;
+			float speedLimit = 8.f * std::max(1.f, bf2mods::GetState().options.movementSpeedMult);
+
+			if(glm::length(wish) >= speedLimit)
+				wish = glm::normalize(wish) * speedLimit;
+		}
+
+		//fw::debug::drawFontFmtShadow(0, 216, mm::Col4::White, "velWsh PST {:2} (len {:.2f})", static_cast<const glm::vec3&>(this_pointer->velocityWish), this_pointer->velocityWish.XZLength());
+		//fw::debug::drawFontFmtShadow(0, 232, mm::Col4::White, "who knows {:2} {:2}", static_cast<const glm::vec2&>(this_pointer->inputReal), static_cast<const glm::vec2&>(this_pointer->inputDupe));
+	}
+
 	namespace pc {
-
-		void NormalizeMovementDeltas(gf::GfComPropertyPc* pcProperty) {
-			if(bf2mods::GetState().moonJump) {
-				static_cast<glm::vec3&>(pcProperty->velocityActual).y = 8.f;
-				//dbgutil::logStackTrace();
-
-				//---------- this function
-				//7100a663e4 ai::Hfsm::update(void const*)+c8
-				//7100656290 gf::GfComBehaviorPc::update(fw::UpdateInfo const&)+454
-				//71006a1070 gf::GfObjUpdate::updateComponent(gf::GfObj*, fw::UpdateInfo const&)+c4
-				//7100672384 gf::GfObj::update(fw::UpdateInfo const&)+20
-				//71001c4b18 fw::UpdatableGroup::update(fw::UpdateInfo const&, unsigned int)+6c
-				//71001c56cc fw::UpdatableObjectManager::update(fw::UpdateInfo const&, unsigned int)+74
-				//71001b0964 fw::Framework::update()+1c8
-			}
-
-			if(bf2mods::GetState().options.movementSpeedMult == 1.0f)
-				return;
-
-			static_cast<glm::vec3&>(pcProperty->velocityDelta) *= bf2mods::GetState().options.movementSpeedMult;
-
-			if(pcProperty->velocityDelta.XZLengthSqu() > 8.f) {
-				glm::vec3 normalized = static_cast<glm::vec3>(pcProperty->velocityDelta.XZNormalized()) * 8.f * bf2mods::GetState().options.movementSpeedMult;
-				normalized.y = static_cast<glm::vec3&>(pcProperty->velocityDelta).y;
-				pcProperty->velocityDelta = normalized;
-			}
-		}
-
-		GENERATE_SYM_HOOK(MoveUtilField_updateMoveJump, "_ZN2gf2pc13MoveUtilField14updateMoveJumpERKN2fw10UpdateInfoERNS_15GfComPropertyPcE", void, void* param_1, gf::GfComPropertyPc* pcProperty) {
-			MoveUtilField_updateMoveJumpBak(param_1, pcProperty);
-			gf::pc::NormalizeMovementDeltas(pcProperty);
-		}
-		GENERATE_SYM_HOOK(MoveUtilField_updateMoveRun, "_ZN2gf2pc13MoveUtilField13updateMoveRunERKN2fw10UpdateInfoERNS_15GfComPropertyPcE", void, void* param_1, gf::GfComPropertyPc* pcProperty) {
-			MoveUtilField_updateMoveRunBak(param_1, pcProperty);
-			gf::pc::NormalizeMovementDeltas(pcProperty);
-		}
-		GENERATE_SYM_HOOK(MoveUtilField_updateMoveSwim, "_ZN2gf2pc13MoveUtilField14updateMoveSwimERKN2fw10UpdateInfoERNS_15GfComPropertyPcE", void, void* param_1, gf::GfComPropertyPc* pcProperty) {
-			MoveUtilField_updateMoveSwimBak(param_1, pcProperty);
-			gf::pc::NormalizeMovementDeltas(pcProperty);
-		}
 
 		// FallDistance handles the animation+grunt the player makes when falling from a height
 		GENERATE_SYM_HOOK(FallDistancePlugin_calcDistance, "_ZNK2gf2pc18FallDistancePlugin12calcDistanceERKN2mm4Vec3E", float, FallDamagePlugin* this_pointer, mm::Vec3* vec) {
@@ -89,9 +74,7 @@ namespace bf2mods {
 	void PlayerMovement::Initialize() {
 		g_Logger->LogDebug("Setting up player movement hooks...");
 
-		gf::pc::MoveUtilField_updateMoveJumpHook();
-		gf::pc::MoveUtilField_updateMoveRunHook();
-		gf::pc::MoveUtilField_updateMoveSwimHook();
+		gf::GfComPropertyPc_writeBackHook();
 
 		gf::pc::FallDistancePlugin_calcDistanceHook();
 		gf::pc::StateUtil_setFallDamageDisableHook();

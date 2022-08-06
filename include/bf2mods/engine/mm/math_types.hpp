@@ -23,14 +23,14 @@ namespace mm {
 		// won't work. Ugly using, but oh well.
 		using ConvertTo<glm::vec3, sizeof(glm::vec3)>::ConvertTo;
 
-		inline float XZLengthSqu() const {
+		inline float XZLength() const {
 			glm::vec3 glm = *this;
 			return std::sqrt(glm.x * glm.x + glm.z * glm.z);
 		}
 
 		inline void XZNormalizeInPlace() {
 			glm::vec3 glm = *this;
-			float length = glm::length(glm);
+			float length = XZLength();
 			glm.x /= length;
 			glm.z /= length;
 		}
@@ -94,6 +94,37 @@ namespace mm {
  * README IF CRASHING: this isn't a float formatter!
  * If you're using {:.Nf}, don't! Use {:N}!
  */
+
+template<>
+struct fmt::formatter<glm::vec2> : fmt::formatter<std::string> {
+	int precision = 0;
+
+	constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+		auto it = ctx.begin(), end = ctx.end();
+		if(it != end && isdigit(*it)) {
+			auto p = *it++;
+
+			// cheap hack to make it a number, this means that
+			// any number over 9 won't work (but this is practical enough)
+			precision = p - '0';
+		} else {
+			// this SHOULD be an error
+			//ctx.on_error("invalid format");
+		}
+
+		// Check if reached the end of the range:
+		if(it != end && *it != '}')
+			ctx.on_error("invalid format");
+
+		// Return an iterator past the end of the parsed range:
+		return it;
+	}
+
+	template<typename FormatContext>
+	inline auto format(const glm::vec2& glmVec, FormatContext& ctx) {
+		return fmt::format_to(ctx.out(), FMT_STRING("(X: {1:.{0}f}, Y: {2:.{0}f})"), precision, glmVec.x, glmVec.y);
+	}
+};
 
 template<>
 struct fmt::formatter<glm::vec3> : fmt::formatter<std::string> {
