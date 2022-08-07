@@ -17,6 +17,7 @@
 #include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "plugin_main.hpp"
+#include "debug_stuff.hpp"
 #include "skyline/logger/Logger.hpp"
 #include "state.hpp"
 
@@ -60,7 +61,7 @@ namespace ml {
 				}
 			}
 
-			if(bf2mods::GetState().options.enableDebugRendering && freecam.isOn) {
+			if(bf2mods::DebugStuff::enableDebugRendering && freecam.isOn) {
 				fw::debug::drawCompareZ(false);
 				fw::debug::drawCamera(trueMatrix, camColor);
 				fw::debug::drawCompareZ(true);
@@ -97,7 +98,7 @@ namespace ml {
 namespace event {
 
 	GENERATE_SYM_HOOK(Manager_update, "_ZN5event7Manager6updateEv", void, Manager* p_this) {
-		if(!p_this->isPlayCancel() && bf2mods::GetState().options.enableDebugRendering)
+		if(!p_this->isPlayCancel() && bf2mods::DebugStuff::enableDebugRendering)
 			p_this->drawInfo();
 
 		return Manager_updateBak(p_this);

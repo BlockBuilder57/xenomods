@@ -64,13 +64,15 @@ namespace gf {
 namespace layer {
 
 	GENERATE_SYM_HOOK(LayerManager_finalRender, "_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE", void, void* this_pointer, void* IDrDrawWorkInfo) {
-		if(bf2mods::GetState().options.enableUIRendering)
+		if(bf2mods::MenuViewer::enableUIRendering)
 			LayerManager_finalRenderBak(this_pointer, IDrDrawWorkInfo);
 	}
 
 } // namespace layer
 
 namespace bf2mods {
+
+	bool MenuViewer::enableUIRendering = true;
 
 	void MenuViewer::Initialize() {
 		g_Logger->LogDebug("Setting up menu viewer...");
@@ -93,8 +95,8 @@ namespace bf2mods {
 		auto& state = GetState();
 
 		if(btnDown(Keybind::UI_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
-			state.options.enableUIRendering = !state.options.enableUIRendering;
-			g_Logger->LogInfo("UI rendering: {}", state.options.enableUIRendering);
+			enableUIRendering = !enableUIRendering;
+			g_Logger->LogInfo("UI rendering: {}", enableUIRendering);
 		}
 	}
 

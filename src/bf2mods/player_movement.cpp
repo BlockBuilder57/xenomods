@@ -18,7 +18,7 @@ namespace gf {
 		GfComPropertyPc_writeBackBak(this_pointer);
 
 		// set the velocity for moonjump
-		if(bf2mods::GetState().moonJump)
+		if(bf2mods::PlayerMovement::moonJump)
 			static_cast<glm::vec3&>(this_pointer->velocityActual).y = 10.f;
 
 		// wish never carries a Y component
@@ -27,8 +27,8 @@ namespace gf {
 
 		// if we're not inputting, just don't do anything
 		if (glm::length(input) > 0) {
-			wish *= bf2mods::GetState().options.movementSpeedMult;
-			float speedLimit = 8.f * std::max(1.f, bf2mods::GetState().options.movementSpeedMult);
+			wish *= bf2mods::PlayerMovement::movementSpeedMult;
+			float speedLimit = 8.f * std::max(1.f, bf2mods::PlayerMovement::movementSpeedMult);
 
 			if(glm::length(wish) >= speedLimit)
 				wish = glm::normalize(wish) * speedLimit;
@@ -44,21 +44,21 @@ namespace gf {
 		GENERATE_SYM_HOOK(FallDistancePlugin_calcDistance, "_ZNK2gf2pc18FallDistancePlugin12calcDistanceERKN2mm4Vec3E", float, FallDamagePlugin* this_pointer, mm::Vec3* vec) {
 			float height = FallDistancePlugin_calcDistanceBak(this_pointer, vec);
 			//bf2mods::g_Logger->LogInfo("FallDistancePlugin::calcDistance called, would return {:.2f}", height);
-			return bf2mods::GetState().options.disableFallDamage ? 0.f : height;
+			return bf2mods::PlayerMovement::disableFallDamage ? 0.f : height;
 		}
 
 		// Can't figure out how to properly set the actual max height, but this will do
 		// Forcibly disables fall damage when any movement state tries to enable or disable it
 		GENERATE_SYM_HOOK(StateUtil_setFallDamageDisable, "_ZN2gf2pc9StateUtil20setFallDamageDisableERNS_15GfComBehaviorPcEb", void, void* GfComBehaviorPc, bool param_2) {
 			//bf2mods::g_Logger->LogInfo("StateUtil::setFallDamageDisable(GfComBehaviorPc: {:p}, bool: {})", GfComBehaviorPc, param_2);
-			StateUtil_setFallDamageDisableBak(GfComBehaviorPc, bf2mods::GetState().options.disableFallDamage ? true : param_2);
+			StateUtil_setFallDamageDisableBak(GfComBehaviorPc, bf2mods::PlayerMovement::disableFallDamage ? true : param_2);
 		}
 
 	} // namespace pc
 
 	GENERATE_SYM_HOOK(PlayerCameraTarget_writeTargetInfo, "_ZN2gf18PlayerCameraTarget15writeTargetInfoEv", void, gf::PlayerCameraTarget* this_pointer) {
 		PlayerCameraTarget_writeTargetInfoBak(this_pointer);
-		if(bf2mods::GetState().moonJump) {
+		if(bf2mods::PlayerMovement::moonJump) {
 			// makes the game always take the on ground path in gf::PlayerCamera::updateTracking
 			this_pointer->inAir = false;
 			// should stop the camera from suddenly jerking back to the maximum height moonjumped to
@@ -70,6 +70,10 @@ namespace gf {
 } // namespace gf
 
 namespace bf2mods {
+
+	bool PlayerMovement::moonJump = false;
+	bool PlayerMovement::disableFallDamage = true;
+	float PlayerMovement::movementSpeedMult = 1.f;
 
 	void PlayerMovement::Initialize() {
 		g_Logger->LogDebug("Setting up player movement hooks...");
@@ -83,19 +87,17 @@ namespace bf2mods {
 	}
 
 	void PlayerMovement::Update() {
-		auto& state = GetState();
-
-		state.moonJump = btnHeld(Keybind::MOONJUMP, p1Cur.Buttons);
+		moonJump = btnHeld(Keybind::MOONJUMP, p1Cur.Buttons);
 
 		if(btnDown(Keybind::MOVEMENT_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons)) {
-			state.options.movementSpeedMult *= 2.0f;
-			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", state.options.movementSpeedMult);
+			movementSpeedMult *= 2.0f;
+			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", movementSpeedMult);
 		} else if(btnDown(Keybind::MOVEMENT_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons)) {
-			state.options.movementSpeedMult /= 2.0f;
-			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", state.options.movementSpeedMult);
+			movementSpeedMult /= 2.0f;
+			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", movementSpeedMult);
 		} else if(btnDown(Keybind::DISABLE_FALL_DAMAGE, p2Cur.Buttons, p2Prev.Buttons)) {
-			state.options.disableFallDamage = !state.options.disableFallDamage;
-			g_Logger->LogInfo("Disable fall damage: {}", state.options.disableFallDamage);
+			disableFallDamage = !disableFallDamage;
+			g_Logger->LogInfo("Disable fall damage: {}", disableFallDamage);
 		}
 	}
 

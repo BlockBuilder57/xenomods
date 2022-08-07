@@ -39,9 +39,9 @@ namespace Bdat {
 			}
 		}
 
-		using enum bf2mods::Options::BdatScrambleType;
+		switch(bf2mods::BdatRandomizer::scrambleType) {
+			using enum bf2mods::BdatRandomizer::BdatScrambleType;
 
-		switch(bf2mods::GetState().options.bdatScrambleType) {
 			case ScrambleIndex:
 				// scrambles the index of the ms text sheet
 				return Bdat::getMSTextBak(bdatData, (util::nnRand<int16_t>() % Bdat::getIdCount(bdatData)) + Bdat::getIdTop(bdatData));
@@ -58,6 +58,8 @@ namespace Bdat {
 
 namespace bf2mods {
 
+	BdatRandomizer::BdatScrambleType BdatRandomizer::scrambleType = BdatRandomizer::BdatScrambleType::Off;
+
 	void BdatRandomizer::Initialize() {
 		g_Logger->LogDebug("Setting up BDAT randomizer...");
 
@@ -66,15 +68,13 @@ namespace bf2mods {
 	}
 
 	void BdatRandomizer::Update() {
-		auto& state = GetState();
-
 		if(btnDown(Keybind::BDAT_SCRAMBLETYPE_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
-			underlying_value(state.options.bdatScrambleType) += 1;
+			underlying_value(scrambleType) += 1;
 
-			if(state.options.bdatScrambleType >= bf2mods::Options::BdatScrambleType::Count)
-				state.options.bdatScrambleType = bf2mods::Options::BdatScrambleType::Off;
+			if(scrambleType >= BdatScrambleType::Count)
+				scrambleType = BdatScrambleType::Off;
 
-			g_Logger->LogInfo("Bdat scramble type set to {}", state.options.bdatScrambleType);
+			g_Logger->LogInfo("Bdat scramble type set to {}", scrambleType);
 		}
 	}
 

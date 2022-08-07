@@ -13,6 +13,7 @@
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
+#include "plugin_main.hpp"
 #include "state.hpp"
 
 #if BF2MODS_CODENAME(bfsw)
@@ -78,7 +79,7 @@ namespace gf {
 	GENERATE_SYM_HOOK(BgmTrack_update, "_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE", void, gf::BgmTrack* this_pointer, void* updateInfo) {
 		BgmTrack_updateBak(this_pointer, updateInfo);
 
-		if(!bf2mods::GetState().options.enableDebugRendering)
+		if(!bf2mods::DebugStuff::enableDebugRendering)
 			return;
 
 		auto* vtable = reinterpret_cast<BgmTrack::VfTable*>(*(size_t**)this_pointer);
@@ -100,7 +101,7 @@ namespace gf {
 			}
 
 			fw::debug::drawFontFmtShadow(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White,
-								   "{}: {} {:.1f}/{:.1f}, looping: {}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop());
+										 "{}: {} {:.1f}/{:.1f}, looping: {}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop());
 		} else {
 			// uncomment if you want every BgmTrack instance to show
 			//fw::debug::drawFontFmtShadow(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "{}: not playing", vtable->GetTrackName(this_pointer));
@@ -129,6 +130,8 @@ namespace nn {
 } // namespace nn
 
 namespace bf2mods {
+
+	bool DebugStuff::enableDebugRendering = true;
 
 	int DebugStuff::bgmTrackIndex = 0;
 
@@ -204,11 +207,11 @@ namespace bf2mods {
 		bgmTrackIndex = 0;
 
 		if(btnDown(Keybind::DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
-			state.options.enableDebugRendering = !state.options.enableDebugRendering;
+			enableDebugRendering = !enableDebugRendering;
 #if !BF2MODS_CODENAME(bfsw)
-			fw::PadManager::enableDebugDraw(state.options.enableDebugRendering);
+			fw::PadManager::enableDebugDraw(enableDebugRendering);
 #endif
-			g_Logger->LogInfo("Debug rendering: {}", state.options.enableDebugRendering);
+			g_Logger->LogInfo("Debug rendering: {}", enableDebugRendering);
 		}
 
 		else if(btnDown(Keybind::TEMPINT_INC, p2Cur.Buttons, p2Prev.Buttons)) {
@@ -232,4 +235,5 @@ namespace bf2mods {
 	}
 
 	BF2MODS_REGISTER_MODULE(DebugStuff);
+
 } // namespace bf2mods
