@@ -98,6 +98,8 @@ namespace tl {
 		//bf2mods::g_Logger->LogDebug("chapter {}, clear count {}, needs cleared game? {}", this_pointer->getChapterIdFromSaveData(), clearCount, bf2mods::GetState().config.titleEventsNeedsClearedGame);
 
 		// we need to have started the game (to avoid a lock) and optionally cleared the game once before
+		// TODO: replace the global cleared game check with a per-event check
+		// it would loop each thing in the array and exclude the events that one hasn't seen yet to avoid spoilers
 		if(this_pointer->getChapterIdFromSaveData() > 0 && (clearCount > 0 || !bf2mods::GetState().config.titleEventsNeedsClearedGame)) {
 			auto& events = bf2mods::GetState().config.titleEvents;
 

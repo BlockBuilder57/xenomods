@@ -1,6 +1,9 @@
 #pragma once
 
-#include "bf2mods/utils.hpp"
+#include <toml++/toml.h>
+
+#include <cstdint>
+#include <vector>
 
 namespace bf2mods {
 
@@ -8,28 +11,28 @@ namespace bf2mods {
 		/**
 		 * Reset to default values.
 		 */
-		constexpr void Reset() {
-			port = 6969;
+		void Reset();
 
-			// all chapters, game clear, and NG+ clear
-			titleEvents = { 10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609 };
-			titleEventsNeedsClearedGame = true;
-		}
+		void LoadFromFile();
 
 		uint16_t port {};
 		std::vector<uint16_t> titleEvents {};
 		bool titleEventsNeedsClearedGame {};
+	   private:
+		toml::table tomlTable;
 	};
 
 	struct Bf2ModsState {
-		constexpr explicit Bf2ModsState() {
+		explicit Bf2ModsState() {
 			Reset();
+
+			config.LoadFromFile();
 		}
 
 		/**
 		 * Reset to clean state.
 		 */
-		constexpr void Reset() {
+		void Reset() {
 			config.Reset();
 
 			tempInt = 1;
