@@ -3,6 +3,7 @@
 #include <bf2mods/engine/game/mapjump.hpp>
 #include <bf2mods/engine/game/scripts.hpp>
 #include <bf2mods/engine/gf/bgm.hpp>
+#include <bf2mods/engine/gf/events.hpp>
 #include <bf2mods/engine/gf/play_factory.hpp>
 #include <bf2mods/engine/mm/math_types.hpp>
 #include <bf2mods/engine/tl/title.hpp>
@@ -70,7 +71,46 @@ namespace event {
 		return MovieManager_makePathBak(param_1, param_2);
 	}*/
 
+	GENERATE_SYM_HOOK(Manager_play, "_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef", void, void* this_pointer, const char* evtName, void* objHandle, uint param_3, uint param_4, uint param_5, uint param_6, mm::Vec3* playerPos, float param_8) {
+		std::string eventName = evtName;
+		if(eventName.size() > 10)
+			eventName.resize(10);
+		uint eventId = gf::GfDataEvent::getEventID(eventName.c_str());
+
+		if(eventId > 0)
+			bf2mods::g_Logger->LogDebug("Creating event {} (id {})", evtName, eventId);
+		else
+			bf2mods::g_Logger->LogDebug("Creating event {}", evtName);
+		//bf2mods::g_Logger->LogDebug("Other args: {:p} {} {} {} {} {:2} {:2}", objHandle, param_3, param_4, param_5, param_6, static_cast<const glm::vec3&>(*playerPos), param_8);
+
+		Manager_playBak(this_pointer, evtName, objHandle, param_3, param_4, param_5, param_6, playerPos, param_8);
+	}
+
 } // namespace event
+
+namespace tl {
+
+	GENERATE_SYM_HOOK(TitleMain_playTitleEvent, "_ZN2tl9TitleMain14playTitleEventEj", void, TitleMain* this_pointer, uint eventId) {
+		uint newEventId = eventId;
+
+		// get the clear count from the save because that's what everything else seems to do
+		int clearCount = *reinterpret_cast<int*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
+		//bf2mods::g_Logger->LogDebug("chapter {}, clear count {}, needs cleared game? {}", this_pointer->getChapterIdFromSaveData(), clearCount, bf2mods::GetState().config.titleEventsNeedsClearedGame);
+
+		// we need to have started the game (to avoid a lock) and optionally cleared the game once before
+		if(this_pointer->getChapterIdFromSaveData() > 0 && (clearCount > 0 || !bf2mods::GetState().config.titleEventsNeedsClearedGame)) {
+			auto& events = bf2mods::GetState().config.titleEvents;
+
+			if (!events.empty())
+				newEventId = events[(util::nnRand<int16_t>() % events.size())];
+		}
+
+		if (newEventId != eventId)
+			bf2mods::g_Logger->LogDebug("Replacing title event {} (id {}) with {} (id {})", gf::GfDataEvent::getEventName(eventId), eventId, gf::GfDataEvent::getEventName(newEventId), newEventId);
+		TitleMain_playTitleEventBak(this_pointer, newEventId);
+	}
+
+}; // namespace tl
 
 void (*__cxa_pure_virtual)();
 
@@ -198,6 +238,9 @@ namespace bf2mods {
 		util::ResolveSymbol<decltype(__cxa_pure_virtual)>(&__cxa_pure_virtual, "__cxa_pure_virtual");
 
 		gf::BgmTrack_updateHook();
+
+		tl::TitleMain_playTitleEventHook();
+		event::Manager_playHook();
 #endif
 	}
 

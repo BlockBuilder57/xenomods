@@ -12,6 +12,7 @@ namespace tl {
 	   public:
 		static void returnTitle(gf::SAVESLOT slot);
 		unsigned int getChapterIdFromSaveData();
+		void* getSaveBuffer();
 	};
 
 } // namespace tl
