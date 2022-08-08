@@ -7,3 +7,7 @@
 [submodule "vendor/fmt"]
 	path = vendor/fmt
 	url = https://github.com/fmtlib/fmt
+[submodule "vendor/tomlpp"]
+	path = vendor/tomlpp
+	url = https://github.com/marzer/tomlplusplus.git
+	shallow = true

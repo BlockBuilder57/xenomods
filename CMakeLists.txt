@@ -34,6 +34,7 @@ set_source_files_properties(${PROJECT_BINARY_DIR}/version.h PROPERTIES GENERATED
 # Vendor libraries
 add_subdirectory(vendor/glm)
 add_subdirectory(vendor/fmt)
+add_subdirectory(vendor/tomlpp)
 
 add_subdirectory(src)
 
