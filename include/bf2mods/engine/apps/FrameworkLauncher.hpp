@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "bf2mods/engine/ml/camera.hpp"
+#include "bf2mods/engine/ml/scene.hpp"
 #include "bf2mods/utils.hpp"
 
 namespace apps {

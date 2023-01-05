@@ -5,6 +5,7 @@
 #include <bf2mods/engine/gf/bgm.hpp>
 #include <bf2mods/engine/gf/events.hpp>
 #include <bf2mods/engine/gf/play_factory.hpp>
+#include <bf2mods/engine/ml/debdraw.hpp>
 #include <bf2mods/engine/mm/math_types.hpp>
 #include <bf2mods/engine/tl/title.hpp>
 #include <map>
@@ -46,6 +47,24 @@ namespace ml {
 		}*/
 
 	}
+
+	/*GENERATE_SYM_HOOK(FontLayer_font, "_ZN2ml9FontLayer4fontEiiPKcz", void, int x, int y, const char* format, ...) {
+		__builtin_va_list val;
+		__builtin_va_start(val, format);
+
+		skyline::logger::s_Instance->LogFormat("ml::FontLayer::font: %s", format);
+		FontLayer_fontBak(x, y, format, val);
+
+		__builtin_va_end(val);
+	}
+
+	GENERATE_SYM_HOOK(DevFont_fontLayer, "_ZN2ml7DevFont9fontLayerEPKNS_9FontLayerEiiPKc", void, const void* fontLayer, int x, int y, const char* text) {
+
+		skyline::logger::s_Instance->LogFormat("fontLayer: %s", text);
+		dbgutil::logStackTrace();
+
+		return DevFont_fontLayerBak(fontLayer, x, y, text);
+	}*/
 
 } // namespace ml
 
@@ -229,6 +248,8 @@ namespace bf2mods {
 		//util::ResolveSymbol<decltype(ml::DrMdlMan::headerChek)>(&ml::DrMdlMan::headerChek, "_ZN2ml8DrMdlMan10headerChekEPKv");
 		//ml::DrMdlMan::createMdlHook();
 		//ml::DrMdlMan::createInstantMdlHook();
+		//ml::FontLayer_fontHook();
+		//ml::DevFont_fontLayerHook();
 
 		nn::hid_ShowControllerSupportHook();
 

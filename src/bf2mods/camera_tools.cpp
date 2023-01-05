@@ -7,7 +7,7 @@
 #include <bf2mods/engine/apps/FrameworkLauncher.hpp>
 #include <bf2mods/engine/event/manager.hpp>
 #include <bf2mods/engine/fw/camera.hpp>
-#include <bf2mods/engine/ml/camera.hpp>
+#include <bf2mods/engine/ml/scene.hpp>
 #include <bf2mods/engine/mm/math_types.hpp>
 #include <bf2mods/stuff/utils/debug_util.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
@@ -16,8 +16,8 @@
 #include "bf2logger.hpp"
 #include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "plugin_main.hpp"
 #include "debug_stuff.hpp"
+#include "plugin_main.hpp"
 #include "skyline/logger/Logger.hpp"
 #include "state.hpp"
 

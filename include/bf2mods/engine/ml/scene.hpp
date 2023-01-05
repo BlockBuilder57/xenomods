@@ -41,6 +41,8 @@ namespace ml {
 
 	class Scn {
 	   public:
+		INSERT_PADDING_BYTES(0x38)
+		void* somePointer;
 		// will this work? lol
 		ScnObjCam* getCam(int index);
 	};
