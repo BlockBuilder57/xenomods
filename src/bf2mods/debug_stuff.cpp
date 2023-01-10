@@ -5,6 +5,7 @@
 #include <bf2mods/engine/gf/bgm.hpp>
 #include <bf2mods/engine/gf/events.hpp>
 #include <bf2mods/engine/gf/play_factory.hpp>
+#include <bf2mods/engine/fw/framework.hpp>
 #include <bf2mods/engine/ml/debdraw.hpp>
 #include <bf2mods/engine/mm/math_types.hpp>
 #include <bf2mods/engine/tl/title.hpp>
@@ -272,7 +273,15 @@ namespace bf2mods {
 
 		bgmTrackIndex = 0;
 
-		if(btnDown(Keybind::DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+		if(btnDown(Keybind::TEST_BUTTON, p2Cur.Buttons, p2Prev.Buttons)) {
+			// temp space for tests
+
+			if (state.tempInt < 0)
+				fw::Framework::setUpdateSpeed(1.f/abs(state.tempInt));
+			else if (state.tempInt > 0)
+				fw::Framework::setUpdateSpeed(state.tempInt);
+		}
+		else if(btnDown(Keybind::DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
 			enableDebugRendering = !enableDebugRendering;
 #if !BF2MODS_CODENAME(bfsw)
 			fw::PadManager::enableDebugDraw(enableDebugRendering);

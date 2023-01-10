@@ -9,7 +9,21 @@
 
 namespace nn {
 	namespace diag {
-		struct LogMetaData;
+		enum class LogSeverity : u8 {
+			Trace = 0,
+			Info,
+			Warn,
+			Error,
+			Fatal
+		};
+
+		struct LogMetaData {
+			std::uint32_t lineNo;
+			LogSeverity severity;
+			const char* fileName;
+			const char* function;
+			const char* moduleName;
+		};
 
 		struct ModuleInfo {
 			char* mPath;
@@ -23,6 +37,8 @@ namespace nn {
 			void AbortImpl(char const*, char const*, char const*, s32);
 			void AbortImpl(char const*, char const*, char const*, int, Result);
 		}; // namespace detail
+
+#define NN_DIAG_LOG(severity_, format, ...) ({ nn::diag::LogMetaData metadata{ .lineNo = __LINE__, .severity = severity_, .fileName = __FILE__, .function = __FUNCTION__, .moduleName = ""  }; nn::diag::detail::LogImpl(metadata, format, ##__VA_ARGS__);  })
 
 		// MODULE / SYMBOL
 		u32* GetSymbolName(char* name, u64 nameSize, u64 addr);

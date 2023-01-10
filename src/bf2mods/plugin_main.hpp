@@ -15,6 +15,7 @@ namespace bf2mods {
 		MOVEMENT_SPEED_UP = nn::hid::KEY_DUP,
 		MOVEMENT_SPEED_DOWN = nn::hid::KEY_DDOWN,
 
+		TEST_BUTTON = nn::hid::KEY_MINUS | nn::hid::KEY_A,
 		TEMPINT_INC = nn::hid::KEY_DRIGHT | nn::hid::KEY_ZL,
 		TEMPINT_DEC = nn::hid::KEY_DLEFT | nn::hid::KEY_ZL,
 
