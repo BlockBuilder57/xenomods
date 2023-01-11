@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cstdint>
+#include <cstring>
+#include <string_view>
+
 namespace mm {
 
 	namespace mtl {
@@ -32,3 +36,16 @@ namespace mm {
 	} // namespace mtl
 
 } // namespace mm
+
+namespace bf2mods {
+	template<int32_t N>
+	std::string_view GetStringView(const mm::mtl::FixStr<N>& str) {
+		auto len = str.m_nLen - 1;
+
+		// for some reason this can get screwy...
+		if(len > N)
+			len = strlen(str.buffer);
+
+		return { str.buffer, len };
+	}
+} // namespace bf2mods

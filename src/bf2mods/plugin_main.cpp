@@ -40,6 +40,10 @@ namespace fw {
 
 namespace bf2mods {
 
+	void fmt_assert_failed(const char* file, int line, const char* message) {
+		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught @ %s:%d : %s", file, line, message);
+	}
+
 	HidInput p1Cur {};
 	HidInput p1Prev {};
 	HidInput p2Cur {};

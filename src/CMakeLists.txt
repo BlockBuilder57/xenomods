@@ -11,6 +11,7 @@ add_executable(bf2mods
 		bf2mods/plugin_main.cpp
 		bf2mods/debug_stuff.cpp
 		bf2mods/bf2logger.cpp
+		bf2mods/file_detours.cpp
 		bf2mods/camera_tools.cpp
 		bf2mods/menu_viewer.cpp
 		bf2mods/player_movement.cpp

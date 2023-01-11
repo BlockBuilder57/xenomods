@@ -33,22 +33,6 @@ namespace game {
 
 namespace ml {
 
-	namespace DrMdlMan {
-
-		/*uint8_t(*headerChek)(const char* buffer);
-
-		GENERATE_SYM_HOOK(createMdl, "_ZN2ml8DrMdlMan9createMdlEPKvPKci", void*, void* that, char* model_buffer, const char* model_path, int unknown) {
-			bf2mods::g_Logger->LogInfo("Loading model \"{}\" - magic {:c}{:c}{:c}{:c}, chek {}", model_path, model_buffer[0], model_buffer[1], model_buffer[2], model_buffer[3], headerChek(model_buffer));
-			return createMdlBak(that, model_buffer, model_path, unknown);
-		}
-
-		GENERATE_SYM_HOOK(createInstantMdl, "_ZN2ml8DrMdlMan16createInstantMdlEPKvPKci", void*, void* that, char* model_buffer, const char* model_path, int unknown) {
-			bf2mods::g_Logger->LogInfo("Loading instant model \"{}\"", model_path);
-			return createMdlBak(that, model_buffer, model_path, unknown);
-		}*/
-
-	}
-
 	/*GENERATE_SYM_HOOK(FontLayer_font, "_ZN2ml9FontLayer4fontEiiPKcz", void, int x, int y, const char* format, ...) {
 		__builtin_va_list val;
 		__builtin_va_start(val, format);
@@ -71,14 +55,10 @@ namespace ml {
 
 namespace mm {
 
-	namespace MMStdBase {
-
-		GENERATE_SYM_HOOK(mmAssert, "_ZN2mm9MMStdBase8mmAssertEPKcS2_j", void, const char* expr, const char* file, unsigned line) {
-			bf2mods::g_Logger->LogFatal("Caught Assert!!! Expr \"{}\" ({} : {})", expr, file, line);
-			mmAssertBak(expr, file, line);
-		}
-
-	} // namespace MMStdBase
+	GENERATE_SYM_HOOK(MMStdBase_mmAssert, "_ZN2mm9MMStdBase8mmAssertEPKcS2_j", void, const char* expr, const char* file, unsigned line) {
+		bf2mods::g_Logger->LogFatal("Caught Assert!!! Expr \"{}\" ({} : {})", expr, file, line);
+		MMStdBase_mmAssertBak(expr, file, line);
+	}
 
 } // namespace mm
 
@@ -244,11 +224,8 @@ namespace bf2mods {
 	void DebugStuff::Initialize() {
 		g_Logger->LogDebug("Setting up debug stuff...");
 
-		mm::MMStdBase::mmAssertHook();
+		mm::MMStdBase_mmAssertHook();
 
-		//util::ResolveSymbol<decltype(ml::DrMdlMan::headerChek)>(&ml::DrMdlMan::headerChek, "_ZN2ml8DrMdlMan10headerChekEPKv");
-		//ml::DrMdlMan::createMdlHook();
-		//ml::DrMdlMan::createInstantMdlHook();
 		//ml::FontLayer_fontHook();
 		//ml::DevFont_fontLayerHook();
 
