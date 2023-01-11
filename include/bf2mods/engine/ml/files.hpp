@@ -144,7 +144,7 @@ namespace ml {
 
 	struct FileReadResult { /* PlaceHolder Structure */
 		ulong bytesRead;
-		bool bWasCompressed;
+		bool bFullyLoaded;
 		undefined field2_0x9;
 		undefined field3_0xa;
 		undefined field4_0xb;

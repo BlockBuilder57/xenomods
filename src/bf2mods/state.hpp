@@ -16,8 +16,12 @@ namespace bf2mods {
 		void LoadFromFile();
 
 		uint16_t port {};
+
 		std::vector<uint16_t> titleEvents {};
 		bool titleEventsNeedsClearedGame {};
+
+		bool dumpFileReads {};
+		bool useFileDumps {};
 	   private:
 		toml::table tomlTable;
 	};
