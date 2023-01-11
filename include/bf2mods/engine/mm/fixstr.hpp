@@ -9,10 +9,10 @@ namespace mm {
 	namespace mtl {
 
 		template<int32_t size>
-		class FixStr {
+		class [[gnu::packed]] FixStr {
 		   public:
 			char buffer[size];
-			std::size_t m_nLen;
+			std::uint32_t m_nLen;
 
 			/*char* format (char* fmt, ...) {
 				va_list args;

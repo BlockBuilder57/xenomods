@@ -4,6 +4,16 @@
 #include <cstring>
 #include <type_traits>
 
+// ghidra typedefs
+using undefined = uint8_t;
+using undefined1 = uint8_t;
+using undefined4 = uint32_t;
+using undefined8 = uint64_t;
+
+using byte = uint8_t;
+using uint = uint32_t;
+using ulong = uint64_t;
+
 #ifndef CONCATENATE
 	#define _CONCATENATE(x1, x2) x1##x2
 	#define CONCATENATE(x1, x2) _CONCATENATE(x1, x2)
