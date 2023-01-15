@@ -1,7 +1,6 @@
 add_executable(bf2mods
-		main.cpp
-		module.cpp
-		operator.cpp
+
+		bf2mods/plugin_main.cpp
 
 		# UTILITY
 		bf2mods/NnFile.cpp
@@ -11,7 +10,6 @@ add_executable(bf2mods
         bf2mods/engine/mm/math_types.cpp
 
 		bf2mods/state.cpp
-		bf2mods/plugin_main.cpp
 		bf2mods/debug_stuff.cpp
 		bf2mods/bf2logger.cpp
 		bf2mods/file_detours.cpp
@@ -19,49 +17,50 @@ add_executable(bf2mods
 		bf2mods/menu_viewer.cpp
 		bf2mods/player_movement.cpp
 		bf2mods/bdat_randomizer.cpp
-		bf2mods/party_selector.cpp
 
         bf2mods/stuff/utils/debug_util.cpp
 		bf2mods/stuff/utils/util.cpp
 
+
+		# Skylaunch (skyline/exlaunch-like illegal breeding experiment, mostly from skyline)
+		# TODO: throw most of it (including the nx fork) into another cmakelists
+		# 		and then probably keep only the "jackin" sources in here
+
 		# runtime source (which we use to get executed)
-		crt0.s
-		crti.c
-		cxa.c
+		skylaunch/entry/crt0.s
+		skylaunch/entry/crti.c
+		skylaunch/entry/cxa.c
+
+		skylaunch/entry/main.cpp
+		skylaunch/entry/module.cpp
+		skylaunch/entry/operator.cpp
 
 		# hook source code
-		skyline/inlinehook/And64InlineHook.cpp
-		skyline/inlinehook/controlledpages.cpp
-		skyline/inlinehook/memcpy_controlled.cpp
+		skylaunch/inlinehook/And64InlineHook.cpp
+		skylaunch/inlinehook/controlledpages.cpp
 
-		# deprecated sources which will slowly be removed
-		nvn/pfnc.cpp
 
-		skyline/efl/service.cpp
-		skyline/logger/KernelLogger.cpp
-		skyline/logger/Logger.cpp
-		skyline/logger/SdLogger.cpp
-		skyline/logger/TcpLogger.cpp
-		skyline/utils/SafeQueue.cpp
-		skyline/utils/cpputils.cpp
-		skyline/utils/ipc.cpp
+		skylaunch/logger/Logger.cpp
+		skylaunch/logger/TcpLogger.cpp
 
-		skyline/utils/utils.c
-		skyline/nx/kernel/condvar.c
-		skyline/nx/kernel/detect.c
-		skyline/nx/kernel/jit.c
-		skyline/nx/kernel/mutex.c
-		skyline/nx/kernel/shmem.c
-		skyline/nx/kernel/thread.c
-		skyline/nx/kernel/virtmem.c
-		skyline/nx/runtime/env.c
-		skyline/nx/runtime/hosversion.c
-		skyline/nx/runtime/init.c
-		skyline/nx/sf/sessionmgr.c
-		skyline/utils/armutils.s
-		skyline/nx/arm/cache.s
+		skylaunch/utils/cpputils.cpp
+		skylaunch/utils/ipc.cpp
+		skylaunch/utils/utils.c
 
-		skyline/nx/kernel/svc.s
+		skylaunch/nx/kernel/condvar.c
+		skylaunch/nx/kernel/detect.c
+		skylaunch/nx/kernel/jit.c
+		skylaunch/nx/kernel/mutex.c
+		skylaunch/nx/kernel/shmem.c
+		skylaunch/nx/kernel/thread.c
+		skylaunch/nx/kernel/virtmem.c
+		skylaunch/nx/runtime/env.c
+		skylaunch/nx/runtime/hosversion.c
+		skylaunch/nx/runtime/init.c
+		skylaunch/nx/sf/sessionmgr.c
+		skylaunch/utils/armutils.s
+		skylaunch/nx/arm/cache.s
+		skylaunch/nx/kernel/svc.s
 		)
 
 add_dependencies(bf2mods __bf2mods_gittag)
@@ -82,7 +81,6 @@ set_target_properties(bf2mods PROPERTIES
 target_include_directories(bf2mods PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(bf2mods PUBLIC ${PROJECT_BINARY_DIR}/)
 
-# TODO: I want to use fmt::fmt but it doesn't seem to respect fpic. so for now header only it is
 target_link_libraries(bf2mods PUBLIC
 		tomlplusplus::tomlplusplus
 		fmt::fmt-header-only

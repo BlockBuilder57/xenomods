@@ -1,8 +1,8 @@
 ## bf2mods
 
-Some mod code by [modeco80](https://github.com/modeco80) and [BlockBuilder57](https://github.com/BlockBuilder57) for all Xenoblade games on Switch. Based off [Ether Flow](https://github.com/3096/ether) by 3096/dualie.
+Some mod code by [modeco80](https://github.com/modeco80) and [BlockBuilder57](https://github.com/BlockBuilder57) for all Xenoblade games on Switch.
 
-As such, this includes a custom fork of a [custom fork](https://github.com/3096/skyline/tree/xde) of [Skyline](https://github.com/skyline-dev/skyline/), made by many people much smarter people than us.
+Initially based off [Ether Flow](https://github.com/3096/ether) by 3096/dualie. As such, this includes a custom fork of [Skyline](https://github.com/skyline-dev/skyline/) modified to have an architecture similar to [exlaunch](https://github.com/shadowninja108/exlaunch).
 
 
 ## Installation instructions (LayeredFS)
@@ -38,7 +38,7 @@ $ make -j4
 # to build for other games, for example DE, append -DBF2MODS_CODENAME=bfsw to the cmake command
 ```
 
-Once built, copy bf2mods.nso (as `subsdk1`) and main.npdm from build/src to the LayeredFS exefs directory.
+Once built, copy bf2mods.nso (as `subsdk1`) and main.npdm from build/ to the LayeredFS exefs directory.
 
 For those with sys-ftpd installed, adding `-DBF2MODS_SWITCH_IP=<ip>` to the CMake command will automatically copy the files to your console when builds finish.
 

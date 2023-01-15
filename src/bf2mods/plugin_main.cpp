@@ -3,10 +3,9 @@
 #include <bf2mods/engine/fw/document.hpp>
 #include <bf2mods/engine/mm/math_types.hpp>
 
-#include "bf2logger.hpp"
+#include "bf2mods/bf2logger.hpp"
 #include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
-#include "skyline/efl/service.hpp"
 #include "state.hpp"
 #include "version.h"
 
@@ -102,7 +101,7 @@ namespace bf2mods {
 
 		if(btnDown(CLEAR_TCPLOG, p2Cur.Buttons, p2Prev.Buttons)) {
 			// https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#text-modification
-			skyline::logger::s_Instance->LogFormat("\u001B[2J");
+			skylaunch::logger::s_Instance->LogFormat("\u001B[2J");
 
 			g_Logger->LogInfo("Cleared TCP log");
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
@@ -125,6 +124,11 @@ namespace bf2mods {
 	}
 
 	void bf2mods_main() {
+
+		// mount sd
+		Result rc = nn::fs::MountSdCardForDebug("sd");
+		g_Logger->LogInfo("Mounted SD card 0x{:08x}", rc);
+
 		InitializeAllRegisteredModules();
 
 		// hook our updater

@@ -2,14 +2,14 @@
 
 #include <bf2mods/engine/gf/player_controller.hpp>
 
-#include "bf2logger.hpp"
+#include "bf2mods/bf2logger.hpp"
+#include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "bf2mods/utils.hpp"
-#include "bf2mods/debug_wrappers.hpp"
 #include "debug_stuff.hpp"
 #include "plugin_main.hpp"
-#include "skyline/logger/Logger.hpp"
+#include "skylaunch/logger/Logger.hpp"
 #include "state.hpp"
 
 namespace gf {

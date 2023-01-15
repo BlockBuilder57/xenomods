@@ -1,6 +1,6 @@
 #include "state.hpp"
 
-#include "bf2logger.hpp"
+#include "bf2mods/bf2logger.hpp"
 
 namespace bf2mods {
 

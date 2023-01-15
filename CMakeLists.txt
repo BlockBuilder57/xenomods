@@ -4,27 +4,23 @@ if(" ${CMAKE_SOURCE_DIR}" STREQUAL " ${CMAKE_BINARY_DIR}")
 	message(FATAL_ERROR "NO NO NO NO NO. Please use a distinct binary directory.")
 endif()
 
-project(skyline)
-
-
-# Enable languages used in the project
-enable_language(C)
-enable_language(CXX)
-enable_language(ASM)
+project(bf2mods
+		DESCRIPTION ""
+		LANGUAGES C CXX ASM
+		)
 
 option(BF2MODS_ENABLE_FTP OFF "enable ftp transfer")
 
-# If no codename was set default to bf2
+# If no codename was set, default to bf2.
 if(" ${BF2MODS_CODENAME}" STREQUAL " ")
 	set(BF2MODS_CODENAME "bf2")
 endif()
-
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(MakeNso)
 
 # Generate switch.specs for this build
-set(SKYLINE_LINKERSCRIPTS_DIR "${PROJECT_SOURCE_DIR}/linkerscripts")
+set(SKYLAUNCH_LINKERSCRIPTS_DIR "${PROJECT_SOURCE_DIR}/linkerscripts")
 configure_file(linkerscripts/switch.specs.in ${PROJECT_BINARY_DIR}/switch.specs)
 
 # Generate version

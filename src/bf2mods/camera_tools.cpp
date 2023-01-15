@@ -13,12 +13,12 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "bf2logger.hpp"
+#include "bf2mods/bf2logger.hpp"
 #include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "debug_stuff.hpp"
 #include "plugin_main.hpp"
-#include "skyline/logger/Logger.hpp"
+#include "skylaunch/logger/Logger.hpp"
 #include "state.hpp"
 
 namespace ml {

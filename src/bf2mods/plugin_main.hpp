@@ -70,7 +70,7 @@ namespace bf2mods {
 	void update();
 
 	/**
- 	 * Called from our modified skyline when ready.
+ 	 * Called from skylaunch when ready.
  	 */
 	void bf2mods_main();
 

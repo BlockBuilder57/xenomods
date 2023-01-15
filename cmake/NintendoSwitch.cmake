@@ -71,7 +71,7 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Shared libs not available for target")
 
 set(ARCH "-march=armv8-a -mtune=cortex-a57 -mtp=soft  -ftls-model=local-exec")
 set(CMAKE_ASM_FLAGS "-x assembler-with-cpp -g ${ARCH}")
-set(CMAKE_C_FLAGS "${ARCH} -D__SWITCH__ -D__SKYLINE__ -fomit-frame-pointer -ffunction-sections -isystem ${DEVKITPRO}/libnx/include -I${PROJECT_SOURCE_DIR}/libs/libeiffel/include")
+set(CMAKE_C_FLAGS "${ARCH} -D__SWITCH__ -fomit-frame-pointer -ffunction-sections -isystem ${DEVKITPRO}/libnx/include -I${PROJECT_SOURCE_DIR}/libs/libeiffel/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fno-rtti -fno-exceptions -fno-asynchronous-unwind-tables -fno-unwind-tables -fpermissive -fno-threadsafe-statics ")
 
 set(CMAKE_CXX_FLAGS_DEBUG "-D_DEBUG")

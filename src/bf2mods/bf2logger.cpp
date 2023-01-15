@@ -1,10 +1,9 @@
-#include "bf2logger.hpp"
-
+#include "bf2mods/bf2logger.hpp"
 
 #include <nn/diag.h>
 
 #include "bf2mods/debug_wrappers.hpp"
-#include "skyline/logger/Logger.hpp"
+#include "skylaunch/logger/Logger.hpp"
 
 namespace bf2mods {
 
@@ -47,7 +46,7 @@ namespace bf2mods {
 		auto formatted = fmt::vformat(format, args);
 
 		// by god I wish I didn't have to deal with this
-		skyline::logger::s_Instance->LogFormat("[bf2mods Console] [%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
+		//skylaunch::logger::s_Instance->LogFormat("[bf2mods Console] [%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
 
 		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[bf2mods diag] [%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
 
