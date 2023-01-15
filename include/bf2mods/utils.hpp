@@ -55,7 +55,7 @@ using ulong = uint64_t;
 // for one particular codename.
 // Intended to be used in expressions.
 #define BF2MODS_CODENAME(cn) defined __BF2MODS_CODENAME_##cn
-
+#define BF2MODS_CODENAME_STR _BF2MODS_CODENAME_STR
 
 
 namespace bf2mods {

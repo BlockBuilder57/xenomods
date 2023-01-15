@@ -3,6 +3,9 @@ add_executable(bf2mods
 		module.cpp
 		operator.cpp
 
+		# UTILITY
+		bf2mods/NnFile.cpp
+
 		bf2mods/UpdatableModule.cpp
 
         bf2mods/engine/mm/math_types.cpp
@@ -88,6 +91,7 @@ target_link_libraries(bf2mods PUBLIC
 
 target_compile_definitions(bf2mods PUBLIC
 	__BF2MODS_CODENAME_${BF2MODS_CODENAME}
+	_BF2MODS_CODENAME_STR="${BF2MODS_CODENAME}"
 )
 
 # NPDM/NSO output.

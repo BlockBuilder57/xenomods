@@ -7,6 +7,8 @@
 #include <bf2mods/engine/ml/files.hpp>
 #include <bf2mods/engine/mm/fixstr.hpp>
 
+#include <bf2mods/NnFile.hpp>
+
 #include "bf2logger.hpp"
 #include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
@@ -89,147 +91,16 @@ namespace {
 		return true;
 	}
 
-
-	// TODO: new file please !
-
-	/**
-	 * A really stupid wrapper over nn filesystem functions
-	 */
-	struct NnFile {
-
-		explicit NnFile(std::string_view path, nn::fs::OpenMode mode) {
-			Open(path, mode);
-		}
-
-		~NnFile() {
-			Close();
-		}
-
-		void Open(std::string_view path, nn::fs::OpenMode mode) {
-			if(R_FAILED(nn::fs::OpenFile(&fh, path.data(), mode))) {
-				fh.handle = reinterpret_cast<void*>(-1);
-			} else {
-				// I give up
-				if(R_FAILED(nn::fs::GetFileSize(&size, fh)))
-					Close();
-			}
-		}
-
-		void Close() {
-			if(Ok()) {
-				nn::fs::CloseFile(fh);
-				fh.handle = reinterpret_cast<void*>(-1);
-			}
-
-		}
-
-		bool Ok() const {
-			return fh.handle != reinterpret_cast<void*>(-1);
-		}
-
-		operator bool() const {
-			return Ok();
-		}
-
-		void Read(void* buffer, s64 length) {
-			if(!Ok())
-				return;
-
-			if(R_SUCCEEDED(nn::fs::ReadFile(fh, filePointer, buffer, length))) {
-				// this is dirty but the minimum sdk version doesn't have the overload which can actually
-				// signal short reads.... so this will have to do. i guess i could do some min() stuff
-				filePointer += length;
-			}
-		}
-
-		void Write(const void* buffer, s64 length) {
-			if(!Ok())
-				return;
-
-			if(R_SUCCEEDED(nn::fs::WriteFile(fh, filePointer, buffer, length, {}))) {
-				filePointer += length;
-			}
-		}
-
-		void Flush() {
-			if(!Ok())
-				return;
-
-			nn::fs::FlushFile(fh);
-		}
-
-		void Seek(s64 offset, int whence) {
-			switch(whence) {
-				case SEEK_SET: filePointer = offset; break;
-				case SEEK_CUR: filePointer += offset; break;
-				case SEEK_END: filePointer = size + offset; break; // i think ?
-				default: return;
-			}
-		}
-
-		s64 Tell() const {
-			return filePointer;
-		}
-
-		s64 Size() const {
-			return size;
-		}
-
-		/**
-		 * Preallocate a file with the given size.
-		 *
-		 * \param[in] path path to file to preallocate
-		 * \param[in] size the file size
-		 * \return true if able to preallocate; false otherwise
-		 */
-		static bool Preallocate(std::string_view path, s64 size) {
-			auto res = nn::fs::CreateFile(path.data(), size);
-			if(R_FAILED(res)) {
-
-				if(R_VALUE(res) == 0x0402) {
-					u64 fileSize;
-					{
-						NnFile file(path, nn::fs::OpenMode_Read);
-						fileSize = file.Size();
-					}
-
-					if(fileSize != size) {
-						nn::fs::DeleteFile(path.data());
-
-						// Yay for recursion!
-						return Preallocate(path, size);
-					} else {
-						// seems to be the right size so let's not bother
-						// trying to recurse in pedantry's sake
-						return true;
-					}
-				}
-
-				return false;
-			}
-
-			return true;
-		}
-
-	   private:
-
-		nn::fs::FileHandle fh{};
-		nn::fs::OpenMode mode{};
-
-		s64 filePointer{};
-		s64 size{};
-	};
-
 	bool DumpToFilesystem(std::string_view path, const void* buffer, std::size_t length) {
 		Result res{};
 		nn::fs::FileHandle dumpFileHandle{};
 
 
-		if(!NnFile::Preallocate(path, length)) {
+		if(!bf2mods::NnFile::Preallocate(path, length)) {
 			bf2mods::g_Logger->LogError("Couldn't create/preallocate dump file \"{}\": 0x{:08x};", path, res);
 		}
 
-		NnFile file(path, nn::fs::OpenMode_Write);
+		bf2mods::NnFile file(path, nn::fs::OpenMode_Write);
 
 		if(!file) {
 			bf2mods::g_Logger->LogError("Couldn't open dump file \"{}\": 0x{:08x}", path, res);
@@ -243,7 +114,7 @@ namespace {
 
 
 	void LoadFromFilesystem(std::string_view jackPath, void* buffer, std::size_t length) {
-		NnFile file(jackPath, nn::fs::OpenMode_Read);
+		bf2mods::NnFile file(jackPath, nn::fs::OpenMode_Read);
 
 		// This isn't really fatal since the override file
 		// doesn't particularly need to exist. It's whatever really
@@ -260,14 +131,14 @@ namespace {
 
 		// dump data reads to sd card
 		if (bf2mods::GetState().config.dumpFileReads) {
-			auto path = fmt::format("sd:/config/bf2mods/dump/{}/{:08x}.bin", filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
+			auto path = fmt::format("sd:/config/bf2mods/dump/{}/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			if (EnsurePath(path, true))
 				DumpToFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 
 		// load from loose sd card files
 		if (bf2mods::GetState().config.useFileDumps) {
-			auto path = fmt::format("sd:/config/bf2mods/override/{}/{:08x}.bin", filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
+			auto path = fmt::format("sd:/config/bf2mods/override/{}/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			LoadFromFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 
