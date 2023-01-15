@@ -1,10 +1,9 @@
 #pragma once
 
-#include <fmt/core.h>
-
 #include <cstdint>
 
-#include "bf2mods/UpdatableModule.hpp"
+#include "UpdatableModule.hpp"
+#include "fmt/core.h"
 
 namespace bf2mods {
 

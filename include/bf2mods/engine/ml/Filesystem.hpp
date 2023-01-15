@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <bf2mods/utils.hpp>
+#include <bf2mods/Utils.hpp>
 
-#include "bf2mods/engine/mm/fixstr.hpp"
+#include "bf2mods/engine/mm/FixStr.hpp"
 
 namespace ml {
 

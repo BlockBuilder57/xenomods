@@ -1,4 +1,5 @@
-#include <bf2mods/UpdatableModule.hpp>
+#include "UpdatableModule.hpp"
+
 #include <array>
 
 namespace bf2mods {
@@ -20,7 +21,7 @@ namespace bf2mods {
 		}
 
 		void ModuleFini() {
-		//	delete registeredModules;
+			//	delete registeredModules;
 		}
 
 		void RegisterModule(UpdatableModule* module) {
@@ -33,19 +34,19 @@ namespace bf2mods {
 			registeredModules[moduleIndex++] = module;
 		}
 
-	}
+	} // namespace detail
 
 	void InitializeAllRegisteredModules() {
-		for(int i = 0 ; i < moduleIndex; ++i)
+		for(int i = 0; i < moduleIndex; ++i)
 			registeredModules[i]->Initialize();
 	}
 
 	void UpdateAllRegisteredModules() {
-		for(int i = 0 ; i < moduleIndex; ++i)
+		for(int i = 0; i < moduleIndex; ++i)
 			if(registeredModules[i]->NeedsUpdate())
 				registeredModules[i]->Update();
 			else
 				continue;
 	}
 
-}
+} // namespace bf2mods

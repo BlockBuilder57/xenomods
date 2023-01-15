@@ -4,13 +4,15 @@
 
 #pragma once
 
-#include "bf2mods/UpdatableModule.hpp"
+#include "UpdatableModule.hpp"
 
 namespace bf2mods {
 
 	struct FileDetours : public bf2mods::UpdatableModule {
 		void Initialize() override;
-		bool NeedsUpdate() const override { return false; }
+		bool NeedsUpdate() const override {
+			return false;
+		}
 	};
 
 } // namespace bf2mods

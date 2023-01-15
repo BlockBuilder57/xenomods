@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "bf2mods/engine/mm/math_types.hpp"
+#include "bf2mods/engine/mm/MathTypes.hpp"
 
 namespace fw {
 	namespace debug {

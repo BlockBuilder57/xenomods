@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "bf2mods/engine/mm/fixstr.hpp"
+#include "bf2mods/engine/mm/FixStr.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 
 namespace gf {

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <bf2mods/engine/mm/math_types.hpp>
-#include <bf2mods/UpdatableModule.hpp>
+#include <bf2mods/engine/mm/MathTypes.hpp>
 #include <nn/hid.hpp>
 
-#include "state.hpp"
+#include "State.hpp"
+#include "modules/UpdatableModule.hpp"
 
 namespace bf2mods {
 

@@ -1,9 +1,9 @@
 #include "main.hpp"
 
-#include "../../bf2mods/plugin_main.hpp"
-#include "skylaunch/utils/ipc.hpp"
-
 #include <skylaunch/hookng/Hooks.hpp>
+
+#include "../../bf2mods/main.hpp"
+#include "skylaunch/utils/ipc.hpp"
 
 // For handling exceptions
 char ALIGNA(0x1000) exception_handler_stack[0x4000];

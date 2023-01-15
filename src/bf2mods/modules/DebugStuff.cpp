@@ -1,23 +1,23 @@
-#include "debug_stuff.hpp"
+#include "DebugStuff.hpp"
 
-#include <bf2mods/engine/fw/framework.hpp>
-#include <bf2mods/engine/game/mapjump.hpp>
-#include <bf2mods/engine/game/scripts.hpp>
-#include <bf2mods/engine/gf/bgm.hpp>
-#include <bf2mods/engine/gf/events.hpp>
-#include <bf2mods/engine/gf/play_factory.hpp>
-#include <bf2mods/engine/ml/debdraw.hpp>
-#include <bf2mods/engine/mm/math_types.hpp>
-#include <bf2mods/engine/tl/title.hpp>
 #include <map>
 
-#include "bf2mods/bf2logger.hpp"
-#include "bf2mods/debug_wrappers.hpp"
+#include "../State.hpp"
+#include "../main.hpp"
+#include "bf2mods/DebugWrappers.hpp"
+#include "bf2mods/Logger.hpp"
+#include "bf2mods/Utils.hpp"
+#include "bf2mods/engine/fw/Framework.hpp"
+#include "bf2mods/engine/game/MapJump.hpp"
+#include "bf2mods/engine/game/Scripts.hpp"
+#include "bf2mods/engine/gf/Bgm.hpp"
+#include "bf2mods/engine/gf/Events.hpp"
+#include "bf2mods/engine/gf/PlayFactory.hpp"
+#include "bf2mods/engine/ml/DebugDrawing.hpp"
+#include "bf2mods/engine/mm/MathTypes.hpp"
+#include "bf2mods/engine/tl/title.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "bf2mods/utils.hpp"
-#include "plugin_main.hpp"
-#include "state.hpp"
 
 #if BF2MODS_CODENAME(bfsw)
 namespace game {
@@ -103,11 +103,11 @@ namespace tl {
 		if(this_pointer->getChapterIdFromSaveData() > 0 && (clearCount > 0 || !bf2mods::GetState().config.titleEventsNeedsClearedGame)) {
 			auto& events = bf2mods::GetState().config.titleEvents;
 
-			if (!events.empty())
+			if(!events.empty())
 				newEventId = events[(util::nnRand<int16_t>() % events.size())];
 		}
 
-		if (newEventId != eventId)
+		if(newEventId != eventId)
 			bf2mods::g_Logger->LogDebug("Replacing title event {} (id {}) with {} (id {})", gf::GfDataEvent::getEventName(eventId), eventId, gf::GfDataEvent::getEventName(newEventId), newEventId);
 		TitleMain_playTitleEventBak(this_pointer, newEventId);
 	}
@@ -253,12 +253,11 @@ namespace bf2mods {
 		if(btnDown(Keybind::TEST_BUTTON, p2Cur.Buttons, p2Prev.Buttons)) {
 			// temp space for tests
 
-			if (state.tempInt < 0)
-				fw::Framework::setUpdateSpeed(1.f/abs(state.tempInt));
-			else if (state.tempInt > 0)
+			if(state.tempInt < 0)
+				fw::Framework::setUpdateSpeed(1.f / abs(state.tempInt));
+			else if(state.tempInt > 0)
 				fw::Framework::setUpdateSpeed(state.tempInt);
-		}
-		else if(btnDown(Keybind::DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+		} else if(btnDown(Keybind::DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
 			enableDebugRendering = !enableDebugRendering;
 #if !BF2MODS_CODENAME(bfsw)
 			fw::PadManager::enableDebugDraw(enableDebugRendering);

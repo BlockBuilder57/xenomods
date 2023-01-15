@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <bf2mods/engine/fw/debug.hpp>
+#include <bf2mods/engine/fw/Debug.hpp>
 
 namespace fw::debug {
 

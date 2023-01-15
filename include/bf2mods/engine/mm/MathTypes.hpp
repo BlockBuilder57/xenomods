@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "bf2mods/utils.hpp"
+#include "bf2mods/Utils.hpp"
 #include "fmt/format.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/mat4x4.hpp"

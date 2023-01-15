@@ -4,14 +4,12 @@
 
 #pragma once
 
-#include <bf2mods/engine/mm/math_types.hpp>
-
-#include "bf2mods/UpdatableModule.hpp"
+#include "UpdatableModule.hpp"
+#include "bf2mods/engine/mm/MathTypes.hpp"
 
 namespace bf2mods {
 
 	struct CameraTools : public bf2mods::UpdatableModule {
-
 		struct FreecamState {
 			bool isOn;
 			mm::Mat44 matrix;
@@ -23,7 +21,9 @@ namespace bf2mods {
 		static void DoFreeCameraMovement();
 
 		void Initialize() override;
-		bool NeedsUpdate() const override { return true; }
+		bool NeedsUpdate() const override {
+			return true;
+		}
 		void Update() override;
 	};
 

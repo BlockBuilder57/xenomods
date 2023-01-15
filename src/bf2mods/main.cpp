@@ -1,22 +1,21 @@
-#include "plugin_main.hpp"
+#include "main.hpp"
 
-#include <bf2mods/engine/fw/document.hpp>
-#include <bf2mods/engine/mm/math_types.hpp>
-
-#include "bf2mods/bf2logger.hpp"
-#include "bf2mods/debug_wrappers.hpp"
-#include "bf2mods/stuff/utils/debug_util.hpp"
-#include "state.hpp"
-#include "version.h"
-
+#include <bf2mods/engine/fw/Document.hpp>
+#include <bf2mods/engine/mm/MathTypes.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
+#include "State.hpp"
+#include "bf2mods/DebugWrappers.hpp"
+#include "bf2mods/Logger.hpp"
+#include "bf2mods/stuff/utils/debug_util.hpp"
+#include "version.h"
+
 // all parts here
-#include "bdat_randomizer.hpp"
-#include "camera_tools.hpp"
-#include "debug_stuff.hpp"
-#include "menu_viewer.hpp"
-#include "player_movement.hpp"
+#include "modules/BdatRandomizer.hpp"
+#include "modules/CameraTools.hpp"
+#include "modules/DebugStuff.hpp"
+#include "modules/MenuViewer.hpp"
+#include "modules/PlayerMovement.hpp"
 
 namespace fw {
 

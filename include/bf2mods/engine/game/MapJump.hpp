@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "bf2mods/engine/fw/document.hpp"
-#include "bf2mods/engine/mm/math_types.hpp"
+#include "bf2mods/engine/fw/Document.hpp"
+#include "bf2mods/engine/mm/MathTypes.hpp"
 
 namespace game {
 

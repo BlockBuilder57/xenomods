@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "Utils.hpp"
 #include "fmt/format.h"
-#include "utils.hpp"
 
 namespace bf2mods {
 

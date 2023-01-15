@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "bf2mods/utils.hpp"
+#include "bf2mods/Utils.hpp"
 
 #if BF2MODS_CODENAME(bfsw)
 namespace game {

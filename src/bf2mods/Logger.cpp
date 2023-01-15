@@ -1,8 +1,8 @@
-#include "bf2mods/bf2logger.hpp"
+#include "bf2mods/Logger.hpp"
 
 #include <nn/diag.h>
 
-#include "bf2mods/debug_wrappers.hpp"
+#include "bf2mods/DebugWrappers.hpp"
 #include "skylaunch/logger/Logger.hpp"
 
 namespace bf2mods {
