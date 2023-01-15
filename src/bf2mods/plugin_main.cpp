@@ -9,6 +9,8 @@
 #include "state.hpp"
 #include "version.h"
 
+#include <skylaunch/hookng/Hooks.hpp>
+
 // all parts here
 #include "bdat_randomizer.hpp"
 #include "camera_tools.hpp"
@@ -18,22 +20,30 @@
 
 namespace fw {
 
+
+#if !BF2MODS_CODENAME(bfsw)
+	struct FrameworkUpdateHook : skylaunch::hook::Trampoline<FrameworkUpdateHook> {
+		static void Hook(void* framework) {
+			Orig(framework);
+			bf2mods::update();
+		}
+	};
+#else
 	Document* document;
 
-	GENERATE_SYM_HOOK(Framework_update, "_ZN2fw9Framework6updateEv", void, void* that) {
-		Framework_updateBak(that);
-		bf2mods::update();
-	}
+	struct FrameworkUpdater_updateStdHook : skylaunch::hook::Trampoline<FrameworkUpdater_updateStdHook> {
+		static void Hook(fw::Document* doc, void* FrameworkController) {
+			Orig(doc, FrameworkController);
 
-	GENERATE_SYM_HOOK(FrameworkUpdater_updateStd, "_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE", void, fw::Document* doc, void* FrameworkController) {
-		FrameworkUpdater_updateStdBak(doc, FrameworkController);
+			if(doc != nullptr && document == nullptr) {
+				document = doc;
+			}
 
-		if(doc != nullptr && document == nullptr) {
-			document = doc;
+			bf2mods::update();
 		}
 
-		bf2mods::update();
-	}
+	};
+#endif
 
 } // namespace fw
 
@@ -123,19 +133,19 @@ namespace bf2mods {
 		g_Logger->Draw();
 	}
 
-	void bf2mods_main() {
+	void main() {
 
 		// mount sd
 		Result rc = nn::fs::MountSdCardForDebug("sd");
-		g_Logger->LogInfo("Mounted SD card 0x{:08x}", rc);
+		g_Logger->LogDebug("Mounted SD card (result 0x{:x})", rc);
 
 		InitializeAllRegisteredModules();
 
 		// hook our updater
 #if !BF2MODS_CODENAME(bfsw)
-		fw::Framework_updateHook();
+		fw::FrameworkUpdateHook::HookAt("_ZN2fw9Framework6updateEv");
 #else
-		fw::FrameworkUpdater_updateStdHook();
+		fw::FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #endif
 
 #if _DEBUG
