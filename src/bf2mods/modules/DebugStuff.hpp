@@ -1,8 +1,7 @@
 #pragma once
 
-#include "bf2mods/UpdatableModule.hpp"
-
-#include <bf2mods/engine/gf/menu_object.hpp>
+#include "UpdatableModule.hpp"
+#include "bf2mods/engine/gf/MenuObject.hpp"
 
 namespace bf2mods {
 
@@ -16,7 +15,9 @@ namespace bf2mods {
 		static void ReturnTitle(unsigned int slot = -1);
 
 		void Initialize() override;
-		bool NeedsUpdate() const override { return true; }
+		bool NeedsUpdate() const override {
+			return true;
+		}
 		void Update() override;
 	};
 

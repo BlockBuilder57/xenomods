@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bf2mods/UpdatableModule.hpp"
+#include "UpdatableModule.hpp"
 
 namespace bf2mods {
 
@@ -8,7 +8,9 @@ namespace bf2mods {
 		static bool enableUIRendering;
 
 		void Initialize() override;
-		bool NeedsUpdate() const override { return true; }
+		bool NeedsUpdate() const override {
+			return true;
+		}
 		void Update() override;
 	};
 

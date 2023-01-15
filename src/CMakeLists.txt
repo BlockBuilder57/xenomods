@@ -1,22 +1,23 @@
 add_executable(bf2mods
 
-		bf2mods/plugin_main.cpp
+		bf2mods/main.cpp
 
 		# UTILITY
 		bf2mods/NnFile.cpp
 
-		bf2mods/UpdatableModule.cpp
+		bf2mods/modules/UpdatableModule.cpp
 
-        bf2mods/engine/mm/math_types.cpp
+		bf2mods/engine/mm/MathTypes.cpp
 
-		bf2mods/state.cpp
-		bf2mods/debug_stuff.cpp
-		bf2mods/bf2logger.cpp
-		bf2mods/file_detours.cpp
-		bf2mods/camera_tools.cpp
-		bf2mods/menu_viewer.cpp
-		bf2mods/player_movement.cpp
-		bf2mods/bdat_randomizer.cpp
+		bf2mods/State.cpp
+		bf2mods/Logger.cpp
+
+		bf2mods/modules/DebugStuff.cpp
+		bf2mods/modules/FileDetours.cpp
+		bf2mods/modules/CameraTools.cpp
+		bf2mods/modules/MenuViewer.cpp
+		bf2mods/modules/PlayerMovement.cpp
+		bf2mods/modules/BdatRandomizer.cpp
 
         bf2mods/stuff/utils/debug_util.cpp
 		bf2mods/stuff/utils/util.cpp

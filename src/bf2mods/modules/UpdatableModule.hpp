@@ -12,9 +12,12 @@ namespace bf2mods {
 
 		virtual void Initialize() = 0;
 
-		virtual bool NeedsUpdate() const { return false; }
+		virtual bool NeedsUpdate() const {
+			return false;
+		}
 
-		virtual void Update() {}
+		virtual void Update() {
+		}
 	};
 
 	namespace detail {
@@ -31,9 +34,8 @@ namespace bf2mods {
 	};
 
 #define BF2MODS_REGISTER_MODULE(T) \
-		static T module__##T;            \
-		::bf2mods::ModuleRegistrar<T> register__##T(&module__##T);
-
+	static T module__##T;          \
+	::bf2mods::ModuleRegistrar<T> register__##T(&module__##T);
 
 	void InitializeAllRegisteredModules();
 
@@ -41,4 +43,4 @@ namespace bf2mods {
 	 * Update all registered modules.
 	 */
 	void UpdateAllRegisteredModules();
-}
+} // namespace bf2mods

@@ -1,16 +1,15 @@
-#include "player_movement.hpp"
+#include "PlayerMovement.hpp"
 
-#include <bf2mods/engine/gf/player_controller.hpp>
-
-#include "bf2mods/bf2logger.hpp"
-#include "bf2mods/debug_wrappers.hpp"
+#include "../State.hpp"
+#include "../main.hpp"
+#include "DebugStuff.hpp"
+#include "bf2mods/DebugWrappers.hpp"
+#include "bf2mods/Logger.hpp"
+#include "bf2mods/Utils.hpp"
+#include "bf2mods/engine/gf/player_controller.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "bf2mods/utils.hpp"
-#include "debug_stuff.hpp"
-#include "plugin_main.hpp"
 #include "skylaunch/logger/Logger.hpp"
-#include "state.hpp"
 
 namespace gf {
 
@@ -26,7 +25,7 @@ namespace gf {
 		auto& input = static_cast<glm::vec2&>(this_pointer->inputReal);
 
 		// if we're not inputting, just don't do anything
-		if (glm::length(input) > 0) {
+		if(glm::length(input) > 0) {
 			wish *= bf2mods::PlayerMovement::movementSpeedMult;
 			float speedLimit = 8.f * std::max(1.f, bf2mods::PlayerMovement::movementSpeedMult);
 

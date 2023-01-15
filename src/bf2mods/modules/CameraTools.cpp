@@ -2,24 +2,22 @@
 // Created by block on 6/21/2022.
 //
 
-#include "camera_tools.hpp"
+#include "CameraTools.hpp"
 
-#include <bf2mods/engine/apps/FrameworkLauncher.hpp>
-#include <bf2mods/engine/event/manager.hpp>
-#include <bf2mods/engine/fw/camera.hpp>
-#include <bf2mods/engine/ml/scene.hpp>
-#include <bf2mods/engine/mm/math_types.hpp>
-#include <bf2mods/stuff/utils/debug_util.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
-#include <glm/mat4x4.hpp>
-
-#include "bf2mods/bf2logger.hpp"
-#include "bf2mods/debug_wrappers.hpp"
+#include "../State.hpp"
+#include "../main.hpp"
+#include "DebugStuff.hpp"
+#include "bf2mods/DebugWrappers.hpp"
+#include "bf2mods/Logger.hpp"
+#include "bf2mods/engine/apps/FrameworkLauncher.hpp"
+#include "bf2mods/engine/event/Manager.hpp"
+#include "bf2mods/engine/ml/Scene.hpp"
+#include "bf2mods/engine/mm/MathTypes.hpp"
+#include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "debug_stuff.hpp"
-#include "plugin_main.hpp"
+#include "glm/gtx/matrix_decompose.hpp"
+#include "glm/mat4x4.hpp"
 #include "skylaunch/logger/Logger.hpp"
-#include "state.hpp"
 
 namespace ml {
 

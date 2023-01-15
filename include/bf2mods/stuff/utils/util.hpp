@@ -1,13 +1,12 @@
 #ifndef STUFF_UTIL
 #define STUFF_UTIL
 
+#include <bf2mods/Logger.hpp>
 #include <type_traits>
 
 #include "nn/ro.h"
 #include "skylaunch/inlinehook/And64InlineHook.hpp"
 #include "skylaunch/nx/arm/counter.h"
-
-#include <bf2mods/bf2logger.hpp>
 
 namespace util {
 

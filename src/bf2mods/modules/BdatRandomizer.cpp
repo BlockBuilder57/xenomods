@@ -1,12 +1,11 @@
-#include "bdat_randomizer.hpp"
+#include "BdatRandomizer.hpp"
 
-#include <bf2mods/engine/bdat/bdat.hpp>
-
-#include "bf2mods/bf2logger.hpp"
+#include "../State.hpp"
+#include "../main.hpp"
+#include "bf2mods/Logger.hpp"
+#include "bf2mods/engine/bdat/Bdat.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "nn/oe.h"
-#include "plugin_main.hpp"
-#include "state.hpp"
 #include "version.h"
 
 // Bdat syms & hooks

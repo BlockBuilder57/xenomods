@@ -2,26 +2,26 @@
 // Created by block on 1/9/2023.
 //
 
-#include "file_detours.hpp"
+#include "FileDetours.hpp"
 
-#include <bf2mods/NnFile.hpp>
-#include <bf2mods/engine/ml/files.hpp>
-#include <bf2mods/engine/mm/fixstr.hpp>
-
-#include "bf2mods/bf2logger.hpp"
-#include "bf2mods/debug_wrappers.hpp"
+#include "../main.hpp"
+#include "bf2mods/DebugWrappers.hpp"
+#include "bf2mods/Logger.hpp"
+#include "bf2mods/NnFile.hpp"
+#include "bf2mods/Utils.hpp"
+#include "bf2mods/engine/ml/Filesystem.hpp"
+#include "bf2mods/engine/mm/FixStr.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "bf2mods/utils.hpp"
-#include "plugin_main.hpp"
 
 namespace {
 
-	void CleanPath(std::string& path, bool flat = false) {;
+	void CleanPath(std::string& path, bool flat = false) {
+		;
 		// https://en.cppreference.com/w/cpp/string/basic_string/replace
 		auto replace_all = [](std::string& inout, std::string_view what, std::string_view with) {
-			std::size_t count{};
-			for (std::string::size_type pos{};
+			std::size_t count {};
+			for(std::string::size_type pos {};
 				inout.npos != (pos = inout.find(what.data(), pos, what.length()));
 				pos += with.length(), ++count) {
 				inout.replace(pos, what.length(), with.data(), with.length());
@@ -29,10 +29,10 @@ namespace {
 			return count;
 		};
 
-		if (path.starts_with("/"))
+		if(path.starts_with("/"))
 			path.erase(0, 1);
 
-		if (flat)
+		if(flat)
 			replace_all(path, "/", "_");
 		replace_all(path, ":", "_");
 		replace_all(path, "//", "/");
@@ -59,25 +59,24 @@ namespace {
 
 		std::stringstream ss;
 
-		for (int i = 0; i < splits.size(); i++) {
+		for(int i = 0; i < splits.size(); i++) {
 			ss << splits[i];
 
-			if (i != splits.size() - 1) {
+			if(i != splits.size() - 1) {
 				ss << "/";
 
-				Result res{};
-				nn::fs::DirectoryHandle dh{};
+				Result res {};
+				nn::fs::DirectoryHandle dh {};
 				res = nn::fs::OpenDirectory(&dh, ss.str().c_str(), nn::fs::OpenDirectoryMode::OpenDirectoryMode_All);
 
-				if (R_FAILED(res)) {
-					if (res == 0x202 && createPaths) { // Path does not exist
+				if(R_FAILED(res)) {
+					if(res == 0x202 && createPaths) { // Path does not exist
 						res = nn::fs::CreateDirectory(ss.str().c_str());
-						if (R_FAILED(res) && res != 0x402) {
+						if(R_FAILED(res) && res != 0x402) {
 							bf2mods::g_Logger->LogError("Failed to create dump directory \"{}\" for reason {}", ss.str(), res);
 							return false;
 						}
-					}
-					else {
+					} else {
 						bf2mods::g_Logger->LogError("Failed to open dump directory \"{}\" for reason {}", ss.str(), res);
 						return false;
 					}
@@ -91,9 +90,8 @@ namespace {
 	}
 
 	bool DumpToFilesystem(std::string_view path, const void* buffer, std::size_t length) {
-		Result res{};
-		nn::fs::FileHandle dumpFileHandle{};
-
+		Result res {};
+		nn::fs::FileHandle dumpFileHandle {};
 
 		if(!bf2mods::NnFile::Preallocate(path, length)) {
 			bf2mods::g_Logger->LogError("Couldn't create/preallocate dump file \"{}\": 0x{:08x};", path, res);
@@ -110,7 +108,6 @@ namespace {
 		file.Flush();
 		return true;
 	}
-
 
 	void LoadFromFilesystem(std::string_view jackPath, void* buffer, std::size_t length) {
 		bf2mods::NnFile file(jackPath, nn::fs::OpenMode_Read);
@@ -129,21 +126,20 @@ namespace {
 		CleanPath(filename);
 
 		// dump data reads to sd card
-		if (bf2mods::GetState().config.dumpFileReads) {
+		if(bf2mods::GetState().config.dumpFileReads) {
 			auto path = fmt::format("sd:/config/bf2mods/dump/{}/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
-			if (EnsurePath(path, true))
+			if(EnsurePath(path, true))
 				DumpToFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 
 		// load from loose sd card files
-		if (bf2mods::GetState().config.useFileDumps) {
+		if(bf2mods::GetState().config.useFileDumps) {
 			auto path = fmt::format("sd:/config/bf2mods/override/{}/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			LoadFromFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
-
 	}
 
-}
+} // namespace
 
 namespace ml {
 
@@ -172,8 +168,6 @@ namespace ml {
 	}
 
 } // namespace ml
-
-
 
 namespace bf2mods {
 

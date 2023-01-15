@@ -1,8 +1,7 @@
 #pragma once
 
-#include "bf2mods/UpdatableModule.hpp"
-
-#include <bf2mods/engine/mm/math_types.hpp>
+#include "UpdatableModule.hpp"
+#include "bf2mods/engine/mm/MathTypes.hpp"
 
 namespace bf2mods {
 
@@ -12,7 +11,9 @@ namespace bf2mods {
 		static float movementSpeedMult;
 
 		void Initialize() override;
-		bool NeedsUpdate() const override { return true; }
+		bool NeedsUpdate() const override {
+			return true;
+		}
 		void Update() override;
 	};
 

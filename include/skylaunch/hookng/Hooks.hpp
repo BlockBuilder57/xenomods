@@ -3,7 +3,7 @@
 
 #include <nn/ro.h>
 
-#include <bf2mods/bf2logger.hpp>
+#include <bf2mods/Logger.hpp>
 #include <skylaunch/inlinehook/And64InlineHook.hpp>
 #include <string_view>
 

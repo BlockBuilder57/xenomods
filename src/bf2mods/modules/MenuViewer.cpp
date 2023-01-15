@@ -1,10 +1,10 @@
-#include "menu_viewer.hpp"
+#include "MenuViewer.hpp"
 
-#include "bf2mods/bf2logger.hpp"
+#include "../State.hpp"
+#include "../main.hpp"
+#include "bf2mods/Logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "plugin_main.hpp"
 #include "skylaunch/logger/Logger.hpp"
-#include "state.hpp"
 
 namespace gf {
 
