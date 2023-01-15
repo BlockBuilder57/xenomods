@@ -72,6 +72,6 @@ namespace bf2mods {
 	/**
  	 * Called from skylaunch when ready.
  	 */
-	void bf2mods_main();
+	void main();
 
 } // namespace bf2mods

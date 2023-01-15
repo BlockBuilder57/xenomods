@@ -389,8 +389,8 @@ static bool __fix_pcreladdr(instruction inprwp, instruction inprxp, instruction 
             int64_t absolute_addr =
                 (reinterpret_cast<int64_t>(*inprxp) & ~0xfffll) +
                 ((((static_cast<int32_t>(ins << msb) >> (msb + lsb - 2u)) & ~3u) | lsb_bytes) << 12);
-            skylaunch::logger::s_Instance->LogFormat("[And64InlineHook] ins = 0x%.8X, pc = %p, abs_addr = %p", ins,
-                                                   *inprxp, reinterpret_cast<int64_t*>(absolute_addr));
+            /*skylaunch::logger::s_Instance->LogFormat("[And64InlineHook] ins = 0x%.8X, pc = %p, abs_addr = %p", ins,
+                                                   *inprxp, reinterpret_cast<int64_t*>(absolute_addr));*/
             if (ctxp->is_in_fixing_range(absolute_addr)) {
                 intptr_t ref_idx = ctxp->get_ref_ins_index(absolute_addr /* & ~3ull*/);
                 if (ref_idx > current_idx) {
@@ -604,9 +604,9 @@ void* A64HookFunctionV(void* const symbol, void* const replace, void* const rxtr
         *reinterpret_cast<int64_t*>(original + 2) = __intval(replace);
         __flush_cache(symbol, 5 * sizeof(uint32_t));
 
-        skylaunch::logger::s_Instance->LogFormat(
+        /*skylaunch::logger::s_Instance->LogFormat(
             "[And64InlineHook] inline hook %p->%p successfully! %zu bytes overwritten", symbol, replace,
-            5 * sizeof(uint32_t));
+            5 * sizeof(uint32_t));*/
 
         control.unclaim();
     } else {
@@ -628,9 +628,9 @@ void* A64HookFunctionV(void* const symbol, void* const replace, void* const rxtr
         __sync_cmpswap(original, *original, 0x14000000u | (pc_offset & mask));  // "B" ADDR_PCREL26
         __flush_cache(symbol, 1 * sizeof(uint32_t));
 
-        skylaunch::logger::s_Instance->LogFormat(
+        /*skylaunch::logger::s_Instance->LogFormat(
             "[And64InlineHook] inline hook %p->%p successfully! %zu bytes overwritten", symbol, replace,
-            1 * sizeof(uint32_t));
+            1 * sizeof(uint32_t));*/
 
         control.unclaim();
     }
