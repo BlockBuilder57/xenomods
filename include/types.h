@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "skyline/nx/result.h"
+#include "skylaunch/nx/result.h"
 
 #pragma once
 

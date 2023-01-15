@@ -10,7 +10,6 @@
 #include "mem.h"
 #include "nifm.h"
 #include "nn.h"
-#include "nn.rs"
 #include "oe.h"
 #include "os.h"
 #include "os.hpp"

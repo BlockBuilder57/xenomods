@@ -4,12 +4,11 @@
 
 #include "file_detours.hpp"
 
+#include <bf2mods/NnFile.hpp>
 #include <bf2mods/engine/ml/files.hpp>
 #include <bf2mods/engine/mm/fixstr.hpp>
 
-#include <bf2mods/NnFile.hpp>
-
-#include "bf2logger.hpp"
+#include "bf2mods/bf2logger.hpp"
 #include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"

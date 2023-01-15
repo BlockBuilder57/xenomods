@@ -3,7 +3,7 @@
 #include "../utils/util.hpp"
 #include "nn/fs.h"
 #include "nn/prepo.h"
-#include "skyline/utils/cpputils.hpp"
+#include "skylaunch/utils/cpputils.hpp"
 
 namespace log {
 
@@ -21,7 +21,7 @@ namespace log {
 		reportOutputPath += std::to_string(svcGetSystemTick()) + "_";
 		reportOutputPath += std::string((char*)&p_reportObj->m_EventName) + ".bin";
 
-		skyline::utils::writeFile(reportOutputPath.c_str(), 0, p_reportObj->m_Buff, p_reportObj->m_End);
+		skylaunch::utils::writeFile(reportOutputPath.c_str(), 0, p_reportObj->m_Buff, p_reportObj->m_End);
 		LOG("Logged report: %s", p_reportObj->m_EventName);
 	}
 

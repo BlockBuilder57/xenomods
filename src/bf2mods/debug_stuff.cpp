@@ -1,17 +1,17 @@
 #include "debug_stuff.hpp"
 
+#include <bf2mods/engine/fw/framework.hpp>
 #include <bf2mods/engine/game/mapjump.hpp>
 #include <bf2mods/engine/game/scripts.hpp>
 #include <bf2mods/engine/gf/bgm.hpp>
 #include <bf2mods/engine/gf/events.hpp>
 #include <bf2mods/engine/gf/play_factory.hpp>
-#include <bf2mods/engine/fw/framework.hpp>
 #include <bf2mods/engine/ml/debdraw.hpp>
 #include <bf2mods/engine/mm/math_types.hpp>
 #include <bf2mods/engine/tl/title.hpp>
 #include <map>
 
-#include "bf2logger.hpp"
+#include "bf2mods/bf2logger.hpp"
 #include "bf2mods/debug_wrappers.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
@@ -37,7 +37,7 @@ namespace ml {
 		__builtin_va_list val;
 		__builtin_va_start(val, format);
 
-		skyline::logger::s_Instance->LogFormat("ml::FontLayer::font: %s", format);
+		skylaunch::logger::s_Instance->LogFormat("ml::FontLayer::font: %s", format);
 		FontLayer_fontBak(x, y, format, val);
 
 		__builtin_va_end(val);
@@ -45,7 +45,7 @@ namespace ml {
 
 	GENERATE_SYM_HOOK(DevFont_fontLayer, "_ZN2ml7DevFont9fontLayerEPKNS_9FontLayerEiiPKc", void, const void* fontLayer, int x, int y, const char* text) {
 
-		skyline::logger::s_Instance->LogFormat("fontLayer: %s", text);
+		skylaunch::logger::s_Instance->LogFormat("fontLayer: %s", text);
 		dbgutil::logStackTrace();
 
 		return DevFont_fontLayerBak(fontLayer, x, y, text);

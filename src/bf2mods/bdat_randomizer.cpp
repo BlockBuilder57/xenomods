@@ -2,10 +2,10 @@
 
 #include <bf2mods/engine/bdat/bdat.hpp>
 
-#include "bf2logger.hpp"
+#include "bf2mods/bf2logger.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "plugin_main.hpp"
 #include "nn/oe.h"
+#include "plugin_main.hpp"
 #include "state.hpp"
 #include "version.h"
 
@@ -16,7 +16,7 @@ namespace Bdat {
 	static char bdatVersionBuffer[16] {};
 
 	GENERATE_SYM_HOOK(getMSText, "_ZN4Bdat9getMSTextEPhi", const char*, std::uint8_t* bdatData, int n) {
-		//skyline::logger::s_Instance->LogFormat("Bdat::getMSText(bdat: %p, n: %d)", bdatData, n);
+		//skylaunch::logger::s_Instance->LogFormat("Bdat::getMSText(bdat: %p, n: %d)", bdatData, n);
 		const char* sheetName = Bdat::getSheetName(bdatData);
 
 		if(!strcmp(sheetName, "menu_ms")) {
