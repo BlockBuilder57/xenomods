@@ -33,6 +33,23 @@ struct RomMountedHook : skylaunch::hook::Trampoline<RomMountedHook> {
 	}
 };
 
+struct DisableSingleModeHook : skylaunch::hook::Trampoline<DisableSingleModeHook> {
+	static void Hook(nn::hid::ControllerSupportResultInfo* resultInfo, nn::hid::ControllerSupportArg* supportArg) {
+		nn::hid::NpadFullKeyState p1State {};
+		nn::hid::GetNpadState(&p1State, nn::hid::CONTROLLER_PLAYER_1);
+
+		if(p1State.Flags & nn::hid::NpadFlags::NPAD_CONNECTED) {
+			// We have a player 1 at this point, so disable single-controller only mode
+			// That way if another controller is connected while the game is running, we can allow it to be P2
+			// Monolib actually passes the (according to switchbrew) default arguments to this,
+			// so we technically get 4 max controllers for free!
+			supportArg->mSingleMode = false;
+		}
+
+		Orig(resultInfo, supportArg);
+	}
+};
+
 void skylaunch_main() {
 	// populate our own process handle
 	Handle h;
@@ -46,6 +63,9 @@ void skylaunch_main() {
 	// hook it so the game can't even try
 	nn::ro::Initialize();
 	skylaunch::hook::StubHook<Result()>::HookAt(nn::ro::Initialize);
+
+	// Enable multiple controllers
+	DisableSingleModeHook::HookAt(nn::hid::ShowControllerSupport);
 
 	// initialize logger
 	skylaunch::logger::s_Instance = new skylaunch::logger::TcpLogger();

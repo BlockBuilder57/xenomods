@@ -17,93 +17,87 @@
 #include "bf2mods/stuff/utils/util.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"
-#include "skylaunch/logger/Logger.hpp"
 
-namespace ml {
+#include <skylaunch/hookng/Hooks.hpp>
 
-	template<auto backupFunction>
-	void FreecamUpdateMatrix(ScnObjCam* this_pointer, mm::Mat44& matrix) {
-		auto& freecam = bf2mods::CameraTools::Freecam;
-		mm::Col4 camColor = mm::Col4::White;
+namespace {
+
+	struct SetCameraMatrix : skylaunch::hook::Trampoline<SetCameraMatrix> {
+		static void Hook(ml::ScnObjCam* this_pointer, mm::Mat44& matrix) {
+			auto& freecam = bf2mods::CameraTools::Freecam;
+			mm::Col4 camColor = mm::Col4::White;
 
 #if BF2MODS_CODENAME(bfsw)
-		mm::Mat44 trueMatrix = matrix;
+			mm::Mat44 trueMatrix = matrix;
 #else
-		// remember: 2 and Torna camera matricies are not world-space
-		// for these, the inverse of the matrix is needed
-		// essentially walking back the matrix to get world space instead of local (camera) space
-		mm::Mat44 trueMatrix = glm::inverse(static_cast<const glm::mat4&>(matrix));
+			// remember: 2 and Torna camera matricies are not world-space
+			// for these, the inverse of the matrix is needed
+			// essentially walking back the matrix to get world space instead of local (camera) space
+			mm::Mat44 trueMatrix = glm::inverse(static_cast<const glm::mat4&>(matrix));
 #endif
 
-		if(this_pointer->ScnPtr != nullptr) {
-			if(this_pointer != this_pointer->ScnPtr->getCam(-1)) {
-				// not our active cam, move on
-				(*backupFunction)(this_pointer, matrix);
-				camColor.a = 0.1f;
-			} else {
-				// the active camera!
-
-				if(!freecam.isOn)
-					freecam.matrix = trueMatrix; // put current cam matrix into the state
-
-				if(freecam.isOn) {
-					// use the matrix calculated in DoFreeCameraMovement
-#if BF2MODS_CODENAME(bfsw)
-					(*backupFunction)(this_pointer, freecam.matrix);
-#else
-					mm::Mat44 inverse = glm::inverse(static_cast<const glm::mat4&>(freecam.matrix));
-					(*backupFunction)(this_pointer, inverse);
-#endif
+			if(this_pointer->ScnPtr != nullptr) {
+				if(this_pointer != this_pointer->ScnPtr->getCam(-1)) {
+					// not our active cam, move on
+					Orig(this_pointer, matrix);
+					camColor.a = 0.1f;
 				} else {
-					(*backupFunction)(this_pointer, matrix);
+					// the active camera!
+
+					if(!freecam.isOn)
+						freecam.matrix = trueMatrix; // put current cam matrix into the state
+
+					if(freecam.isOn) {
+						// use the matrix calculated in DoFreeCameraMovement
+#if BF2MODS_CODENAME(bfsw)
+						Orig(this_pointer, freecam.matrix);
+#else
+						mm::Mat44 inverse = glm::inverse(static_cast<const glm::mat4&>(freecam.matrix));
+						Orig(this_pointer, inverse);
+#endif
+					} else {
+						Orig(this_pointer, matrix);
+					}
+				}
+
+				if(bf2mods::DebugStuff::enableDebugRendering && freecam.isOn) {
+					fw::debug::drawCompareZ(false);
+					fw::debug::drawCamera(trueMatrix, camColor);
+					fw::debug::drawCompareZ(true);
+				}
+			}
+		}
+	};
+
+	struct UpdateFOVNearFar : skylaunch::hook::Trampoline<UpdateFOVNearFar> {
+		static void Hook(ml::ScnObjCam* this_pointer) {
+			if(this_pointer->ScnPtr != nullptr) {
+				if(this_pointer == this_pointer->ScnPtr->getCam(-1)) {
+					auto& freecamState = bf2mods::CameraTools::Freecam;
+
+					if(freecamState.isOn)
+						this_pointer->AttrTransformPtr->fov = freecamState.fov; // put freecam info into the current camera
+					else
+						freecamState.fov = this_pointer->AttrTransformPtr->fov; // get fov from current camera
 				}
 			}
 
-			if(bf2mods::DebugStuff::enableDebugRendering && freecam.isOn) {
-				fw::debug::drawCompareZ(false);
-				fw::debug::drawCamera(trueMatrix, camColor);
-				fw::debug::drawCompareZ(true);
-			}
+			Orig(this_pointer);
 		}
-	}
-
-	GENERATE_SYM_HOOK(ScnObjCam_setViewMatrix, "_ZN2ml9ScnObjCam13setViewMatrixERKN2mm5Mat44E", void, ScnObjCam* this_pointer, mm::Mat44& matrix) {
-		FreecamUpdateMatrix<&ScnObjCam_setViewMatrixBak>(this_pointer, matrix);
-	}
-
-	GENERATE_SYM_HOOK(ScnObjCam_setWorldMatrix, "_ZN2ml9ScnObjCam14setWorldMatrixERKN2mm5Mat44E", void, ScnObjCam* this_pointer, mm::Mat44& matrix) {
-		FreecamUpdateMatrix<&ScnObjCam_setWorldMatrixBak>(this_pointer, matrix);
-	}
-
-	GENERATE_SYM_HOOK(ScnObjCam_updateFovNearFar, "_ZN2ml9ScnObjCam16updateFovNearFarEv", void, ScnObjCam* this_pointer) {
-		if(this_pointer->ScnPtr != nullptr) {
-			if(this_pointer == this_pointer->ScnPtr->getCam(-1)) {
-				auto& freecamState = bf2mods::CameraTools::Freecam;
-
-				if(freecamState.isOn)
-					this_pointer->AttrTransformPtr->fov = freecamState.fov; // put freecam info into the current camera
-				else
-					freecamState.fov = this_pointer->AttrTransformPtr->fov; // get fov from current camera
-			}
-		}
-
-		ScnObjCam_updateFovNearFarBak(this_pointer);
-	}
-
-} // namespace ml
+	};
 
 #if !BF2MODS_CODENAME(bfsw)
-namespace event {
+	struct DrawManagerInfo : skylaunch::hook::Trampoline<DrawManagerInfo> {
+		static void Hook(event::Manager* this_pointer) {
+			if(!this_pointer->isPlayCancel() && bf2mods::DebugStuff::enableDebugRendering)
+				this_pointer->drawInfo();
 
-	GENERATE_SYM_HOOK(Manager_update, "_ZN5event7Manager6updateEv", void, Manager* p_this) {
-		if(!p_this->isPlayCancel() && bf2mods::DebugStuff::enableDebugRendering)
-			p_this->drawInfo();
-
-		return Manager_updateBak(p_this);
-	}
-
-} // namespace event
+			return Orig(this_pointer);
+		}
+	};
 #endif
+
+} // namespace
 
 namespace bf2mods {
 
@@ -211,13 +205,13 @@ namespace bf2mods {
 		g_Logger->LogDebug("Setting up camera tools...");
 
 #if BF2MODS_CODENAME(bfsw)
-		ml::ScnObjCam_setWorldMatrixHook();
+		SetCameraMatrix::HookAt(&ml::ScnObjCam::setWorldMatrix);
 #else
-		ml::ScnObjCam_setViewMatrixHook();
-		event::Manager_updateHook();
+		SetCameraMatrix::HookAt(&ml::ScnObjCam::setViewMatrix);
+		DrawManagerInfo::HookAt(&event::Manager::update);
 #endif
 
-		ml::ScnObjCam_updateFovNearFarHook();
+		UpdateFOVNearFar::HookAt(&ml::ScnObjCam::updateFovNearFar);
 	}
 
 	void CameraTools::Update() {

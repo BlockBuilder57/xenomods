@@ -8,8 +8,10 @@
 
 namespace Bdat {
 
-	uint16_t getIdCount(unsigned char*);
-	uint16_t getIdTop(unsigned char*);
-	char* getSheetName(unsigned char*);
+	char* getMSText(unsigned char* pBdat, int index);
+
+	uint16_t getIdCount(unsigned char* pBdat);
+	uint16_t getIdTop(unsigned char* pBdat);
+	char* getSheetName(unsigned char* pBdat);
 
 }

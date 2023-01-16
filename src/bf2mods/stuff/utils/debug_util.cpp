@@ -13,6 +13,8 @@
 #include "skylaunch/nx/kernel/svc.h"
 #include "skylaunch/utils/cpputils.hpp"
 
+#include <fmt/core.h>
+
 extern "C" uint64_t __module_start;
 
 namespace dbgutil {
@@ -25,39 +27,34 @@ namespace dbgutil {
 
 	std::string getSymbol(uintptr_t address) {
 		std::array<char, 0x100> symbolStrBuffer { 0 };
+		auto symbolAddress = uintptr_t {};
+
 		nn::diag::GetSymbolName(symbolStrBuffer.data(), symbolStrBuffer.size(), address);
 
-		if(!(strlen(symbolStrBuffer.data()) > 0)) {
-			return "";
+		auto mangledLength = strlen(symbolStrBuffer.data());
+
+		if(mangledLength <= 0) {
+			return fmt::format("{:#016x} (no symbol name)", address);
 		}
 
-		auto symbolAddress = uintptr_t {};
-		if(R_FAILED(nn::ro::LookupSymbol(&symbolAddress, symbolStrBuffer.data()))) {
-			return "nn::ro::LookupSymbol failed";
-		}
+		Result res{};
+		if(R_FAILED(res = nn::ro::LookupSymbol(&symbolAddress, symbolStrBuffer.data())))
+			return fmt::format("nn::ro::LookupSymbol failed (result {:#x})", res);
 
-		int rc;
-		auto demangledStrBuffer = abi::__cxa_demangle(symbolStrBuffer.data(), nullptr, nullptr, &rc);
+		int demangleRc;
+		size_t demangledLength = symbolStrBuffer.size();
 
-		switch(rc) {
-			case 0: // no error
-				// abi::__cxa_demangle succeeded, so we copy the data from the buffer it returned
-				// and then free() as ABI docs say to do.
-				strncpy(symbolStrBuffer.data(), demangledStrBuffer, symbolStrBuffer.size() - 1);
-				free(demangledStrBuffer);
-				break;
-			case -1: // malloc failure
-				return "abi::__cxa_demangle unable to allocate memory";
-			case -2: // not valid name, just use the mangled name then
-				break;
-			case -3: // invalid argument(s)
-				return "invalid arguments to abi::__cxa_demangle?";
-		}
+		abi::__cxa_demangle(symbolStrBuffer.data(), symbolStrBuffer.data(), &demangledLength, &demangleRc);
 
-		std::stringstream resultSs;
-		resultSs << symbolStrBuffer.data() << "+" << std::hex << address - symbolAddress;
+		// if it fails with anything other than -2 (invalid name)
+		// give up
+		if(demangleRc != 0 && demangleRc != -2)
+			return fmt::format("error in abi::__cxa_demangle: {}", demangleRc);
 
-		return resultSs.str();
+		if (address - symbolAddress != 0)
+			return fmt::format("{}+{:#x}", std::string_view { symbolStrBuffer.data(), demangledLength }, (address - symbolAddress));
+
+		return std::string{ symbolStrBuffer.data(), demangledLength };
 	}
 
 	void logStackTrace() {

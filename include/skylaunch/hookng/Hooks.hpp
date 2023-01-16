@@ -3,8 +3,8 @@
 
 #include <nn/ro.h>
 
-#include <bf2mods/Logger.hpp>
 #include <skylaunch/inlinehook/And64InlineHook.hpp>
+#include <bit>
 #include <string_view>
 #include <skylaunch/hookng/FunctionPointers.hpp>
 
@@ -12,25 +12,18 @@ namespace skylaunch::hook {
 
 	namespace detail {
 
+		void* HookFunctionBase(void* function, void* replacement);
+		uintptr_t ResolveSymbolBase(std::string_view symbolName);
+
 		template<class Func, class FuncHook>
-		inline Func HookFunction(Func function, FuncHook hook) {
-			Func backup;
-			A64HookFunction(reinterpret_cast<void*>(function), reinterpret_cast<void*>(hook), reinterpret_cast<void**>(&backup));
-			return backup;
+		constexpr Func HookFunction(Func function, FuncHook hook) {
+			return std::bit_cast<Func>(HookFunctionBase(std::bit_cast<void*>(function), std::bit_cast<void*>(hook)));
 		}
 
 		template<class SymType>
-		SymType ResolveSymbol(std::string_view symbolName) {
-			uintptr_t addr;
-
-			if(Result res; R_SUCCEEDED(res = nn::ro::LookupSymbol(&addr, symbolName.data()))) {
-				return reinterpret_cast<SymType>(addr);
-			} else {
-				bf2mods::g_Logger->LogError("[hook-ng] Failed to resolve symbol \"{}\"! (Horizon ec {})", symbolName, res);
-				return reinterpret_cast<SymType>(0xDEADDEAD);
-			}
+		constexpr SymType ResolveSymbol(std::string_view symbolName) {
+			return std::bit_cast<SymType>(ResolveSymbolBase(symbolName));
 		}
-
 
 	} // namespace detail
 
@@ -83,7 +76,6 @@ namespace skylaunch::hook {
 
 		template<class T, class R, class... Args>
 		static inline void HookAt(MemberFuncPtr<T, R, Args...> address) {
-			bf2mods::g_Logger->LogDebug("test: ptr is is {}", reinterpret_cast<void*>(FlattenMemberPtr(address)));
 			Backup() = detail::HookFunction(reinterpret_cast<TrampolineHookType<>>(FlattenMemberPtr(address)), &Impl::Hook);
 		}
 

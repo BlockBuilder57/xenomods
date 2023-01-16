@@ -37,6 +37,10 @@ namespace ml {
 		Scn* ScnPtr {};
 		INSERT_PADDING_BYTES(0x70)
 		AttrTransformInheriter* AttrTransformPtr {};
+
+		void setWorldMatrix(const mm::Mat44& matrix);
+		void setViewMatrix(const mm::Mat44& matrix);
+		void updateFovNearFar();
 	};
 
 	class Scn {

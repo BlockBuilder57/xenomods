@@ -7,6 +7,7 @@
 namespace event {
 	class Manager {
 	   public:
+		void update();
 		void drawInfo();
 		bool isPlayCancel() const;
 	};

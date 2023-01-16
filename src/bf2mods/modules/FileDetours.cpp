@@ -14,10 +14,11 @@
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 
+#include <skylaunch/hookng/Hooks.hpp>
+
 namespace {
 
 	void CleanPath(std::string& path, bool flat = false) {
-		;
 		// https://en.cppreference.com/w/cpp/string/basic_string/replace
 		auto replace_all = [](std::string& inout, std::string_view what, std::string_view with) {
 			std::size_t count {};
@@ -90,17 +91,14 @@ namespace {
 	}
 
 	bool DumpToFilesystem(std::string_view path, const void* buffer, std::size_t length) {
-		Result res {};
-		nn::fs::FileHandle dumpFileHandle {};
-
 		if(!bf2mods::NnFile::Preallocate(path, length)) {
-			bf2mods::g_Logger->LogError("Couldn't create/preallocate dump file \"{}\": 0x{:08x};", path, res);
+			bf2mods::g_Logger->LogError("Couldn't create/preallocate dump file \"{}\"", path);
 		}
 
 		bf2mods::NnFile file(path, nn::fs::OpenMode_Write);
 
 		if(!file) {
-			bf2mods::g_Logger->LogError("Couldn't open dump file \"{}\": 0x{:08x}", path, res);
+			bf2mods::g_Logger->LogError("Couldn't open dump file \"{}\"", path);
 			return false;
 		}
 
@@ -118,7 +116,7 @@ namespace {
 			return;
 
 		file.Read(buffer, file.Size());
-		bf2mods::g_Logger->LogDebug("Loaded dump file \"{}\".", jackPath);
+		bf2mods::g_Logger->LogDebug("Loaded dump file \"{}\"", jackPath);
 	}
 
 	void FileDetourImpl(ml::FileHandleTh* fileHandle, ml::FileReadResult& readResult) {
@@ -139,43 +137,43 @@ namespace {
 		}
 	}
 
+	struct ReadFileHook : skylaunch::hook::Trampoline<ReadFileHook> {
+		static uint Hook(ml::FileHandleTh*& fh, nn::fs::FileHandle& nnHandle, int unk, long offset, void* buffer, unsigned int buffersize, ml::FileReadResult& readres) {
+			// used by maps (exclusively?)
+
+			auto fileRes = Orig(fh, nnHandle, unk, offset, buffer, buffersize, readres);
+			//bf2mods::g_Logger->LogDebug("DevFileUtilNx::readFile: \"{}\" (start offset 0x{:08x} size 0x{:08x}, was compressed? {})", fh->filename.buffer, fh->readStartOffset, fh->readSize, readres.bWasCompressed);
+
+			if(fileRes && readres.bFullyLoaded == 1)
+				FileDetourImpl(fh, readres);
+
+			return fileRes;
+		}
+	};
+
+	struct ReadFileSliceHook : skylaunch::hook::Trampoline<ReadFileSliceHook> {
+		static uint Hook(ml::FileHandleTh* fh, nn::fs::FileHandle& nnHandle, long unk, long offset, void* buffer, unsigned int buffersize, ml::FileReadResult& readres) {
+			// used by most other things
+
+			auto fileRes = Orig(fh, nnHandle, unk, offset, buffer, buffersize, readres);
+			//bf2mods::g_Logger->LogDebug("DevFileUtilNx::readFileSlice: \"{}\" (start offset 0x{:08x} size 0x{:08x}, was compressed? {})", fh->filename.buffer, fh->readStartOffset, fh->readSize, readres.bWasCompressed);
+
+			if(fileRes && readres.bFullyLoaded == 1)
+				FileDetourImpl(fh, readres);
+
+			return fileRes;
+		}
+	};
+
 } // namespace
-
-namespace ml {
-
-	GENERATE_SYM_HOOK(DevFileUtilNx_readFile, "_ZN2ml13DevFileUtilNx8readFileERPNS_12FileHandleThERN2nn2fs10FileHandleEilPvjRNS_14FileReadResultE", uint, ml::FileHandleTh*& fh, nn::fs::FileHandle& nnHandle, int unk, long offset, void* buffer, unsigned int buffersize, ml::FileReadResult& readres) {
-		// used by maps (exclusively?)
-
-		auto fileRes = DevFileUtilNx_readFileBak(fh, nnHandle, unk, offset, buffer, buffersize, readres);
-		//bf2mods::g_Logger->LogDebug("DevFileUtilNx::readFile: \"{}\" (start offset 0x{:08x} size 0x{:08x}, was compressed? {})", fh->filename.buffer, fh->readStartOffset, fh->readSize, readres.bWasCompressed);
-
-		if(fileRes && readres.bFullyLoaded == 1)
-			FileDetourImpl(fh, readres);
-
-		return fileRes;
-	}
-
-	GENERATE_SYM_HOOK(DevFileUtilNx_readFileSlice, "_ZN2ml13DevFileUtilNx13readFileSliceEPNS_12FileHandleThERN2nn2fs10FileHandleEllPvjRNS_14FileReadResultE", uint, ml::FileHandleTh* fh, nn::fs::FileHandle& nnHandle, long unk, long offset, void* buffer, unsigned int buffersize, ml::FileReadResult& readres) {
-		// used by most other things
-
-		auto fileRes = DevFileUtilNx_readFileSliceBak(fh, nnHandle, unk, offset, buffer, buffersize, readres);
-		//bf2mods::g_Logger->LogDebug("DevFileUtilNx::readFileSlice: \"{}\" (start offset 0x{:08x} size 0x{:08x}, was compressed? {})", fh->filename.buffer, fh->readStartOffset, fh->readSize, readres.bWasCompressed);
-
-		if(fileRes && readres.bFullyLoaded == 1)
-			FileDetourImpl(fh, readres);
-
-		return fileRes;
-	}
-
-} // namespace ml
 
 namespace bf2mods {
 
 	void FileDetours::Initialize() {
 		g_Logger->LogDebug("Setting up file detours...");
 
-		ml::DevFileUtilNx_readFileHook();
-		ml::DevFileUtilNx_readFileSliceHook();
+		ReadFileHook::HookAt("_ZN2ml13DevFileUtilNx8readFileERPNS_12FileHandleThERN2nn2fs10FileHandleEilPvjRNS_14FileReadResultE");
+		ReadFileSliceHook::HookAt("_ZN2ml13DevFileUtilNx13readFileSliceEPNS_12FileHandleThERN2nn2fs10FileHandleEllPvjRNS_14FileReadResultE");
 	}
 
 	BF2MODS_REGISTER_MODULE(FileDetours);
