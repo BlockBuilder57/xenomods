@@ -40,6 +40,8 @@ add_executable(bf2mods
 		skylaunch/inlinehook/And64InlineHook.cpp
 		skylaunch/inlinehook/controlledpages.cpp
 
+		skylaunch/hookng/Hooks.cpp
+
 
 		skylaunch/logger/Logger.cpp
 		skylaunch/logger/TcpLogger.cpp
