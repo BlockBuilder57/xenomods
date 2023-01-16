@@ -4,19 +4,11 @@
 
 namespace bf2mods {
 
-	// a bit yucky, but this way it's in one spot
-#define CONFIG_PORT_DEFAULT 6969
-#define CONFIG_TITLEEVENTS_DEFAULT { 10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609 }
-#define CONFIG_TITLEEVENTSNEEDSCLEAREDGAME_DEFAULT true
-#define CONFIG_DUMP_FILEREADS false
-#define CONFIG_USE_FILEDUMPS false
-
 	void Config::Reset() {
 		port = CONFIG_PORT_DEFAULT;
 
 		// all chapters, game clear, and NG+ clear
 		titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
-		titleEventsNeedsClearedGame = CONFIG_TITLEEVENTSNEEDSCLEAREDGAME_DEFAULT;
 
 		dumpFileReads = CONFIG_DUMP_FILEREADS;
 		useFileDumps = CONFIG_USE_FILEDUMPS;
@@ -52,8 +44,6 @@ namespace bf2mods {
 			if(event_load_failed)
 				titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 		}
-
-		titleEventsNeedsClearedGame = tomlTable["titleEventsNeedsClearedGame"].value_or(CONFIG_TITLEEVENTSNEEDSCLEAREDGAME_DEFAULT);
 
 		dumpFileReads = tomlTable["dumpFileReads"].value_or(CONFIG_DUMP_FILEREADS);
 		useFileDumps = tomlTable["useFileDumps"].value_or(CONFIG_DUMP_FILEREADS);

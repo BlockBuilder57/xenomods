@@ -7,10 +7,11 @@
 #include "../main.hpp"
 #include "bf2mods/Logger.hpp"
 #include "bf2mods/Utils.hpp"
+#include "bf2mods/engine/bdat/Bdat.hpp"
 #include "bf2mods/engine/fw/Debug.hpp"
 #include "bf2mods/engine/fw/Framework.hpp"
 #include "bf2mods/engine/game/MapJump.hpp"
-#include "bf2mods/engine/gf/Events.hpp"
+#include "bf2mods/engine/gf/BdatData.hpp"
 #include "bf2mods/engine/gf/PlayFactory.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 #include "bf2mods/engine/tl/title.hpp"
@@ -47,20 +48,25 @@ namespace {
 			uint newEventId = eventId;
 
 			// get the clear count from the save because that's what everything else seems to do
-			int clearCount = *reinterpret_cast<int*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
-			//bf2mods::g_Logger->LogDebug("chapter {}, clear count {}, needs cleared game? {}", this_pointer->getChapterIdFromSaveData(), clearCount, bf2mods::GetState().config.titleEventsNeedsClearedGame);
+			uint clearCount = *reinterpret_cast<uint*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
+			uint chapter = this_pointer->getChapterIdFromSaveData();
+			chapter |= clearCount << 16; // "encodes" as 0x00010006 for 1 clear on ch6
 
-			// we need to have started the game (to avoid a lock) and optionally cleared the game once before
-			// TODO: replace the global cleared game check with a per-event check
-			// it would loop each thing in the array and exclude the events that one hasn't seen yet to avoid spoilers
-			bool startedGame = this_pointer->getChapterIdFromSaveData() > 0;
-			bool clearedGame = (clearCount > 0 || !bf2mods::GetState().config.titleEventsNeedsClearedGame);
-
-			if(startedGame && clearedGame) {
+			// we need to have started the game (to avoid a lock)
+			if(chapter > 0) {
 				auto& events = bf2mods::GetState().config.titleEvents;
 
-				if(!events.empty())
-					newEventId = events[(util::nnRand<int16_t>() % events.size())];
+				if(!events.empty()) {
+					const auto eventsDefault = std::vector<uint16_t>(CONFIG_TITLEEVENTS_DEFAULT);
+					if (events == eventsDefault && chapter <= 10) {
+						// we're still the default, so let's be fancy and progressively reveal chapters
+						// once the user clears the game at least once this path will never be run,
+						// so the extra stuff in the default (post-credits titlescreens) won't be shown
+						newEventId = events[(util::nnRand<uint16_t>() % (chapter + 1))];
+					}
+					else
+						newEventId = events[(util::nnRand<uint16_t>() % (events.size() + 1))];
+				}
 			}
 
 			if(newEventId != eventId)
