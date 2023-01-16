@@ -37,7 +37,9 @@ void Logger::StartThread() {
     nn::os::StartThread(thread);
 }
 
-void Logger::SendRaw(const char* data) { SendRaw((void*)data, strlen(data)); }
+void Logger::SendRaw(const char* data) {
+	SendRaw((void*)data, strlen(data));
+}
 
 void Logger::SendRawFormat(const char* format, ...) {
     va_list args;
@@ -52,13 +54,15 @@ void Logger::SendRawFormat(const char* format, ...) {
 }
 
 void AddToQueue(char* data) {
-    if (!g_msgQueue) g_msgQueue = new std::queue<char*>();
+    if (!g_msgQueue)
+		g_msgQueue = new std::queue<char*>();
 
     g_msgQueue->push(data);
 }
 
 void Logger::Flush() {
-    if (!g_msgQueue) return;
+    if (!g_msgQueue)
+		return;
 
     while (!g_msgQueue->empty()) {
         auto data = g_msgQueue->front();
@@ -81,7 +85,9 @@ void Logger::Log(const char* data, size_t size) {
     return;
 }
 
-void Logger::Log(std::string str) { Log(str.data(), str.size()); }
+void Logger::Log(std::string str) {
+	Log(str.data(), str.size());
+}
 
 void Logger::LogFormat(const char* format, ...) {
     va_list args;
