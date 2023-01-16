@@ -12,4 +12,8 @@ namespace gf {
 		static bool isWatchedEventFlag(unsigned int eventId);
 	};
 
+	namespace GfDataBdat {
+		static unsigned char* getFP(unsigned int idx);
+	};
+
 }
