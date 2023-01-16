@@ -6,6 +6,7 @@
 #include <bf2mods/Logger.hpp>
 #include <skylaunch/inlinehook/And64InlineHook.hpp>
 #include <string_view>
+#include <skylaunch/hookng/FunctionPointers.hpp>
 
 namespace skylaunch::hook {
 
@@ -30,8 +31,7 @@ namespace skylaunch::hook {
 			}
 		}
 
-		template<class R, class... Args>
-		using FuncPtr = R (*)(Args...);
+
 	} // namespace detail
 
 	/**
@@ -44,8 +44,13 @@ namespace skylaunch::hook {
 		using ReplaceHookType = decltype(&DelayedImpl::Hook);
 
 		template<class R, class... Args>
-		static inline void HookAt(detail::FuncPtr<R, Args...> address) {
+		static inline void HookAt(FuncPtr<R, Args...> address) {
 			(void)detail::HookFunction(reinterpret_cast<ReplaceHookType<>>(address), &Impl::Hook);
+		}
+
+		template<class T, class R, class... Args>
+		static inline void HookAt(MemberFuncPtr<T, R, Args...> address) {
+			detail::HookFunction(reinterpret_cast<ReplaceHookType<>>(FlattenMemberPtr(address)), &Impl::Hook);
 		}
 
 		static inline void HookAt(uintptr_t address) {
@@ -72,8 +77,14 @@ namespace skylaunch::hook {
 		}
 
 		template<class R, class... Args>
-		static inline void HookAt(detail::FuncPtr<R, Args...> address) {
+		static inline void HookAt(FuncPtr<R, Args...> address) {
 			Backup() = detail::HookFunction(reinterpret_cast<TrampolineHookType<>>(address), &Impl::Hook);
+		}
+
+		template<class T, class R, class... Args>
+		static inline void HookAt(MemberFuncPtr<T, R, Args...> address) {
+			bf2mods::g_Logger->LogDebug("test: ptr is is {}", reinterpret_cast<void*>(FlattenMemberPtr(address)));
+			Backup() = detail::HookFunction(reinterpret_cast<TrampolineHookType<>>(FlattenMemberPtr(address)), &Impl::Hook);
 		}
 
 		static inline void HookAt(uintptr_t address) {
