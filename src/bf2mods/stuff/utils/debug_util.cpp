@@ -66,11 +66,11 @@ namespace dbgutil {
 			auto symbolStrBuffer = getSymbol(address);
 
 			if((size_t)address > (size_t)&__module_start) {
-				LOG("skylaunch+{:lx} {}", (size_t)address - (size_t)&__module_start, symbolStrBuffer.data());
+				LOG("skylaunch+{:#x} {}", (size_t)address - (size_t)&__module_start, symbolStrBuffer.data());
 			} else if((size_t)address > skylaunch::utils::g_MainTextAddr) {
-				LOG("{:lx} {}", (size_t)address - skylaunch::utils::g_MainTextAddr + TEXT_OFFSET, symbolStrBuffer.data());
+				LOG("{:#x} {}", (size_t)address - skylaunch::utils::g_MainTextAddr + TEXT_OFFSET, symbolStrBuffer.data());
 			} else {
-				LOG("main-{:lx} {}", skylaunch::utils::g_MainTextAddr - (size_t)address, symbolStrBuffer.data());
+				LOG("main-{:#x} {}", skylaunch::utils::g_MainTextAddr - (size_t)address, symbolStrBuffer.data());
 			}
 		}
 	}

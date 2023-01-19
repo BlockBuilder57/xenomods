@@ -19,7 +19,7 @@ namespace bf2mods {
 
 		if(!res) {
 			auto error = std::move(res).error();
-			g_Logger->LogError("Couldn't load config! ({}) Falling back to defaults.", error.description());
+			g_Logger->LogWarning("Couldn't load config! ({}) Falling back to defaults.", error.description());
 			return Reset();
 		}
 
