@@ -1,13 +1,15 @@
 #include "DebugStuff.hpp"
 
 #include <map>
+
+#include <bf2mods/DebugWrappers.hpp>
+#include <bf2mods/HidInput.hpp>
+#include <bf2mods/Logger.hpp>
+#include <bf2mods/Utils.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
 #include "../main.hpp"
-#include "bf2mods/DebugWrappers.hpp"
-#include "bf2mods/Logger.hpp"
-#include "bf2mods/Utils.hpp"
 #include "bf2mods/engine/bdat/Bdat.hpp"
 #include "bf2mods/engine/fw/Debug.hpp"
 #include "bf2mods/engine/fw/Framework.hpp"
@@ -193,14 +195,14 @@ namespace bf2mods {
 
 		bgmTrackIndex = 0;
 
-		if(btnDown(Keybind::TEST_BUTTON, p2Cur.Buttons, p2Prev.Buttons)) {
+		if(GetPlayer(2)->InputDownStrict(Keybind::TEST_BUTTON)) {
 			// temp space for tests
 
 			/*if(state.tempInt < 0)
 				fw::Framework::setUpdateSpeed(1.f / abs(state.tempInt));
 			else if(state.tempInt > 0)
 				fw::Framework::setUpdateSpeed(state.tempInt);*/
-		} else if(btnDown(Keybind::DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::DEBUG_RENDER_TOGGLE)) {
 			enableDebugRendering = !enableDebugRendering;
 #if !BF2MODS_CODENAME(bfsw)
 			fw::PadManager::enableDebugDraw(enableDebugRendering);
@@ -208,21 +210,21 @@ namespace bf2mods {
 			g_Logger->LogInfo("Debug rendering: {}", enableDebugRendering);
 		}
 
-		else if(btnDown(Keybind::TEMPINT_INC, p2Cur.Buttons, p2Prev.Buttons)) {
+		else if(GetPlayer(2)->InputDownStrict(Keybind::TEMPINT_INC)) {
 			state.tempInt++;
 			g_Logger->LogInfo("TempInt++, now {}", state.tempInt);
-		} else if(btnDown(Keybind::TEMPINT_DEC, p2Cur.Buttons, p2Prev.Buttons)) {
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::TEMPINT_DEC)) {
 			state.tempInt--;
 			g_Logger->LogInfo("TempInt--, now {}", state.tempInt);
-		} else if(btnDown(Keybind::MAPJUMP_JUMP, p2Cur.Buttons, p2Prev.Buttons)) {
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::MAPJUMP_JUMP)) {
 			g_Logger->LogInfo("Attempting jump to MapJump {}", state.tempInt);
 			DoMapJump(state.tempInt);
-		} else if(btnDown(Keybind::PLAYSE, p2Cur.Buttons, p2Prev.Buttons)) {
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::PLAYSE)) {
 			g_Logger->LogInfo("Sound effect {} (0x{:x})", state.tempInt, state.tempInt);
 			PlaySE(state.tempInt);
 		}
 
-		else if(btnDown(Keybind::RETURN_TO_TITLE, p2Cur.Buttons, p2Prev.Buttons)) {
+		else if(GetPlayer(2)->InputDownStrict(Keybind::RETURN_TO_TITLE)) {
 			PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 			ReturnTitle(-1);
 		}

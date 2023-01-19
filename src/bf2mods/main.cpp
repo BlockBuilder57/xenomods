@@ -6,16 +6,11 @@
 
 #include "State.hpp"
 #include "bf2mods/DebugWrappers.hpp"
+#include "bf2mods/HidInput.hpp"
 #include "bf2mods/Logger.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
-#include "version.h"
-
-// all parts here
-#include "modules/BdatRandomizer.hpp"
-#include "modules/CameraTools.hpp"
 #include "modules/DebugStuff.hpp"
-#include "modules/MenuViewer.hpp"
-#include "modules/PlayerMovement.hpp"
+#include "version.h"
 
 namespace fw {
 
@@ -52,43 +47,21 @@ namespace bf2mods {
 		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught @ %s:%d : %s", file, line, message);
 	}
 
-	HidInput p1Cur {};
-	HidInput p1Prev {};
-	HidInput p2Cur {};
-	HidInput p2Prev {};
-
 	void update() {
 		// lazy
 		using enum bf2mods::Keybind;
 
-		// Read controllers
-		p1Cur.Buttons = 0ul;
-		p2Cur.Buttons = 0ul;
+		HidInput* P1 = GetPlayer(1);
+		HidInput* P2 = GetPlayer(2);
+		P1->Poll();
+		P2->Poll();
 
-		nn::hid::NpadHandheldState npadHandheldState {};
-		nn::hid::NpadFullKeyState npadP1FullKeyState {};
-		nn::hid::NpadFullKeyState npadP2FullKeyState {};
-
-		nn::hid::GetNpadState(&npadHandheldState, nn::hid::CONTROLLER_HANDHELD);
-		nn::hid::GetNpadState(&npadP1FullKeyState, nn::hid::CONTROLLER_PLAYER_1);
-		nn::hid::GetNpadState(&npadP2FullKeyState, nn::hid::CONTROLLER_PLAYER_2);
-
-		auto updateHidInput = [&](nn::hid::NpadHandheldState& state, bf2mods::HidInput& cur) {
-			if(state.Flags & nn::hid::NpadFlags::NPAD_CONNECTED) {
-				cur.Buttons |= state.Buttons;
-				cur.LAxis = glm::vec2(static_cast<float>(state.LStickX) / 32768.f, static_cast<float>(state.LStickY) / 32768.f);
-				cur.RAxis = glm::vec2(static_cast<float>(state.RStickX) / 32768.f, static_cast<float>(state.RStickY) / 32768.f);
-			}
-		};
-
-		updateHidInput(npadHandheldState, p1Cur);
-		updateHidInput(npadP1FullKeyState, p1Cur);
-		updateHidInput(npadP2FullKeyState, p2Cur);
-
-		//int buttonsP1Width = fw::debug::drawFontGetWidth("%xh - P1", p1Cur.Buttons);
-		//int buttonsP2Width = fw::debug::drawFontGetWidth("%xh - P2", p2Cur.Buttons);
-		//fw::debug::drawFont(1280-buttonsP1Width-5, 5, mm::Col4::White, "%xh - P1", p1Cur.Buttons);
-		//fw::debug::drawFont(1280-buttonsP2Width-5, 5+16, mm::Col4::White, "%xh - P2", p2Cur.Buttons);
+		/*std::string p1Buttons = fmt::format("{:#08x} - P1 - {:#08x}", P1->stateCur.Buttons, P1->statePrev.Buttons);
+		std::string p2Buttons = fmt::format("{:#08x} - P2 - {:#08x}", P2->stateCur.Buttons, P2->statePrev.Buttons);
+		int buttonsP1Width = fw::debug::drawFontGetWidth(p1Buttons.c_str());
+		int buttonsP2Width = fw::debug::drawFontGetWidth(p2Buttons.c_str());
+		fw::debug::drawFontShadow(1280-buttonsP1Width-5, 5, mm::Col4::White, p1Buttons.c_str());
+		fw::debug::drawFontShadow(1280-buttonsP2Width-5, 5+16, mm::Col4::White, p2Buttons.c_str());*/
 
 		/*
 		 * Enforce some things on first update
@@ -106,15 +79,13 @@ namespace bf2mods {
 		 * Check buttons
 		 */
 
-		auto& state = GetState();
-
-		if(btnDown(CLEAR_TCPLOG, p2Cur.Buttons, p2Prev.Buttons)) {
+		if(P2->InputDownStrict(CLEAR_TCPLOG)) {
 			// https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#text-modification
 			skylaunch::logger::s_Instance->LogFormat("\u001B[2J");
 
 			g_Logger->LogInfo("Cleared TCP log");
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
-		} else if(btnDown(LOGGER_TEST, p2Cur.Buttons, p2Prev.Buttons)) {
+		} else if(P2->InputDownStrict(LOGGER_TEST)) {
 			g_Logger->LogDebug("test debug message! {}", nn::os::GetSystemTick());
 			g_Logger->LogInfo("test info message! {}", nn::os::GetSystemTick());
 			g_Logger->LogWarning("test warning message! {}", nn::os::GetSystemTick());
@@ -124,9 +95,6 @@ namespace bf2mods {
 
 		// Update modules
 		bf2mods::UpdateAllRegisteredModules();
-
-		p1Prev = p1Cur;
-		p2Prev = p2Cur;
 
 		// draw log messages
 		g_Logger->Draw();

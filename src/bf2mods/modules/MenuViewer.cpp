@@ -1,9 +1,11 @@
 #include "MenuViewer.hpp"
 
-#include "../State.hpp"
-#include "../main.hpp"
+#include <bf2mods/HidInput.hpp>
 #include <bf2mods/Logger.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
+
+#include "../State.hpp"
+#include "../main.hpp"
 
 namespace {
 
@@ -29,7 +31,7 @@ namespace bf2mods {
 	void MenuViewer::Update() {
 		auto& state = GetState();
 
-		if(btnDown(Keybind::UI_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+		if(GetPlayer(2)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {
 			enableUIRendering = !enableUIRendering;
 			g_Logger->LogInfo("UI rendering: {}", enableUIRendering);
 		}

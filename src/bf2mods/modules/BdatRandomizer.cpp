@@ -1,8 +1,12 @@
 #include "BdatRandomizer.hpp"
 
+#include <bf2mods/DebugWrappers.hpp>
+#include <bf2mods/HidInput.hpp>
+#include <bf2mods/Logger.hpp>
+#include <bf2mods/Utils.hpp>
+
 #include "../State.hpp"
 #include "../main.hpp"
-#include "bf2mods/Logger.hpp"
 #include "bf2mods/engine/bdat/Bdat.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "nn/oe.h"
@@ -66,7 +70,7 @@ namespace bf2mods {
 	}
 
 	void BdatRandomizer::Update() {
-		if(btnDown(Keybind::BDAT_SCRAMBLETYPE_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+		if(GetPlayer(2)->InputDownStrict(Keybind::BDAT_SCRAMBLETYPE_TOGGLE)) {
 			underlying_value(scrambleType) += 1;
 
 			if(scrambleType >= BdatScrambleType::Count)

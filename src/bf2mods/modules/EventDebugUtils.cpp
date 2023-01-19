@@ -4,12 +4,14 @@
 
 #include "EventDebugUtils.hpp"
 
+#include <bf2mods/DebugWrappers.hpp>
+#include <bf2mods/HidInput.hpp>
+#include <bf2mods/Logger.hpp>
+#include <bf2mods/Utils.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
 #include "../main.hpp"
 #include "DebugStuff.hpp"
-#include "bf2mods/DebugWrappers.hpp"
-#include "bf2mods/Logger.hpp"
 #include "bf2mods/engine/event/Manager.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 
@@ -88,10 +90,10 @@ namespace bf2mods {
 
 		//fw::debug::drawFontFmtShadow(0, 720-16, mm::Col4::White, "Manager bits: {:0b}", ActiveBits);
 
-		if(btnDown(Keybind::EVENT_DEBUG_PREV, p1Cur.Buttons, p1Prev.Buttons)) {
+		if(GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_PREV)) {
 			CurrentIndex--;
 			changed = true;
-		} else if(btnDown(Keybind::EVENT_DEBUG_NEXT, p1Cur.Buttons, p1Prev.Buttons)) {
+		} else if(GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_NEXT)) {
 			CurrentIndex++;
 			changed = true;
 		}
@@ -105,7 +107,7 @@ namespace bf2mods {
 			g_Logger->LogInfo("Selected {} (currently {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");
 		}
 
-		if(btnDown(Keybind::EVENT_DEBUG_TOGGLE, p1Cur.Buttons, p1Prev.Buttons)) {
+		if(GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_TOGGLE)) {
 			if(CurrentIndex >= 0 && CurrentIndex < RegistrationIndex) {
 				ActiveBits ^= 1 << CurrentIndex;
 				g_Logger->LogInfo("Toggled debug for {} (now {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");

@@ -4,11 +4,13 @@
 
 #include "CameraTools.hpp"
 
+#include <bf2mods/DebugWrappers.hpp>
+#include <bf2mods/HidInput.hpp>
+#include <bf2mods/Logger.hpp>
+
 #include "../State.hpp"
 #include "../main.hpp"
 #include "DebugStuff.hpp"
-#include "bf2mods/DebugWrappers.hpp"
-#include "bf2mods/Logger.hpp"
 #include "bf2mods/engine/apps/FrameworkLauncher.hpp"
 #include "bf2mods/engine/ml/Scene.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
@@ -117,8 +119,8 @@ namespace bf2mods {
 		// decompose existing matrix
 		glm::decompose(static_cast<const glm::mat4&>(Freecam.matrix), scale, rot, pos, skew, perspective);
 
-		glm::vec2 lStick = p2Cur.LAxis;
-		glm::vec2 rStick = p2Cur.RAxis;
+		glm::vec2 lStick = GetPlayer(2)->stateCur.LAxis;
+		glm::vec2 rStick = GetPlayer(2)->stateCur.RAxis;
 
 		// deadzone
 		if(glm::length(lStick) < 0.15f)
@@ -128,7 +130,7 @@ namespace bf2mods {
 
 		// movement
 		glm::vec3 move {};
-		if(btnHeld(FREECAM_FOVHOLD, p2Cur.Buttons)) {
+		if(GetPlayer(2)->InputHeld(FREECAM_FOVHOLD)) {
 			// holding down the button, so modify fov
 			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
 			Freecam.fov = std::clamp(Freecam.fov + -lStick.y * 0.25f, -179.f, 179.f);
@@ -148,7 +150,7 @@ namespace bf2mods {
 		if(std::abs(Freecam.fov) < 45.f)
 			lookMult *= Freecam.fov / 45.f;
 
-		if(btnHeld(FREECAM_ROLLHOLD, p2Cur.Buttons))
+		if(GetPlayer(2)->InputHeld(FREECAM_ROLLHOLD))
 			look = { 0, 0, -rStick.x * 0.5f }; // only roll
 		else
 			look = { rStick.y * lookMult, -rStick.x * lookMult, 0 }; // pitch and yaw
@@ -202,12 +204,12 @@ namespace bf2mods {
 	}
 
 	void CameraTools::Update() {
-		if(btnDown(Keybind::FREECAM_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
+		if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TOGGLE)) {
 			Freecam.isOn = !Freecam.isOn;
 			g_Logger->LogInfo("Toggling freecam: {}", Freecam.isOn);
-		} else if(btnDown(Keybind::FREECAM_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons))
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_UP))
 			Freecam.camSpeed *= 2.f;
-		else if(btnDown(Keybind::FREECAM_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons))
+		else if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_DOWN))
 			Freecam.camSpeed /= 2.f;
 
 		if(Freecam.isOn)

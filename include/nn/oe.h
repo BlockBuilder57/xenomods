@@ -17,9 +17,14 @@ namespace nn {
 			char name[16];
 		};
 
+		enum class OperationMode : s32 {
+			Handheld = 0,
+			Docked
+		};
+
 		void Initialize();
 		void SetPerformanceConfiguration(nn::oe::PerformanceMode, s32);
-		s32 GetOperationMode();
+		OperationMode GetOperationMode();
 		s32 GetPerformanceMode();
 		void SetResumeNotificationEnabled(bool);
 		void SetOperationModeChangedNotificationEnabled(bool);

@@ -80,7 +80,7 @@ namespace nn {
 			CONTROLLER_HANDHELD = 0x20,
 		} NpadId;
 
-		struct NpadHandheldState {
+		struct NpadState {
 			s64 updateCount;
 			u64 Buttons;
 			s32 LStickX;
@@ -89,9 +89,10 @@ namespace nn {
 			s32 RStickY;
 			u32 Flags;
 		};
-		// Seems to be the same?
-		struct NpadFullKeyState : NpadHandheldState {};
-		struct NpadJoyDualState : NpadHandheldState {};
+
+		struct NpadFullKeyState : NpadState {};
+		struct NpadHandheldState : NpadState {};
+		struct NpadJoyDualState : NpadState {};
 
 		struct NpadStyleTag;
 		struct NpadStyleSet {

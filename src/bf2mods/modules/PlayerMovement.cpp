@@ -1,17 +1,16 @@
 #include "PlayerMovement.hpp"
 
+#include <bf2mods/HidInput.hpp>
+#include <bf2mods/Logger.hpp>
+#include <bf2mods/Utils.hpp>
+#include <skylaunch/hookng/Hooks.hpp>
+
 #include "../State.hpp"
 #include "../main.hpp"
 #include "DebugStuff.hpp"
-#include "bf2mods/DebugWrappers.hpp"
-#include "bf2mods/Logger.hpp"
-#include "bf2mods/Utils.hpp"
 #include "bf2mods/engine/gf/player_controller.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
-#include "skylaunch/logger/Logger.hpp"
-#include <skylaunch/hookng/Hooks.hpp>
-
 
 namespace {
 
@@ -87,15 +86,15 @@ namespace bf2mods {
 	}
 
 	void PlayerMovement::Update() {
-		moonJump = btnHeld(Keybind::MOONJUMP, p1Cur.Buttons);
+		moonJump = GetPlayer(1)->InputHeld(Keybind::MOONJUMP);
 
-		if(btnDown(Keybind::MOVEMENT_SPEED_UP, p2Cur.Buttons, p2Prev.Buttons)) {
+		if(GetPlayer(2)->InputDownStrict(Keybind::MOVEMENT_SPEED_UP)) {
 			movementSpeedMult *= 2.0f;
 			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", movementSpeedMult);
-		} else if(btnDown(Keybind::MOVEMENT_SPEED_DOWN, p2Cur.Buttons, p2Prev.Buttons)) {
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::MOVEMENT_SPEED_DOWN)) {
 			movementSpeedMult /= 2.0f;
 			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", movementSpeedMult);
-		} else if(btnDown(Keybind::DISABLE_FALL_DAMAGE, p2Cur.Buttons, p2Prev.Buttons)) {
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::DISABLE_FALL_DAMAGE)) {
 			disableFallDamage = !disableFallDamage;
 			g_Logger->LogInfo("Disable fall damage: {}", disableFallDamage);
 		}

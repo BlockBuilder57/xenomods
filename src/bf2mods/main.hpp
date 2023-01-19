@@ -43,30 +43,9 @@ namespace bf2mods {
 		LOGGER_TEST = nn::hid::KEY_PLUS | nn::hid::KEY_R,
 	};
 
-	struct HidInput {
-		std::uint64_t Buttons {};
-		glm::vec2 LAxis;
-		glm::vec2 RAxis;
-	};
-
-	extern HidInput p1Cur;
-	extern HidInput p1Prev;
-	extern HidInput p2Cur;
-	extern HidInput p2Prev;
-
 	// TODO: make these members of hidinput, and probably store current/previous there (removing the need for "prev" instances).
 
-	inline static bool btnHeld(Keybind combo, std::uint64_t buttons) {
-		return (buttons & underlying_value(combo)) == underlying_value(combo);
-	}
 
-	inline static bool btnUp(Keybind combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
-		return (curButtons & underlying_value(combo)) == underlying_value(combo) && (prevButtons & underlying_value(combo)) != underlying_value(combo);
-	}
-
-	inline static bool btnDown(Keybind combo, std::uint64_t curButtons, std::uint64_t prevButtons) {
-		return (curButtons & underlying_value(combo)) != underlying_value(combo) && (prevButtons & underlying_value(combo)) == underlying_value(combo);
-	}
 
 	/**
  	 * Called on each Framework update.
