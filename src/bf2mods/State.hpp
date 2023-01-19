@@ -2,6 +2,8 @@
 
 #include <toml++/toml.h>
 
+#include <bf2mods/Utils.hpp>
+
 #include <cstdint>
 #include <vector>
 
@@ -11,7 +13,11 @@ namespace bf2mods {
 
 		// very yucky, but this way it's in one spot
 #define CONFIG_PORT_DEFAULT 6969
+#if BF2MODS_CODENAME(bf2)
 #define CONFIG_TITLEEVENTS_DEFAULT { 10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609 }
+#else
+#define CONFIG_TITLEEVENTS_DEFAULT {}
+#endif
 #define CONFIG_DUMP_FILEREADS false
 #define CONFIG_USE_FILEDUMPS false
 
