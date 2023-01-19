@@ -5,13 +5,16 @@
 
 #include "../State.hpp"
 #include "../main.hpp"
+#include "bf2mods/DebugWrappers.hpp"
 #include "bf2mods/Logger.hpp"
 #include "bf2mods/Utils.hpp"
 #include "bf2mods/engine/bdat/Bdat.hpp"
 #include "bf2mods/engine/fw/Debug.hpp"
 #include "bf2mods/engine/fw/Framework.hpp"
+#include "bf2mods/engine/fw/UpdateInfo.hpp"
 #include "bf2mods/engine/game/MapJump.hpp"
 #include "bf2mods/engine/gf/BdatData.hpp"
+#include "bf2mods/engine/gf/Bgm.hpp"
 #include "bf2mods/engine/gf/PlayFactory.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 #include "bf2mods/engine/tl/title.hpp"
@@ -80,6 +83,45 @@ namespace {
 		}
 	};
 
+	void (*__cxa_pure_virtual)();
+
+	struct BGMDebugging : skylaunch::hook::Trampoline<BGMDebugging> {
+		static void Hook(gf::BgmTrack* this_pointer, fw::UpdateInfo* updateInfo) {
+			Orig(this_pointer, updateInfo);
+
+			if(!bf2mods::DebugStuff::enableDebugRendering)
+				return;
+
+			auto* vtable = reinterpret_cast<gf::BgmTrack::VfTable*>(*(size_t**)this_pointer);
+
+			const int height = fw::debug::drawFontGetHeight();
+			std::string trackName = "BgmTrack?";
+
+			if(reinterpret_cast<void*>(&vtable->GetTrackName) != reinterpret_cast<void*>(&__cxa_pure_virtual)) {
+				// not a pure virtual, so we can call this safely
+				trackName = vtable->GetTrackName(this_pointer);
+			}
+
+			if (trackName == "EventBGM")
+				return; // already shown by event::BgmManager
+
+			if(this_pointer->isPlaying()) {
+				mm::mtl::FixStr<64> bgmFileName {};
+
+				if(!this_pointer->makePlayFileName(bgmFileName)) {
+					// failed to make a filename, just fall back to playingBgmFileName
+					bgmFileName.set(this_pointer->playingBgmFileName);
+				}
+
+				fw::debug::drawFontFmtShadow(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White,
+											 "{}: {} {:.1f}/{:.1f}{}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop() ? " (∞)" : "");
+			} else {
+				// uncomment if you want every BgmTrack instance to show
+				//fw::debug::drawFontFmtShadow(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::White, "{}: not playing", trackName);
+			}
+		}
+	};
+
 }
 
 namespace bf2mods {
@@ -138,7 +180,8 @@ namespace bf2mods {
 		MMAssert::HookAt("_ZN2mm9MMStdBase8mmAssertEPKcS2_j");
 
 #if !BF2MODS_CODENAME(bfsw)
-		// TODO: get the bgm debugging stuff that's already present to work
+		__cxa_pure_virtual = skylaunch::hook::detail::ResolveSymbol<decltype(__cxa_pure_virtual)>("__cxa_pure_virtual");
+		BGMDebugging::HookAt("_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE");
 
 		EventStartInfo::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef");
 		ReplaceTitleEvent::HookAt("_ZN2tl9TitleMain14playTitleEventEj");
