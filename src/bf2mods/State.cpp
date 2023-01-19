@@ -9,7 +9,6 @@ namespace bf2mods {
 	void Config::Reset() {
 		port = CONFIG_PORT_DEFAULT;
 
-		// all chapters, game clear, and NG+ clear
 		titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 
 		eventDebugBits = CONFIG_EVENT_DEBUG_BITS_DEFAULT;
@@ -30,31 +29,49 @@ namespace bf2mods {
 		// load things
 		tomlTable = std::move(res).table();
 
-		port = tomlTable["port"].value_or(CONFIG_PORT_DEFAULT);
+		InitializeFromTable(tomlTable, true);
 
-		if(toml::array* events = tomlTable["titleEvents"].as_array()) {
+		g_Logger->LogInfo("Loaded config successfully!");
+	}
+
+	void Config::InitializeFromTable(const toml::table& table, bool respectDefaults) {
+		if (respectDefaults || table["port"].type() != toml::node_type::none)
+			port = table["port"].value_or(CONFIG_PORT_DEFAULT);
+
+		if(table["titleEvents"].is_array()) {
+			const toml::array* events = table["titleEvents"].as_array();
 			bool event_load_failed = false;
 			titleEvents.clear();
 
-			events->for_each([&](auto& el) {
-				if constexpr(toml::is_integer<decltype(el)>)
-					titleEvents.push_back(static_cast<std::uint16_t>(el.get()));
-				else {
-					event_load_failed = true;
-					return false;
-				}
-			});
+			if (events != nullptr) {
+				events->for_each([&](auto& el) {
+					if constexpr(toml::is_integer<decltype(el)>)
+						titleEvents.push_back(static_cast<std::uint16_t>(el.get()));
+					else {
+						event_load_failed = true;
+						return false;
+					}
+				});
+			}
+			else
+				event_load_failed = true;
 
-			if(event_load_failed)
+			if(event_load_failed && respectDefaults)
 				titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 		}
 
-		eventDebugBits = tomlTable["eventDebugBits"].value_or(CONFIG_EVENT_DEBUG_BITS_DEFAULT);
+		if (respectDefaults || table["eventDebugBits"].type() != toml::node_type::none)
+			eventDebugBits = table["eventDebugBits"].value_or(CONFIG_EVENT_DEBUG_BITS_DEFAULT);
 
-		dumpFileReads = tomlTable["dumpFileReads"].value_or(CONFIG_DUMP_FILEREADS_DEFAULT);
-		useFileDumps = tomlTable["useFileDumps"].value_or(CONFIG_DUMP_FILEREADS_DEFAULT);
+		if (respectDefaults || table["dumpFileReads"].type() != toml::node_type::none)
+			dumpFileReads = table["dumpFileReads"].value_or(CONFIG_DUMP_FILEREADS_DEFAULT);
+		if (respectDefaults || table["useFileDumps"].type() != toml::node_type::none)
+			useFileDumps = table["useFileDumps"].value_or(CONFIG_USE_FILEDUMPS_DEFAULT);
 
-		g_Logger->LogInfo("Loaded config successfully!");
+		if (respectDefaults && table[BF2MODS_CODENAME_STR].is_table()) {
+			//g_Logger->LogDebug("Found {} as a category, loading...", BF2MODS_CODENAME_STR);
+			InitializeFromTable(*table[BF2MODS_CODENAME_STR].as_table(), false);
+		}
 	}
 
 	Bf2ModsState& GetState() {
