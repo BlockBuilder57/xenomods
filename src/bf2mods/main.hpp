@@ -30,6 +30,10 @@ namespace bf2mods {
 		UI_RENDER_TOGGLE = nn::hid::KEY_Y,
 		DEBUG_RENDER_TOGGLE = nn::hid::KEY_B,
 
+		EVENT_DEBUG_PREV = nn::hid::KEY_R | nn::hid::KEY_DLEFT,
+		EVENT_DEBUG_NEXT = nn::hid::KEY_R | nn::hid::KEY_DRIGHT,
+		EVENT_DEBUG_TOGGLE = nn::hid::KEY_R | nn::hid::KEY_DUP,
+
 		FREECAM_TOGGLE = nn::hid::KEY_LSTICK | nn::hid::KEY_RSTICK,
 		FREECAM_FOVHOLD = nn::hid::KEY_LSTICK,
 		FREECAM_ROLLHOLD = nn::hid::KEY_RSTICK,

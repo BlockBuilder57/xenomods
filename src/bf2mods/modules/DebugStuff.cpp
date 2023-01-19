@@ -148,10 +148,10 @@ namespace bf2mods {
 		if(btnDown(Keybind::TEST_BUTTON, p2Cur.Buttons, p2Prev.Buttons)) {
 			// temp space for tests
 
-			if(state.tempInt < 0)
+			/*if(state.tempInt < 0)
 				fw::Framework::setUpdateSpeed(1.f / abs(state.tempInt));
 			else if(state.tempInt > 0)
-				fw::Framework::setUpdateSpeed(state.tempInt);
+				fw::Framework::setUpdateSpeed(state.tempInt);*/
 		} else if(btnDown(Keybind::DEBUG_RENDER_TOGGLE, p2Cur.Buttons, p2Prev.Buttons)) {
 			enableDebugRendering = !enableDebugRendering;
 #if !BF2MODS_CODENAME(bfsw)
