@@ -28,15 +28,12 @@ namespace {
 			return Orig(this_pointer);
 		}
 
-		static void HookIt(bool enable = false) {
+		static void HookIt() {
 			HookAt(&event::Manager::update);
 			registeredIndex = bf2mods::EventDebugUtils::RegistrationIndex++;
 			auto name = dbgutil::getSymbol(std::bit_cast<uintptr_t>(skylaunch::FlattenMemberPtr(&event::Manager::update)));
 			name = name.substr(0, name.find("::", name.find_first_of("::")+2));
 			bf2mods::EventDebugUtils::FuncNames.emplace_back(name);
-
-			if (enable)
-				bf2mods::EventDebugUtils::ActiveBits |= 1 << registeredIndex;
 		}
 
 		static int registeredIndex;
@@ -54,15 +51,12 @@ namespace {
 			}
 		}
 
-		static void HookIt(bool enable = false) {
+		static void HookIt() {
 			HookType::HookAt(&TManager::OnEventProc);
 			registeredIndex = bf2mods::EventDebugUtils::RegistrationIndex++;
 			auto name = dbgutil::getSymbol(std::bit_cast<uintptr_t>(skylaunch::FlattenMemberPtr(&TManager::OnEventProc)));
 			name = name.substr(0, name.find("::", name.find_first_of("::")+2)); // lobs off anything past event::ManagerName
 			bf2mods::EventDebugUtils::FuncNames.emplace_back(name);
-
-			if (enable)
-				bf2mods::EventDebugUtils::ActiveBits |= 1 << registeredIndex;
 		}
 
 		static int registeredIndex;
@@ -113,7 +107,7 @@ namespace bf2mods {
 		}
 
 		if (btnDown(Keybind::EVENT_DEBUG_TOGGLE, p1Cur.Buttons, p1Prev.Buttons)) {
-			if (CurrentIndex > 0 && CurrentIndex < RegistrationIndex) {
+			if (CurrentIndex >= 0 && CurrentIndex < RegistrationIndex) {
 				ActiveBits ^= 1 << CurrentIndex;
 				g_Logger->LogInfo("Toggled debug for {} (now {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");
 			}
@@ -125,33 +119,35 @@ namespace bf2mods {
 	void EventDebugUtils::Initialize() {
 		g_Logger->LogDebug("Setting up event debug utils...");
 
-		DrawEventManagerInfo::HookIt(true);
+		ActiveBits = bf2mods::GetState().config.eventDebugBits;
+
+		DrawEventManagerInfo::HookIt();
 
 		ManagerDisplay<event::AgelogManager>::HookIt();
 		ManagerDisplay<event::AlphaManager>::HookIt();
-		ManagerDisplay<event::BgmManager>::HookIt(true);
+		ManagerDisplay<event::BgmManager>::HookIt();
 		ManagerDisplay<event::BouManager>::HookIt();
-		ManagerDisplay<event::CamManager>::HookIt(true);
-		ManagerDisplay<event::CsSndManager>::HookIt(true);
-		ManagerDisplay<event::DebugManager>::HookIt(true);
+		ManagerDisplay<event::CamManager>::HookIt();
+		ManagerDisplay<event::CsSndManager>::HookIt();
+		ManagerDisplay<event::DebugManager>::HookIt();
 		ManagerDisplay<event::DofManager>::HookIt();
 		ManagerDisplay<event::EnvManager>::HookIt();
 		ManagerDisplay<event::EvtxtManager>::HookIt();
-		ManagerDisplay<event::FrameManager>::HookIt(true);
+		ManagerDisplay<event::FrameManager>::HookIt();
 		ManagerDisplay<event::GroupManager>::HookIt();
 		ManagerDisplay<event::LightManager>::HookIt();
 		ManagerDisplay<event::MemoryManager>::HookIt();
-		ManagerDisplay<event::MovieManager>::HookIt(true);
+		ManagerDisplay<event::MovieManager>::HookIt();
 		ManagerDisplay<event::ObjectManager>::HookIt();
 		ManagerDisplay<event::OutsiderManager>::HookIt();
 		ManagerDisplay<event::ResManager>::HookIt();
 		ManagerDisplay<event::SeamlessManager>::HookIt();
-		ManagerDisplay<event::SeManager>::HookIt(true);
-		ManagerDisplay<event::SeqManager>::HookIt(true);
-		ManagerDisplay<event::TextManager>::HookIt(true);
+		ManagerDisplay<event::SeManager>::HookIt();
+		ManagerDisplay<event::SeqManager>::HookIt();
+		ManagerDisplay<event::TextManager>::HookIt();
 		ManagerDisplay<event::TodoManager>::HookIt();
-		ManagerDisplay<event::VoiceManager>::HookIt(true);
-		ManagerDisplay<event::VolumeManager>::HookIt(true);
+		ManagerDisplay<event::VoiceManager>::HookIt();
+		ManagerDisplay<event::VolumeManager>::HookIt();
 	}
 
 #if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)

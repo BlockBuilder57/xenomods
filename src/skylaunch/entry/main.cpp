@@ -26,6 +26,15 @@ struct RomMountedHook : skylaunch::hook::Trampoline<RomMountedHook> {
 	static Result Hook(const char* path, void* buffer, ulong size) {
 		auto res = Orig(path, buffer, size);
 
+		// mount sd
+		Result rc = nn::fs::MountSdCardForDebug("sd");
+		skylaunch::logger::s_Instance->LogFormat("Mounted SD card (result 0x%x)", rc);
+
+		// initialize logger
+		skylaunch::logger::s_Instance = new skylaunch::logger::TcpLogger(bf2mods::GetState().config.port);
+		skylaunch::logger::s_Instance->Log("[skylaunch] Beginning initialization.\n");
+		skylaunch::logger::s_Instance->StartThread();
+
 		// bring up the rest
 		bf2mods::main();
 
@@ -66,11 +75,6 @@ void skylaunch_main() {
 
 	// Enable multiple controllers
 	DisableSingleModeHook::HookAt(nn::hid::ShowControllerSupport);
-
-	// initialize logger
-	skylaunch::logger::s_Instance = new skylaunch::logger::TcpLogger();
-	skylaunch::logger::s_Instance->Log("[skylaunch] Beginning initialization.\n");
-	skylaunch::logger::s_Instance->StartThread();
 
 	// override exception handler to dump info
 	nn::os::SetUserExceptionHandler(exception_handler, exception_handler_stack, sizeof(exception_handler_stack),
