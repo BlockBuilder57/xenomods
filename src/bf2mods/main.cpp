@@ -133,11 +133,6 @@ namespace bf2mods {
 	}
 
 	void main() {
-
-		// mount sd
-		Result rc = nn::fs::MountSdCardForDebug("sd");
-		g_Logger->LogDebug("Mounted SD card (result 0x{:x})", rc);
-
 		InitializeAllRegisteredModules();
 
 		// hook our updater

@@ -2,10 +2,10 @@
 
 #include <toml++/toml.h>
 
-#include <bf2mods/Utils.hpp>
-
 #include <cstdint>
 #include <vector>
+
+#include "bf2mods/Utils.hpp"
 
 namespace bf2mods {
 
@@ -18,8 +18,9 @@ namespace bf2mods {
 #else
 #define CONFIG_TITLEEVENTS_DEFAULT {}
 #endif
-#define CONFIG_DUMP_FILEREADS false
-#define CONFIG_USE_FILEDUMPS false
+#define CONFIG_EVENT_DEBUG_BITS_DEFAULT 0b1
+#define CONFIG_DUMP_FILEREADS_DEFAULT false
+#define CONFIG_USE_FILEDUMPS_DEFAULT false
 
 		/**
 		 * Reset to default values.
@@ -31,6 +32,8 @@ namespace bf2mods {
 		uint16_t port {};
 
 		std::vector<uint16_t> titleEvents {};
+
+		unsigned int eventDebugBits {};
 
 		bool dumpFileReads {};
 		bool useFileDumps {};

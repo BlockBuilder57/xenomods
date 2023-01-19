@@ -1,5 +1,7 @@
 #include "State.hpp"
 
+#include <bf2mods/stuff/utils/debug_util.hpp>
+
 #include "bf2mods/Logger.hpp"
 
 namespace bf2mods {
@@ -10,8 +12,10 @@ namespace bf2mods {
 		// all chapters, game clear, and NG+ clear
 		titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 
-		dumpFileReads = CONFIG_DUMP_FILEREADS;
-		useFileDumps = CONFIG_USE_FILEDUMPS;
+		eventDebugBits = CONFIG_EVENT_DEBUG_BITS_DEFAULT;
+
+		dumpFileReads = CONFIG_DUMP_FILEREADS_DEFAULT;
+		useFileDumps = CONFIG_USE_FILEDUMPS_DEFAULT;
 	}
 
 	void Config::LoadFromFile() {
@@ -45,10 +49,12 @@ namespace bf2mods {
 				titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 		}
 
-		dumpFileReads = tomlTable["dumpFileReads"].value_or(CONFIG_DUMP_FILEREADS);
-		useFileDumps = tomlTable["useFileDumps"].value_or(CONFIG_DUMP_FILEREADS);
+		eventDebugBits = tomlTable["eventDebugBits"].value_or(CONFIG_EVENT_DEBUG_BITS_DEFAULT);
 
-		g_Logger->LogInfo("Loaded config successfully");
+		dumpFileReads = tomlTable["dumpFileReads"].value_or(CONFIG_DUMP_FILEREADS_DEFAULT);
+		useFileDumps = tomlTable["useFileDumps"].value_or(CONFIG_DUMP_FILEREADS_DEFAULT);
+
+		g_Logger->LogInfo("Loaded config successfully!");
 	}
 
 	Bf2ModsState& GetState() {

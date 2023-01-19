@@ -12,7 +12,14 @@
 
 namespace skylaunch::logger {
 	class TcpLogger : public Logger {
+		u16 port;
 	   public:
+
+		explicit TcpLogger(u16 port)
+			: port(port) {
+
+		}
+
 		void Initialize() override;
 		void SendRaw(void*, size_t) override;
 		std::string FriendlyName() override {

@@ -7,10 +7,6 @@
 #include <skylaunch/hookng/Hooks.hpp>
 #include <vector>
 
-#include "skylaunch/utils/cpputils.hpp"
-
-#define PORT 6969
-
 namespace skylaunch::logger {
 
 	struct NnSocketInitalizeHook : hook::Trampoline<NnSocketInitalizeHook> {
@@ -105,7 +101,7 @@ namespace skylaunch::logger {
 
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_addr.s_addr = INADDR_ANY;
-		serverAddr.sin_port = nn::socket::InetHtons(PORT);
+		serverAddr.sin_port = nn::socket::InetHtons(port);
 
 		int rval = nn::socket::Bind(gListenerSocket, (sockaddr*)&serverAddr, sizeof(serverAddr));
 		if(rval < 0)
