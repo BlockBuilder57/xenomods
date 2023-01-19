@@ -87,7 +87,6 @@ namespace skylaunch::hook {
 			Backup() = detail::HookFunction(detail::ResolveSymbol<TrampolineHookType<>>(symbolName), &Impl::Hook);
 		}
 
-	   private:
 		static auto& Backup() {
 			constinit static TrampolineHookType<> backup {};
 			return backup;

@@ -10,7 +10,6 @@
 #include "bf2mods/DebugWrappers.hpp"
 #include "bf2mods/Logger.hpp"
 #include "bf2mods/engine/apps/FrameworkLauncher.hpp"
-#include "bf2mods/engine/event/Manager.hpp"
 #include "bf2mods/engine/ml/Scene.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
@@ -85,17 +84,6 @@ namespace {
 			Orig(this_pointer);
 		}
 	};
-
-#if !BF2MODS_CODENAME(bfsw)
-	struct DrawManagerInfo : skylaunch::hook::Trampoline<DrawManagerInfo> {
-		static void Hook(event::Manager* this_pointer) {
-			if(!this_pointer->isPlayCancel() && bf2mods::DebugStuff::enableDebugRendering)
-				this_pointer->drawInfo();
-
-			return Orig(this_pointer);
-		}
-	};
-#endif
 
 } // namespace
 
@@ -208,7 +196,6 @@ namespace bf2mods {
 		SetCameraMatrix::HookAt(&ml::ScnObjCam::setWorldMatrix);
 #else
 		SetCameraMatrix::HookAt(&ml::ScnObjCam::setViewMatrix);
-		DrawManagerInfo::HookAt(&event::Manager::update);
 #endif
 
 		UpdateFOVNearFar::HookAt(&ml::ScnObjCam::updateFovNearFar);
