@@ -4,14 +4,14 @@
 
 #include "EventDebugUtils.hpp"
 
+#include <skylaunch/hookng/Hooks.hpp>
+
 #include "../main.hpp"
 #include "DebugStuff.hpp"
-#include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/DebugWrappers.hpp"
 #include "bf2mods/Logger.hpp"
 #include "bf2mods/engine/event/Manager.hpp"
-
-#include <skylaunch/hookng/Hooks.hpp>
+#include "bf2mods/stuff/utils/debug_util.hpp"
 
 namespace {
 
@@ -20,7 +20,7 @@ namespace {
 			bf2mods::EventDebugUtils::ShouldUpdate = !this_pointer->isPlayCancel();
 
 			if(!this_pointer->isPlayCancel() && bf2mods::DebugStuff::enableDebugRendering) {
-				if ((bf2mods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
+				if((bf2mods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
 					this_pointer->drawInfo();
 				}
 			}
@@ -32,7 +32,7 @@ namespace {
 			HookAt(&event::Manager::update);
 			registeredIndex = bf2mods::EventDebugUtils::RegistrationIndex++;
 			auto name = dbgutil::getSymbol(std::bit_cast<uintptr_t>(skylaunch::FlattenMemberPtr(&event::Manager::update)));
-			name = name.substr(0, name.find("::", name.find_first_of("::")+2));
+			name = name.substr(0, name.find("::", name.find_first_of("::") + 2));
 			bf2mods::EventDebugUtils::FuncNames.emplace_back(name);
 		}
 
@@ -45,7 +45,7 @@ namespace {
 
 		static void Hook(TManager* this_pointer, event::MSG_TYPE msg) {
 			HookType::Orig(this_pointer, msg);
-			if (msg == 0xe && bf2mods::DebugStuff::enableDebugRendering && (bf2mods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
+			if(msg == 0xe && bf2mods::DebugStuff::enableDebugRendering && (bf2mods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
 				this_pointer->setDisp(true);
 				this_pointer->render();
 			}
@@ -55,7 +55,7 @@ namespace {
 			HookType::HookAt(&TManager::OnEventProc);
 			registeredIndex = bf2mods::EventDebugUtils::RegistrationIndex++;
 			auto name = dbgutil::getSymbol(std::bit_cast<uintptr_t>(skylaunch::FlattenMemberPtr(&TManager::OnEventProc)));
-			name = name.substr(0, name.find("::", name.find_first_of("::")+2)); // lobs off anything past event::ManagerName
+			name = name.substr(0, name.find("::", name.find_first_of("::") + 2)); // lobs off anything past event::ManagerName
 			bf2mods::EventDebugUtils::FuncNames.emplace_back(name);
 		}
 
@@ -67,19 +67,19 @@ namespace {
 
 	int DrawEventManagerInfo::registeredIndex = 0;
 
-}
+} // namespace
 
 namespace bf2mods {
 
 	int EventDebugUtils::RegistrationIndex = 0;
 	int EventDebugUtils::CurrentIndex = -1;
 	unsigned long EventDebugUtils::ActiveBits = 0;
-	std::vector<std::string> EventDebugUtils::FuncNames{};
+	std::vector<std::string> EventDebugUtils::FuncNames {};
 
 	bool EventDebugUtils::ShouldUpdate = false;
 
 	void EventDebugUtils::Update() {
-		if (FuncNames.size() != RegistrationIndex) {
+		if(FuncNames.size() != RegistrationIndex) {
 			bf2mods::g_Logger->LogError("Event function names not the same size as regist index {} vs {}", FuncNames.size(), RegistrationIndex);
 			return;
 		}
@@ -88,30 +88,28 @@ namespace bf2mods {
 
 		//fw::debug::drawFontFmtShadow(0, 720-16, mm::Col4::White, "Manager bits: {:0b}", ActiveBits);
 
-		if (btnDown(Keybind::EVENT_DEBUG_PREV, p1Cur.Buttons, p1Prev.Buttons)) {
+		if(btnDown(Keybind::EVENT_DEBUG_PREV, p1Cur.Buttons, p1Prev.Buttons)) {
 			CurrentIndex--;
 			changed = true;
-		}
-		else if (btnDown(Keybind::EVENT_DEBUG_NEXT, p1Cur.Buttons, p1Prev.Buttons)) {
+		} else if(btnDown(Keybind::EVENT_DEBUG_NEXT, p1Cur.Buttons, p1Prev.Buttons)) {
 			CurrentIndex++;
 			changed = true;
 		}
 
-		if (changed) {
-			if (CurrentIndex < 0)
-				CurrentIndex = RegistrationIndex -1;
-			else if (CurrentIndex >= RegistrationIndex)
+		if(changed) {
+			if(CurrentIndex < 0)
+				CurrentIndex = RegistrationIndex - 1;
+			else if(CurrentIndex >= RegistrationIndex)
 				CurrentIndex = 0;
 
 			g_Logger->LogInfo("Selected {} (currently {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");
 		}
 
-		if (btnDown(Keybind::EVENT_DEBUG_TOGGLE, p1Cur.Buttons, p1Prev.Buttons)) {
-			if (CurrentIndex >= 0 && CurrentIndex < RegistrationIndex) {
+		if(btnDown(Keybind::EVENT_DEBUG_TOGGLE, p1Cur.Buttons, p1Prev.Buttons)) {
+			if(CurrentIndex >= 0 && CurrentIndex < RegistrationIndex) {
 				ActiveBits ^= 1 << CurrentIndex;
 				g_Logger->LogInfo("Toggled debug for {} (now {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");
-			}
-			else
+			} else
 				g_Logger->LogWarning("Tried to toggle invalid debug manager, try another (was index {})", CurrentIndex);
 		}
 	}
@@ -121,10 +119,9 @@ namespace bf2mods {
 
 		ActiveBits = bf2mods::GetState().config.eventDebugBits;
 
-		DrawEventManagerInfo::HookIt();
-
-		ManagerDisplay<event::AgelogManager>::HookIt();
-		ManagerDisplay<event::AlphaManager>::HookIt();
+		DrawEventManagerInfo::HookIt();                 // bit 0
+		ManagerDisplay<event::AgelogManager>::HookIt(); // bit 1
+		ManagerDisplay<event::AlphaManager>::HookIt();	// bit ...
 		ManagerDisplay<event::BgmManager>::HookIt();
 		ManagerDisplay<event::BouManager>::HookIt();
 		ManagerDisplay<event::CamManager>::HookIt();
@@ -153,4 +150,4 @@ namespace bf2mods {
 #if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
 	BF2MODS_REGISTER_MODULE(EventDebugUtils);
 #endif
-}
+} // namespace bf2mods
