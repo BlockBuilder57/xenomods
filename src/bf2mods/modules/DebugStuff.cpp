@@ -50,7 +50,12 @@ namespace {
 			// get the clear count from the save because that's what everything else seems to do
 			uint clearCount = *reinterpret_cast<uint*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
 			uint chapter = this_pointer->getChapterIdFromSaveData();
+#if BF2MODS_CODENAME(ira)
+			chapter = 0; // it's always 10!
+#endif
 			chapter |= clearCount << 16; // "encodes" as 0x00010006 for 1 clear on ch6
+
+			//bf2mods::g_Logger->LogDebug("Chapter info: {:#x}", chapter);
 
 			// we need to have started the game (to avoid a lock)
 			if(chapter > 0) {

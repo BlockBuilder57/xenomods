@@ -20,7 +20,7 @@ namespace bf2mods {
 #endif
 #define CONFIG_EVENT_DEBUG_BITS_DEFAULT 0b1
 #define CONFIG_DUMP_FILEREADS_DEFAULT false
-#define CONFIG_USE_FILEDUMPS_DEFAULT false
+#define CONFIG_USE_FILEDUMPS_DEFAULT true
 
 		/**
 		 * Reset to default values.
