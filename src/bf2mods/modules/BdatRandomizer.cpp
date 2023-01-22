@@ -15,28 +15,12 @@
 #include <skylaunch/hookng/Hooks.hpp>
 
 namespace {
-	static bool versionBufferPrepared = false;
-	static char bdatVersionBuffer[16] {};
-
 	struct MSTextHook : skylaunch::hook::Trampoline<MSTextHook> {
 		static const char* Hook(unsigned char* pBdat, int n) {
 			const char* sheetName = Bdat::getSheetName(pBdat);
 
 			if(!strcmp(sheetName, "menu_ms")) {
-				// I don't like hardcoding these but they don't seem to change between versions
-				// it's unfortunately nicer (imo) than doing a string comparison
-				if(n == 1830) {
-					//nn::oe::DisplayVersion displayVersion;
-					//nn::oe::GetDisplayVersion(&displayVersion);
-
-					// TODO: probably use fmt
-					if(!versionBufferPrepared) {
-						std::snprintf(&bdatVersionBuffer[0], sizeof(bdatVersionBuffer) - 1, "(%s)", bf2mods::version::tagDirty);
-						versionBufferPrepared = true;
-					}
-
-					return &bdatVersionBuffer[0];
-				} else if(n == 1610) {
+				if(n == 1610) {
 					// it says "Loading" in the japanese version too so I'm not allowed to moan about hardcoding this
 					return "Loading (modded)";
 				}

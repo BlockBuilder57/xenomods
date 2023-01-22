@@ -1,11 +1,15 @@
 #include "MenuViewer.hpp"
 
+#include <bf2mods/DebugWrappers.hpp>
 #include <bf2mods/HidInput.hpp>
 #include <bf2mods/Logger.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
 #include "../main.hpp"
+#include "bf2mods/engine/gf/MenuObject.hpp"
+#include "bf2mods/engine/ui/UIObjectAcc.hpp"
+#include "version.h"
 
 namespace {
 
@@ -13,6 +17,45 @@ namespace {
 		static void Hook(void* this_pointer, void* IDrDrawWorkInfo) {
 			if(bf2mods::MenuViewer::enableUIRendering)
 				Orig(this_pointer, IDrDrawWorkInfo);
+		}
+	};
+
+	struct MainMenuVersionInfo : skylaunch::hook::Trampoline<MainMenuVersionInfo> {
+		static void Hook(gf::GfMenuObjTitle* this_pointer) {
+			Orig(this_pointer);
+
+			ui::UIObjectAcc titlescreen = ui::UIObjectAcc(this_pointer->rootUIObjAcc);
+			ui::UIObjectAcc versionNum = ui::UIObjectAcc(this_pointer->rootUIObjAcc, "TXT_version_num");
+
+			if (versionNum.objectId == 0)
+				return;
+
+			// we're duplicating the copyright text for its length
+			// for whatever reason we're still bounded by the size of the ui object,
+			// and it doesn't seem like there's a clear way to resize it properly
+			auto newVersionId = titlescreen.duplicateChild("TXT_copyright");
+			ui::UIObjectAcc newVersion = ui::UIObjectAcc(newVersionId);
+
+			if (newVersion.objectId == 0)
+				return;
+
+			// make the version string...
+			std::string version = fmt::format("bf2mods {}", bf2mods::version::tagDirty);
+			auto newText = ui::UIStr(version.c_str(), true);
+			newVersion.setText(newText);
+
+			// i want the offset the game version has
+			mm::Rect<short> rect;
+			versionNum.getRect(rect, 2);
+			short offset = 1280 - rect.w - rect.x;
+			newVersion.getRect(rect, 2);
+
+			// so we can use it for ourselves
+			mm::Pnt<short> pos;
+			versionNum.getPos(pos);
+			pos.y += 25;
+			pos.x = 1280 - offset - rect.w;
+			newVersion.setPos(pos);
 		}
 	};
 
@@ -26,6 +69,9 @@ namespace bf2mods {
 		g_Logger->LogDebug("Setting up menu viewer...");
 
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
+#if !BF2MODS_CODENAME(bfsw)
+		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
+#endif
 	}
 
 	void MenuViewer::Update() {

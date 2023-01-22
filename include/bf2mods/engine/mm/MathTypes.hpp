@@ -10,9 +10,14 @@
 
 namespace mm {
 
+	template<class T>
 	struct Pnt {
-		int x;
-		int y;
+		T x, y;
+	};
+
+	template<class T>
+	struct Rect {
+		T x, y, w, h;
 	};
 
 	BF2MODS_CONVERTTO_TYPE(Vec2, glm::vec2, sizeof(glm::vec2));

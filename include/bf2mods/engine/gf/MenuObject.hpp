@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <bf2mods/Utils.hpp>
+
 namespace gf {
 	namespace GfMenuObjUtil {
 		/*
@@ -43,4 +45,13 @@ namespace gf {
 
 		void playSE(unsigned int index);
 	} // namespace GfMenuObjUtil
+
+	class GfMenuObjTitle {
+	   public:
+		INSERT_PADDING_BYTES(0x18);
+		uint rootUIObjAcc;
+
+		void initialize();
+	};
+
 } // namespace gf
