@@ -6,6 +6,7 @@ namespace bf2mods {
 
 	struct MenuViewer : public bf2mods::UpdatableModule {
 		static bool enableUIRendering;
+		static bool straightenFont;
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {

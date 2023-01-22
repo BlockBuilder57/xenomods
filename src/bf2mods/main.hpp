@@ -30,6 +30,8 @@ namespace bf2mods {
 		UI_RENDER_TOGGLE = nn::hid::KEY_Y,
 		DEBUG_RENDER_TOGGLE = nn::hid::KEY_B,
 
+		STRAIGHTEN_FONT = nn::hid::KEY_L | nn::hid::KEY_Y,
+
 		EVENT_DEBUG_PREV = nn::hid::KEY_R | nn::hid::KEY_DLEFT,
 		EVENT_DEBUG_NEXT = nn::hid::KEY_R | nn::hid::KEY_DRIGHT,
 		EVENT_DEBUG_TOGGLE = nn::hid::KEY_R | nn::hid::KEY_DUP,

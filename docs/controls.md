@@ -30,5 +30,6 @@ Check out the list below to see what does what.
 | Play Sound Effect       | ZL+Minus, **P2**      | Plays a common sound effect with the id of the temp int.                                                                                       |
 | Clear TCP Log           | Plus, **P2**          | Clears the TCP log. Any clients connected will have their terminals cleared of output.                                                         |
 | Test Logger             | Plus+R, **P2**        | A simple logging test for the logger console.                                                                                                  |
+| Straighten Font         | L+Y, **P2**           | Straightens out the font used in 2 and Torna. Nice meme.                                                                                       |
 
 MapJump/Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/common/SYS_MapJumpList.html) for 2/Torna and [here](https://xenoblade.github.io/xb1de/bdat/bdat_common/landmarklist.html) for DE.

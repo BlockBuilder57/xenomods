@@ -8,6 +8,7 @@
 #include "../State.hpp"
 #include "../main.hpp"
 #include "bf2mods/engine/gf/MenuObject.hpp"
+#include "bf2mods/engine/layer/LayerObj.hpp"
 #include "bf2mods/engine/ui/UIObjectAcc.hpp"
 #include "version.h"
 
@@ -59,18 +60,33 @@ namespace {
 		}
 	};
 
+	struct StraightensYourXenoblade : skylaunch::hook::Trampoline<StraightensYourXenoblade> {
+		static void Hook(layer::LayerObjFont* this_pointer, void* LayerRenderView, void* LayerResMatrix, void* LayerResColor) {
+			float temp = this_pointer->slopeRot;
+			if (bf2mods::MenuViewer::straightenFont)
+				this_pointer->slopeRot = 0; // hook to the system tick for fun times
+			Orig(this_pointer, LayerRenderView, LayerResMatrix, LayerResColor);
+			this_pointer->slopeRot = temp;
+		}
+	};
+
 }
 
 namespace bf2mods {
 
 	bool MenuViewer::enableUIRendering = true;
+	bool MenuViewer::straightenFont = false;
 
 	void MenuViewer::Initialize() {
 		g_Logger->LogDebug("Setting up menu viewer...");
 
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
+
 #if !BF2MODS_CODENAME(bfsw)
 		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
+
+		// doesn't seem to work in DE, but does at least hook
+		StraightensYourXenoblade::HookAt("_ZN5layer12LayerObjFont17updateShaderParmsEPKNS_15LayerRenderViewERKNS_14LayerResMatrixERKNS_13LayerResColorE");
 #endif
 	}
 
@@ -80,6 +96,9 @@ namespace bf2mods {
 		if(GetPlayer(2)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {
 			enableUIRendering = !enableUIRendering;
 			g_Logger->LogInfo("UI rendering: {}", enableUIRendering);
+		}
+		else if (GetPlayer(2)->InputDownStrict(Keybind::STRAIGHTEN_FONT)) {
+			straightenFont = !straightenFont;
 		}
 	}
 
