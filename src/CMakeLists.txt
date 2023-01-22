@@ -86,6 +86,9 @@ set_target_properties(bf2mods PROPERTIES
 target_include_directories(bf2mods PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(bf2mods PUBLIC ${PROJECT_BINARY_DIR}/)
 
+# not entirely sure what this is about, but
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_ENABLE_FLOAT16=0")
+
 target_link_libraries(bf2mods PUBLIC
 		tomlplusplus::tomlplusplus
 		fmt::fmt-header-only
