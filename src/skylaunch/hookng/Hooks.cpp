@@ -19,7 +19,7 @@ namespace skylaunch::hook::detail {
 		if(Result res; R_SUCCEEDED(res = nn::ro::LookupSymbol(&addr, symbolName.data()))) {
 			return addr;
 		} else {
-			bf2mods::g_Logger->LogError("[hook-ng] Failed to resolve symbol \"{}\"! (Horizon ec {})", symbolName, res);
+			bf2mods::g_Logger->LogDebug("[hook-ng] Failed to resolve symbol \"{}\"! (Horizon ec {})", symbolName, res);
 			return 0xDEADDEAD;
 		}
 	}

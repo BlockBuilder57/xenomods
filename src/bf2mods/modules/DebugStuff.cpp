@@ -31,20 +31,29 @@ namespace {
 		}
 	};
 
+	void PrintEventInfo(const char* evtName) {
+		std::string eventName = evtName;
+		if(eventName.size() > 10)
+			eventName.resize(10);
+		uint eventId = gf::GfDataEvent::getEventID(eventName.c_str());
+
+		if(eventId > 0)
+			bf2mods::g_Logger->LogDebug("Creating event {} (id {})", evtName, eventId);
+		else
+			bf2mods::g_Logger->LogDebug("Creating event {}", evtName);
+	}
+
 	struct EventStartInfo : skylaunch::hook::Trampoline<EventStartInfo> {
 		static void Hook(void* this_pointer, const char* evtName, void* objHandle, uint param_3, uint param_4, uint param_5, uint param_6, mm::Vec3* playerPos, float param_8) {
-			std::string eventName = evtName;
-			if(eventName.size() > 10)
-				eventName.resize(10);
-			uint eventId = gf::GfDataEvent::getEventID(eventName.c_str());
-
-			if(eventId > 0)
-				bf2mods::g_Logger->LogDebug("Creating event {} (id {})", evtName, eventId);
-			else
-				bf2mods::g_Logger->LogDebug("Creating event {}", evtName);
-			//bf2mods::g_Logger->LogDebug("Other args: {:p} {} {} {} {} {:2} {:2}", objHandle, param_3, param_4, param_5, param_6, static_cast<const glm::vec3&>(*playerPos), param_8);
-
+			PrintEventInfo(evtName);
 			Orig(this_pointer, evtName, objHandle, param_3, param_4, param_5, param_6, playerPos, param_8);
+		}
+	};
+
+	struct EventStartInfo_Earlier : skylaunch::hook::Trampoline<EventStartInfo_Earlier> {
+		static void Hook(void* this_pointer, const char* evtName, void* objHandle, uint param_3, uint param_4, uint param_5, uint param_6) {
+			PrintEventInfo(evtName);
+			Orig(this_pointer, evtName, objHandle, param_3, param_4, param_5, param_6);
 		}
 	};
 
@@ -185,7 +194,12 @@ namespace bf2mods {
 		__cxa_pure_virtual = skylaunch::hook::detail::ResolveSymbol<decltype(__cxa_pure_virtual)>("__cxa_pure_virtual");
 		BGMDebugging::HookAt("_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE");
 
-		EventStartInfo::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef");
+		// earlier versions didn't include the last two parameters
+		if (skylaunch::hook::detail::ResolveSymbolBase("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef") == 0xDEADDEAD)
+			EventStartInfo_Earlier::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjj");
+		else
+			EventStartInfo::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef");
+
 		ReplaceTitleEvent::HookAt("_ZN2tl9TitleMain14playTitleEventEj");
 #endif
 	}
