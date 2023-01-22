@@ -40,7 +40,11 @@ else()
 		# we actually have a tag, so do this instead
 		file(APPEND ${VERSION_FILENAME} "\tconstexpr static char tag[] = \"${GIT_COMMIT}-${GIT_TAG}-${GIT_BRANCH}\";\n")
 
-		file(APPEND ${VERSION_FILENAME} "\tconstexpr static char tagDirty[] = \"${GIT_COMMIT}~${GIT_TAG_DIRTY}${GIT_BRANCH}\";\n")
+		if("${GIT_TAG}" STREQUAL "${GIT_TAG_DIRTY}")
+			file(APPEND ${VERSION_FILENAME} "\tconstexpr static char tagDirty[] = \"${GIT_COMMIT}-${GIT_TAG}-${GIT_BRANCH}\";\n")
+		else()
+			file(APPEND ${VERSION_FILENAME} "\tconstexpr static char tagDirty[] = \"${GIT_COMMIT}~${GIT_TAG_DIRTY}${GIT_BRANCH}\";\n")
+		endif()
 	endif()
 endif()
 
@@ -66,7 +70,11 @@ else()
 		# we actually have a tag, so do this instead
 		file(APPEND ${VERSION_FILENAME} "\t#define GIT_TAG \"${GIT_TAG}-${GIT_COMMIT}-${GIT_BRANCH}\";\n")
 
-		file(APPEND ${VERSION_FILENAME} "\t#define GIT_TAG_DIRTY \"${GIT_COMMIT}~${GIT_TAG_DIRTY}${GIT_BRANCH}\";\n")
+		if("${GIT_TAG}" STREQUAL "${GIT_TAG_DIRTY}")
+			file(APPEND ${VERSION_FILENAME} "\t#define GIT_TAG \"${GIT_TAG}-${GIT_COMMIT}-${GIT_BRANCH}\";\n")
+		else()
+			file(APPEND ${VERSION_FILENAME} "\t#define GIT_TAG_DIRTY \"${GIT_COMMIT}~${GIT_TAG_DIRTY}${GIT_BRANCH}\";\n")
+		endif()
 	endif()
 endif()
 file(APPEND ${VERSION_FILENAME} "\t#define GIT_BRANCH \"${GIT_BRANCH}\"\n")
