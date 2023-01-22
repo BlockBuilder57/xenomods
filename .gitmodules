@@ -3,7 +3,8 @@
 	url = https://github.com/g-truc/glm
 [submodule "vendor/fmt"]
 	path = vendor/fmt
-	url = https://github.com/fmtlib/fmt
+	url = https://github.com/BlockBuilder57/fmt.git
+	branch = v9.1.0-custom-assert
 [submodule "vendor/tomlpp"]
 	path = vendor/tomlpp
 	url = https://github.com/marzer/tomlplusplus.git
