@@ -1,6 +1,7 @@
 #include "main.hpp"
 
 #include <bf2mods/engine/fw/Document.hpp>
+#include <bf2mods/engine/ml/Rand.hpp>
 #include <bf2mods/engine/mm/MathTypes.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
@@ -86,10 +87,10 @@ namespace bf2mods {
 			g_Logger->LogInfo("Cleared TCP log");
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
-			g_Logger->LogDebug("test debug message! {}", nn::os::GetSystemTick());
-			g_Logger->LogInfo("test info message! {}", nn::os::GetSystemTick());
-			g_Logger->LogWarning("test warning message! {}", nn::os::GetSystemTick());
-			g_Logger->LogError("test error message! {}", nn::os::GetSystemTick());
+			g_Logger->LogDebug("test debug message! {}", ml::mtRand());
+			g_Logger->LogInfo("test info message! {}", ml::mtRandf1());
+			g_Logger->LogWarning("test warning message! {}", ml::mtRandf2());
+			g_Logger->LogError("test error message! {}", ml::mtRandf3());
 			g_Logger->LogFatal("test fatal message! {}", nn::os::GetSystemTick());
 		}
 
