@@ -54,4 +54,14 @@ namespace gf {
 		void initialize();
 	};
 
+	struct MenuZoneMapInfo {};
+
+	class GfMenuObjWorldMap {
+	   public:
+		static bool isDispMap(unsigned int mapjump);
+		static bool isEnableJump(const MenuZoneMapInfo& nuts);
+		static bool isEnterMap(unsigned int mapjump);
+		static bool isOpenLandmark(unsigned int mapjump);
+	};
+
 } // namespace gf

@@ -7,6 +7,7 @@ namespace bf2mods {
 
 	struct DebugStuff : public bf2mods::UpdatableModule {
 		static bool enableDebugRendering;
+		static bool accessClosedLandmarks;
 
 		static int bgmTrackIndex;
 

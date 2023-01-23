@@ -20,6 +20,7 @@ namespace bf2mods {
 		TEMPINT_DEC = nn::hid::KEY_DLEFT | nn::hid::KEY_ZL,
 
 		MAPJUMP_JUMP = nn::hid::KEY_DDOWN | nn::hid::KEY_ZL,
+		ACCESS_CLOSED_LANDMARKS = nn::hid::KEY_DUP | nn::hid::KEY_ZL,
 		PLAYSE = nn::hid::KEY_MINUS | nn::hid::KEY_ZL,
 
 		MOONJUMP = nn::hid::KEY_R | nn::hid::KEY_B,

@@ -17,6 +17,7 @@
 #include "bf2mods/engine/game/MapJump.hpp"
 #include "bf2mods/engine/gf/BdatData.hpp"
 #include "bf2mods/engine/gf/Bgm.hpp"
+#include "bf2mods/engine/gf/MenuObject.hpp"
 #include "bf2mods/engine/gf/PlayFactory.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 #include "bf2mods/engine/tl/title.hpp"
@@ -133,11 +134,24 @@ namespace {
 		}
 	};
 
+	struct JumpToClosedLandmarks_World : skylaunch::hook::Trampoline<JumpToClosedLandmarks_World> {
+		static bool Hook(unsigned int mapjump) {
+			return bf2mods::DebugStuff::accessClosedLandmarks ? true : Orig(mapjump);
+		}
+	};
+
+	struct JumpToClosedLandmarks_Zone : skylaunch::hook::Trampoline<JumpToClosedLandmarks_Zone> {
+		static bool Hook(unsigned int mapjump) {
+			return bf2mods::DebugStuff::accessClosedLandmarks ? true : Orig(mapjump);
+		}
+	};
+
 }
 
 namespace bf2mods {
 
 	bool DebugStuff::enableDebugRendering = true;
+	bool DebugStuff::accessClosedLandmarks = true;
 
 	int DebugStuff::bgmTrackIndex = 0;
 
@@ -200,6 +214,9 @@ namespace bf2mods {
 		else
 			EventStartInfo::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef");
 
+		JumpToClosedLandmarks_World::HookAt(&gf::GfMenuObjWorldMap::isEnterMap);
+		JumpToClosedLandmarks_Zone::HookAt(&gf::GfMenuObjWorldMap::isOpenLandmark);
+
 		ReplaceTitleEvent::HookAt("_ZN2tl9TitleMain14playTitleEventEj");
 #endif
 	}
@@ -222,6 +239,9 @@ namespace bf2mods {
 			fw::PadManager::enableDebugDraw(enableDebugRendering);
 #endif
 			g_Logger->LogInfo("Debug rendering: {}", enableDebugRendering);
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::ACCESS_CLOSED_LANDMARKS)) {
+			accessClosedLandmarks = !accessClosedLandmarks;
+			g_Logger->LogInfo("Access closed landmarks: {}", accessClosedLandmarks);
 		}
 
 		else if(GetPlayer(2)->InputDownStrict(Keybind::TEMPINT_INC)) {
