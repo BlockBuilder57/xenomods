@@ -25,7 +25,7 @@ namespace dbgutil {
 		return result;
 	}
 
-	std::string getSymbol(uintptr_t address) {
+	std::string getSymbol(uintptr_t address, bool leaveMangled) {
 		std::array<char, 0x100> symbolStrBuffer { 0 };
 		auto symbolAddress = uintptr_t {};
 
@@ -36,6 +36,9 @@ namespace dbgutil {
 		if(mangledLength <= 0) {
 			return fmt::format("{:#016x} (no symbol name)", address);
 		}
+
+		if (leaveMangled)
+			return std::string{ symbolStrBuffer.data(), mangledLength };
 
 		Result res{};
 		if(R_FAILED(res = nn::ro::LookupSymbol(&symbolAddress, symbolStrBuffer.data())))

@@ -21,6 +21,7 @@
 #include "bf2mods/engine/gf/PlayFactory.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 #include "bf2mods/engine/tl/title.hpp"
+#include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 
 namespace {
@@ -62,6 +63,14 @@ namespace {
 		static void Hook(tl::TitleMain* this_pointer, uint eventId) {
 			uint newEventId = eventId;
 
+			// no randomizing new games!! only allow the intended call through
+			auto stack = dbgutil::getStackTrace();
+			// ow my soul, find a better way to do this
+			if (dbgutil::getSymbol(stack[1], true) != "_ZN2tl20TitleStateMainScreen6updateEPNS_9TitleMainERKN2fw10UpdateInfoE") {
+				bf2mods::g_Logger->LogDebug("Not replacing title event {} (id {}) as it would cause a lock (called by {})", gf::GfDataEvent::getEventName(eventId), eventId, dbgutil::getSymbol(stack[1]));
+				return Orig(this_pointer, eventId);
+			}
+
 			// get the clear count from the save because that's what everything else seems to do
 			uint clearCount = *reinterpret_cast<uint*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
 			uint chapter = this_pointer->getChapterIdFromSaveData();
@@ -72,7 +81,7 @@ namespace {
 
 			//bf2mods::g_Logger->LogDebug("Chapter info: {:#x}", chapter);
 
-			// we need to have started the game (to avoid a lock)
+			// we need to have started the game, as the opening cutscene just continues off the titlescreen
 			if(chapter > 0) {
 				auto& events = bf2mods::GetState().config.titleEvents;
 

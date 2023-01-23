@@ -26,7 +26,7 @@ namespace dbgutil {
 
 	std::array<uintptr_t, MAX_TRACE_SIZE> getStackTrace();
 
-	std::string getSymbol(uintptr_t address);
+	std::string getSymbol(uintptr_t address, bool leaveMangled = false);
 
 	void logStackTrace();
 
