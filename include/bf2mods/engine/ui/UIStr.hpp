@@ -18,6 +18,7 @@ namespace ui {
 		int unk1;
 		int unk2;
 		UIStrType type;
+		int unk3;
 
 		UIStr();
 		UIStr(const char* text, bool doAllocate);

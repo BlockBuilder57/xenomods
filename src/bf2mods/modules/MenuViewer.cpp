@@ -1,4 +1,5 @@
 #include "MenuViewer.hpp"
+#include "DebugStuff.hpp"
 
 #include <bf2mods/DebugWrappers.hpp>
 #include <bf2mods/HidInput.hpp>
@@ -70,6 +71,53 @@ namespace {
 		}
 	};
 
+	struct BigOlUIDebugger : skylaunch::hook::Trampoline<BigOlUIDebugger> {
+		static void Hook(ui::UIObject* this_pointer) {
+			Orig(this_pointer);
+
+			if (!bf2mods::DebugStuff::enableDebugRendering)
+				return;
+
+			bool shouldSkip = false;
+			bool goodName = false;
+
+			ui::UIObject* obj = this_pointer;
+			do {
+				std::string_view name = {obj->name.buffer, obj->name.m_nLen};
+				if (name.find("talk") != std::string::npos)
+					goodName = true;
+
+				shouldSkip = !obj->displayInfo.isDisp;
+				obj = obj->getParentPtr();
+			}
+			while (!shouldSkip && obj != nullptr);
+
+			if (!goodName || shouldSkip)
+				return;
+
+			mm::Rect<short> rectS;
+			auto objAcc = ui::UIObjectAcc(this_pointer->objectId);
+			objAcc.getRect(rectS, 3);
+
+			mm::Rect<int> rect = {rectS.x, rectS.y, rectS.w, rectS.h};
+			fw::debug::drawLineSquare2D(rect, mm::Col4::White);
+
+			short textX = rect.x;
+			short textY = rect.y + rect.h;
+
+			mm::Col4 transparentWhite = {1, 1, 1, 0.5f};
+
+			//fw::debug::drawFontFmtShadow(textX, textY, mm::Col4::White, "flags: {}", this_pointer->flags);
+			fw::debug::drawFontFmtShadow(textX, textY, transparentWhite, "{}", this_pointer->name.buffer);
+
+			ui::UIObjectPlugin* plugin = this_pointer->latestPlugin;
+			while (plugin != nullptr) {
+				fw::debug::drawFontFmtShadow(textX, textY += fw::debug::drawFontGetHeight(), transparentWhite, "Plugin: {}", plugin->getRTTI()->szName);
+				plugin = plugin->prevPlugin;
+			}
+		}
+	};
+
 }
 
 namespace bf2mods {
@@ -81,6 +129,8 @@ namespace bf2mods {
 		g_Logger->LogDebug("Setting up menu viewer...");
 
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
+
+		//BigOlUIDebugger::HookAt(&ui::UIObject::update);
 
 #if !BF2MODS_CODENAME(bfsw)
 		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);

@@ -6,6 +6,7 @@
 
 #include <bf2mods/Utils.hpp>
 
+#include "UIObject.hpp"
 #include "UIStr.hpp"
 
 namespace ui {
@@ -13,7 +14,7 @@ namespace ui {
 	class UIObjectAcc {
 	   public:
 		void* vtable;
-		void* uiObject;
+		UIObject* uiObject;
 		unsigned int objectId;
 
 		UIObjectAcc(uint id);
