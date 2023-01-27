@@ -19,6 +19,7 @@
 #include "bf2mods/engine/gf/Bgm.hpp"
 #include "bf2mods/engine/gf/MenuObject.hpp"
 #include "bf2mods/engine/gf/PlayFactory.hpp"
+#include "bf2mods/engine/ml/Rand.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 #include "bf2mods/engine/tl/title.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
@@ -91,10 +92,10 @@ namespace {
 						// we're still the default, so let's be fancy and progressively reveal chapters
 						// once the user clears the game at least once this path will never be run,
 						// so the extra stuff in the default (post-credits titlescreens) won't be shown
-						newEventId = events[(util::nnRand<uint16_t>() % (chapter + 1))];
+						newEventId = events[(ml::mtRand() % (chapter + 1))]; // +1 for the initial titlescreen
 					}
 					else
-						newEventId = events[(util::nnRand<uint16_t>() % (events.size() + 1))];
+						newEventId = events[(ml::mtRand() % events.size())];
 				}
 			}
 
