@@ -105,8 +105,6 @@ namespace {
 		}
 	};
 
-	void (*__cxa_pure_virtual)();
-
 	struct BGMDebugging : skylaunch::hook::Trampoline<BGMDebugging> {
 		static void Hook(gf::BgmTrack* this_pointer, fw::UpdateInfo* updateInfo) {
 			Orig(this_pointer, updateInfo);
@@ -114,15 +112,8 @@ namespace {
 			if(!bf2mods::DebugStuff::enableDebugRendering)
 				return;
 
-			auto* vtable = reinterpret_cast<gf::BgmTrack::VfTable*>(*(size_t**)this_pointer);
-
 			const int height = fw::debug::drawFontGetHeight();
-			std::string trackName = "BgmTrack?";
-
-			if(reinterpret_cast<void*>(&vtable->GetTrackName) != reinterpret_cast<void*>(&__cxa_pure_virtual)) {
-				// not a pure virtual, so we can call this safely
-				trackName = vtable->GetTrackName(this_pointer);
-			}
+			std::string trackName = this_pointer->getTrackName();
 
 			if (trackName == "EventBGM")
 				return; // already shown by event::BgmManager
@@ -215,7 +206,6 @@ namespace bf2mods {
 		MMAssert::HookAt("_ZN2mm9MMStdBase8mmAssertEPKcS2_j");
 
 #if !BF2MODS_CODENAME(bfsw)
-		__cxa_pure_virtual = skylaunch::hook::detail::ResolveSymbol<decltype(__cxa_pure_virtual)>("__cxa_pure_virtual");
 		BGMDebugging::HookAt("_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE");
 
 		// earlier versions didn't include the last two parameters
