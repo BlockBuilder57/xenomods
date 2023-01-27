@@ -35,8 +35,8 @@ namespace {
 					wish = glm::normalize(wish) * speedLimit;
 			}
 
-			//fw::debug::drawFontFmtShadow(0, 216, mm::Col4::White, "velWsh PST {:2} (len {:.2f})", static_cast<const glm::vec3&>(this_pointer->velocityWish), this_pointer->velocityWish.XZLength());
-			//fw::debug::drawFontFmtShadow(0, 232, mm::Col4::White, "who knows {:2} {:2}", static_cast<const glm::vec2&>(this_pointer->inputReal), static_cast<const glm::vec2&>(this_pointer->inputDupe));
+			//fw::debug::drawFontFmtShadow(0, 216, mm::Col4::white, "velWsh PST {:2} (len {:.2f})", static_cast<const glm::vec3&>(this_pointer->velocityWish), this_pointer->velocityWish.XZLength());
+			//fw::debug::drawFontFmtShadow(0, 232, mm::Col4::white, "who knows {:2} {:2}", static_cast<const glm::vec2&>(this_pointer->inputReal), static_cast<const glm::vec2&>(this_pointer->inputDupe));
 		}
 	};
 

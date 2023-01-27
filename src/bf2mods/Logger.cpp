@@ -12,13 +12,13 @@ namespace bf2mods {
 			case Logger::Severity::Debug:
 				return { 0.25f, 0.5f, 1.f, 1.f };
 			case Logger::Severity::Info:
-				return mm::Col4::White;
+				return mm::Col4::white;
 			case Logger::Severity::Warning:
-				return { 1.f, 1.f, 0.f, 1.f };
+				return mm::Col4::yellow;
 			case Logger::Severity::Error:
-				return { 1.f, 0.f, 0.f, 1.f };
+				return mm::Col4::red;
 			case Logger::Severity::Fatal:
-				return { 1.f, 0.f, 1.f, 1.f };
+				return mm::Col4::magenta;
 			default:
 				assert(false && "You shouldn't get here!!!");
 		};

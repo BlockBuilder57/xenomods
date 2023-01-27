@@ -7,9 +7,7 @@ add_executable(bf2mods
 
 		bf2mods/modules/UpdatableModule.cpp
 
-		bf2mods/engine/mm/MathTypes.cpp
-
-		bf2mods/State.cpp
+        bf2mods/State.cpp
 		bf2mods/Logger.cpp
 		bf2mods/HidInput.cpp
 

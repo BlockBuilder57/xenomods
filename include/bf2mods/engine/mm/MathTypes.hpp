@@ -45,6 +45,12 @@ namespace mm {
 			other.XZNormalizeInPlace();
 			return other;
 		}
+
+		static const Vec3 zero;
+		static const Vec3 unitX;
+		static const Vec3 unitY;
+		static const Vec3 unitZ;
+		static const Vec3 unit;
 	};
 	using Transform = Vec3;
 	static_assert(sizeof(Vec3) == 0xC, "size 0xC");
@@ -65,8 +71,18 @@ namespace mm {
 		float b;
 		float a;
 
-		static const Col4 White;
-		static const Col4 Black;
+		static const Col4 white;   // 1.0, 1.0, 1.0, 1.0 (0xFFFFFFFF)
+		static const Col4 gray;    // 0.5, 0.5, 0.5, 1.0 (0x7F7F7FFF)
+		static const Col4 black;   // 0.0, 0.0, 0.0, 1.0 (0x000000FF)
+		static const Col4 red;     // 1.0, 0.0, 0.0, 1.0 (0xFF0000FF)
+		static const Col4 green;   // 0.0, 1.0, 0.0, 1.0 (0x00FF00FF)
+		static const Col4 blue;    // 0.0, 0.0, 1.0, 1.0 (0x0000FFFF)
+		static const Col4 yellow;  // 1.0, 1.0, 0.0, 1.0 (0xFFFF00FF)
+		static const Col4 cyan;    // 0.0, 1.0, 1.0, 1.0 (0x00FFFFFF)
+		static const Col4 magenta; // 1.0, 0.0, 1.0, 1.0 (0xFF00FFFF)
+		static const Col4 salmon;  // 1.0, 0.5, 0.5, 1.0 (0xFF7FFFFF)
+		static const Col4 orange;  // 1.0, 0.5, 0.0, 1.0 (0xFF7F00FF)
+		static const Col4 zero;    // 0.0, 0.0, 0.0, 0.0 (0x00000000)
 
 		mm::Col4 operator*(const float& rhs) {
 			mm::Col4 color;

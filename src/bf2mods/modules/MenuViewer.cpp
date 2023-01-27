@@ -100,14 +100,14 @@ namespace {
 			objAcc.getRect(rectS, 3);
 
 			mm::Rect<int> rect = {rectS.x, rectS.y, rectS.w, rectS.h};
-			fw::debug::drawLineSquare2D(rect, mm::Col4::White);
+			fw::debug::drawLineSquare2D(rect, mm::Col4::white);
 
 			short textX = rect.x;
 			short textY = rect.y + rect.h;
 
 			mm::Col4 transparentWhite = {1, 1, 1, 0.5f};
 
-			//fw::debug::drawFontFmtShadow(textX, textY, mm::Col4::White, "flags: {}", this_pointer->flags);
+			//fw::debug::drawFontFmtShadow(textX, textY, mm::Col4::white, "flags: {}", this_pointer->flags);
 			fw::debug::drawFontFmtShadow(textX, textY, transparentWhite, "{}", this_pointer->name.buffer);
 
 			ui::UIObjectPlugin* plugin = this_pointer->latestPlugin;

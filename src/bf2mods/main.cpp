@@ -61,8 +61,8 @@ namespace bf2mods {
 		std::string p2Buttons = fmt::format("{:#08x} - P2 - {:#08x}", P2->stateCur.Buttons, P2->statePrev.Buttons);
 		int buttonsP1Width = fw::debug::drawFontGetWidth(p1Buttons.c_str());
 		int buttonsP2Width = fw::debug::drawFontGetWidth(p2Buttons.c_str());
-		fw::debug::drawFontShadow(1280-buttonsP1Width-5, 5, mm::Col4::White, p1Buttons.c_str());
-		fw::debug::drawFontShadow(1280-buttonsP2Width-5, 5+16, mm::Col4::White, p2Buttons.c_str());*/
+		fw::debug::drawFontShadow(1280-buttonsP1Width-5, 5, mm::Col4::white, p1Buttons.c_str());
+		fw::debug::drawFontShadow(1280-buttonsP2Width-5, 5+16, mm::Col4::white, p2Buttons.c_str());*/
 
 		/*
 		 * Enforce some things on first update

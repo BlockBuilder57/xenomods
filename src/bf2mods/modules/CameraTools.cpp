@@ -26,7 +26,7 @@ namespace {
 	struct SetCameraMatrix : skylaunch::hook::Trampoline<SetCameraMatrix> {
 		static void Hook(ml::ScnObjCam* this_pointer, mm::Mat44& matrix) {
 			auto& freecam = bf2mods::CameraTools::Freecam;
-			mm::Col4 camColor = mm::Col4::White;
+			mm::Col4 camColor = mm::Col4::white;
 
 #if BF2MODS_CODENAME(bfsw)
 			mm::Mat44 trueMatrix = matrix;
@@ -177,11 +177,11 @@ namespace bf2mods {
 #if 0
 		int yPos = 200;
 		const int height = fw::debug::drawFontGetHeight();
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "- freecam debug -");
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "pos: {:1}", pos);
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "rot: {:1}", glm::degrees(glm::eulerAngles(rot)));
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "speed: {:.3f}", Freecam.camSpeed);
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::White, "fov: {:.1f}", Freecam.fov);
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "- freecam debug -");
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "pos: {:1}", pos);
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "rot: {:1}", glm::degrees(glm::eulerAngles(rot)));
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "speed: {:.3f}", Freecam.camSpeed);
+		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "fov: {:.1f}", Freecam.fov);
 #endif
 
 		glm::mat4 newmat = glm::mat4(1.f);
