@@ -212,6 +212,40 @@ namespace bf2mods {
 		else if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_DOWN))
 			Freecam.camSpeed /= 2.f;
 
+		if (Freecam.isOn) {
+			static float lastFOVPress = MAXFLOAT;
+			static float lastRollPress = MAXFLOAT;
+
+			float now = nn::os::GetSystemTick()/19200000.;
+
+			if (GetPlayer(2)->InputDownStrict(Keybind::FREECAM_FOVHOLD)) {
+				if (now - lastFOVPress < 0.2f)
+					Freecam.fov = 80;
+
+				lastFOVPress = now;
+			}
+			if (GetPlayer(2)->InputDownStrict(Keybind::FREECAM_ROLLHOLD)) {
+				if (now - lastRollPress < 0.2f) {
+					glm::vec3 pos {};
+					glm::quat rot {};
+					glm::vec3 scale {};
+					glm::vec3 skew {};
+					glm::vec4 perspective {};
+
+					// decompose existing matrix
+					glm::decompose(static_cast<const glm::mat4&>(Freecam.matrix), scale, rot, pos, skew, perspective);
+
+					glm::mat4 newmat = glm::mat4(1.f);
+					newmat = glm::translate(newmat, pos);
+					// just don't apply any rotation
+
+					Freecam.matrix = newmat;
+				}
+
+				lastRollPress = now;
+			}
+		}
+
 		if(Freecam.isOn)
 			DoFreeCameraMovement();
 	}
