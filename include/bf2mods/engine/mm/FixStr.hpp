@@ -29,7 +29,9 @@ namespace mm {
 
 			void set(const char* text) {
 				int length = strlen(text);
+				memset(&buffer[0], 0, size);
 				memcpy(&buffer[0], text, length);
+				m_nLen = length-1;
 			}
 		};
 

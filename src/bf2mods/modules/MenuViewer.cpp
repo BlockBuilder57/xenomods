@@ -28,36 +28,61 @@ namespace {
 
 			ui::UIObjectAcc titlescreen = ui::UIObjectAcc(this_pointer->rootUIObjAcc);
 			ui::UIObjectAcc versionNum = ui::UIObjectAcc(this_pointer->rootUIObjAcc, "TXT_version_num");
-
-			if (versionNum.objectId == 0)
+			if (versionNum.uiObject == nullptr)
 				return;
+
+			// get the offset the game version has
+			mm::Rect<short> versionRect;
+			mm::Rect<short> scratchRect;
+			mm::Pnt<short> scratchPos;
+
+			versionNum.getRect(versionRect, 2);
+			short offsetX = 1280 - versionRect.w - versionRect.x;
+			short offsetY = versionRect.y + versionRect.h;
 
 			// we're duplicating the copyright text for its length
-			// for whatever reason we're still bounded by the size of the ui object,
-			// and it doesn't seem like there's a clear way to resize it properly
-			auto newVersionId = titlescreen.duplicateChild("TXT_copyright");
-			ui::UIObjectAcc newVersion = ui::UIObjectAcc(newVersionId);
-
-			if (newVersion.objectId == 0)
+			// for whatever reason we're still bounded by some size of the ui object,
+			// and it doesn't seem like there's a clear way to change it properly
+			ui::UIObjectAcc modVersion = ui::UIObjectAcc(titlescreen.duplicateChild("TXT_copyright"));
+			if (modVersion.uiObject == nullptr)
 				return;
 
+			modVersion.uiObject->name.set("TXT_mod_version");
+
 			// make the version string...
-			std::string version = fmt::format("bf2mods {}", bf2mods::version::tagDirty);
-			auto newText = ui::UIStr(version.c_str(), true);
-			newVersion.setText(newText);
+			auto modVersionStr = fmt::format("bf2mods {}", bf2mods::version::tagDirty);
+			auto modVersionUIStr = ui::UIStr(modVersionStr.c_str(), true);
+			modVersion.setText(modVersionUIStr);
 
-			// i want the offset the game version has
-			mm::Rect<short> rect;
-			versionNum.getRect(rect, 2);
-			short offset = 1280 - rect.w - rect.x;
-			newVersion.getRect(rect, 2);
+			// now we can use the offset for ourselves
+			modVersion.getRect(scratchRect, 2);
+			scratchPos.x = 1280 - offsetX - scratchRect.w;
+			scratchPos.y = offsetY += 2;
+			offsetY += scratchRect.h;
+			modVersion.setPos(scratchPos);
 
-			// so we can use it for ourselves
-			mm::Pnt<short> pos;
-			versionNum.getPos(pos);
-			pos.y += 25;
-			pos.x = 1280 - offset - rect.w;
-			newVersion.setPos(pos);
+#if _DEBUG
+			// might as well show a build string too
+			// ideally this would just be a newline in the version string,
+			// but it seems that fixing the text size is more hassle than its worth
+
+			ui::UIObjectAcc modBuildDate = ui::UIObjectAcc(titlescreen.duplicateChild("TXT_copyright"));
+			if (modBuildDate.uiObject == nullptr)
+				return;
+
+			modBuildDate.uiObject->name.set("TXT_mod_builddate");
+
+			auto modBuildDateStr = fmt::format("Built {} {}", __DATE__, __TIME__);
+			auto modBuildDateUIStr = ui::UIStr(modBuildDateStr.c_str(), true);
+			modBuildDate.setText(modBuildDateUIStr);
+
+			modBuildDate.getRect(scratchRect, 2);
+			scratchPos.x = 1280 - offsetX - scratchRect.w;
+			scratchPos.y = offsetY += 2;
+			offsetY += scratchRect.h;
+			modBuildDate.setPos(scratchPos);
+#endif
+
 		}
 	};
 
@@ -82,9 +107,10 @@ namespace {
 			bool goodName = false;
 
 			ui::UIObject* obj = this_pointer;
+			std::string_view name = {obj->name.buffer, obj->name.m_nLen};
+
 			do {
-				std::string_view name = {obj->name.buffer, obj->name.m_nLen};
-				if (name.find("talk") != std::string::npos)
+				if (name.find("TXT_") != std::string::npos)
 					goodName = true;
 
 				shouldSkip = !obj->displayInfo.isDisp;
@@ -97,24 +123,31 @@ namespace {
 
 			mm::Rect<short> rectS;
 			auto objAcc = ui::UIObjectAcc(this_pointer->objectId);
-			objAcc.getRect(rectS, 3);
+			objAcc.getRect(rectS, 0b11);
 
 			mm::Rect<int> rect = {rectS.x, rectS.y, rectS.w, rectS.h};
 			fw::debug::drawLineSquare2D(rect, mm::Col4::white);
 
+			short height = fw::debug::drawFontGetHeight();
 			short textX = rect.x;
-			short textY = rect.y + rect.h;
+			short textY = rect.y + rect.h - height;
 
-			mm::Col4 transparentWhite = {1, 1, 1, 0.5f};
+			mm::Col4 transparentWhite = {1, 1, 1, 0.8f};
 
-			//fw::debug::drawFontFmtShadow(textX, textY, mm::Col4::white, "flags: {}", this_pointer->flags);
-			fw::debug::drawFontFmtShadow(textX, textY, transparentWhite, "{}", this_pointer->name.buffer);
+			fw::debug::drawFontFmt(textX, textY += 0, transparentWhite, "{}", this_pointer->name.buffer);
+			//fw::debug::drawFontFmt(textX, textY += height, mm::Col4::white, "flags: {}", static_cast<uint>(this_pointer->flags));
 
-			ui::UIObjectPlugin* plugin = this_pointer->latestPlugin;
-			while (plugin != nullptr) {
-				fw::debug::drawFontFmtShadow(textX, textY += fw::debug::drawFontGetHeight(), transparentWhite, "Plugin: {}", plugin->getRTTI()->szName);
-				plugin = plugin->prevPlugin;
+			if (this_pointer->getRTTI()->isKindOf(&ui::UITextObject::m_rtti)) {
+				//fw::debug::drawFontFmt(textX, textY += height, transparentWhite, "alignH: {}", objAcc.getTextAlignH());
+				//fw::debug::drawFontFmt(textX, textY += height, transparentWhite, "alignV: {}", objAcc.getTextAlignV());
+				//fw::debug::drawFontFmt(textX, textY += height, transparentWhite, "dispmode: {}", static_cast<byte>(this_pointer->displayInfo.displayMode));
 			}
+
+			/*ui::UIObjectPlugin* plugin = this_pointer->latestPlugin;
+			while (plugin != nullptr) {
+				fw::debug::drawFontFmt(textX, textY += height, transparentWhite, "Plugin: {}", plugin->getRTTI()->szName);
+				plugin = plugin->prevPlugin;
+			}*/
 		}
 	};
 
@@ -130,10 +163,10 @@ namespace bf2mods {
 
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 
-		//BigOlUIDebugger::HookAt(&ui::UIObject::update);
-
 #if !BF2MODS_CODENAME(bfsw)
 		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
+
+		//BigOlUIDebugger::HookAt("_ZN2ui8UIObject6updateEv");
 
 		// doesn't seem to work in DE, but does at least hook
 		StraightensYourXenoblade::HookAt("_ZN5layer12LayerObjFont17updateShaderParmsEPKNS_15LayerRenderViewERKNS_14LayerResMatrixERKNS_13LayerResColorE");

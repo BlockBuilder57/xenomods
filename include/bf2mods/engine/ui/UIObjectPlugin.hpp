@@ -6,15 +6,10 @@
 
 #include <bf2mods/Utils.hpp>
 
+#include "bf2mods/engine/mm/mtl/RTTI.hpp"
+
 namespace ui {
 
-	// temporary, move somewhere else
-	struct RTTIObj {
-		const char* szName;
-
-		RTTIObj* pPrevInheritanceObj;
-		void* unk;
-	};
 
 	class UIObjectPlugin {
 	   public:
@@ -24,7 +19,7 @@ namespace ui {
 
 		virtual ~UIObjectPlugin() = default;
 
-		virtual RTTIObj* getRTTI() const;
+		virtual mm::mtl::RTTI* getRTTI() const;
 		virtual void reload();
 		virtual void execute();
 

@@ -10,9 +10,15 @@ namespace ui {
 
 	class UIDisplayInfo {
 	   public:
+		enum class DisplayMode : byte {
+			kZero = 0,
+			kOne
+		};
+
 		void* vtable;
 		bool isDisp;
-		INSERT_PADDING_BYTES(0x3);
+		DisplayMode displayMode;
+		INSERT_PADDING_BYTES(0x2);
 		short priority;
 		short unk2;
 		mm::Col4 multiplyColor;
