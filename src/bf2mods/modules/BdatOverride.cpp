@@ -24,7 +24,7 @@ namespace {
 	}
 
 	struct GetValHook : skylaunch::hook::Trampoline<GetValHook> {
-		static void* Hook(unsigned char* pBdat, unsigned char* pVarName, int idx) {
+		static unsigned long Hook(unsigned char* pBdat, unsigned char* pVarName, int idx) {
 			auto sheetName = std::string_view { Bdat::getSheetName(pBdat) };
 			auto memberName = std::string_view { reinterpret_cast<char*>(pBdat + *reinterpret_cast<short*>(pVarName + 4)) };
 			//bf2mods::g_Logger->LogInfo("[Bdat] {}/{}:{}", sheetName, memberName, idx);
@@ -36,7 +36,7 @@ namespace {
 					.member = memberName,
 					.row = static_cast<unsigned short>(idx)
 				},
-				.data = nullptr
+				.data = 0
 			};
 
 			std::vector<bf2mods::BdatOverrideBase*> applicableCallbacks;
@@ -50,18 +50,85 @@ namespace {
 			for(auto& callback : applicableCallbacks)
 				(*callback)(access);
 
-			if(access.data != nullptr)
+			if(access.data != 0)
 				return access.data;
 
 			return Orig(pBdat, pVarName, access.sheet.row);
 		}
 	};
 
+	struct TomlBdatOverride : bf2mods::BdatOverrideBase {
+		[[nodiscard]] bool IsApplicable(SheetData& sheet) const override {
+			return bf2mods::BdatOverride::TOMLTable[sheet.name].is_table();
+		}
+
+		void operator()(Access& access) override {
+			std::string unfortunateConversion = fmt::format("{}", access.sheet.row);
+			toml::table* rowTable = bf2mods::BdatOverride::TOMLTable[access.sheet.name][unfortunateConversion].as_table();
+			if (rowTable == nullptr)
+				return; // no table for the row
+
+			// we can declare a fallback for unchanged values
+			ushort rowPre = access.sheet.row;
+			auto fallbackRow = rowTable->get("_fallback");
+			if (fallbackRow != nullptr) {
+				access.sheet.row = fallbackRow->value_or(access.sheet.row);
+				//bf2mods::g_Logger->LogWarning("{}/{}:{} requested fallback to {}", access.sheet.name, access.sheet.member, rowPre, access.sheet.row);
+			}
+
+			auto memberNode = rowTable->get(access.sheet.member);
+			if (memberNode == nullptr) {
+				//bf2mods::g_Logger->LogDebug("no value for {}/{}:{}", access.sheet.name, access.sheet.member, rowPre);
+				return; // no value for this member
+			}
+
+			using enum Bdat::ValueType;
+
+			auto memberPtr = Bdat::getMember(access.sheet.buffer, access.sheet.member.data());
+			auto type = Bdat::getVarType(access.sheet.buffer, memberPtr);
+
+			switch(type) {
+				case Bdat::kUByte:
+					access.data = static_cast<unsigned long>(memberNode->value<std::uint64_t>().value());
+					break;
+				case Bdat::kUInt16:
+					access.data = static_cast<unsigned long>(memberNode->value<std::uint16_t>().value());
+					break;
+				case Bdat::kUInt32:
+					access.data = static_cast<unsigned long>(memberNode->value<std::uint32_t>().value());
+					break;
+				case Bdat::kSByte:
+					access.data = static_cast<unsigned long>(memberNode->value<std::int64_t>().value());
+					break;
+				case Bdat::kInt16:
+					access.data = static_cast<unsigned long>(memberNode->value<std::int16_t>().value());
+					break;
+				case Bdat::kInt32:
+					access.data = static_cast<unsigned long>(memberNode->value<std::int32_t>().value());
+					break;
+				case Bdat::kString:
+					access.data = reinterpret_cast<unsigned long>(memberNode->value<const char*>().value());
+					break;
+				case Bdat::kFloat:
+					access.data = static_cast<unsigned long>(memberNode->value<float>().value());
+					break;
+				default:
+					break;
+			}
+		};
+	};
+
+	static auto& TomlOverride() {
+		static TomlBdatOverride gOverride;
+		return gOverride;
+	}
+
 } // namespace
 
 namespace bf2mods {
 
 	std::vector<bf2mods::BdatOverrideBase*> BdatOverride::Callbacks = {};
+	toml::table BdatOverride::TOMLTable = {};
 
 	void BdatOverride::RegisterCallback(bf2mods::BdatOverrideBase* override) {
 		Callbacks.push_back(override);
@@ -69,8 +136,24 @@ namespace bf2mods {
 
 	void BdatOverride::Initialize() {
 		g_Logger->LogDebug("Setting up Bdat overrides...");
+		LoadFromFile();
 
 		GetValHook::HookAt(Bdat::getVal);
+
+		RegisterCallback(&TomlOverride());
+	}
+
+	void BdatOverride::LoadFromFile() {
+		auto path = fmt::format("sd:/config/bf2mods/{}/bdatOverride.toml", BF2MODS_CODENAME_STR);
+		toml::parse_result res = toml::parse_file(path);
+
+		if(!res) {
+			auto error = std::move(res).error();
+			g_Logger->LogDebug("No Bdat override file could be found ({})", error.description());
+			return;
+		}
+
+		TOMLTable = std::move(res).table();
 	}
 
 	BF2MODS_REGISTER_MODULE(BdatOverride);

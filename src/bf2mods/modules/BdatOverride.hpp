@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <toml++/toml.h>
+
 #include <string>
 #include <string_view>
 #include <vector>
@@ -25,7 +27,7 @@ namespace bf2mods {
 
 		struct Access {
 			SheetData sheet;
-			void* data {};
+			unsigned long data {};
 		};
 
 		[[nodiscard]] virtual bool IsApplicable(SheetData& sheetName) const = 0;
@@ -34,9 +36,13 @@ namespace bf2mods {
 
 	struct BdatOverride : public UpdatableModule {
 		static std::vector<BdatOverrideBase*> Callbacks;
+		static toml::table TOMLTable;
 
 		static void RegisterCallback(bf2mods::BdatOverrideBase* override);
 		void Initialize() override;
+
+		void LoadFromFile();
+
 	};
 
 } // namespace bf2mods

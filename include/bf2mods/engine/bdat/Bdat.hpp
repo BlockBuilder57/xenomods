@@ -41,6 +41,8 @@ namespace Bdat {
 	char* getMSLabel(unsigned char* pBdat, int index);
 	char* getMSText(unsigned char* pBdat, int index);
 
+	ValueType getVarType(unsigned char* pBdat, unsigned char* pVarName);
+
 	void* getVal(unsigned char* pBdat, unsigned char* pVarName, int);
 	long getValCheck(unsigned char* pBdat, const char* memberName, int param_3, int type);
 

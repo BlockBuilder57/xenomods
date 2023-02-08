@@ -35,7 +35,7 @@ namespace {
 				} break;
 				case ShowSheetName: {
 					auto label = Bdat::getMSLabel(access.sheet.buffer, access.sheet.row);
-					access.data = label != nullptr ? label : Bdat::getSheetName(access.sheet.buffer);
+					access.data = reinterpret_cast<unsigned long>(label != nullptr ? label : Bdat::getSheetName(access.sheet.buffer));
 				} break;
 				default:
 					break;

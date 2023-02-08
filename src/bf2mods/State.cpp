@@ -18,7 +18,7 @@ namespace bf2mods {
 	}
 
 	void Config::LoadFromFile() {
-		toml::parse_result res = toml::parse_file("sd:/config/bf2mods/bf2mods.toml");
+		toml::parse_result res = toml::parse_file("sd:/config/bf2mods/config.toml");
 
 		if(!res) {
 			auto error = std::move(res).error();
