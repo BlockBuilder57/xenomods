@@ -10,7 +10,7 @@ namespace bf2mods {
 
 	enum class Keybind : std::uint64_t {
 		CLEAR_TCPLOG = nn::hid::KEY_PLUS,
-		BDAT_SCRAMBLETYPE_TOGGLE = nn::hid::KEY_X,
+		BDAT_MSSCRAMBLETYPE_SWITCH = nn::hid::KEY_X,
 
 		MOVEMENT_SPEED_UP = nn::hid::KEY_DUP,
 		MOVEMENT_SPEED_DOWN = nn::hid::KEY_DDOWN,

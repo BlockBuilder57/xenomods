@@ -4,63 +4,70 @@
 #include <bf2mods/HidInput.hpp>
 #include <bf2mods/Logger.hpp>
 #include <bf2mods/Utils.hpp>
+#include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
 #include "../main.hpp"
 #include "bf2mods/engine/bdat/Bdat.hpp"
+#include "bf2mods/engine/ml/Rand.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "nn/oe.h"
 #include "version.h"
 
-#include <skylaunch/hookng/Hooks.hpp>
-
 namespace {
-	struct MSTextHook : skylaunch::hook::Trampoline<MSTextHook> {
-		static const char* Hook(unsigned char* pBdat, int n) {
-			const char* sheetName = Bdat::getSheetName(pBdat);
 
-			if(!strcmp(sheetName, "menu_ms")) {
-				if(n == 1610) {
-					// it says "Loading" in the japanese version too so I'm not allowed to moan about hardcoding this
-					return "Loading (modded)";
-				}
-			}
+	struct RandomizerOverride : bf2mods::BdatOverrideBase {
+		using enum bf2mods::BdatRandomizer::BdatMSScrambleType;
 
-			switch(bf2mods::BdatRandomizer::scrambleType) {
-				using enum bf2mods::BdatRandomizer::BdatScrambleType;
-
-				case ScrambleIndex:
-					// scrambles the index of the ms text sheet
-					return Orig(pBdat, (util::nnRand<int16_t>() % Bdat::getIdCount(pBdat)) + Bdat::getIdTop(pBdat));
-				case ShowSheetName:
-					return sheetName;
-				case Off:
-				default:
-					return Orig(pBdat, n);
-			}
+		[[nodiscard]] bool IsApplicable(SheetData& sheet) const override {
+			return bf2mods::BdatRandomizer::msScrambleType != Off &&
+				   Bdat::getMember(sheet.buffer, "name") &&
+				   Bdat::getMember(sheet.buffer, "style");
 		}
+
+		void operator()(Access& access) override {
+			if(access.sheet.member != "name")
+				return;
+
+			switch(bf2mods::BdatRandomizer::msScrambleType) {
+				case ScrambleIndex: {
+					access.sheet.row = (ml::mtRand() % Bdat::getIdCount(access.sheet.buffer)) + Bdat::getIdTop(access.sheet.buffer);
+				} break;
+				case ShowSheetName: {
+					auto label = Bdat::getMSLabel(access.sheet.buffer, access.sheet.row);
+					access.data = label != nullptr ? label : Bdat::getSheetName(access.sheet.buffer);
+				} break;
+				default:
+					break;
+			}
+		};
 	};
+
+	static auto& MsOverride() {
+		static RandomizerOverride gOverride;
+		return gOverride;
+	}
+
 } // namespace
 
 namespace bf2mods {
 
-	BdatRandomizer::BdatScrambleType BdatRandomizer::scrambleType = BdatRandomizer::BdatScrambleType::Off;
+	BdatRandomizer::BdatMSScrambleType BdatRandomizer::msScrambleType = BdatRandomizer::BdatMSScrambleType::Off;
 
 	void BdatRandomizer::Initialize() {
-		g_Logger->LogDebug("Setting up BDAT randomizer...");
+		g_Logger->LogDebug("Setting up Bdat randomizer...");
 
-		// Hook stuff
-		MSTextHook::HookAt(Bdat::getMSText);
+		BdatOverride::RegisterCallback(&MsOverride());
 	}
 
 	void BdatRandomizer::Update() {
-		if(GetPlayer(2)->InputDownStrict(Keybind::BDAT_SCRAMBLETYPE_TOGGLE)) {
-			underlying_value(scrambleType) += 1;
+		if(GetPlayer(2)->InputDownStrict(Keybind::BDAT_MSSCRAMBLETYPE_SWITCH)) {
+			underlying_value(msScrambleType) += 1;
 
-			if(scrambleType >= BdatScrambleType::Count)
-				scrambleType = BdatScrambleType::Off;
+			if(msScrambleType >= BdatMSScrambleType::Count)
+				msScrambleType = BdatMSScrambleType::Off;
 
-			g_Logger->LogInfo("Bdat scramble type set to {}", scrambleType);
+			g_Logger->LogInfo("Bdat text scramble type set to {}", msScrambleType);
 		}
 	}
 

@@ -13,6 +13,7 @@ add_executable(bf2mods
 
 		bf2mods/modules/DebugStuff.cpp
 		bf2mods/modules/FileDetours.cpp
+		bf2mods/modules/BdatOverride.cpp
 		bf2mods/modules/CameraTools.cpp
 		bf2mods/modules/EventDebugUtils.cpp
 		bf2mods/modules/MenuViewer.cpp
