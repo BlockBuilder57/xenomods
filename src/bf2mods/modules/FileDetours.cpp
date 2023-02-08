@@ -125,14 +125,14 @@ namespace {
 
 		// dump data reads to sd card
 		if(bf2mods::GetState().config.dumpFileReads) {
-			auto path = fmt::format("sd:/config/bf2mods/dump/{}/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
+			auto path = fmt::format("sd:/config/bf2mods/{}/dump/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			if(EnsurePath(path, true))
 				DumpToFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 
 		// load from loose sd card files
 		if(bf2mods::GetState().config.useFileDumps) {
-			auto path = fmt::format("sd:/config/bf2mods/override/{}/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
+			auto path = fmt::format("sd:/config/bf2mods/{}/override/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			LoadFromFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 	}
