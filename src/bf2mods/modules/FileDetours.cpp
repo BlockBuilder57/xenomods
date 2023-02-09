@@ -131,7 +131,7 @@ namespace {
 		}
 
 		// load from loose sd card files
-		if(bf2mods::GetState().config.useFileDumps) {
+		if(bf2mods::GetState().config.enableFileOverrides) {
 			auto path = fmt::format("sd:/config/bf2mods/{}/override/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			LoadFromFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}

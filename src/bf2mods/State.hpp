@@ -19,8 +19,8 @@ namespace bf2mods {
 #define CONFIG_TITLEEVENTS_DEFAULT {}
 #endif
 #define CONFIG_EVENT_DEBUG_BITS_DEFAULT 0b1
-#define CONFIG_DUMP_FILEREADS_DEFAULT false
-#define CONFIG_USE_FILEDUMPS_DEFAULT true
+#define CONFIG_DUMP_FILE_READS_DEFAULT false
+#define CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT true
 
 		/**
 		 * Reset to default values.
@@ -36,7 +36,7 @@ namespace bf2mods {
 		unsigned int eventDebugBits {};
 
 		bool dumpFileReads {};
-		bool useFileDumps {};
+		bool enableFileOverrides {};
 	   private:
 		void InitializeFromTable(const toml::table& table, bool respectDefaults);
 

@@ -143,6 +143,12 @@ namespace bf2mods {
 		RegisterCallback(&TomlOverride());
 	}
 
+	void BdatOverride::Update() {
+		if(GetPlayer(2)->InputDownStrict(Keybind::RELOAD_CONFIG)) {
+			LoadFromFile();
+		}
+	}
+
 	void BdatOverride::LoadFromFile() {
 		auto path = fmt::format("sd:/config/bf2mods/{}/bdatOverride.toml", BF2MODS_CODENAME_STR);
 		toml::parse_result res = toml::parse_file(path);

@@ -40,6 +40,10 @@ namespace bf2mods {
 
 		static void RegisterCallback(bf2mods::BdatOverrideBase* override);
 		void Initialize() override;
+		bool NeedsUpdate() const override {
+			return true;
+		}
+		void Update() override;
 
 		void LoadFromFile();
 

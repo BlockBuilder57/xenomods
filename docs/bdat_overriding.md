@@ -4,8 +4,6 @@ With optional TOML config files, Bdat values can be overridden with ease.
 
 The game-specific override file can be created/found at `sd:/config/bf2mods/{game}/bdatOverride.toml`.
 
-It is only read at boot.
-
 ---
 
 ### Example

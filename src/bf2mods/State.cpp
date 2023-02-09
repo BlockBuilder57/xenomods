@@ -13,8 +13,8 @@ namespace bf2mods {
 
 		eventDebugBits = CONFIG_EVENT_DEBUG_BITS_DEFAULT;
 
-		dumpFileReads = CONFIG_DUMP_FILEREADS_DEFAULT;
-		useFileDumps = CONFIG_USE_FILEDUMPS_DEFAULT;
+		dumpFileReads = CONFIG_DUMP_FILE_READS_DEFAULT;
+		enableFileOverrides = CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT;
 	}
 
 	void Config::LoadFromFile() {
@@ -64,9 +64,9 @@ namespace bf2mods {
 			eventDebugBits = table["eventDebugBits"].value_or(CONFIG_EVENT_DEBUG_BITS_DEFAULT);
 
 		if (respectDefaults || table["dumpFileReads"].type() != toml::node_type::none)
-			dumpFileReads = table["dumpFileReads"].value_or(CONFIG_DUMP_FILEREADS_DEFAULT);
-		if (respectDefaults || table["useFileDumps"].type() != toml::node_type::none)
-			useFileDumps = table["useFileDumps"].value_or(CONFIG_USE_FILEDUMPS_DEFAULT);
+			dumpFileReads = table["dumpFileReads"].value_or(CONFIG_DUMP_FILE_READS_DEFAULT);
+		if (respectDefaults || table["enableFileOverrides"].type() != toml::node_type::none)
+			enableFileOverrides = table["enableFileOverrides"].value_or(CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT);
 
 		if (respectDefaults && table[BF2MODS_CODENAME_STR].is_table()) {
 			//g_Logger->LogDebug("Found {} as a category, loading...", BF2MODS_CODENAME_STR);

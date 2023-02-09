@@ -80,11 +80,8 @@ namespace bf2mods {
 		 * Check buttons
 		 */
 
-		if(P2->InputDownStrict(CLEAR_TCPLOG)) {
-			// https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#text-modification
-			skylaunch::logger::s_Instance->LogFormat("\u001B[2J");
-
-			g_Logger->LogInfo("Cleared TCP log");
+		if (P2->InputDownStrict(RELOAD_CONFIG)) {
+			GetState().config.LoadFromFile();
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
 			g_Logger->LogDebug("test debug message! {}", ml::mtRand());

@@ -2,8 +2,6 @@
 
 bf2mods has an optional TOML config file located on the SD card. By default, the file does not exist, but can be created at `sd:/config/bf2mods/config.toml`.
 
-As of writing, it is mostly used for initialization as it is only read at boot.
-
 ---
 
 ### Example
@@ -23,7 +21,7 @@ eventDebugBits = 0b1
 # Dumps files to /config/bf2mods/{game}/dump/
 dumpFileReads = false
 # Reads overrides from /config/bf2mods/{game}/override/
-useFileOverrides = true
+enableFileOverrides = true
 
 # Using a header can override configs for specific games
 [ira]

@@ -28,7 +28,7 @@ Check out the list below to see what does what.
 | Temp Int Decrement      | ZL+Dpad Left, **P2**  | Decrements the temp int.                                                                                                                                    |
 | Jump to MapJump         | ZL+Dpad Down, **P2**  | Jumps to the MapJump with the id of the temp int. Look below for a list.                                                                                    |
 | Play Sound Effect       | ZL+Minus, **P2**      | Plays a common sound effect with the id of the temp int.                                                                                                    |
-| Clear TCP Log           | Plus, **P2**          | Clears the TCP log. Any clients connected will have their terminals cleared of output.                                                                      |
+| Reload Config File      | Plus, **P2**          | Reloads the config file from the SD card.                                                                                                                   |
 | Test Logger             | Plus+R, **P2**        | A simple logging test for the logger console.                                                                                                               |
 | Straighten Font         | L+Y, **P2**           | Straightens out the font used in 2 and Torna. Nice meme.                                                                                                    |
 
