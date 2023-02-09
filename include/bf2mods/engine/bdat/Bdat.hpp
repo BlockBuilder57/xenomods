@@ -38,6 +38,10 @@ namespace Bdat {
 
 	unsigned char* getMember(unsigned char* pBdat, const char* memberName);
 
+	unsigned short getIdTop(unsigned char* pBdat);
+	unsigned short getIdEnd(unsigned char* pBdat);
+	unsigned short getIdCount(unsigned char* pBdat);
+
 	char* getMSLabel(unsigned char* pBdat, int index);
 	char* getMSText(unsigned char* pBdat, int index);
 
@@ -46,8 +50,6 @@ namespace Bdat {
 	void* getVal(unsigned char* pBdat, unsigned char* pVarName, int);
 	long getValCheck(unsigned char* pBdat, const char* memberName, int param_3, int type);
 
-	uint16_t getIdCount(unsigned char* pBdat);
-	uint16_t getIdTop(unsigned char* pBdat);
 	char* getSheetName(unsigned char* pBdat);
 	char* getMemberName(unsigned char* somethin, int index);
 

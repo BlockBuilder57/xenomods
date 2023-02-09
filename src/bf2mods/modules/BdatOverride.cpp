@@ -10,6 +10,7 @@
 #include <bf2mods/Utils.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
+#include "../main.hpp"
 #include "bf2mods/engine/bdat/Bdat.hpp"
 
 namespace {
@@ -54,6 +55,37 @@ namespace {
 				return access.data;
 
 			return Orig(pBdat, pVarName, access.sheet.row);
+		}
+	};
+
+	struct IDCountOverride : skylaunch::hook::Trampoline<IDCountOverride> {
+		static unsigned short Hook(unsigned char* pBdat) {
+			auto sheet = reinterpret_cast<Bdat::BdatSheet*>(pBdat);
+			auto sheetName = std::string_view { Bdat::getSheetName(pBdat) };
+			unsigned short result = Orig(pBdat);
+
+			if (bf2mods::BdatOverride::SheetMaxIDs.contains(sheetName.data())) {
+				unsigned short maxId = bf2mods::BdatOverride::SheetMaxIDs[sheetName.data()] - sheet->idTop + 1;
+				if (maxId > result)
+					result = maxId;
+			}
+
+			return result;
+		}
+	};
+
+	struct IDEndOverride : skylaunch::hook::Trampoline<IDEndOverride> {
+		static unsigned short Hook(unsigned char* pBdat) {
+			auto sheetName = std::string_view { Bdat::getSheetName(pBdat) };
+			unsigned short result = Orig(pBdat);
+
+			if (bf2mods::BdatOverride::SheetMaxIDs.contains(sheetName.data())) {
+				unsigned short maxId = bf2mods::BdatOverride::SheetMaxIDs[sheetName.data()];
+				if (maxId > result)
+					result = maxId;
+			}
+
+			return result;
 		}
 	};
 
@@ -129,6 +161,7 @@ namespace bf2mods {
 
 	std::vector<bf2mods::BdatOverrideBase*> BdatOverride::Callbacks = {};
 	toml::table BdatOverride::TOMLTable = {};
+	std::unordered_map<std::string_view, unsigned short> BdatOverride::SheetMaxIDs = {};
 
 	void BdatOverride::RegisterCallback(bf2mods::BdatOverrideBase* override) {
 		Callbacks.push_back(override);
@@ -139,6 +172,13 @@ namespace bf2mods {
 		LoadFromFile();
 
 		GetValHook::HookAt(Bdat::getVal);
+
+		if (!TOMLTable.empty()) {
+			// these are slow! if there's no override file, let's just not even bother hooking
+			// NOTE: this needs removing if native code ever extends a sheet
+			IDCountOverride::HookAt(Bdat::getIdCount);
+			IDEndOverride::HookAt(Bdat::getIdEnd);
+		}
 
 		RegisterCallback(&TomlOverride());
 	}
@@ -155,11 +195,30 @@ namespace bf2mods {
 
 		if(!res) {
 			auto error = std::move(res).error();
-			g_Logger->LogDebug("No Bdat override file could be found ({})", error.description());
+			//g_Logger->LogDebug("No Bdat override file could be found ({})", error.description());
 			return;
 		}
 
+		SheetMaxIDs.clear();
 		TOMLTable = std::move(res).table();
+
+		TOMLTable.for_each([&](auto& sheetKey, auto& sheetEl) {
+			if constexpr(toml::is_table<decltype(sheetEl)>) {
+				toml::table sheetName = sheetEl;
+				unsigned short maxRow = 0;
+
+				sheetName.for_each([&](auto& rowKey, auto& rowEl) {
+					if (toml::is_table<decltype(rowEl)>) {
+						int attempt = std::atoi(rowKey.data());
+						if (attempt > 0 && maxRow < attempt)
+							maxRow = attempt;
+					}
+				});
+
+				SheetMaxIDs[sheetKey.data()] = maxRow;
+				//g_Logger->LogDebug("Adding {} with {} max", sheetKey.data(), maxRow);
+			}
+		});
 	}
 
 	BF2MODS_REGISTER_MODULE(BdatOverride);

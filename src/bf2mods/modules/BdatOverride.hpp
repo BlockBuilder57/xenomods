@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <unordered_map>
 
 #include "UpdatableModule.hpp"
 
@@ -37,6 +38,7 @@ namespace bf2mods {
 	struct BdatOverride : public UpdatableModule {
 		static std::vector<BdatOverrideBase*> Callbacks;
 		static toml::table TOMLTable;
+		static std::unordered_map<std::string_view, unsigned short> SheetMaxIDs;
 
 		static void RegisterCallback(bf2mods::BdatOverrideBase* override);
 		void Initialize() override;
