@@ -15,15 +15,6 @@
 
 namespace {
 
-	template<class InputIt, class OutputContainer, class UnaryOp>
-	constexpr OutputContainer& InsertIf(InputIt begin, InputIt end, OutputContainer& container, UnaryOp op) {
-		while(begin != end)
-			if(auto obj = *begin++; op(obj))
-				container.push_back(obj);
-
-		return container;
-	}
-
 	struct GetValHook : skylaunch::hook::Trampoline<GetValHook> {
 		static unsigned long Hook(unsigned char* pBdat, unsigned char* pVarName, int idx) {
 			auto sheetName = std::string_view { Bdat::getSheetName(pBdat) };
@@ -40,16 +31,11 @@ namespace {
 				.data = 0
 			};
 
-			std::vector<bf2mods::BdatOverrideBase*> applicableCallbacks;
-
-			// reduce all applicable callbacks from global vector
-			InsertIf(bf2mods::BdatOverride::Callbacks.begin(), bf2mods::BdatOverride::Callbacks.end(), applicableCallbacks, [&](auto* callback) {
-				return callback->IsApplicable(access.sheet);
-			});
-
 			// run all applicable callbacks
-			for(auto& callback : applicableCallbacks)
-				(*callback)(access);
+			for(bf2mods::BdatOverrideBase* callback : bf2mods::BdatOverride::Callbacks) {
+				if (callback->IsApplicable(access.sheet))
+					(*callback)(access);
+			}
 
 			if(access.data != 0)
 				return access.data;
@@ -95,14 +81,14 @@ namespace {
 		}
 
 		void operator()(Access& access) override {
-			std::string unfortunateConversion = fmt::format("{}", access.sheet.row);
+			std::string unfortunateConversion = std::to_string(access.sheet.row);
 			toml::table* rowTable = bf2mods::BdatOverride::TOMLTable[access.sheet.name][unfortunateConversion].as_table();
 			if (rowTable == nullptr)
 				return; // no table for the row
 
 			// we can declare a fallback for unchanged values
-			ushort rowPre = access.sheet.row;
-			auto fallbackRow = rowTable->get("_fallback");
+			//ushort rowPre = access.sheet.row;
+			auto fallbackRow = rowTable->get("_fb");
 			if (fallbackRow != nullptr) {
 				access.sheet.row = fallbackRow->value_or(access.sheet.row);
 				//bf2mods::g_Logger->LogWarning("{}/{}:{} requested fallback to {}", access.sheet.name, access.sheet.member, rowPre, access.sheet.row);
@@ -174,8 +160,6 @@ namespace bf2mods {
 		GetValHook::HookAt(Bdat::getVal);
 
 		if (!TOMLTable.empty()) {
-			// these are slow! if there's no override file, let's just not even bother hooking
-			// NOTE: this needs removing if native code ever extends a sheet
 			IDCountOverride::HookAt(Bdat::getIdCount);
 			IDEndOverride::HookAt(Bdat::getIdEnd);
 		}
