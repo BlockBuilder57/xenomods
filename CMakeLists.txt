@@ -24,7 +24,7 @@ set(SKYLAUNCH_LINKERSCRIPTS_DIR "${PROJECT_SOURCE_DIR}/linkerscripts")
 configure_file(linkerscripts/switch.specs.in ${PROJECT_BINARY_DIR}/switch.specs)
 
 # Generate version
-add_custom_target(__bf2mods_gittag COMMAND python3 ${PROJECT_SOURCE_DIR}/scripts/gittag.py WORKING_DIRECTORY ${PROJECT_BINARY_DIR} SOURCES ${PROJECT_BINARY_DIR}/gitversion.h)
+add_custom_target(__bf2mods_gittag COMMAND python3 ../scripts/gittag.py WORKING_DIRECTORY ${PROJECT_BINARY_DIR} SOURCES ${PROJECT_BINARY_DIR}/gitversion.h)
 set_source_files_properties(${PROJECT_BINARY_DIR}/gitversion.h PROPERTIES GENERATED TRUE)
 
 # Vendor libraries
