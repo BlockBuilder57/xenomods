@@ -1,4 +1,4 @@
-## bf2mods
+## bf2mods [![bf2mods CI](https://github.com/BlockBuilder57/bf2mods/actions/workflows/ci.yml/badge.svg)](https://github.com/BlockBuilder57/bf2mods/actions/workflows/ci.yml)
 
 Some mod code by [modeco80](https://github.com/modeco80) and [BlockBuilder57](https://github.com/BlockBuilder57) for the Xenoblade games on Switch.
 
@@ -18,7 +18,7 @@ Latest compatible exefs versions:
 | Xenoblade Definitive Edition | 0100FF500E34A000                               | All versions           | bfsw     |
 | Xenoblade 3                  | 010074F013262000                               | **None**               | bf3      |
 
-Once you've done that, simply copy the main.npdm and subsdk1 files to the exefs directory.
+Once you've done that, simply copy the contents of the zip to the root of your SD card. (The `atmosphere` folders should merge.)
 
 ## Usage
 
@@ -37,7 +37,7 @@ $ cmake --build build
 # profit?
 ```
 
-Once built, copy bf2mods.nso (as `subsdk1`) and main.npdm from build/ to the LayeredFS exefs directory.
+Once built, copy bf2mods.nso (renamed to `subsdk1`) and main.npdm from build/ to the LayeredFS exefs directory.
 
 For those with sys-ftpd installed, adding `-DBF2MODS_SWITCH_IP=<ip>` to the first CMake command will automatically copy the files to your console when builds finish.
 
