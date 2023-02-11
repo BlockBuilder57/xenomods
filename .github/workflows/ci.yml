@@ -72,7 +72,7 @@ jobs:
           wget https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2-linux-x86_64.sh 
           sudo mkdir /opt/cmake
           sudo sh cmake-3.25.2-linux-x86_64.sh --skip-license --exclude-subdir --prefix=/opt/cmake || true
-          sudo apt install -y ninja-build
+          sudo apt install -y ninja-build python3
         shell: bash
 
       - name: Build ${{matrix.build.name}}
