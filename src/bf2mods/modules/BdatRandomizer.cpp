@@ -12,7 +12,6 @@
 #include "bf2mods/engine/ml/Rand.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 #include "nn/oe.h"
-#include "version.h"
 
 namespace {
 

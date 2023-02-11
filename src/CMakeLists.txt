@@ -10,6 +10,7 @@ add_executable(bf2mods
         bf2mods/State.cpp
 		bf2mods/Logger.cpp
 		bf2mods/HidInput.cpp
+		bf2mods/Version.cpp
 
 		bf2mods/modules/DebugStuff.cpp
 		bf2mods/modules/FileDetours.cpp

@@ -6,12 +6,12 @@
 #include <skylaunch/hookng/Hooks.hpp>
 
 #include "State.hpp"
+#include "Version.hpp"
 #include "bf2mods/DebugWrappers.hpp"
 #include "bf2mods/HidInput.hpp"
 #include "bf2mods/Logger.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "modules/DebugStuff.hpp"
-#include "gitversion.h"
 
 namespace fw {
 
@@ -108,11 +108,7 @@ namespace bf2mods {
 		fw::FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #endif
 
-#if _DEBUG
-		g_Logger->LogInfo("bf2mods (debug) - {} initialized (built {} {})", version::fullTag, __DATE__, __TIME__);
-#else
-		g_Logger->LogInfo("bf2mods - {} initalized", version::fullTag);
-#endif
+		g_Logger->LogInfo("bf2mods{} - {} initialized (built {})", version::IsDebug() ? " (debug)" : "", version::GitVersion(), version::BuildTimestamp());
 	}
 
 } // namespace bf2mods
