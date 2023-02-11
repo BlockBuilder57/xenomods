@@ -7,11 +7,11 @@
 #include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
+#include "../Version.hpp"
 #include "../main.hpp"
 #include "bf2mods/engine/gf/MenuObject.hpp"
 #include "bf2mods/engine/layer/LayerObj.hpp"
 #include "bf2mods/engine/ui/UIObjectAcc.hpp"
-#include "version.h"
 
 namespace {
 
@@ -50,7 +50,7 @@ namespace {
 			modVersion.uiObject->name.set("TXT_mod_version");
 
 			// make the version string...
-			auto modVersionStr = fmt::format("bf2mods {}", bf2mods::version::tagDirty);
+			auto modVersionStr = fmt::format("bf2mods {}", bf2mods::version::GitVersion());
 			auto modVersionUIStr = ui::UIStr(modVersionStr.c_str(), true);
 			modVersion.setText(modVersionUIStr);
 
@@ -72,8 +72,7 @@ namespace {
 
 			modBuildDate.uiObject->name.set("TXT_mod_builddate");
 
-			auto modBuildDateStr = fmt::format("Built {} {}", __DATE__, __TIME__);
-			auto modBuildDateUIStr = ui::UIStr(modBuildDateStr.c_str(), true);
+			auto modBuildDateUIStr = ui::UIStr(bf2mods::version::BuildTimestamp().data(), true);
 			modBuildDate.setText(modBuildDateUIStr);
 
 			modBuildDate.getRect(scratchRect, 2);

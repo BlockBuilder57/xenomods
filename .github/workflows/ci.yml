@@ -1,0 +1,124 @@
+name: bf2mods CI
+
+on:
+  push:
+    paths:
+      - .github/workflows/ci.yml
+      - cmake/**
+      - CMakeLists.txt
+      - CMakePresets.json
+      - scripts/**
+      - linkerscripts/**
+      - src/**
+      - include/**
+  pull_request:
+    paths:
+      - .github/workflows/ci.yml
+      - cmake/**
+      - CMakeLists.txt
+      - CMakePresets.json
+      - scripts/**
+      - linkerscripts/**
+      - src/**
+      - include/**
+
+jobs:
+  build:
+    name: Build
+    # Run on the devkitPro switch container
+    runs-on: ubuntu-22.04
+    container:
+      image: devkitpro/devkita64:latest
+
+    strategy:
+      fail-fast: true
+
+      # All possible build configurations.
+      # These run in parallel.
+      matrix:
+        build:
+          - name: debug-bf2
+            preset: debug-bf2
+            codename: bf2
+          - name: release-bf2
+            preset: release-bf2
+            codename: bf2
+          - name: debug-ira
+            preset: debug-ira
+            codename: ira
+          - name: release-ira
+            preset: release-ira
+            codename: ira
+          - name: debug-bfsw
+            preset: debug-bfsw
+            codename: bfsw
+          - name: release-bfsw
+            preset: release-bfsw
+            codename: bfsw
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      # This cursed incantation is because the container is Debian Buster,
+      # and buster-backports does not have a CMake version new enough
+      # for the --preset option/presets functionality.
+      #
+      # ...If the container is upgraded this can hopefully be replaced..
+      - name: Install core build deps
+        id: install-coredeps
+        run: |
+          wget https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2-linux-x86_64.sh 
+          sudo mkdir /opt/cmake
+          sudo sh cmake-3.25.2-linux-x86_64.sh --skip-license --exclude-subdir --prefix=/opt/cmake || true
+          sudo apt install -y ninja-build python3
+        shell: bash
+
+      - name: Build ${{matrix.build.name}}
+        id: build
+        run: |
+          /opt/cmake/bin/cmake -Bbuild-${{matrix.build.preset}} --preset ${{matrix.build.preset}}
+          /opt/cmake/bin/cmake --build build-${{matrix.build.preset}} -j $(nproc)
+        shell: bash
+
+      # "packaging" basically makes a atmosphere layeredfs directory structure
+      # and zips that up.
+      - name: Package ${{matrix.build.name}}
+        id: package
+        run: |
+          cd build-${{matrix.build.preset}}
+          python3 ../scripts/makePackage.py --json ../npdm/${{matrix.build.codename}}.json
+          cd pkg
+          zip -9r ../bf2mods-${{matrix.build.preset}}.zip .
+
+      - name: Upload artifact
+        id: upload
+        uses: actions/upload-artifact@v3
+        with:
+            name: bf2mods-${{matrix.build.preset}}
+            path: |
+              build-${{matrix.build.preset}}/bf2mods-${{matrix.build.preset}}.zip
+            if-no-files-found: error
+
+  # This job creates a release from the build artifacts of this job
+  # if there is a tag attached to this commit.
+  create-release:
+    name: Create release
+    runs-on: ubuntu-22.04
+    needs: build
+    if: ${{ github.ref_type == 'tag' }}
+
+    steps:
+      - name: Fetch build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: .
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          fail_on_unmatched_files: true
+          generate_release_notes:  false
+          files: |
+            bf2mods-release-*/*.zip
