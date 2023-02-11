@@ -11,7 +11,7 @@
 #include "bf2mods/engine/gf/MenuObject.hpp"
 #include "bf2mods/engine/layer/LayerObj.hpp"
 #include "bf2mods/engine/ui/UIObjectAcc.hpp"
-#include "version.h"
+#include "gitversion.h"
 
 namespace {
 
@@ -50,7 +50,7 @@ namespace {
 			modVersion.uiObject->name.set("TXT_mod_version");
 
 			// make the version string...
-			auto modVersionStr = fmt::format("bf2mods {}", bf2mods::version::tagDirty);
+			auto modVersionStr = fmt::format("bf2mods {}", bf2mods::version::fullTag);
 			auto modVersionUIStr = ui::UIStr(modVersionStr.c_str(), true);
 			modVersion.setText(modVersionUIStr);
 

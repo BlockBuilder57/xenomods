@@ -11,7 +11,7 @@
 #include "bf2mods/Logger.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "modules/DebugStuff.hpp"
-#include "version.h"
+#include "gitversion.h"
 
 namespace fw {
 
@@ -109,9 +109,9 @@ namespace bf2mods {
 #endif
 
 #if _DEBUG
-		g_Logger->LogInfo("bf2mods (debug) - {} initialized (built {} {})", version::tagDirty, __DATE__, __TIME__);
+		g_Logger->LogInfo("bf2mods (debug) - {} initialized (built {} {})", version::fullTag, __DATE__, __TIME__);
 #else
-		g_Logger->LogInfo("bf2mods - {} initalized", version::tagDirty);
+		g_Logger->LogInfo("bf2mods - {} initalized", version::fullTag);
 #endif
 	}
 
