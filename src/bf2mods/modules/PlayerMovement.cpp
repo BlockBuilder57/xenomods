@@ -1,5 +1,6 @@
 #include "PlayerMovement.hpp"
 
+#include <bf2mods/DebugWrappers.hpp>
 #include <bf2mods/HidInput.hpp>
 #include <bf2mods/Logger.hpp>
 #include <bf2mods/Utils.hpp>
@@ -8,35 +9,35 @@
 #include "../State.hpp"
 #include "../main.hpp"
 #include "DebugStuff.hpp"
-#include "bf2mods/engine/gf/player_controller.hpp"
+#include "bf2mods/engine/fw/UpdateInfo.hpp"
+#include "bf2mods/engine/gf/PlayerController.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
 #include "bf2mods/stuff/utils/util.hpp"
 
 namespace {
 
 	struct ApplyVelocityChanges : skylaunch::hook::Trampoline<ApplyVelocityChanges> {
-		static void Hook(gf::GfComPropertyPc* this_pointer) {
-			Orig(this_pointer);
+		static void Hook(gf::GfComBehaviorPc* this_pointer, fw::UpdateInfo* updateInfo, gf::GfComPropertyPc* pcProperty) {
+			//using enum gf::GfComPropertyPc::Flags;
+			//bool flagInAir = (pcProperty->flags & static_cast<std::uint32_t>(InAir)) != 0;
+			//bool flagOnWall = (pcProperty->flags & static_cast<std::uint32_t>(OnWall)) != 0;
 
-			// set the velocity for moonjump
 			if(bf2mods::PlayerMovement::moonJump)
-				static_cast<glm::vec3&>(this_pointer->velocityActual).y = 10.f;
+				static_cast<glm::vec3&>(pcProperty->velocityActual).y = std::max(10.f, 10.f * (bf2mods::PlayerMovement::movementSpeedMult / 64.f));
 
-			// wish never carries a Y component
-			auto& wish = static_cast<glm::vec3&>(this_pointer->velocityWish);
-			auto& input = static_cast<glm::vec2&>(this_pointer->inputReal);
+			auto& wish = static_cast<glm::vec3&>(pcProperty->velocityWish);
 
-			// if we're not inputting, just don't do anything
-			if(glm::length(input) > 0) {
-				wish *= bf2mods::PlayerMovement::movementSpeedMult;
-				float speedLimit = 8.f * std::max(1.f, bf2mods::PlayerMovement::movementSpeedMult);
+			wish *= bf2mods::PlayerMovement::movementSpeedMult;
 
-				if(glm::length(wish) >= speedLimit)
-					wish = glm::normalize(wish) * speedLimit;
-			}
+			//fw::debug::drawFontFmtShadow(0, 200, mm::Col4::white, "velAct {:2} (len {:.2f})", static_cast<const glm::vec3&>(pcProperty->velocityActual), pcProperty->velocityActual.XZLength());
+			//fw::debug::drawFontFmtShadow(0, 216, mm::Col4::white, "velWsh {:2} (len {:.2f})", static_cast<const glm::vec3&>(pcProperty->velocityWish), pcProperty->velocityWish.XZLength());
+			//fw::debug::drawFontFmtShadow(0, 232, mm::Col4::white, "who knows {:2} {:2}", static_cast<const glm::vec2&>(pcProperty->inputReal), static_cast<const glm::vec2&>(pcProperty->inputDupe));
+			//fw::debug::drawFontFmtShadow(0, 248, mm::Col4::white, "flags: {:032b}", static_cast<std::uint32_t>(pcProperty->flags));
+			//fw::debug::drawFontFmtShadow(0, 264, mm::Col4::white, "in air? {} on wall? {}", flagInAir, flagOnWall);
 
-			//fw::debug::drawFontFmtShadow(0, 216, mm::Col4::white, "velWsh PST {:2} (len {:.2f})", static_cast<const glm::vec3&>(this_pointer->velocityWish), this_pointer->velocityWish.XZLength());
-			//fw::debug::drawFontFmtShadow(0, 232, mm::Col4::white, "who knows {:2} {:2}", static_cast<const glm::vec2&>(this_pointer->inputReal), static_cast<const glm::vec2&>(this_pointer->inputDupe));
+			Orig(this_pointer, updateInfo, pcProperty);
+
+			wish /= bf2mods::PlayerMovement::movementSpeedMult;
 		}
 	};
 
@@ -47,9 +48,9 @@ namespace {
 	};
 
 	struct DisableStateUtilFallDamage : skylaunch::hook::Trampoline<DisableStateUtilFallDamage> {
-		static void Hook(void* GfComBehaviorPc, bool param_2) {
+		static void Hook(gf::GfComBehaviorPc* GfComBehaviorPc, bool param_2) {
 			//bf2mods::g_Logger->LogInfo("StateUtil::setFallDamageDisable(GfComBehaviorPc: {:p}, bool: {})", GfComBehaviorPc, param_2);
-			Orig(GfComBehaviorPc, bf2mods::PlayerMovement::disableFallDamage ? true : param_2);
+			Orig(GfComBehaviorPc, bf2mods::PlayerMovement::disableFallDamage || param_2);
 		}
 	};
 
@@ -77,7 +78,7 @@ namespace bf2mods {
 	void PlayerMovement::Initialize() {
 		g_Logger->LogDebug("Setting up player movement hooks...");
 
-		ApplyVelocityChanges::HookAt("_ZN2gf15GfComPropertyPc9writeBackEv");
+		ApplyVelocityChanges::HookAt("_ZN2gf15GfComBehaviorPc19integrateMoveNormalERKN2fw10UpdateInfoERNS_15GfComPropertyPcE");
 
 		DisableFallDamagePlugin::HookAt("_ZNK2gf2pc18FallDistancePlugin12calcDistanceERKN2mm4Vec3E");
 		DisableStateUtilFallDamage::HookAt("_ZN2gf2pc9StateUtil20setFallDamageDisableERNS_15GfComBehaviorPcEb");

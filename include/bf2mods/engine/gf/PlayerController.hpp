@@ -41,6 +41,15 @@ namespace gf {
 	};
 
 	struct GfComPropertyPc {
+
+		enum class Flags : std::uint32_t {
+			Idle = BIT(2),
+			OnWall = BIT(5),
+			WallAdsorption = BIT(6),
+			AutoRun = BIT(8),
+			InAir = BIT(9),
+		};
+
 		uint8_t pad_bytes[0x60];
 		mm::Vec2 inputReal;
 		INSERT_PADDING_BYTES(8);
@@ -48,6 +57,8 @@ namespace gf {
 		INSERT_PADDING_BYTES(8);
 		mm::Vec3 velocityWish;
 		mm::Vec3 velocityActual;
+		INSERT_PADDING_BYTES(648);
+		unsigned int flags;
 
 		/**
 		 * this is a hack
@@ -69,6 +80,10 @@ namespace gf {
 			// kinda looks fugly being seperate tbh return
 			// *reinterpret_cast<GfComAsm**>(this_0x8 + 0x48);
 		}
+	};
+
+	struct GfComBehaviorPc {
+
 	};
 
 	struct MsgObjectGetVelocity {

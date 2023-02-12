@@ -9,7 +9,8 @@
 namespace fw {
 
 	struct UpdateInfo {
-
+		float unk;
+		float deltaTime;
 	};
 
 }
