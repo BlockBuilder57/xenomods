@@ -1,7 +1,5 @@
 #include "DebugStuff.hpp"
 
-#include <map>
-
 #include <bf2mods/DebugWrappers.hpp>
 #include <bf2mods/HidInput.hpp>
 #include <bf2mods/Logger.hpp>
@@ -14,12 +12,16 @@
 #include "bf2mods/engine/fw/Debug.hpp"
 #include "bf2mods/engine/fw/Framework.hpp"
 #include "bf2mods/engine/fw/UpdateInfo.hpp"
+#include "bf2mods/engine/game/DebugDraw.hpp"
 #include "bf2mods/engine/game/MapJump.hpp"
 #include "bf2mods/engine/gf/BdatData.hpp"
 #include "bf2mods/engine/gf/Bgm.hpp"
 #include "bf2mods/engine/gf/MenuObject.hpp"
 #include "bf2mods/engine/gf/PlayFactory.hpp"
+#include "bf2mods/engine/ml/DebugDrawing.hpp"
 #include "bf2mods/engine/ml/Rand.hpp"
+#include "bf2mods/engine/ml/Scene.hpp"
+#include "bf2mods/engine/ml/WinView.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 #include "bf2mods/engine/tl/title.hpp"
 #include "bf2mods/stuff/utils/debug_util.hpp"
@@ -147,6 +149,24 @@ namespace {
 		}
 	};
 
+#if BF2MODS_CODENAME(bfsw)
+	static unsigned int ForceWinID = 0;
+
+	struct GetWinIDOverride : skylaunch::hook::Trampoline<GetWinIDOverride> {
+		static unsigned int Hook() {
+			return ForceWinID;
+		}
+	};
+
+	struct RenderViewHook : skylaunch::hook::Trampoline<RenderViewHook> {
+		static void Hook(ml::WinView* this_pointer) {
+			ForceWinID = this_pointer->windowID;
+			//bf2mods::g_Logger->LogInfo("winview {} winid {} equal? {}", this_pointer->windowID, ml::DebDraw::getCacheDrawWID(), this_pointer->windowID == ml::DebDraw::getCacheDrawWID());
+			Orig(this_pointer);
+		}
+	};
+#endif
+
 }
 
 namespace bf2mods {
@@ -218,6 +238,9 @@ namespace bf2mods {
 		JumpToClosedLandmarks_Zone::HookAt(&gf::GfMenuObjWorldMap::isOpenLandmark);
 
 		ReplaceTitleEvent::HookAt("_ZN2tl9TitleMain14playTitleEventEj");
+#else
+		GetWinIDOverride::HookAt("_ZN2ml7DebDraw15getCacheDrawWIDEv");
+		RenderViewHook::HookAt("_ZN2ml7WinView10renderViewEv");
 #endif
 	}
 

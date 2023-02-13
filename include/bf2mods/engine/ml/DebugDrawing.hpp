@@ -22,6 +22,7 @@ namespace ml {
 		static DebDraw* getOnly(uint32_t unused);
 		static DebDraw* get(uint32_t maybeIndex); // use -1 for this
 		//void setForceRenderQueue(bool enable);
+		static unsigned int getCacheDrawWID();
 
 	};
 

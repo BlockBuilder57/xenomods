@@ -43,12 +43,18 @@ namespace ml {
 		void updateFovNearFar();
 	};
 
+	enum class SCNCAM : std::uint32_t {};
+	enum class SCNPRIO_CB : std::uint32_t {};
+
 	class Scn {
 	   public:
 		INSERT_PADDING_BYTES(0x38)
 		void* somePointer;
 		// will this work? lol
 		ScnObjCam* getCam(int index);
+
+		void setDebDraw(SCNCAM cam, SCNPRIO_CB prio);
+		bool enableScnDebug(bool nuts);
 	};
 
 } // namespace ml
