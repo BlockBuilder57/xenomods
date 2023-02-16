@@ -9,6 +9,9 @@ project(bf2mods
 		LANGUAGES C CXX ASM
 		)
 
+find_package(Python3 REQUIRED
+		COMPONENTS Interpreter)
+
 option(BF2MODS_ENABLE_FTP OFF "enable ftp transfer")
 
 # If no codename was set, default to bf2.
@@ -24,8 +27,14 @@ set(SKYLAUNCH_LINKERSCRIPTS_DIR "${PROJECT_SOURCE_DIR}/linkerscripts")
 configure_file(linkerscripts/switch.specs.in ${PROJECT_BINARY_DIR}/switch.specs)
 
 # Generate version
-add_custom_target(__bf2mods_gittag COMMAND python3 ../scripts/gittag.py WORKING_DIRECTORY ${PROJECT_BINARY_DIR} SOURCES ${PROJECT_BINARY_DIR}/gitversion.h)
-set_source_files_properties(${PROJECT_BINARY_DIR}/gitversion.h PROPERTIES GENERATED TRUE)
+set(VERSION_FILENAME gitversion.h)
+
+add_custom_target(__bf2mods_gittag
+		COMMAND ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/gittag.py ${VERSION_FILENAME}
+		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+		SOURCES ${PROJECT_BINARY_DIR}/${VERSION_FILENAME}
+		)
+set_source_files_properties(${PROJECT_BINARY_DIR}/${VERSION_FILENAME} PROPERTIES GENERATED TRUE)
 
 # Vendor libraries
 add_subdirectory(vendor/glm)
