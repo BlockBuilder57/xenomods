@@ -7,6 +7,7 @@
 #include <bf2mods/DebugWrappers.hpp>
 #include <bf2mods/HidInput.hpp>
 #include <bf2mods/Logger.hpp>
+#include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
 #include "../main.hpp"
@@ -18,8 +19,6 @@
 #include "bf2mods/stuff/utils/util.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"
-
-#include <skylaunch/hookng/Hooks.hpp>
 
 namespace {
 
@@ -207,25 +206,36 @@ namespace bf2mods {
 		if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TOGGLE)) {
 			Freecam.isOn = !Freecam.isOn;
 			g_Logger->LogInfo("Toggling freecam: {}", Freecam.isOn);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_UP))
-			Freecam.camSpeed *= 2.f;
-		else if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_DOWN))
-			Freecam.camSpeed /= 2.f;
+		}
 
-		if (Freecam.isOn) {
+		if(Freecam.isOn) {
 			static float lastFOVPress = MAXFLOAT;
 			static float lastRollPress = MAXFLOAT;
+			static float lastSpeedPress = MAXFLOAT;
+			float now = nn::os::GetSystemTick() / 19200000.;
 
-			float now = nn::os::GetSystemTick()/19200000.;
+			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_UP)) {
+				Freecam.camSpeed *= 2.f;
+				lastSpeedPress = now;
+			} else if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_DOWN)) {
+				Freecam.camSpeed /= 2.f;
+				lastSpeedPress = now;
+			}
 
-			if (GetPlayer(2)->InputDownStrict(Keybind::FREECAM_FOVHOLD)) {
-				if (now - lastFOVPress < 0.2f)
+			if(DebugStuff::enableDebugRendering && std::abs(now - lastSpeedPress) < 1.5f) {
+				std::string speed = fmt::format("Freecam speed: {}", Freecam.camSpeed);
+				int width = fw::debug::drawFontGetWidth(speed.c_str());
+				fw::debug::drawFontFmtShadow(1280 - width - 3, 3, mm::Col4::white, speed);
+			}
+
+			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_FOVHOLD)) {
+				if(std::abs(now - lastFOVPress) < 0.2f)
 					Freecam.fov = 80;
 
 				lastFOVPress = now;
 			}
-			if (GetPlayer(2)->InputDownStrict(Keybind::FREECAM_ROLLHOLD)) {
-				if (now - lastRollPress < 0.2f) {
+			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_ROLLHOLD)) {
+				if(std::abs(now - lastRollPress) < 0.2f) {
 					glm::vec3 pos {};
 					glm::quat rot {};
 					glm::vec3 scale {};
