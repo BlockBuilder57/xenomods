@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # A simple Git version script.
 # Generates a C/C++ header with definitions.
