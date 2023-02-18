@@ -4,7 +4,7 @@
 
 #include "bf2mods/Logger.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
 	void Config::Reset() {
 		port = CONFIG_PORT_DEFAULT;
@@ -18,7 +18,7 @@ namespace bf2mods {
 	}
 
 	void Config::LoadFromFile() {
-		toml::parse_result res = toml::parse_file("sd:/config/bf2mods/config.toml");
+		toml::parse_result res = toml::parse_file("sd:/config/xenomods/config.toml");
 
 		if(!res) {
 			auto error = std::move(res).error();
@@ -68,15 +68,15 @@ namespace bf2mods {
 		if (respectDefaults || table["enableFileOverrides"].type() != toml::node_type::none)
 			enableFileOverrides = table["enableFileOverrides"].value_or(CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT);
 
-		if (respectDefaults && table[BF2MODS_CODENAME_STR].is_table()) {
-			//g_Logger->LogDebug("Found {} as a category, loading...", BF2MODS_CODENAME_STR);
-			InitializeFromTable(*table[BF2MODS_CODENAME_STR].as_table(), false);
+		if (respectDefaults && table[XENOMODS_CODENAME_STR].is_table()) {
+			//g_Logger->LogDebug("Found {} as a category, loading...", XENOMODS_CODENAME_STR);
+			InitializeFromTable(*table[XENOMODS_CODENAME_STR].as_table(), false);
 		}
 	}
 
-	Bf2ModsState& GetState() {
-		static Bf2ModsState state;
+	XenomodsState& GetState() {
+		static XenomodsState state;
 		return state;
 	}
 
-} // namespace bf2mods
+} // namespace xenomods

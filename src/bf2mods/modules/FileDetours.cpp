@@ -74,11 +74,11 @@ namespace {
 					if(res == 0x202 && createPaths) { // Path does not exist
 						res = nn::fs::CreateDirectory(ss.str().c_str());
 						if(R_FAILED(res) && res != 0x402) {
-							bf2mods::g_Logger->LogError("Failed to create dump directory \"{}\" for reason {}", ss.str(), res);
+							xenomods::g_Logger->LogError("Failed to create dump directory \"{}\" for reason {}", ss.str(), res);
 							return false;
 						}
 					} else {
-						bf2mods::g_Logger->LogError("Failed to open dump directory \"{}\" for reason {}", ss.str(), res);
+						xenomods::g_Logger->LogError("Failed to open dump directory \"{}\" for reason {}", ss.str(), res);
 						return false;
 					}
 				} else {
@@ -91,14 +91,14 @@ namespace {
 	}
 
 	bool DumpToFilesystem(std::string_view path, const void* buffer, std::size_t length) {
-		if(!bf2mods::NnFile::Preallocate(path, length)) {
-			bf2mods::g_Logger->LogError("Couldn't create/preallocate dump file \"{}\"", path);
+		if(!xenomods::NnFile::Preallocate(path, length)) {
+			xenomods::g_Logger->LogError("Couldn't create/preallocate dump file \"{}\"", path);
 		}
 
-		bf2mods::NnFile file(path, nn::fs::OpenMode_Write);
+		xenomods::NnFile file(path, nn::fs::OpenMode_Write);
 
 		if(!file) {
-			bf2mods::g_Logger->LogError("Couldn't open dump file \"{}\"", path);
+			xenomods::g_Logger->LogError("Couldn't open dump file \"{}\"", path);
 			return false;
 		}
 
@@ -108,7 +108,7 @@ namespace {
 	}
 
 	void LoadFromFilesystem(std::string_view jackPath, void* buffer, std::size_t length) {
-		bf2mods::NnFile file(jackPath, nn::fs::OpenMode_Read);
+		xenomods::NnFile file(jackPath, nn::fs::OpenMode_Read);
 
 		// This isn't really fatal since the override file
 		// doesn't particularly need to exist. It's whatever really
@@ -116,7 +116,7 @@ namespace {
 			return;
 
 		file.Read(buffer, file.Size());
-		bf2mods::g_Logger->LogDebug("Loaded dump file \"{}\"", jackPath);
+		xenomods::g_Logger->LogDebug("Loaded dump file \"{}\"", jackPath);
 	}
 
 	void FileDetourImpl(ml::FileHandleTh* fileHandle, ml::FileReadResult& readResult) {
@@ -124,15 +124,15 @@ namespace {
 		CleanPath(filename);
 
 		// dump data reads to sd card
-		if(bf2mods::GetState().config.dumpFileReads) {
-			auto path = fmt::format("sd:/config/bf2mods/{}/dump/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
+		if(xenomods::GetState().config.dumpFileReads) {
+			auto path = fmt::format("sd:/config/xenomods/{}/dump/{}/{:08x}.bin", XENOMODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			if(EnsurePath(path, true))
 				DumpToFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 
 		// load from loose sd card files
-		if(bf2mods::GetState().config.enableFileOverrides) {
-			auto path = fmt::format("sd:/config/bf2mods/{}/override/{}/{:08x}.bin", BF2MODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
+		if(xenomods::GetState().config.enableFileOverrides) {
+			auto path = fmt::format("sd:/config/xenomods/{}/override/{}/{:08x}.bin", XENOMODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			LoadFromFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 	}
@@ -142,7 +142,7 @@ namespace {
 			// used by maps (exclusively?)
 
 			auto fileRes = Orig(fh, nnHandle, unk, offset, buffer, buffersize, readres);
-			//bf2mods::g_Logger->LogDebug("DevFileUtilNx::readFile: \"{}\" (start offset 0x{:08x} size 0x{:08x}, was compressed? {})", fh->filename.buffer, fh->readStartOffset, fh->readSize, readres.bWasCompressed);
+			//xenomods::g_Logger->LogDebug("DevFileUtilNx::readFile: \"{}\" (start offset 0x{:08x} size 0x{:08x}, was compressed? {})", fh->filename.buffer, fh->readStartOffset, fh->readSize, readres.bWasCompressed);
 
 			if(fileRes && readres.bFullyLoaded == 1)
 				FileDetourImpl(fh, readres);
@@ -156,7 +156,7 @@ namespace {
 			// used by most other things
 
 			auto fileRes = Orig(fh, nnHandle, unk, offset, buffer, buffersize, readres);
-			//bf2mods::g_Logger->LogDebug("DevFileUtilNx::readFileSlice: \"{}\" (start offset 0x{:08x} size 0x{:08x}, was compressed? {})", fh->filename.buffer, fh->readStartOffset, fh->readSize, readres.bWasCompressed);
+			//xenomods::g_Logger->LogDebug("DevFileUtilNx::readFileSlice: \"{}\" (start offset 0x{:08x} size 0x{:08x}, was compressed? {})", fh->filename.buffer, fh->readStartOffset, fh->readSize, readres.bWasCompressed);
 
 			if(fileRes && readres.bFullyLoaded == 1)
 				FileDetourImpl(fh, readres);
@@ -167,7 +167,7 @@ namespace {
 
 } // namespace
 
-namespace bf2mods {
+namespace xenomods {
 
 	void FileDetours::Initialize() {
 		g_Logger->LogDebug("Setting up file detours...");
@@ -176,6 +176,6 @@ namespace bf2mods {
 		ReadFileSliceHook::HookAt("_ZN2ml13DevFileUtilNx13readFileSliceEPNS_12FileHandleThERN2nn2fs10FileHandleEllPvjRNS_14FileReadResultE");
 	}
 
-	BF2MODS_REGISTER_MODULE(FileDetours);
+	XENOMODS_REGISTER_MODULE(FileDetours);
 
-} // namespace bf2mods
+} // namespace xenomods

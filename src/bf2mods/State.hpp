@@ -7,13 +7,13 @@
 
 #include "bf2mods/Utils.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
 	struct Config {
 
 		// very yucky, but this way it's in one spot
 #define CONFIG_PORT_DEFAULT 6969
-#if BF2MODS_CODENAME(bf2)
+#if XENOMODS_CODENAME(bf2)
 #define CONFIG_TITLEEVENTS_DEFAULT { 10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609 } // all chapters, game clear, and NG+ clear
 #else
 #define CONFIG_TITLEEVENTS_DEFAULT {}
@@ -43,8 +43,8 @@ namespace bf2mods {
 		toml::table tomlTable;
 	};
 
-	struct Bf2ModsState {
-		explicit Bf2ModsState() {
+	struct XenomodsState {
+		explicit XenomodsState() {
 			Reset();
 
 			config.LoadFromFile();
@@ -67,6 +67,6 @@ namespace bf2mods {
 	/**
 	 * Get singleton state.
 	 */
-	Bf2ModsState& GetState();
+	XenomodsState& GetState();
 
-} // namespace bf2mods
+} // namespace xenomods

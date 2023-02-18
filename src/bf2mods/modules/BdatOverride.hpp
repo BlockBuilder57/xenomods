@@ -13,7 +13,7 @@
 
 #include "UpdatableModule.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
 	/**
 	 * Interface for Bdat overrides to follow.
@@ -40,7 +40,7 @@ namespace bf2mods {
 		static toml::table TOMLTable;
 		static std::unordered_map<std::string_view, unsigned short> SheetMaxIDs;
 
-		static void RegisterCallback(bf2mods::BdatOverrideBase* override);
+		static void RegisterCallback(xenomods::BdatOverrideBase* override);
 		void Initialize() override;
 		bool NeedsUpdate() const override {
 			return true;
@@ -51,4 +51,4 @@ namespace bf2mods {
 
 	};
 
-} // namespace bf2mods
+} // namespace xenomods

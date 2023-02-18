@@ -7,7 +7,7 @@
 #include <bf2mods/engine/mm/MathTypes.hpp>
 #include <nn/hid.hpp>
 
-namespace bf2mods {
+namespace xenomods {
 
 	struct HidInput {
 		struct State {
@@ -37,37 +37,37 @@ namespace bf2mods {
 
 		template<class T>
 		inline bool InputHeld(T combo) {
-			auto val = bf2mods::underlying_value(combo);
+			auto val = xenomods::underlying_value(combo);
 			return (stateCur.Buttons & val) == val;
 		}
 
 		template<class T>
 		inline bool InputUp(T combo) {
-			auto val = bf2mods::underlying_value(combo);
+			auto val = xenomods::underlying_value(combo);
 			return (stateCur.Buttons & val) != val && (statePrev.Buttons & val) == val;
 		}
 
 		template<class T>
 		inline bool InputDown(T combo) {
-			auto val = bf2mods::underlying_value(combo);
+			auto val = xenomods::underlying_value(combo);
 			return (stateCur.Buttons & val) == val && (statePrev.Buttons & val) != val;
 		}
 
 		template<class T>
 		inline bool InputHeldStrict(T combo) {
-			auto val = bf2mods::underlying_value(combo);
+			auto val = xenomods::underlying_value(combo);
 			return (stateCur.Buttons & 0xFFFF) == val;
 		}
 
 		template<class T>
 		inline bool InputUpStrict(T combo) {
-			auto val = bf2mods::underlying_value(combo);
+			auto val = xenomods::underlying_value(combo);
 			return (stateCur.Buttons & 0xFFFF) != val && (statePrev.Buttons & 0xFFFF) == val;
 		}
 
 		template<class T>
 		inline bool InputDownStrict(T combo) {
-			auto val = bf2mods::underlying_value(combo);
+			auto val = xenomods::underlying_value(combo);
 			return (stateCur.Buttons & 0xFFFF) == val && (statePrev.Buttons & 0xFFFF) != val;
 		}
 
@@ -76,4 +76,4 @@ namespace bf2mods {
 
 	HidInput* GetPlayer(int player);
 
-}; // namespace bf2mods
+}; // namespace xenomods

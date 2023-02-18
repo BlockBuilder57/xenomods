@@ -31,7 +31,7 @@ namespace {
 
 	struct MMAssert : skylaunch::hook::Trampoline<MMAssert> {
 		static void Hook(const char* expr, const char* file, unsigned line) {
-			bf2mods::g_Logger->LogFatal("Caught Assert!!! Expr \"{}\" ({} : {})", expr, file, line);
+			xenomods::g_Logger->LogFatal("Caught Assert!!! Expr \"{}\" ({} : {})", expr, file, line);
 			Orig(expr, file, line);
 		}
 	};
@@ -43,9 +43,9 @@ namespace {
 		uint eventId = gf::GfDataEvent::getEventID(eventName.c_str());
 
 		if(eventId > 0)
-			bf2mods::g_Logger->LogDebug("Creating event {} (id {})", evtName, eventId);
+			xenomods::g_Logger->LogDebug("Creating event {} (id {})", evtName, eventId);
 		else
-			bf2mods::g_Logger->LogDebug("Creating event {}", evtName);
+			xenomods::g_Logger->LogDebug("Creating event {}", evtName);
 	}
 
 	struct EventStartInfo : skylaunch::hook::Trampoline<EventStartInfo> {
@@ -70,23 +70,23 @@ namespace {
 			auto stack = dbgutil::getStackTrace();
 			// ow my soul, find a better way to do this
 			if (dbgutil::getSymbol(stack[1], true) != "_ZN2tl20TitleStateMainScreen6updateEPNS_9TitleMainERKN2fw10UpdateInfoE") {
-				bf2mods::g_Logger->LogDebug("Not replacing title event {} (id {}) as it would cause a lock (called by {})", gf::GfDataEvent::getEventName(eventId), eventId, dbgutil::getSymbol(stack[1]));
+				xenomods::g_Logger->LogDebug("Not replacing title event {} (id {}) as it would cause a lock (called by {})", gf::GfDataEvent::getEventName(eventId), eventId, dbgutil::getSymbol(stack[1]));
 				return Orig(this_pointer, eventId);
 			}
 
 			// get the clear count from the save because that's what everything else seems to do
 			uint clearCount = *reinterpret_cast<uint*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
 			uint chapter = this_pointer->getChapterIdFromSaveData();
-#if BF2MODS_CODENAME(ira)
+#if XENOMODS_CODENAME(ira)
 			chapter = 0; // it's always 10!
 #endif
 			chapter |= clearCount << 16; // "encodes" as 0x00010006 for 1 clear on ch6
 
-			//bf2mods::g_Logger->LogDebug("Chapter info: {:#x}", chapter);
+			//xenomods::g_Logger->LogDebug("Chapter info: {:#x}", chapter);
 
 			// we need to have started the game, as the opening cutscene just continues off the titlescreen
 			if(chapter > 0) {
-				auto& events = bf2mods::GetState().config.titleEvents;
+				auto& events = xenomods::GetState().config.titleEvents;
 
 				if(!events.empty()) {
 					const auto eventsDefault = std::vector<uint16_t>(CONFIG_TITLEEVENTS_DEFAULT);
@@ -102,7 +102,7 @@ namespace {
 			}
 
 			if(newEventId != eventId)
-				bf2mods::g_Logger->LogDebug("Replacing title event {} (id {}) with {} (id {})", gf::GfDataEvent::getEventName(eventId), eventId, gf::GfDataEvent::getEventName(newEventId), newEventId);
+				xenomods::g_Logger->LogDebug("Replacing title event {} (id {}) with {} (id {})", gf::GfDataEvent::getEventName(eventId), eventId, gf::GfDataEvent::getEventName(newEventId), newEventId);
 			Orig(this_pointer, newEventId);
 		}
 	};
@@ -111,7 +111,7 @@ namespace {
 		static void Hook(gf::BgmTrack* this_pointer, fw::UpdateInfo* updateInfo) {
 			Orig(this_pointer, updateInfo);
 
-			if(!bf2mods::DebugStuff::enableDebugRendering)
+			if(!xenomods::DebugStuff::enableDebugRendering)
 				return;
 
 			const int height = fw::debug::drawFontGetHeight();
@@ -128,28 +128,28 @@ namespace {
 					bgmFileName.set(this_pointer->playingBgmFileName);
 				}
 
-				fw::debug::drawFontFmtShadow(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white,
+				fw::debug::drawFontFmtShadow(0, 720 - (xenomods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white,
 											 "{}: {} {:.1f}/{:.1f}{}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop() ? " (∞)" : "");
 			} else {
 				// uncomment if you want every BgmTrack instance to show
-				//fw::debug::drawFontFmtShadow(0, 720 - (bf2mods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white, "{}: not playing", trackName);
+				//fw::debug::drawFontFmtShadow(0, 720 - (xenomods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white, "{}: not playing", trackName);
 			}
 		}
 	};
 
 	struct JumpToClosedLandmarks_World : skylaunch::hook::Trampoline<JumpToClosedLandmarks_World> {
 		static bool Hook(unsigned int mapjump) {
-			return bf2mods::DebugStuff::accessClosedLandmarks ? true : Orig(mapjump);
+			return xenomods::DebugStuff::accessClosedLandmarks ? true : Orig(mapjump);
 		}
 	};
 
 	struct JumpToClosedLandmarks_Zone : skylaunch::hook::Trampoline<JumpToClosedLandmarks_Zone> {
 		static bool Hook(unsigned int mapjump) {
-			return bf2mods::DebugStuff::accessClosedLandmarks ? true : Orig(mapjump);
+			return xenomods::DebugStuff::accessClosedLandmarks ? true : Orig(mapjump);
 		}
 	};
 
-#if BF2MODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw)
 	static unsigned int ForceWinID = 0;
 
 	struct GetWinIDOverride : skylaunch::hook::Trampoline<GetWinIDOverride> {
@@ -161,7 +161,7 @@ namespace {
 	struct RenderViewHook : skylaunch::hook::Trampoline<RenderViewHook> {
 		static void Hook(ml::WinView* this_pointer) {
 			ForceWinID = this_pointer->windowID;
-			//bf2mods::g_Logger->LogInfo("winview {} winid {} equal? {}", this_pointer->windowID, ml::DebDraw::getCacheDrawWID(), this_pointer->windowID == ml::DebDraw::getCacheDrawWID());
+			//xenomods::g_Logger->LogInfo("winview {} winid {} equal? {}", this_pointer->windowID, ml::DebDraw::getCacheDrawWID(), this_pointer->windowID == ml::DebDraw::getCacheDrawWID());
 			Orig(this_pointer);
 		}
 	};
@@ -169,7 +169,7 @@ namespace {
 
 }
 
-namespace bf2mods {
+namespace xenomods {
 
 	bool DebugStuff::enableDebugRendering = true;
 	bool DebugStuff::accessClosedLandmarks = true;
@@ -177,13 +177,13 @@ namespace bf2mods {
 	int DebugStuff::bgmTrackIndex = 0;
 
 	void DebugStuff::DoMapJump(unsigned int mapjumpId) {
-#if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
 		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, 297);
-#elif BF2MODS_CODENAME(bfsw)
+#elif XENOMODS_CODENAME(bfsw)
 		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, 487);
 #endif
 
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 		gf::GfPlayFactory::createSkipTravel(mapjumpId);
 		gf::GfMenuObjUtil::playSE(gf::GfMenuObjUtil::SEIndex::mapjump);
 #else
@@ -203,13 +203,13 @@ namespace bf2mods {
 	}
 
 	void DebugStuff::PlaySE(unsigned int soundEffect) {
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 		gf::GfMenuObjUtil::playSE(soundEffect);
 #endif
 	}
 
 	void DebugStuff::ReturnTitle(unsigned int slot) {
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 		tl::TitleMain::returnTitle((gf::SAVESLOT)slot);
 #else
 		if(fw::document == nullptr) {
@@ -225,7 +225,7 @@ namespace bf2mods {
 
 		MMAssert::HookAt("_ZN2mm9MMStdBase8mmAssertEPKcS2_j");
 
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 		BGMDebugging::HookAt("_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE");
 
 		// earlier versions didn't include the last two parameters
@@ -258,7 +258,7 @@ namespace bf2mods {
 				fw::Framework::setUpdateSpeed(state.tempInt);*/
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::DEBUG_RENDER_TOGGLE)) {
 			enableDebugRendering = !enableDebugRendering;
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 			fw::PadManager::enableDebugDraw(enableDebugRendering);
 #endif
 			g_Logger->LogInfo("Debug rendering: {}", enableDebugRendering);
@@ -287,6 +287,6 @@ namespace bf2mods {
 		}
 	}
 
-	BF2MODS_REGISTER_MODULE(DebugStuff);
+	XENOMODS_REGISTER_MODULE(DebugStuff);
 
-} // namespace bf2mods
+} // namespace xenomods

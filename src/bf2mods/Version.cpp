@@ -3,7 +3,7 @@
 #include "Version.hpp"
 #include "gitversion.h"
 
-namespace bf2mods::version {
+namespace xenomods::version {
 
 	std::string_view GitVersion() {
 		return fullTag;
@@ -20,4 +20,4 @@ namespace bf2mods::version {
 #endif
 	}
 
-} // namespace bf2mods::version
+} // namespace xenomods::version

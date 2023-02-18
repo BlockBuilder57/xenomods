@@ -24,10 +24,10 @@ namespace {
 
 	struct SetCameraMatrix : skylaunch::hook::Trampoline<SetCameraMatrix> {
 		static void Hook(ml::ScnObjCam* this_pointer, mm::Mat44& matrix) {
-			auto& freecam = bf2mods::CameraTools::Freecam;
+			auto& freecam = xenomods::CameraTools::Freecam;
 			mm::Col4 camColor = mm::Col4::white;
 
-#if BF2MODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw)
 			mm::Mat44 trueMatrix = matrix;
 #else
 			// remember: 2 and Torna camera matricies are not world-space
@@ -49,7 +49,7 @@ namespace {
 
 					if(freecam.isOn) {
 						// use the matrix calculated in DoFreeCameraMovement
-#if BF2MODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw)
 						Orig(this_pointer, freecam.matrix);
 #else
 						mm::Mat44 inverse = glm::inverse(static_cast<const glm::mat4&>(freecam.matrix));
@@ -60,7 +60,7 @@ namespace {
 					}
 				}
 
-				if(bf2mods::DebugStuff::enableDebugRendering && freecam.isOn) {
+				if(xenomods::DebugStuff::enableDebugRendering && freecam.isOn) {
 					fw::debug::drawCompareZ(false);
 					fw::debug::drawCamera(trueMatrix, camColor);
 					fw::debug::drawCompareZ(true);
@@ -73,7 +73,7 @@ namespace {
 		static void Hook(ml::ScnObjCam* this_pointer) {
 			if(this_pointer->ScnPtr != nullptr) {
 				if(this_pointer == this_pointer->ScnPtr->getCam(-1)) {
-					auto& freecamState = bf2mods::CameraTools::Freecam;
+					auto& freecamState = xenomods::CameraTools::Freecam;
 
 					if(freecamState.isOn)
 						this_pointer->AttrTransformPtr->fov = freecamState.fov; // put freecam info into the current camera
@@ -88,7 +88,7 @@ namespace {
 
 } // namespace
 
-namespace bf2mods {
+namespace xenomods {
 
 	CameraTools::FreecamState CameraTools::Freecam = {
 		.isOn = false,
@@ -107,7 +107,7 @@ namespace bf2mods {
 		// for future reference:
 		//auto seconds = nn::os::GetSystemTick()/19200000.;
 
-		using enum bf2mods::Keybind;
+		using enum xenomods::Keybind;
 
 		glm::vec3 pos {};
 		glm::quat rot {};
@@ -193,7 +193,7 @@ namespace bf2mods {
 	void CameraTools::Initialize() {
 		g_Logger->LogDebug("Setting up camera tools...");
 
-#if BF2MODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw)
 		SetCameraMatrix::HookAt(&ml::ScnObjCam::setWorldMatrix);
 #else
 		SetCameraMatrix::HookAt(&ml::ScnObjCam::setViewMatrix);
@@ -260,6 +260,6 @@ namespace bf2mods {
 			DoFreeCameraMovement();
 	}
 
-	BF2MODS_REGISTER_MODULE(CameraTools);
+	XENOMODS_REGISTER_MODULE(CameraTools);
 
-} // namespace bf2mods
+} // namespace xenomods

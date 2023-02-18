@@ -19,10 +19,10 @@ namespace {
 
 	struct DrawEventManagerInfo : skylaunch::hook::Trampoline<DrawEventManagerInfo> {
 		static void Hook(event::Manager* this_pointer) {
-			bf2mods::EventDebugUtils::ShouldUpdate = !this_pointer->isPlayCancel();
+			xenomods::EventDebugUtils::ShouldUpdate = !this_pointer->isPlayCancel();
 
-			if(!this_pointer->isPlayCancel() && bf2mods::DebugStuff::enableDebugRendering) {
-				if((bf2mods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
+			if(!this_pointer->isPlayCancel() && xenomods::DebugStuff::enableDebugRendering) {
+				if((xenomods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
 					this_pointer->drawInfo();
 				}
 			}
@@ -32,10 +32,10 @@ namespace {
 
 		static void HookIt() {
 			HookAt(&event::Manager::update);
-			registeredIndex = bf2mods::EventDebugUtils::RegistrationIndex++;
+			registeredIndex = xenomods::EventDebugUtils::RegistrationIndex++;
 			auto name = dbgutil::getSymbol(std::bit_cast<uintptr_t>(skylaunch::FlattenMemberPtr(&event::Manager::update)));
 			name = name.substr(0, name.find("::", name.find_first_of("::") + 2));
-			bf2mods::EventDebugUtils::FuncNames.emplace_back(name);
+			xenomods::EventDebugUtils::FuncNames.emplace_back(name);
 		}
 
 		static int registeredIndex;
@@ -47,7 +47,7 @@ namespace {
 
 		static void Hook(TManager* this_pointer, event::MSG_TYPE msg) {
 			HookType::Orig(this_pointer, msg);
-			if(msg == 0xe && bf2mods::DebugStuff::enableDebugRendering && (bf2mods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
+			if(msg == 0xe && xenomods::DebugStuff::enableDebugRendering && (xenomods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
 				this_pointer->setDisp(true);
 				this_pointer->render();
 			}
@@ -55,10 +55,10 @@ namespace {
 
 		static void HookIt() {
 			HookType::HookAt(&TManager::OnEventProc);
-			registeredIndex = bf2mods::EventDebugUtils::RegistrationIndex++;
+			registeredIndex = xenomods::EventDebugUtils::RegistrationIndex++;
 			auto name = dbgutil::getSymbol(std::bit_cast<uintptr_t>(skylaunch::FlattenMemberPtr(&TManager::OnEventProc)));
 			name = name.substr(0, name.find("::", name.find_first_of("::") + 2)); // lobs off anything past event::ManagerName
-			bf2mods::EventDebugUtils::FuncNames.emplace_back(name);
+			xenomods::EventDebugUtils::FuncNames.emplace_back(name);
 		}
 
 		static int registeredIndex;
@@ -71,7 +71,7 @@ namespace {
 
 } // namespace
 
-namespace bf2mods {
+namespace xenomods {
 
 	int EventDebugUtils::RegistrationIndex = 0;
 	int EventDebugUtils::CurrentIndex = -1;
@@ -82,7 +82,7 @@ namespace bf2mods {
 
 	void EventDebugUtils::Update() {
 		if(FuncNames.size() != RegistrationIndex) {
-			bf2mods::g_Logger->LogError("Event function names not the same size as regist index {} vs {}", FuncNames.size(), RegistrationIndex);
+			xenomods::g_Logger->LogError("Event function names not the same size as regist index {} vs {}", FuncNames.size(), RegistrationIndex);
 			return;
 		}
 
@@ -119,7 +119,7 @@ namespace bf2mods {
 	void EventDebugUtils::Initialize() {
 		g_Logger->LogDebug("Setting up event debug utils...");
 
-		ActiveBits = bf2mods::GetState().config.eventDebugBits;
+		ActiveBits = xenomods::GetState().config.eventDebugBits;
 
 		DrawEventManagerInfo::HookIt();                 // bit 0
 		ManagerDisplay<event::AgelogManager>::HookIt(); // bit 1
@@ -149,7 +149,7 @@ namespace bf2mods {
 		ManagerDisplay<event::VolumeManager>::HookIt();
 	}
 
-#if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
-	BF2MODS_REGISTER_MODULE(EventDebugUtils);
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+	XENOMODS_REGISTER_MODULE(EventDebugUtils);
 #endif
-} // namespace bf2mods
+} // namespace xenomods

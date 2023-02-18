@@ -6,7 +6,7 @@
 
 #include "bf2mods/Utils.hpp"
 
-#if BF2MODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw)
 namespace game {
 	namespace ScriptCfs {
 		void returnTitle();

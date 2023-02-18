@@ -22,12 +22,12 @@ namespace {
 			//bool flagInAir = (pcProperty->flags & static_cast<std::uint32_t>(InAir)) != 0;
 			//bool flagOnWall = (pcProperty->flags & static_cast<std::uint32_t>(OnWall)) != 0;
 
-			if(bf2mods::PlayerMovement::moonJump)
-				static_cast<glm::vec3&>(pcProperty->velocityActual).y = std::max(10.f, 10.f * (bf2mods::PlayerMovement::movementSpeedMult / 64.f));
+			if(xenomods::PlayerMovement::moonJump)
+				static_cast<glm::vec3&>(pcProperty->velocityActual).y = std::max(10.f, 10.f * (xenomods::PlayerMovement::movementSpeedMult / 64.f));
 
 			auto& wish = static_cast<glm::vec3&>(pcProperty->velocityWish);
 
-			wish *= bf2mods::PlayerMovement::movementSpeedMult;
+			wish *= xenomods::PlayerMovement::movementSpeedMult;
 
 			//fw::debug::drawFontFmtShadow(0, 200, mm::Col4::white, "velAct {:2} (len {:.2f})", static_cast<const glm::vec3&>(pcProperty->velocityActual), pcProperty->velocityActual.XZLength());
 			//fw::debug::drawFontFmtShadow(0, 216, mm::Col4::white, "velWsh {:2} (len {:.2f})", static_cast<const glm::vec3&>(pcProperty->velocityWish), pcProperty->velocityWish.XZLength());
@@ -37,27 +37,27 @@ namespace {
 
 			Orig(this_pointer, updateInfo, pcProperty);
 
-			wish /= bf2mods::PlayerMovement::movementSpeedMult;
+			wish /= xenomods::PlayerMovement::movementSpeedMult;
 		}
 	};
 
 	struct DisableFallDamagePlugin : skylaunch::hook::Trampoline<DisableFallDamagePlugin> {
 		static float Hook(gf::pc::FallDamagePlugin* this_pointer, mm::Vec3* vec) {
-			return bf2mods::PlayerMovement::disableFallDamage ? 0.f : Orig(this_pointer, vec);
+			return xenomods::PlayerMovement::disableFallDamage ? 0.f : Orig(this_pointer, vec);
 		}
 	};
 
 	struct DisableStateUtilFallDamage : skylaunch::hook::Trampoline<DisableStateUtilFallDamage> {
 		static void Hook(gf::GfComBehaviorPc* GfComBehaviorPc, bool param_2) {
-			//bf2mods::g_Logger->LogInfo("StateUtil::setFallDamageDisable(GfComBehaviorPc: {:p}, bool: {})", GfComBehaviorPc, param_2);
-			Orig(GfComBehaviorPc, bf2mods::PlayerMovement::disableFallDamage || param_2);
+			//xenomods::g_Logger->LogInfo("StateUtil::setFallDamageDisable(GfComBehaviorPc: {:p}, bool: {})", GfComBehaviorPc, param_2);
+			Orig(GfComBehaviorPc, xenomods::PlayerMovement::disableFallDamage || param_2);
 		}
 	};
 
 	struct CorrectCameraTarget : skylaunch::hook::Trampoline<CorrectCameraTarget> {
 		static void Hook(gf::PlayerCameraTarget* this_pointer) {
 			Orig(this_pointer);
-			if(bf2mods::PlayerMovement::moonJump) {
+			if(xenomods::PlayerMovement::moonJump) {
 				// makes the game always take the on ground path in gf::PlayerCamera::updateTracking
 				this_pointer->inAir = false;
 				// should stop the camera from suddenly jerking back to the maximum height moonjumped to
@@ -69,7 +69,7 @@ namespace {
 
 }
 
-namespace bf2mods {
+namespace xenomods {
 
 	bool PlayerMovement::moonJump = false;
 	bool PlayerMovement::disableFallDamage = true;
@@ -101,8 +101,8 @@ namespace bf2mods {
 		}
 	}
 
-#if BF2MODS_CODENAME(bf2) || BF2MODS_CODENAME(ira)
-	BF2MODS_REGISTER_MODULE(PlayerMovement);
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+	XENOMODS_REGISTER_MODULE(PlayerMovement);
 #endif
 
-} // namespace bf2mods
+} // namespace xenomods

@@ -6,13 +6,13 @@
 
 #include "UpdatableModule.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
-	struct FileDetours : public bf2mods::UpdatableModule {
+	struct FileDetours : public xenomods::UpdatableModule {
 		void Initialize() override;
 		bool NeedsUpdate() const override {
 			return false;
 		}
 	};
 
-} // namespace bf2mods
+} // namespace xenomods

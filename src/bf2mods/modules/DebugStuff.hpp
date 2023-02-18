@@ -3,9 +3,9 @@
 #include "UpdatableModule.hpp"
 #include "bf2mods/engine/gf/MenuObject.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
-	struct DebugStuff : public bf2mods::UpdatableModule {
+	struct DebugStuff : public xenomods::UpdatableModule {
 		static bool enableDebugRendering;
 		static bool accessClosedLandmarks;
 
@@ -22,4 +22,4 @@ namespace bf2mods {
 		void Update() override;
 	};
 
-} // namespace bf2mods
+} // namespace xenomods

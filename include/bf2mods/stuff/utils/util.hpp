@@ -17,7 +17,7 @@ namespace util {
 	#define LOG(...)
 #else
 	#define LOG(fmt, ...) \
-		::bf2mods::g_Logger->LogDebug("[{}]: " fmt, __PRETTY_FUNCTION__ __VA_OPT__(, ) __VA_ARGS__);
+		::xenomods::g_Logger->LogDebug("[{}]: " fmt, __PRETTY_FUNCTION__ __VA_OPT__(, ) __VA_ARGS__);
 #endif
 
 	namespace detail {

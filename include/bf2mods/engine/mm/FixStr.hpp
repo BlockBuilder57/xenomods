@@ -39,7 +39,7 @@ namespace mm {
 
 } // namespace mm
 
-namespace bf2mods {
+namespace xenomods {
 	template<int32_t N>
 	std::string_view GetStringView(const mm::mtl::FixStr<N>& str) {
 		auto len = str.m_nLen - 1;
@@ -50,4 +50,4 @@ namespace bf2mods {
 
 		return { str.buffer, len };
 	}
-} // namespace bf2mods
+} // namespace xenomods

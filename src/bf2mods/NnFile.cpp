@@ -1,6 +1,6 @@
 #include <bf2mods/NnFile.hpp>
 
-namespace bf2mods {
+namespace xenomods {
 
 	NnFile::~NnFile() {
 		Close();
@@ -96,4 +96,4 @@ namespace bf2mods {
 		return true;
 	}
 
-} // namespace bf2mods
+} // namespace xenomods

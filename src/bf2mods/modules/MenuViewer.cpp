@@ -17,7 +17,7 @@ namespace {
 
 	struct SkipLayerRendering : skylaunch::hook::Trampoline<SkipLayerRendering> {
 		static void Hook(void* this_pointer, void* IDrDrawWorkInfo) {
-			if(bf2mods::MenuViewer::enableUIRendering)
+			if(xenomods::MenuViewer::enableUIRendering)
 				Orig(this_pointer, IDrDrawWorkInfo);
 		}
 	};
@@ -50,7 +50,7 @@ namespace {
 			modVersion.uiObject->name.set("TXT_mod_version");
 
 			// make the version string...
-			auto modVersionStr = fmt::format("bf2mods {}", bf2mods::version::GitVersion());
+			auto modVersionStr = fmt::format("xenomods {}", xenomods::version::GitVersion());
 			auto modVersionUIStr = ui::UIStr(modVersionStr.c_str(), true);
 			modVersion.setText(modVersionUIStr);
 
@@ -72,7 +72,7 @@ namespace {
 
 			modBuildDate.uiObject->name.set("TXT_mod_builddate");
 
-			auto modBuildDateUIStr = ui::UIStr(bf2mods::version::BuildTimestamp().data(), true);
+			auto modBuildDateUIStr = ui::UIStr(xenomods::version::BuildTimestamp().data(), true);
 			modBuildDate.setText(modBuildDateUIStr);
 
 			modBuildDate.getRect(scratchRect, 2);
@@ -88,7 +88,7 @@ namespace {
 	struct StraightensYourXenoblade : skylaunch::hook::Trampoline<StraightensYourXenoblade> {
 		static void Hook(layer::LayerObjFont* this_pointer, void* LayerRenderView, void* LayerResMatrix, void* LayerResColor) {
 			float temp = this_pointer->slopeRot;
-			if (bf2mods::MenuViewer::straightenFont)
+			if (xenomods::MenuViewer::straightenFont)
 				this_pointer->slopeRot = 0; // hook to the system tick for fun times
 			Orig(this_pointer, LayerRenderView, LayerResMatrix, LayerResColor);
 			this_pointer->slopeRot = temp;
@@ -99,7 +99,7 @@ namespace {
 		static void Hook(ui::UIObject* this_pointer) {
 			Orig(this_pointer);
 
-			if (!bf2mods::DebugStuff::enableDebugRendering)
+			if (!xenomods::DebugStuff::enableDebugRendering)
 				return;
 
 			bool shouldSkip = false;
@@ -152,7 +152,7 @@ namespace {
 
 }
 
-namespace bf2mods {
+namespace xenomods {
 
 	bool MenuViewer::enableUIRendering = true;
 	bool MenuViewer::straightenFont = false;
@@ -162,7 +162,7 @@ namespace bf2mods {
 
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
 
 		//BigOlUIDebugger::HookAt("_ZN2ui8UIObject6updateEv");
@@ -184,6 +184,6 @@ namespace bf2mods {
 		}
 	}
 
-	BF2MODS_REGISTER_MODULE(MenuViewer);
+	XENOMODS_REGISTER_MODULE(MenuViewer);
 
-} // namespace bf2mods
+} // namespace xenomods

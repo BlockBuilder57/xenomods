@@ -20,11 +20,11 @@ namespace mm {
 		T x, y, w, h;
 	};
 
-	BF2MODS_CONVERTTO_TYPE(Vec2, glm::vec2, sizeof(glm::vec2));
+	XENOMODS_CONVERTTO_TYPE(Vec2, glm::vec2, sizeof(glm::vec2));
 
-	struct Vec3 : public bf2mods::ConvertTo<glm::vec3, sizeof(glm::vec3)> {
+	struct Vec3 : public xenomods::ConvertTo<glm::vec3, sizeof(glm::vec3)> {
 		// We actually want to add members to Vec3 so
-		//BF2MODS_CONVERTTO_TYPE(Vec3, glm::vec3, sizeof(glm::vec3));
+		//XENOMODS_CONVERTTO_TYPE(Vec3, glm::vec3, sizeof(glm::vec3));
 		// won't work. Ugly using, but oh well.
 		using ConvertTo<glm::vec3, sizeof(glm::vec3)>::ConvertTo;
 
@@ -55,9 +55,9 @@ namespace mm {
 	using Transform = Vec3;
 	static_assert(sizeof(Vec3) == 0xC, "size 0xC");
 
-	BF2MODS_CONVERTTO_TYPE(Quat, glm::quat, sizeof(glm::quat));
+	XENOMODS_CONVERTTO_TYPE(Quat, glm::quat, sizeof(glm::quat));
 
-	BF2MODS_CONVERTTO_TYPE(alignas(0x10) Mat44, glm::mat4, sizeof(glm::mat4));
+	XENOMODS_CONVERTTO_TYPE(alignas(0x10) Mat44, glm::mat4, sizeof(glm::mat4));
 
 	static_assert(sizeof(Mat44) == 0x40, "[mm::Mat44] size 0x40");
 	static_assert(alignof(mm::Mat44) == 0x10, "[mm::Mat44] align 0x10");

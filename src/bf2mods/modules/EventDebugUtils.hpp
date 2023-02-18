@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
-namespace bf2mods {
+namespace xenomods {
 
-	struct EventDebugUtils : public bf2mods::UpdatableModule {
+	struct EventDebugUtils : public xenomods::UpdatableModule {
 
 		static int RegistrationIndex;
 		static int CurrentIndex;
@@ -26,4 +26,4 @@ namespace bf2mods {
 		void Update() override;
 	};
 
-} // namespace bf2mods
+} // namespace xenomods

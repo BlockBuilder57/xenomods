@@ -3,9 +3,9 @@
 #include "UpdatableModule.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
-	struct PlayerMovement : public bf2mods::UpdatableModule {
+	struct PlayerMovement : public xenomods::UpdatableModule {
 		static bool moonJump;
 		static bool disableFallDamage;
 		static float movementSpeedMult;
@@ -17,4 +17,4 @@ namespace bf2mods {
 		void Update() override;
 	};
 
-} // namespace bf2mods
+} // namespace xenomods

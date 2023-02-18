@@ -19,9 +19,9 @@ namespace {
 		static unsigned long Hook(unsigned char* pBdat, unsigned char* pVarName, int idx) {
 			auto sheetName = std::string_view { Bdat::getSheetName(pBdat) };
 			auto memberName = std::string_view { reinterpret_cast<char*>(pBdat + *reinterpret_cast<short*>(pVarName + 4)) };
-			//bf2mods::g_Logger->LogInfo("[Bdat] {}/{}:{}", sheetName, memberName, idx);
+			//xenomods::g_Logger->LogInfo("[Bdat] {}/{}:{}", sheetName, memberName, idx);
 
-			bf2mods::BdatOverrideBase::Access access {
+			xenomods::BdatOverrideBase::Access access {
 				.sheet = {
 					.buffer = pBdat,
 					.name = sheetName,
@@ -32,7 +32,7 @@ namespace {
 			};
 
 			// run all applicable callbacks
-			for(bf2mods::BdatOverrideBase* callback : bf2mods::BdatOverride::Callbacks) {
+			for(xenomods::BdatOverrideBase* callback : xenomods::BdatOverride::Callbacks) {
 				if (callback->IsApplicable(access.sheet))
 					(*callback)(access);
 			}
@@ -50,8 +50,8 @@ namespace {
 			auto sheetName = std::string_view { Bdat::getSheetName(pBdat) };
 			unsigned short result = Orig(pBdat);
 
-			if (bf2mods::BdatOverride::SheetMaxIDs.contains(sheetName.data())) {
-				unsigned short maxId = bf2mods::BdatOverride::SheetMaxIDs[sheetName.data()] - sheet->idTop + 1;
+			if (xenomods::BdatOverride::SheetMaxIDs.contains(sheetName.data())) {
+				unsigned short maxId = xenomods::BdatOverride::SheetMaxIDs[sheetName.data()] - sheet->idTop + 1;
 				if (maxId > result)
 					result = maxId;
 			}
@@ -65,8 +65,8 @@ namespace {
 			auto sheetName = std::string_view { Bdat::getSheetName(pBdat) };
 			unsigned short result = Orig(pBdat);
 
-			if (bf2mods::BdatOverride::SheetMaxIDs.contains(sheetName.data())) {
-				unsigned short maxId = bf2mods::BdatOverride::SheetMaxIDs[sheetName.data()];
+			if (xenomods::BdatOverride::SheetMaxIDs.contains(sheetName.data())) {
+				unsigned short maxId = xenomods::BdatOverride::SheetMaxIDs[sheetName.data()];
 				if (maxId > result)
 					result = maxId;
 			}
@@ -75,14 +75,14 @@ namespace {
 		}
 	};
 
-	struct TomlBdatOverride : bf2mods::BdatOverrideBase {
+	struct TomlBdatOverride : xenomods::BdatOverrideBase {
 		[[nodiscard]] bool IsApplicable(SheetData& sheet) const override {
-			return bf2mods::BdatOverride::TOMLTable[sheet.name].is_table();
+			return xenomods::BdatOverride::TOMLTable[sheet.name].is_table();
 		}
 
 		void operator()(Access& access) override {
 			std::string unfortunateConversion = std::to_string(access.sheet.row);
-			toml::table* rowTable = bf2mods::BdatOverride::TOMLTable[access.sheet.name][unfortunateConversion].as_table();
+			toml::table* rowTable = xenomods::BdatOverride::TOMLTable[access.sheet.name][unfortunateConversion].as_table();
 			if (rowTable == nullptr)
 				return; // no table for the row
 
@@ -91,12 +91,12 @@ namespace {
 			auto fallbackRow = rowTable->get("_fb");
 			if (fallbackRow != nullptr) {
 				access.sheet.row = fallbackRow->value_or(access.sheet.row);
-				//bf2mods::g_Logger->LogWarning("{}/{}:{} requested fallback to {}", access.sheet.name, access.sheet.member, rowPre, access.sheet.row);
+				//xenomods::g_Logger->LogWarning("{}/{}:{} requested fallback to {}", access.sheet.name, access.sheet.member, rowPre, access.sheet.row);
 			}
 
 			auto memberNode = rowTable->get(access.sheet.member);
 			if (memberNode == nullptr) {
-				//bf2mods::g_Logger->LogDebug("no value for {}/{}:{}", access.sheet.name, access.sheet.member, rowPre);
+				//xenomods::g_Logger->LogDebug("no value for {}/{}:{}", access.sheet.name, access.sheet.member, rowPre);
 				return; // no value for this member
 			}
 
@@ -143,13 +143,13 @@ namespace {
 
 } // namespace
 
-namespace bf2mods {
+namespace xenomods {
 
-	std::vector<bf2mods::BdatOverrideBase*> BdatOverride::Callbacks = {};
+	std::vector<xenomods::BdatOverrideBase*> BdatOverride::Callbacks = {};
 	toml::table BdatOverride::TOMLTable = {};
 	std::unordered_map<std::string_view, unsigned short> BdatOverride::SheetMaxIDs = {};
 
-	void BdatOverride::RegisterCallback(bf2mods::BdatOverrideBase* override) {
+	void BdatOverride::RegisterCallback(xenomods::BdatOverrideBase* override) {
 		Callbacks.push_back(override);
 	}
 
@@ -174,7 +174,7 @@ namespace bf2mods {
 	}
 
 	void BdatOverride::LoadFromFile() {
-		auto path = fmt::format("sd:/config/bf2mods/{}/bdatOverride.toml", BF2MODS_CODENAME_STR);
+		auto path = fmt::format("sd:/config/xenomods/{}/bdatOverride.toml", XENOMODS_CODENAME_STR);
 		toml::parse_result res = toml::parse_file(path);
 
 		if(!res) {
@@ -205,6 +205,6 @@ namespace bf2mods {
 		});
 	}
 
-	BF2MODS_REGISTER_MODULE(BdatOverride);
+	XENOMODS_REGISTER_MODULE(BdatOverride);
 
-} // namespace bf2mods
+} // namespace xenomods

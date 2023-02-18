@@ -6,7 +6,7 @@
 #include "State.hpp"
 #include "modules/UpdatableModule.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
 	enum class Keybind : std::uint64_t {
 		RELOAD_CONFIG = nn::hid::KEY_PLUS,
@@ -46,10 +46,6 @@ namespace bf2mods {
 		LOGGER_TEST = nn::hid::KEY_PLUS | nn::hid::KEY_R,
 	};
 
-	// TODO: make these members of hidinput, and probably store current/previous there (removing the need for "prev" instances).
-
-
-
 	/**
  	 * Called on each Framework update.
  	 */
@@ -60,4 +56,4 @@ namespace bf2mods {
  	 */
 	void main();
 
-} // namespace bf2mods
+} // namespace xenomods

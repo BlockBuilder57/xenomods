@@ -6,7 +6,7 @@
 #include "UpdatableModule.hpp"
 #include "fmt/core.h"
 
-namespace bf2mods {
+namespace xenomods {
 
 	struct BdatRandomizer : public UpdatableModule {
 		enum class BdatMSScrambleType : std::uint8_t {
@@ -25,17 +25,17 @@ namespace bf2mods {
 		void Update() override;
 	};
 
-} // namespace bf2mods
+} // namespace xenomods
 
 template<>
-struct fmt::formatter<bf2mods::BdatRandomizer::BdatMSScrambleType> : fmt::formatter<std::string_view> {
+struct fmt::formatter<xenomods::BdatRandomizer::BdatMSScrambleType> : fmt::formatter<std::string_view> {
 	template<typename FormatContext>
-	inline auto format(bf2mods::BdatRandomizer::BdatMSScrambleType type, FormatContext& ctx) {
+	inline auto format(xenomods::BdatRandomizer::BdatMSScrambleType type, FormatContext& ctx) {
 		std::string_view name;
 
 		// clang-format off
 		switch(type) {
-			using enum bf2mods::BdatRandomizer::BdatMSScrambleType;
+			using enum xenomods::BdatRandomizer::BdatMSScrambleType;
 
 			case ScrambleIndex: name = "Scramble Index"; break;
 			case ShowSheetName: name = "Show Sheet/Label Name"; break;

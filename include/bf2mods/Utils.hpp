@@ -45,8 +45,8 @@ using ulong = uint64_t;
 // While it's true that comments could be used to communicate reasoning,
 // generally speaking reasoning right where it's being disabled should be more useful,
 // especially since it'll be the line the diagnostics will end up showing.
-#define BF2MODS_DISALLOW_MOVE(T, reason) T(T&&) = delete;
-#define BF2MODS_DISALLOW_COPY(T, reason) T(const T&) = delete;
+#define XENOMODS_DISALLOW_MOVE(T, reason) T(T&&) = delete;
+#define XENOMODS_DISALLOW_COPY(T, reason) T(const T&) = delete;
 
 // Preprocessor macro beautifier for testing
 // what codename we are compiling for.
@@ -54,11 +54,11 @@ using ulong = uint64_t;
 // This can be used to gate off code
 // for one particular codename.
 // Intended to be used in expressions.
-#define BF2MODS_CODENAME(cn) defined __BF2MODS_CODENAME_##cn
-#define BF2MODS_CODENAME_STR _BF2MODS_CODENAME_STR
+#define XENOMODS_CODENAME(cn) defined __BF2MODS_CODENAME_##cn
+#define XENOMODS_CODENAME_STR _BF2MODS_CODENAME_STR
 
 
-namespace bf2mods {
+namespace xenomods {
 	// FIXME: const/by-value versions?
 
 	template<class Enum>
@@ -107,9 +107,9 @@ namespace bf2mods {
 		uint8_t __byteRep[Size];
 	};
 
-#define BF2MODS_CONVERTTO_TYPE(T, U, size) \
-    struct T : public bf2mods::ConvertTo<U, size> { \
+#define XENOMODS_CONVERTTO_TYPE(T, U, size) \
+    struct T : public xenomods::ConvertTo<U, size> { \
         using ConvertTo<U, size>::ConvertTo;  \
     }
 
-} // namespace bf2mods
+} // namespace xenomods

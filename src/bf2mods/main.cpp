@@ -16,11 +16,11 @@
 namespace fw {
 
 
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 	struct FrameworkUpdateHook : skylaunch::hook::Trampoline<FrameworkUpdateHook> {
 		static void Hook(void* framework) {
 			Orig(framework);
-			bf2mods::update();
+			xenomods::update();
 		}
 	};
 #else
@@ -34,7 +34,7 @@ namespace fw {
 				document = doc;
 			}
 
-			bf2mods::update();
+			xenomods::update();
 		}
 
 	};
@@ -42,7 +42,7 @@ namespace fw {
 
 } // namespace fw
 
-namespace bf2mods {
+namespace xenomods {
 
 	void fmt_assert_failed(const char* file, int line, const char* message) {
 		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught @ %s:%d : %s", file, line, message);
@@ -50,7 +50,7 @@ namespace bf2mods {
 
 	void update() {
 		// lazy
-		using enum bf2mods::Keybind;
+		using enum xenomods::Keybind;
 
 		HidInput* P1 = GetPlayer(1);
 		HidInput* P2 = GetPlayer(2);
@@ -70,7 +70,7 @@ namespace bf2mods {
 		static bool hasUpdated;
 		if(!hasUpdated) {
 			nn::hid::SetSupportedNpadStyleSet(3);
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 			fw::PadManager::enableDebugDraw(true);
 #endif
 			hasUpdated = true;
@@ -92,7 +92,7 @@ namespace bf2mods {
 		}
 
 		// Update modules
-		bf2mods::UpdateAllRegisteredModules();
+		xenomods::UpdateAllRegisteredModules();
 
 		// draw log messages
 		g_Logger->Draw();
@@ -102,13 +102,13 @@ namespace bf2mods {
 		InitializeAllRegisteredModules();
 
 		// hook our updater
-#if !BF2MODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bfsw)
 		fw::FrameworkUpdateHook::HookAt("_ZN2fw9Framework6updateEv");
 #else
 		fw::FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #endif
 
-		g_Logger->LogInfo("bf2mods{} - {} initialized (built {})", version::IsDebug() ? " (debug)" : "", version::GitVersion(), version::BuildTimestamp());
+		g_Logger->LogInfo("xenomods{} - {} initialized (built {})", version::IsDebug() ? " (debug)" : "", version::GitVersion(), version::BuildTimestamp());
 	}
 
-} // namespace bf2mods
+} // namespace xenomods

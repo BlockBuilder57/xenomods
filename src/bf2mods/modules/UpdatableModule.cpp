@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace bf2mods {
+namespace xenomods {
 
 	constexpr auto MAX_MODULES = 16;
 
@@ -49,4 +49,4 @@ namespace bf2mods {
 				continue;
 	}
 
-} // namespace bf2mods
+} // namespace xenomods

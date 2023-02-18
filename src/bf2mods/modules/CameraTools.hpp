@@ -7,9 +7,9 @@
 #include "UpdatableModule.hpp"
 #include "bf2mods/engine/mm/MathTypes.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
-	struct CameraTools : public bf2mods::UpdatableModule {
+	struct CameraTools : public xenomods::UpdatableModule {
 		struct FreecamState {
 			bool isOn;
 			mm::Mat44 matrix;
@@ -27,4 +27,4 @@ namespace bf2mods {
 		void Update() override;
 	};
 
-} // namespace bf2mods
+} // namespace xenomods

@@ -15,11 +15,11 @@
 
 namespace {
 
-	struct RandomizerOverride : bf2mods::BdatOverrideBase {
-		using enum bf2mods::BdatRandomizer::BdatMSScrambleType;
+	struct RandomizerOverride : xenomods::BdatOverrideBase {
+		using enum xenomods::BdatRandomizer::BdatMSScrambleType;
 
 		[[nodiscard]] bool IsApplicable(SheetData& sheet) const override {
-			return bf2mods::BdatRandomizer::msScrambleType != Off &&
+			return xenomods::BdatRandomizer::msScrambleType != Off &&
 				   Bdat::getMember(sheet.buffer, "name") &&
 				   Bdat::getMember(sheet.buffer, "style");
 		}
@@ -28,7 +28,7 @@ namespace {
 			if(access.sheet.member != "name")
 				return;
 
-			switch(bf2mods::BdatRandomizer::msScrambleType) {
+			switch(xenomods::BdatRandomizer::msScrambleType) {
 				case ScrambleIndex: {
 					access.sheet.row = (ml::mtRand() % Bdat::getIdCount(access.sheet.buffer)) + Bdat::getIdTop(access.sheet.buffer);
 				} break;
@@ -49,7 +49,7 @@ namespace {
 
 } // namespace
 
-namespace bf2mods {
+namespace xenomods {
 
 	BdatRandomizer::BdatMSScrambleType BdatRandomizer::msScrambleType = BdatRandomizer::BdatMSScrambleType::Off;
 
@@ -70,6 +70,6 @@ namespace bf2mods {
 		}
 	}
 
-	BF2MODS_REGISTER_MODULE(BdatRandomizer);
+	XENOMODS_REGISTER_MODULE(BdatRandomizer);
 
-} // namespace bf2mods
+} // namespace xenomods

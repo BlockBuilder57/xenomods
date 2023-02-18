@@ -2,9 +2,9 @@
 
 #include "UpdatableModule.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
-	struct MenuViewer : public bf2mods::UpdatableModule {
+	struct MenuViewer : public xenomods::UpdatableModule {
 		static bool enableUIRendering;
 		static bool straightenFont;
 
@@ -15,4 +15,4 @@ namespace bf2mods {
 		void Update() override;
 	};
 
-} // namespace bf2mods
+} // namespace xenomods

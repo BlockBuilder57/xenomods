@@ -1,5 +1,4 @@
-#ifndef BF2MODS_LOGGER_H
-#define BF2MODS_LOGGER_H
+#pragma once
 
 #include <array>
 #include <cstdarg>
@@ -10,7 +9,7 @@
 #include "Utils.hpp"
 #include "fmt/format.h"
 
-namespace bf2mods {
+namespace xenomods {
 
 	/**
 	 * Debug console/logger thing.
@@ -20,8 +19,8 @@ namespace bf2mods {
 	struct Logger {
 		Logger();
 
-		BF2MODS_DISALLOW_COPY(Logger, "only one instance of the logger is allowed");
-		BF2MODS_DISALLOW_MOVE(Logger, "only one instance of the logger is allowed");
+		XENOMODS_DISALLOW_COPY(Logger, "only one instance of the logger is allowed");
+		XENOMODS_DISALLOW_MOVE(Logger, "only one instance of the logger is allowed");
 
 		/**
 		 * Severity enumeration.
@@ -131,13 +130,13 @@ namespace bf2mods {
 
 	extern Logger* g_Logger;
 
-} // namespace bf2mods
+} // namespace xenomods
 
 template<>
-struct fmt::formatter<bf2mods::Logger::Severity> : fmt::formatter<std::string_view> {
+struct fmt::formatter<xenomods::Logger::Severity> : fmt::formatter<std::string_view> {
 	template<typename FormatContext>
-	inline auto format(bf2mods::Logger::Severity sev, FormatContext& ctx) {
-		using enum bf2mods::Logger::Severity;
+	inline auto format(xenomods::Logger::Severity sev, FormatContext& ctx) {
+		using enum xenomods::Logger::Severity;
 		std::string_view name = "unknown";
 
 		switch(sev) {
@@ -151,5 +150,3 @@ struct fmt::formatter<bf2mods::Logger::Severity> : fmt::formatter<std::string_vi
 		return formatter<std::string_view>::format(name, ctx);
 	}
 };
-
-#endif //BF2MODS_LOGGER_H

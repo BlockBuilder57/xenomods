@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace bf2mods {
+namespace xenomods {
 
 	/**
 	 * A module.
@@ -33,9 +33,9 @@ namespace bf2mods {
 		}
 	};
 
-#define BF2MODS_REGISTER_MODULE(T) \
+#define XENOMODS_REGISTER_MODULE(T) \
 	static T module__##T;          \
-	::bf2mods::ModuleRegistrar<T> register__##T(&module__##T);
+	::xenomods::ModuleRegistrar<T> register__##T(&module__##T);
 
 	void InitializeAllRegisteredModules();
 
@@ -43,4 +43,4 @@ namespace bf2mods {
 	 * Update all registered modules.
 	 */
 	void UpdateAllRegisteredModules();
-} // namespace bf2mods
+} // namespace xenomods

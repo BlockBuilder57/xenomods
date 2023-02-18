@@ -5,7 +5,7 @@
 #include <string_view>
 #include <bit>
 
-namespace bf2mods {
+namespace xenomods {
 
 	/**
 	 * A file object backed via nn::fs
@@ -121,4 +121,4 @@ namespace bf2mods {
 		s64 size {};
 	};
 
-} // namespace bf2mods
+} // namespace xenomods

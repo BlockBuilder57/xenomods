@@ -5,7 +5,7 @@
 #include "bf2mods/DebugWrappers.hpp"
 #include "skylaunch/logger/Logger.hpp"
 
-namespace bf2mods {
+namespace xenomods {
 
 	static mm::Col4 ColorForSeverity(const Logger::Severity& severity) {
 		switch(severity) {
@@ -46,9 +46,9 @@ namespace bf2mods {
 		auto formatted = fmt::vformat(format, args);
 
 		// by god I wish I didn't have to deal with this
-		skylaunch::logger::s_Instance->LogFormat("[bf2mods|%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
+		skylaunch::logger::s_Instance->LogFormat("[xenomods|%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
 
-		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[bf2mods|%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
+		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[xenomods|%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
 
 		// Don't post Debug severity messages if we shouldn't.
 		if(severity == Logger::Severity::Debug && !GetDebugEnabled())
@@ -102,4 +102,4 @@ namespace bf2mods {
 	static Logger logger;
 	Logger* g_Logger = &logger;
 
-} // namespace bf2mods
+} // namespace xenomods

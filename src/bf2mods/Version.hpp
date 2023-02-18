@@ -4,7 +4,7 @@
 
 #include <string_view>
 
-namespace bf2mods::version {
+namespace xenomods::version {
 
 	std::string_view GitVersion();
 	std::string_view BuildTimestamp();
@@ -12,4 +12,4 @@ namespace bf2mods::version {
 	// Captain Obvious: The Function
 	bool IsDebug();
 
-} // namespace bf2mods::version
+} // namespace xenomods::version

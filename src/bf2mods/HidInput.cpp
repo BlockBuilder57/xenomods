@@ -7,7 +7,7 @@
 #include <bf2mods/HidInput.hpp>
 #include <bf2mods/Logger.hpp>
 
-namespace bf2mods {
+namespace xenomods {
 
 	constexpr static auto CONTROLLER_COUNT = 2;
 
@@ -54,4 +54,4 @@ namespace bf2mods {
 		return &controllers[std::clamp(player, 1, CONTROLLER_COUNT) - 1];
 	}
 
-} // namespace bf2mods
+} // namespace xenomods
