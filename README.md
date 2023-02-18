@@ -1,4 +1,4 @@
-## bf2mods [![bf2mods CI](https://github.com/BlockBuilder57/bf2mods/actions/workflows/ci.yml/badge.svg)](https://github.com/BlockBuilder57/bf2mods/actions/workflows/ci.yml)
+## Xenomods [![xenomods CI](https://github.com/BlockBuilder57/xenomods/actions/workflows/ci.yml/badge.svg)](https://github.com/BlockBuilder57/xenmods/actions/workflows/ci.yml)
 
 Some mod code by [modeco80](https://github.com/modeco80) and [BlockBuilder57](https://github.com/BlockBuilder57) for the Xenoblade games on Switch.
 
@@ -37,9 +37,9 @@ $ cmake --build build
 # profit?
 ```
 
-Once built, copy bf2mods.nso (renamed to `subsdk1`) and main.npdm from build/ to the LayeredFS exefs directory.
+Once built, copy xenomods.nso (renamed to `subsdk1`) and main.npdm from build/ to the LayeredFS exefs directory.
 
-For those with sys-ftpd installed, adding `-DBF2MODS_SWITCH_IP=<ip>` to the first CMake command will automatically copy the files to your console when builds finish.
+For those with sys-ftpd installed, adding `-DXENOMODS_SWITCH_IP=<ip>` to the first CMake command will automatically copy the files to your console when builds finish.
 
 ## Credits
 

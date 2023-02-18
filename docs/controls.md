@@ -1,6 +1,6 @@
 ## Controls
 
-bf2mods mostly utilizes a second controller to interact with the game, as most buttons are already taken up on the first controller. Moonjump is a notable exception to this however, as it can be used by player 1.
+xenomods mostly utilizes a second controller to interact with the game, as most buttons are already taken up on the first controller. Moonjump is a notable exception to this however, as it can be used by player 1.
 
 Check out the list below to see what does what.
 

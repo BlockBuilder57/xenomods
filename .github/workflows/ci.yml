@@ -1,4 +1,4 @@
-name: bf2mods CI
+name: xenomods CI
 
 on:
   push:
@@ -90,15 +90,15 @@ jobs:
           cd build-${{matrix.build.preset}}
           python3 ../scripts/makePackage.py --json ../npdm/${{matrix.build.codename}}.json
           cd pkg
-          zip -9r ../bf2mods-${{matrix.build.preset}}.zip .
+          zip -9r ../xenomods-${{matrix.build.preset}}.zip .
 
       - name: Upload artifact
         id: upload
         uses: actions/upload-artifact@v3
         with:
-            name: bf2mods-${{matrix.build.preset}}
+            name: xenomods-${{matrix.build.preset}}
             path: |
-              build-${{matrix.build.preset}}/bf2mods-${{matrix.build.preset}}.zip
+              build-${{matrix.build.preset}}/xenomods-${{matrix.build.preset}}.zip
             if-no-files-found: error
 
   # This job creates a release from the build artifacts of this job
@@ -121,4 +121,4 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes:  false
           files: |
-            bf2mods-release-*/*.zip
+            xenomods-release-*/*.zip
