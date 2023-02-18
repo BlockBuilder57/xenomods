@@ -8,8 +8,8 @@ import subprocess
 
 # Configuration options
 TRUNK = "master"
-CC_NAMESPACE = "bf2mods::version"
-C_PREFIX = "BF2MODS_VERSION"
+CC_NAMESPACE = "xenomods::version"
+C_PREFIX = "XENOMODS_VERSION"
 DIRTY_CHAR = '~'
 
 def output(command):

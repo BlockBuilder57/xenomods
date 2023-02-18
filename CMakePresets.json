@@ -5,24 +5,22 @@
     "minor": 19
   },
   "configurePresets": [
-
     {
       "name": "debug-bf2",
       "generator": "Ninja",
       "toolchainFile": "cmake/NintendoSwitch.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "BF2MODS_CODENAME": "bf2"
+        "XENOMODS_CODENAME": "bf2"
       }
     },
-
     {
       "name": "release-bf2",
       "generator": "Ninja",
       "toolchainFile": "cmake/NintendoSwitch.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "BF2MODS_CODENAME": "bf2"
+        "XENOMODS_CODENAME": "bf2"
       }
     },
     {
@@ -31,40 +29,35 @@
       "toolchainFile": "cmake/NintendoSwitch.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "BF2MODS_CODENAME": "ira"
+        "XENOMODS_CODENAME": "ira"
       }
     },
-
     {
       "name": "release-ira",
       "generator": "Ninja",
       "toolchainFile": "cmake/NintendoSwitch.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "BF2MODS_CODENAME": "ira"
+        "XENOMODS_CODENAME": "ira"
       }
     },
-
     {
       "name": "debug-bfsw",
       "generator": "Ninja",
       "toolchainFile": "cmake/NintendoSwitch.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "BF2MODS_CODENAME": "bfsw"
+        "XENOMODS_CODENAME": "bfsw"
       }
     },
-
     {
       "name": "release-bfsw",
       "generator": "Ninja",
       "toolchainFile": "cmake/NintendoSwitch.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "BF2MODS_CODENAME": "bfsw"
+        "XENOMODS_CODENAME": "bfsw"
       }
     }
-
-
   ]
 }

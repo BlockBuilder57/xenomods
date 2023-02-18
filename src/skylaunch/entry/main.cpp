@@ -2,7 +2,7 @@
 
 #include <skylaunch/hookng/Hooks.hpp>
 
-#include "../../bf2mods/main.hpp"
+#include "../../xenomods/main.hpp"
 #include "skylaunch/utils/ipc.hpp"
 
 // For handling exceptions
@@ -31,12 +31,12 @@ struct RomMountedHook : skylaunch::hook::Trampoline<RomMountedHook> {
 		skylaunch::logger::s_Instance->LogFormat("Mounted SD card (result 0x%x)", rc);
 
 		// initialize logger
-		skylaunch::logger::s_Instance = new skylaunch::logger::TcpLogger(bf2mods::GetState().config.port);
+		skylaunch::logger::s_Instance = new skylaunch::logger::TcpLogger(xenomods::GetState().config.port);
 		skylaunch::logger::s_Instance->Log("[skylaunch] Beginning initialization.\n");
 		skylaunch::logger::s_Instance->StartThread();
 
 		// bring up the rest
-		bf2mods::main();
+		xenomods::main();
 
 		return res;
 	}

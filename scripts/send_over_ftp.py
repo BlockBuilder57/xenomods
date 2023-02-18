@@ -46,7 +46,7 @@ def Bail(message):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Send and update bf2mods binary output to Switch console, via FTP.')
+    parser = argparse.ArgumentParser(description='Send and update xenomods binary output to Switch console, via FTP.')
 
     # stuff we gather from
     parser.add_argument('--json', dest='path', required=True, type=str, help='path to npdmtool JSON file to gather information from')
@@ -93,6 +93,6 @@ if __name__ == "__main__":
 
     ftpConnection.cwd(f'/atmosphere/contents/{programid}/exefs')
 
-    # Send bf2mods to the console
-    SendFile('./bf2mods.nso', f'{args.subsdk_name}')
+    # Send xenomods to the console
+    SendFile('./xenomods.nso', f'{args.subsdk_name}')
     SendFile('./main.npdm', 'main.npdm')
