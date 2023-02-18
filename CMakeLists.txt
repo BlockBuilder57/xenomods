@@ -4,7 +4,7 @@ if(" ${CMAKE_SOURCE_DIR}" STREQUAL " ${CMAKE_BINARY_DIR}")
 	message(FATAL_ERROR "NO NO NO NO NO. Please use a distinct binary directory.")
 endif()
 
-project(bf2mods
+project(xenomods
 		DESCRIPTION ""
 		LANGUAGES C CXX ASM
 		)
@@ -12,11 +12,11 @@ project(bf2mods
 find_package(Python3 REQUIRED
 		COMPONENTS Interpreter)
 
-option(BF2MODS_ENABLE_FTP OFF "enable ftp transfer")
+option(XENOMODS_ENABLE_FTP OFF "enable ftp transfer")
 
 # If no codename was set, default to bf2.
-if(" ${BF2MODS_CODENAME}" STREQUAL " ")
-	set(BF2MODS_CODENAME "bf2")
+if(" ${XENOMODS_CODENAME}" STREQUAL " ")
+	set(XENOMODS_CODENAME "bf2")
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -29,7 +29,7 @@ configure_file(linkerscripts/switch.specs.in ${PROJECT_BINARY_DIR}/switch.specs)
 # Generate version
 set(VERSION_FILENAME gitversion.h)
 
-add_custom_target(__bf2mods_gittag
+add_custom_target(__xenomods_gittag
 		COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/gittag.py ${VERSION_FILENAME}
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 		SOURCES ${PROJECT_BINARY_DIR}/${VERSION_FILENAME}
@@ -43,5 +43,5 @@ add_subdirectory(vendor/tomlpp)
 
 add_subdirectory(src)
 
-message(STATUS "Bf2mods Buildtype: ${CMAKE_BUILD_TYPE}")
-message(STATUS "Bf2mods Codename: ${BF2MODS_CODENAME}")
+message(STATUS "Xenomods Buildtype: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Xenomods Codename: ${XENOMODS_CODENAME}")

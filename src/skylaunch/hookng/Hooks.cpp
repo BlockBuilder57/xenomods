@@ -1,6 +1,6 @@
-#include <bf2mods/Logger.hpp>
+#include <xenomods/Logger.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
-#include <bf2mods/stuff/utils/debug_util.hpp>
+#include <xenomods/stuff/utils/debug_util.hpp>
 
 namespace skylaunch::hook::detail {
 

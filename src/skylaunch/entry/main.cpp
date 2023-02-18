@@ -2,7 +2,7 @@
 
 #include <skylaunch/hookng/Hooks.hpp>
 
-#include "../../bf2mods/main.hpp"
+#include "../../xenomods/main.hpp"
 #include "skylaunch/utils/ipc.hpp"
 
 // For handling exceptions

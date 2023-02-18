@@ -2,7 +2,7 @@
 
 #include <sys/fcntl.h>
 
-#include <bf2mods/Logger.hpp>
+#include <xenomods/Logger.hpp>
 #include <optional>
 #include <skylaunch/hookng/Hooks.hpp>
 #include <vector>

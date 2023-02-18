@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Hacky script for bf2mods packaging
+# Hacky script for xenomods packaging
 
 import argparse
 import os
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     amspath = Path(os.getcwd()) / 'pkg' / 'atmosphere' / 'contents' / programid / 'exefs'
     amspath.mkdir(parents=True)
 
-    copyfile('bf2mods.nso', str(amspath / args.subsdk_name))
+    copyfile('xenomods.nso', str(amspath / args.subsdk_name))
     copyfile('main.npdm', str(amspath / 'main.npdm'))
 
     print('Generated package data')

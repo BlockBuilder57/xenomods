@@ -1,28 +1,28 @@
-add_executable(bf2mods
+add_executable(xenomods
 
-		bf2mods/main.cpp
+		xenomods/main.cpp
 
 		# UTILITY
-		bf2mods/NnFile.cpp
+		xenomods/NnFile.cpp
 
-		bf2mods/modules/UpdatableModule.cpp
+		xenomods/modules/UpdatableModule.cpp
 
-        bf2mods/State.cpp
-		bf2mods/Logger.cpp
-		bf2mods/HidInput.cpp
-		bf2mods/Version.cpp
+		xenomods/State.cpp
+		xenomods/Logger.cpp
+		xenomods/HidInput.cpp
+		xenomods/Version.cpp
 
-		bf2mods/modules/DebugStuff.cpp
-		bf2mods/modules/FileDetours.cpp
-		bf2mods/modules/BdatOverride.cpp
-		bf2mods/modules/CameraTools.cpp
-		bf2mods/modules/EventDebugUtils.cpp
-		bf2mods/modules/MenuViewer.cpp
-		bf2mods/modules/PlayerMovement.cpp
-		bf2mods/modules/BdatRandomizer.cpp
+		xenomods/modules/DebugStuff.cpp
+		xenomods/modules/FileDetours.cpp
+		xenomods/modules/BdatOverride.cpp
+		xenomods/modules/CameraTools.cpp
+		xenomods/modules/EventDebugUtils.cpp
+		xenomods/modules/MenuViewer.cpp
+		xenomods/modules/PlayerMovement.cpp
+		xenomods/modules/BdatRandomizer.cpp
 
-        bf2mods/stuff/utils/debug_util.cpp
-		bf2mods/stuff/utils/util.cpp
+		xenomods/stuff/utils/debug_util.cpp
+		xenomods/stuff/utils/util.cpp
 
 
 		# Skylaunch (skyline/exlaunch-like illegal breeding experiment, mostly from skyline)
@@ -68,53 +68,53 @@ add_executable(bf2mods
 		skylaunch/nx/kernel/svc.s
 		)
 
-add_dependencies(bf2mods __bf2mods_gittag)
+add_dependencies(xenomods __xenomods_gittag)
 
-set_target_properties(bf2mods PROPERTIES
+set_target_properties(xenomods PROPERTIES
 		CXX_STANDARD 20
 		CXX_STANDARD_REQUIRED ON
 
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
 
 		# We need to trick cmake into making this generate PIC code and link as a
 		# PIC binary, because we can't use add_library(xxx SHARED).
 		# This is ugly, but it SHOULD work.
 		COMPILE_FLAGS "-fPIC -enable-libstdcxx-allocator=new"
-		LINK_FLAGS "-fPIC -specs=${PROJECT_BINARY_DIR}/switch.specs -Wl,-Map,bf2mods.map -Wl,--version-script=${PROJECT_SOURCE_DIR}/linkerscripts/exported.txt -nodefaultlibs -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -L ${DEVKITPRO}/portlibs/switch/lib -L ${DEVKITPRO}/libnx/lib"
+		LINK_FLAGS "-fPIC -specs=${PROJECT_BINARY_DIR}/switch.specs -Wl,-Map,xenomods.map -Wl,--version-script=${PROJECT_SOURCE_DIR}/linkerscripts/exported.txt -nodefaultlibs -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -L ${DEVKITPRO}/portlibs/switch/lib -L ${DEVKITPRO}/libnx/lib"
 )
 
-target_include_directories(bf2mods PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(bf2mods PUBLIC ${PROJECT_BINARY_DIR}/)
+target_include_directories(xenomods PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(xenomods PUBLIC ${PROJECT_BINARY_DIR}/)
 
 # not entirely sure what this is about, but
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_ENABLE_FLOAT16=0")
 
-target_link_libraries(bf2mods PUBLIC
+target_link_libraries(xenomods PUBLIC
 		tomlplusplus::tomlplusplus
 		fmt::fmt-header-only
 		glm::glm
 		)
 
-target_compile_definitions(bf2mods PUBLIC
-	__BF2MODS_CODENAME_${BF2MODS_CODENAME}
-	_BF2MODS_CODENAME_STR="${BF2MODS_CODENAME}"
+target_compile_definitions(xenomods PUBLIC
+	__XENOMODS_CODENAME_${XENOMODS_CODENAME}
+	_XENOMODS_CODENAME_STR="${XENOMODS_CODENAME}"
 )
 
 # NPDM/NSO output.
-add_npdm(bf2mods ${PROJECT_SOURCE_DIR}/npdm/${BF2MODS_CODENAME}.json main)
-add_nso_target(bf2mods)
+add_npdm(xenomods ${PROJECT_SOURCE_DIR}/npdm/${XENOMODS_CODENAME}.json main)
+add_nso_target(xenomods)
 
 # FTP transfer
 
-if(NOT " ${BF2MODS_SWITCH_IP}" STREQUAL " ")
+if(NOT " ${XENOMODS_SWITCH_IP}" STREQUAL " ")
 	message(STATUS "Enabling FTP transfer")
 
-	add_custom_command(TARGET bf2mods
+	add_custom_command(TARGET xenomods
 			POST_BUILD
-			COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/send_over_ftp.py --switchip ${BF2MODS_SWITCH_IP} --json ${PROJECT_SOURCE_DIR}/npdm/${BF2MODS_CODENAME}.json
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+			COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/send_over_ftp.py --switchip ${XENOMODS_SWITCH_IP} --json ${PROJECT_SOURCE_DIR}/npdm/${XENOMODS_CODENAME}.json
+			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 			USES_TERMINAL
 			VERBATIM
-			COMMENT "Sending bf2mods to console"
+			COMMENT "Sending xenomods to console"
 			)
 endif()
