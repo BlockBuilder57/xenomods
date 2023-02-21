@@ -252,6 +252,8 @@ namespace xenomods {
 		if(GetPlayer(2)->InputDownStrict(Keybind::TEST_BUTTON)) {
 			// temp space for tests
 
+			//gf::GfPlayFactory::createOpenMenu(state.tempInt, nullptr);
+
 			/*if(state.tempInt < 0)
 				fw::Framework::setUpdateSpeed(1.f / abs(state.tempInt));
 			else if(state.tempInt > 0)
