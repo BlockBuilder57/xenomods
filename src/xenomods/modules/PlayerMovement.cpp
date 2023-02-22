@@ -1,21 +1,24 @@
 #include "PlayerMovement.hpp"
 
+#include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
 #include <xenomods/Utils.hpp>
-#include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
 #include "../main.hpp"
 #include "DebugStuff.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
+#include "xenomods/engine/game/CharacterController.hpp"
 #include "xenomods/engine/gf/PlayerController.hpp"
+#include "xenomods/engine/mm/mtl/RTTI.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/stuff/utils/util.hpp"
 
 namespace {
 
+#if !XENOMODS_CODENAME(bfsw)
 	struct ApplyVelocityChanges : skylaunch::hook::Trampoline<ApplyVelocityChanges> {
 		static void Hook(gf::GfComBehaviorPc* this_pointer, fw::UpdateInfo* updateInfo, gf::GfComPropertyPc* pcProperty) {
 			//using enum gf::GfComPropertyPc::Flags;
@@ -67,7 +70,48 @@ namespace {
 		}
 	};
 
-}
+#else
+
+	bool ValidToChange(game::CharacterController* cc) {
+		if(cc->actorAccessor != nullptr) {
+			auto behavior = cc->actorAccessor->getBehaviorComponent();
+			if(behavior->getRTTI()->isKindOf(&game::BehaviorPc::m_rtti))
+				return true;
+		}
+		return false;
+	}
+
+	struct ApplyVelocityChanges : skylaunch::hook::Trampoline<ApplyVelocityChanges> {
+		static void Hook(game::CharacterController* this_pointer, mm::Vec3& pos, bool param_2) {
+			if(ValidToChange(this_pointer)) {
+				auto& impulse = static_cast<glm::vec3&>(pos);
+				auto& velocity = static_cast<glm::vec3&>(this_pointer->velocity);
+
+				impulse *= xenomods::PlayerMovement::movementSpeedMult;
+
+				// undo the y changes when we're not on a wall
+				if(!xenomods::bitMask(this_pointer->flags, game::CharacterController::Flags::pcClimb))
+					impulse.y /= xenomods::PlayerMovement::movementSpeedMult;
+
+				if(xenomods::PlayerMovement::moonJump) {
+					velocity.y = 0;
+					impulse.y = std::max(0.5f, 0.5f * (xenomods::PlayerMovement::movementSpeedMult / 64.f));
+				}
+			}
+
+			Orig(this_pointer, pos, param_2);
+		}
+	};
+
+	struct DisableFallDamage : skylaunch::hook::Trampoline<DisableFallDamage> {
+		static float Hook(game::CharacterController* this_pointer) {
+			return ValidToChange(this_pointer) && xenomods::PlayerMovement::disableFallDamage ? 0 : Orig(this_pointer);
+		}
+	};
+
+#endif
+
+} // namespace
 
 namespace xenomods {
 
@@ -78,12 +122,18 @@ namespace xenomods {
 	void PlayerMovement::Initialize() {
 		g_Logger->LogDebug("Setting up player movement hooks...");
 
+#if !XENOMODS_CODENAME(bfsw)
 		ApplyVelocityChanges::HookAt("_ZN2gf15GfComBehaviorPc19integrateMoveNormalERKN2fw10UpdateInfoERNS_15GfComPropertyPcE");
 
 		DisableFallDamagePlugin::HookAt("_ZNK2gf2pc18FallDistancePlugin12calcDistanceERKN2mm4Vec3E");
 		DisableStateUtilFallDamage::HookAt("_ZN2gf2pc9StateUtil20setFallDamageDisableERNS_15GfComBehaviorPcEb");
 
 		CorrectCameraTarget::HookAt("_ZN2gf18PlayerCameraTarget15writeTargetInfoEv");
+#else
+		ApplyVelocityChanges::HookAt(&game::CharacterController::applyMoveVec);
+		DisableFallDamage::HookAt(&game::CharacterController::getFallHeight);
+		// TODO: look into game::PcStateUtil::updateClimbMove for vertical climbing speed
+#endif
 	}
 
 	void PlayerMovement::Update() {
@@ -101,8 +151,6 @@ namespace xenomods {
 		}
 	}
 
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
 	XENOMODS_REGISTER_MODULE(PlayerMovement);
-#endif
 
 } // namespace xenomods
