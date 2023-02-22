@@ -62,7 +62,21 @@ namespace xenomods {
 		int buttonsP1Width = fw::debug::drawFontGetWidth(p1Buttons.c_str());
 		int buttonsP2Width = fw::debug::drawFontGetWidth(p2Buttons.c_str());
 		fw::debug::drawFontShadow(1280-buttonsP1Width-5, 5, mm::Col4::white, p1Buttons.c_str());
-		fw::debug::drawFontShadow(1280-buttonsP2Width-5, 5+16, mm::Col4::white, p2Buttons.c_str());*/
+		fw::debug::drawFontShadow(1280-buttonsP2Width-5, 5+16, mm::Col4::white, p2Buttons.c_str());
+
+		auto testcombo = nn::hid::KEY_A;
+		if(P2->InputHeld(testcombo))
+			fw::debug::drawFontShadow(1280/2, 0, mm::Col4::cyan, "combo held!");
+		if (P2->InputDown(testcombo))
+			g_Logger->LogDebug("combo down...");
+		if (P2->InputUp(testcombo))
+			g_Logger->LogDebug("combo up!");
+		if(P2->InputHeldStrict(testcombo))
+			fw::debug::drawFontShadow(1280/2, 16, mm::Col4::cyan, "strict combo held!");
+		if (P2->InputDownStrict(testcombo))
+			g_Logger->LogDebug("strict combo down...");
+		if (P2->InputUpStrict(testcombo))
+			g_Logger->LogDebug("strict combo up!");*/
 
 		/*
 		 * Enforce some things on first update
@@ -80,7 +94,7 @@ namespace xenomods {
 		 * Check buttons
 		 */
 
-		if (P2->InputDownStrict(RELOAD_CONFIG)) {
+		/*if (P2->InputDownStrict(RELOAD_CONFIG)) {
 			GetState().config.LoadFromFile();
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
@@ -89,7 +103,7 @@ namespace xenomods {
 			g_Logger->LogWarning("test warning message! {}", ml::mtRandf2());
 			g_Logger->LogError("test error message! {}", ml::mtRandf3());
 			g_Logger->LogFatal("test fatal message! {}", nn::os::GetSystemTick());
-		}
+		}*/
 
 		// Update modules
 		xenomods::UpdateAllRegisteredModules();

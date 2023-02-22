@@ -61,7 +61,7 @@ namespace xenomods {
 
 	void BdatRandomizer::Update() {
 		if(GetPlayer(2)->InputDownStrict(Keybind::BDAT_MSSCRAMBLETYPE_SWITCH)) {
-			underlying_value(msScrambleType) += 1;
+			reinterpret_cast<std::underlying_type_t<decltype(msScrambleType)>&>(msScrambleType) += 1;
 
 			if(msScrambleType >= BdatMSScrambleType::Count)
 				msScrambleType = BdatMSScrambleType::Off;

@@ -37,38 +37,32 @@ namespace xenomods {
 
 		template<class T>
 		inline bool InputHeld(T combo) {
-			auto val = xenomods::underlying_value(combo);
-			return (stateCur.Buttons & val) == val;
+			return bitMask(static_cast<T>(stateCur.Buttons), combo);
 		}
 
 		template<class T>
 		inline bool InputUp(T combo) {
-			auto val = xenomods::underlying_value(combo);
-			return (stateCur.Buttons & val) != val && (statePrev.Buttons & val) == val;
+			return !bitMask(static_cast<T>(stateCur.Buttons), combo) && bitMask(static_cast<T>(statePrev.Buttons), combo);
 		}
 
 		template<class T>
 		inline bool InputDown(T combo) {
-			auto val = xenomods::underlying_value(combo);
-			return (stateCur.Buttons & val) == val && (statePrev.Buttons & val) != val;
+			return bitMask(static_cast<T>(stateCur.Buttons), combo) && !bitMask(static_cast<T>(statePrev.Buttons), combo);
 		}
 
 		template<class T>
 		inline bool InputHeldStrict(T combo) {
-			auto val = xenomods::underlying_value(combo);
-			return (stateCur.Buttons & 0xFFFF) == val;
+			return bitMaskStrict(static_cast<T>(stateCur.Buttons & 0xFFFF), combo);
 		}
 
 		template<class T>
 		inline bool InputUpStrict(T combo) {
-			auto val = xenomods::underlying_value(combo);
-			return (stateCur.Buttons & 0xFFFF) != val && (statePrev.Buttons & 0xFFFF) == val;
+			return !bitMaskStrict(static_cast<T>(stateCur.Buttons & 0xFFFF), combo) && bitMaskStrict(static_cast<T>(statePrev.Buttons & 0xFFFF), combo);
 		}
 
 		template<class T>
 		inline bool InputDownStrict(T combo) {
-			auto val = xenomods::underlying_value(combo);
-			return (stateCur.Buttons & 0xFFFF) == val && (statePrev.Buttons & 0xFFFF) != val;
+			return bitMaskStrict(static_cast<T>(stateCur.Buttons & 0xFFFF), combo) && !bitMaskStrict(static_cast<T>(statePrev.Buttons & 0xFFFF), combo);
 		}
 
 		/** @} */

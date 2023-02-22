@@ -63,8 +63,8 @@ namespace xenomods {
 
 	template<class Enum>
 		requires(std::is_enum_v<std::remove_cvref_t<Enum>>)
-	constexpr std::underlying_type_t<Enum>& underlying_value(Enum& e) {
-		return reinterpret_cast<std::underlying_type_t<Enum>&>(e);
+	constexpr std::underlying_type_t<Enum> underlying_value(Enum e) {
+		return static_cast<std::underlying_type_t<Enum>>(e);
 	}
 
 #if 0 // this is my take at a const overload, i tried :(
@@ -81,6 +81,39 @@ namespace xenomods {
 		return reinterpret_cast<std::underlying_type_t<std::remove_cvref_t<Enum>>>(e);
 	}
 #endif
+
+	namespace detail {
+
+		template <typename T>
+		constexpr auto operator |(T lhs, T rhs) requires(std::is_enum_v<std::remove_cvref_t<T>>) {
+			return (xenomods::underlying_value(lhs) | xenomods::underlying_value(rhs));
+		}
+
+		template <typename T>
+		constexpr auto operator &(T lhs, T rhs) requires(std::is_enum_v<std::remove_cvref_t<T>>)  {
+			return (xenomods::underlying_value(lhs) & xenomods::underlying_value(rhs));
+		}
+
+		template <typename T>
+		constexpr auto operator ^(T lhs, T rhs) requires(std::is_enum_v<std::remove_cvref_t<T>>) {
+			return (xenomods::underlying_value(lhs) ^ xenomods::underlying_value(rhs));
+		}
+
+		template <typename T>
+		constexpr auto operator ~(T lhs) requires(std::is_enum_v<std::remove_cvref_t<T>>)  {
+			return ~xenomods::underlying_value(lhs);
+		}
+
+		template<typename T>
+		constexpr bool bitMask(T lhs, T mask) {
+			return (lhs & mask) == xenomods::underlying_value(mask);
+		}
+
+		template<typename T>
+		constexpr bool bitMaskStrict(T lhs, T mask) {
+			return xenomods::underlying_value(lhs) == xenomods::underlying_value(mask);
+		}
+	}
 
 	template<class TConv, std::size_t Size>
 	struct ConvertTo {
@@ -107,9 +140,18 @@ namespace xenomods {
 		uint8_t __byteRep[Size];
 	};
 
+	using xenomods::detail::bitMask;
+	using xenomods::detail::bitMaskStrict;
+
 #define XENOMODS_CONVERTTO_TYPE(T, U, size) \
     struct T : public xenomods::ConvertTo<U, size> { \
         using ConvertTo<U, size>::ConvertTo;  \
     }
 
 } // namespace xenomods
+
+// pull detail operators into global namespace
+using xenomods::detail::operator|;
+using xenomods::detail::operator&;
+using xenomods::detail::operator^;
+using xenomods::detail::operator~;
