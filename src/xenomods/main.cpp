@@ -94,7 +94,7 @@ namespace xenomods {
 		 * Check buttons
 		 */
 
-		/*if (P2->InputDownStrict(RELOAD_CONFIG)) {
+		if (P2->InputDownStrict(RELOAD_CONFIG)) {
 			GetState().config.LoadFromFile();
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
@@ -103,7 +103,7 @@ namespace xenomods {
 			g_Logger->LogWarning("test warning message! {}", ml::mtRandf2());
 			g_Logger->LogError("test error message! {}", ml::mtRandf3());
 			g_Logger->LogFatal("test fatal message! {}", nn::os::GetSystemTick());
-		}*/
+		}
 
 		// Update modules
 		xenomods::UpdateAllRegisteredModules();

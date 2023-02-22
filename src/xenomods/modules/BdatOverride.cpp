@@ -179,7 +179,7 @@ namespace xenomods {
 
 		if(!res) {
 			auto error = std::move(res).error();
-			//g_Logger->LogDebug("No Bdat override file could be found ({})", error.description());
+			g_Logger->LogDebug("Bdat override file error: ({})", error.description());
 			return;
 		}
 
