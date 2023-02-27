@@ -4,21 +4,23 @@
 
 #include "CameraTools.hpp"
 
+#include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
-#include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
 #include "../main.hpp"
 #include "DebugStuff.hpp"
+#include "glm/gtx/matrix_decompose.hpp"
+#include "glm/mat4x4.hpp"
 #include "xenomods/engine/apps/FrameworkLauncher.hpp"
+#include "xenomods/engine/fw/UpdateInfo.hpp"
+#include "xenomods/engine/game/MenuModelView.hpp"
 #include "xenomods/engine/ml/Scene.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/stuff/utils/util.hpp"
-#include "glm/gtx/matrix_decompose.hpp"
-#include "glm/mat4x4.hpp"
 
 namespace {
 
@@ -86,18 +88,39 @@ namespace {
 		}
 	};
 
+#if XENOMODS_CODENAME(bfsw)
+	struct FrameworkCameraPilot : skylaunch::hook::Trampoline<FrameworkCameraPilot> {
+		static void Hook(fw::Camera* this_pointer) {
+			Orig(this_pointer);
+
+			if(xenomods::CameraTools::Freecam.isOn) {
+				xenomods::CameraTools::DoFreeCameraMovement(xenomods::CameraTools::Freecam.matrixUI);
+
+				this_pointer->Matrix1 = xenomods::CameraTools::Freecam.matrixUI;
+				this_pointer->Matrix2 = xenomods::CameraTools::Freecam.matrixUI;
+
+				this_pointer->fov = xenomods::CameraTools::Freecam.fov;
+			} else
+				xenomods::CameraTools::Freecam.matrixUI = this_pointer->Matrix1;
+		}
+	};
+#endif
+
 } // namespace
 
 namespace xenomods {
 
 	CameraTools::FreecamState CameraTools::Freecam = {
 		.isOn = false,
-		.matrix = mm::Mat44 {},
+		.matrix = glm::identity<glm::mat4>(),
+#if XENOMODS_CODENAME(bfsw)
+		.matrixUI = glm::identity<glm::mat4>(),
+#endif
 		.fov = 45.f,
 		.camSpeed = 1.f
 	};
 
-	void CameraTools::DoFreeCameraMovement() {
+	void CameraTools::DoFreeCameraMovement(glm::mat4& matrix) {
 		// controls:
 		// Left stick: Y: forward/back, X: left/right
 		// Right stick: XY: Look movement
@@ -116,7 +139,7 @@ namespace xenomods {
 		glm::vec4 perspective {};
 
 		// decompose existing matrix
-		glm::decompose(static_cast<const glm::mat4&>(Freecam.matrix), scale, rot, pos, skew, perspective);
+		glm::decompose(matrix, scale, rot, pos, skew, perspective);
 
 		glm::vec2 lStick = GetPlayer(2)->stateCur.LAxis;
 		glm::vec2 rStick = GetPlayer(2)->stateCur.RAxis;
@@ -129,17 +152,12 @@ namespace xenomods {
 
 		// movement
 		glm::vec3 move {};
-		if(GetPlayer(2)->InputHeld(FREECAM_FOVHOLD)) {
-			// holding down the button, so modify fov
-			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
-			Freecam.fov = std::clamp(Freecam.fov + -lStick.y * 0.25f, -179.f, 179.f);
-		} else {
-			move = { lStick.x, 0, -lStick.y };
-			move = rot * move; // rotate movement to local space
-		}
 
-		// multiply by cam speed
-		move *= Freecam.camSpeed;
+		if(!GetPlayer(2)->InputHeld(FREECAM_FOVHOLD)) {
+			move = { lStick.x, 0, -lStick.y };
+			move = rot * move;		  // rotate movement to local space
+			move *= Freecam.camSpeed; // multiply by cam speed
+		}
 
 		// rotation
 		glm::vec3 look {};
@@ -187,7 +205,7 @@ namespace xenomods {
 		newmat = glm::translate(newmat, pos + move);
 		newmat = glm::rotate(newmat, angle, axis);
 
-		Freecam.matrix = newmat;
+		matrix = newmat;
 	}
 
 	void CameraTools::Initialize() {
@@ -195,6 +213,8 @@ namespace xenomods {
 
 #if XENOMODS_CODENAME(bfsw)
 		SetCameraMatrix::HookAt(&ml::ScnObjCam::setWorldMatrix);
+
+		FrameworkCameraPilot::HookAt(&fw::Camera::update);
 #else
 		SetCameraMatrix::HookAt(&ml::ScnObjCam::setViewMatrix);
 #endif
@@ -228,6 +248,12 @@ namespace xenomods {
 				fw::debug::drawFontFmtShadow(1280 - width - 3, 3, mm::Col4::white, speed);
 			}
 
+			if(GetPlayer(2)->InputHeldStrict(Keybind::FREECAM_FOVHOLD)) {
+				// holding down the button, so modify fov
+				// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
+				Freecam.fov = std::clamp(Freecam.fov + -GetPlayer(2)->stateCur.LAxis.y * 0.25f, -179.f, 179.f);
+			}
+
 			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_FOVHOLD)) {
 				if(std::abs(now - lastFOVPress) < 0.2f)
 					Freecam.fov = 80;
@@ -244,12 +270,21 @@ namespace xenomods {
 
 					// decompose existing matrix
 					glm::decompose(static_cast<const glm::mat4&>(Freecam.matrix), scale, rot, pos, skew, perspective);
-
-					glm::mat4 newmat = glm::mat4(1.f);
+					glm::mat4 newmat = glm::identity<glm::mat4>();
 					newmat = glm::translate(newmat, pos);
 					// just don't apply any rotation
 
 					Freecam.matrix = newmat;
+
+#if XENOMODS_CODENAME(bfsw)
+					// decompose existing matrix
+					glm::decompose(static_cast<const glm::mat4&>(Freecam.matrixUI), scale, rot, pos, skew, perspective);
+					newmat = glm::identity<glm::mat4>();
+					newmat = glm::translate(newmat, pos);
+					// just don't apply any rotation
+
+					Freecam.matrixUI = newmat;
+#endif
 				}
 
 				lastRollPress = now;
@@ -257,7 +292,7 @@ namespace xenomods {
 		}
 
 		if(Freecam.isOn)
-			DoFreeCameraMovement();
+			DoFreeCameraMovement(static_cast<glm::mat4&>(Freecam.matrix));
 	}
 
 	XENOMODS_REGISTER_MODULE(CameraTools);

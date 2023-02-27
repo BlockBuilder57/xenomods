@@ -13,12 +13,15 @@ namespace xenomods {
 		struct FreecamState {
 			bool isOn;
 			mm::Mat44 matrix;
+#if XENOMODS_CODENAME(bfsw)
+			mm::Mat44 matrixUI;
+#endif
 			float fov;
 			float camSpeed;
 		};
 		static FreecamState Freecam;
 
-		static void DoFreeCameraMovement();
+		static void DoFreeCameraMovement(glm::mat4& matrix);
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {
