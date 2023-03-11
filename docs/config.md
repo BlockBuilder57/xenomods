@@ -24,6 +24,11 @@ dumpFileReads = false
 enableFileOverrides = true
 
 # Using a header can override configs for specific games
+
+[bf2]
+# Tries to load "ira-xm.ard" from the filesystem and mounts if present
+mountTornaContent = true
+
 [ira]
 # This list contains the start and post-credits titlescreen
 titleEvents = [10709, 10710]

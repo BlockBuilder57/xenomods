@@ -21,6 +21,7 @@ namespace xenomods {
 #define CONFIG_EVENT_DEBUG_BITS_DEFAULT 0b1
 #define CONFIG_DUMP_FILE_READS_DEFAULT false
 #define CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT true
+#define CONFIG_MOUNT_TORNA_CONTENT_DEFAULT false
 
 		/**
 		 * Reset to default values.
@@ -37,6 +38,8 @@ namespace xenomods {
 
 		bool dumpFileReads {};
 		bool enableFileOverrides {};
+
+		bool mountTornaContent {};
 	   private:
 		void InitializeFromTable(const toml::table& table, bool respectDefaults);
 

@@ -1,20 +1,21 @@
 #include "main.hpp"
 
+#include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/engine/fw/Document.hpp>
+#include <xenomods/engine/ml/Filesystem.hpp>
 #include <xenomods/engine/ml/Rand.hpp>
 #include <xenomods/engine/mm/MathTypes.hpp>
-#include <skylaunch/hookng/Hooks.hpp>
 
 #include "State.hpp"
 #include "Version.hpp"
+#include "modules/DebugStuff.hpp"
 #include "xenomods/DebugWrappers.hpp"
 #include "xenomods/HidInput.hpp"
 #include "xenomods/Logger.hpp"
+#include "xenomods/NnFile.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
-#include "modules/DebugStuff.hpp"
 
-namespace fw {
-
+namespace {
 
 #if !XENOMODS_CODENAME(bfsw)
 	struct FrameworkUpdateHook : skylaunch::hook::Trampoline<FrameworkUpdateHook> {
@@ -24,7 +25,7 @@ namespace fw {
 		}
 	};
 #else
-	Document* document;
+	fw::Document* document;
 
 	struct FrameworkUpdater_updateStdHook : skylaunch::hook::Trampoline<FrameworkUpdater_updateStdHook> {
 		static void Hook(fw::Document* doc, void* FrameworkController) {
@@ -36,11 +37,21 @@ namespace fw {
 
 			xenomods::update();
 		}
-
 	};
 #endif
 
-} // namespace fw
+#if XENOMODS_CODENAME(bf2)
+	struct FixIraOnBF2Mount : skylaunch::hook::Trampoline<FixIraOnBF2Mount> {
+		static bool Hook(const char* path) {
+			auto view = std::string_view(path);
+			if(view.starts_with("menu_ira"))
+				return false;
+			return Orig(path);
+		}
+	};
+#endif
+
+} // namespace
 
 namespace xenomods {
 
@@ -99,7 +110,7 @@ namespace xenomods {
 		 * Check buttons
 		 */
 
-		if (P2->InputDownStrict(RELOAD_CONFIG)) {
+		if(P2->InputDownStrict(RELOAD_CONFIG)) {
 			GetState().config.LoadFromFile();
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
@@ -125,11 +136,23 @@ namespace xenomods {
 	void main() {
 		InitializeAllRegisteredModules();
 
+#if XENOMODS_CODENAME(bf2)
+		if(GetState().config.mountTornaContent) {
+			NnFile file("rom:/ira-xm.arh", nn::fs::OpenMode_Read);
+
+			if(file) {
+				file.Close(); // gotta let the game read it lol
+				FixIraOnBF2Mount::HookAt(&ml::DevFileTh::checkValidFileBlock);
+				ml::DevFileTh::registArchive(ml::MEDIA::Default, "ira-xm.arh", "ira-xm.ard", "aoc1:/");
+			}
+		}
+#endif
+
 		// hook our updater
 #if !XENOMODS_CODENAME(bfsw)
-		fw::FrameworkUpdateHook::HookAt("_ZN2fw9Framework6updateEv");
+		FrameworkUpdateHook::HookAt("_ZN2fw9Framework6updateEv");
 #else
-		fw::FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
+		FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #endif
 
 		toastVersion();

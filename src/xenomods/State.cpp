@@ -35,11 +35,11 @@ namespace xenomods {
 	}
 
 	void Config::InitializeFromTable(const toml::table& table, bool respectDefaults) {
-		if (respectDefaults || table["port"].type() != toml::node_type::none)
-			port = table["port"].value_or(CONFIG_PORT_DEFAULT);
+		if (respectDefaults || table[STRINGIFY(port)].type() != toml::node_type::none)
+			port = table[STRINGIFY(port)].value_or(CONFIG_PORT_DEFAULT);
 
-		if(table["titleEvents"].is_array()) {
-			const toml::array* events = table["titleEvents"].as_array();
+		if(table[STRINGIFY(titleEvents)].is_array()) {
+			const toml::array* events = table[STRINGIFY(titleEvents)].as_array();
 			bool event_load_failed = false;
 			titleEvents.clear();
 
@@ -60,13 +60,16 @@ namespace xenomods {
 				titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 		}
 
-		if (respectDefaults || table["eventDebugBits"].type() != toml::node_type::none)
-			eventDebugBits = table["eventDebugBits"].value_or(CONFIG_EVENT_DEBUG_BITS_DEFAULT);
+		if (respectDefaults || table[STRINGIFY(eventDebugBits)].type() != toml::node_type::none)
+			eventDebugBits = table[STRINGIFY(eventDebugBits)].value_or(CONFIG_EVENT_DEBUG_BITS_DEFAULT);
 
-		if (respectDefaults || table["dumpFileReads"].type() != toml::node_type::none)
-			dumpFileReads = table["dumpFileReads"].value_or(CONFIG_DUMP_FILE_READS_DEFAULT);
-		if (respectDefaults || table["enableFileOverrides"].type() != toml::node_type::none)
-			enableFileOverrides = table["enableFileOverrides"].value_or(CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT);
+		if (respectDefaults || table[STRINGIFY(dumpFileReads)].type() != toml::node_type::none)
+			dumpFileReads = table[STRINGIFY(dumpFileReads)].value_or(CONFIG_DUMP_FILE_READS_DEFAULT);
+		if (respectDefaults || table[STRINGIFY(enableFileOverrides)].type() != toml::node_type::none)
+			enableFileOverrides = table[STRINGIFY(enableFileOverrides)].value_or(CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT);
+
+		if (respectDefaults || table[STRINGIFY(mountTornaContent)].type() != toml::node_type::none)
+			mountTornaContent = table[STRINGIFY(mountTornaContent)].value_or(CONFIG_MOUNT_TORNA_CONTENT_DEFAULT);
 
 		if (respectDefaults && table[XENOMODS_CODENAME_STR].is_table()) {
 			//g_Logger->LogDebug("Found {} as a category, loading...", XENOMODS_CODENAME_STR);

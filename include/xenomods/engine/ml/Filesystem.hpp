@@ -10,7 +10,7 @@
 
 namespace ml {
 
-	enum FTYPE { /* file type? */
+	enum class FTYPE { /* file type? */
 		kTypeInvalid = 0
 	};
 
@@ -169,6 +169,26 @@ namespace ml {
 		uint8_t field46_0x6c;
 		uint8_t field47_0x6d;
 		uint16_t field48_0x6e;
+	};
+
+	enum class MEDIA : std::uint8_t {
+		Default,      // supposedly covers everything else (like rom:)
+		unknown,      // this *is* a type, but not sure which one
+		DeviceRoot,   // usbkey_ and //
+		Host,         // host:
+		unknown2,     // unused?
+		USB,          // usb:
+		NandAndSave,  // nand: and save:
+		AddOnContent, // aoc(0-9):
+		SDCard        // sd:
+	};
+
+	struct DevFileTh {
+		static void initializePath(const char* mount, bool isArchiveMaybe);
+		static void registArchive(MEDIA media, const char* headerPath, const char* dataPath, const char* mount);
+		static void addMediaPath(MEDIA media, const char* mount, int unknown = 1);
+
+		static bool checkValidFileBlock(const char* path);
 	};
 
 } // namespace ml
