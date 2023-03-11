@@ -69,6 +69,38 @@ namespace xenomods {
 			LogMessage(Severity::Fatal, fmt, std::forward<Args>(args)...);
 		}
 
+		void VToastMessage(std::string_view category, Severity severity, fmt::string_view format, fmt::format_args args);
+
+		template<class FormatString, typename... Args>
+		inline void ToastMessage(std::string_view group, Severity severity, const FormatString& format, Args&&... args) {
+			VToastMessage(group, severity, format, fmt::make_format_args(args...));
+		}
+
+		template<class... Args>
+		inline void ToastDebug(std::string_view group, fmt::string_view fmt, Args... args) {
+			ToastMessage(group, Severity::Debug, fmt, std::forward<Args>(args)...);
+		}
+
+		template<class... Args>
+		inline void ToastInfo(std::string_view group, fmt::string_view fmt, Args... args) {
+			ToastMessage(group, Severity::Info, fmt, std::forward<Args>(args)...);
+		}
+
+		template<class... Args>
+		inline void ToastWarning(std::string_view group, fmt::string_view fmt, Args... args) {
+			ToastMessage(group, Severity::Warning, fmt, std::forward<Args>(args)...);
+		}
+
+		template<class... Args>
+		inline void ToastError(std::string_view group, fmt::string_view fmt, Args... args) {
+			ToastMessage(group, Severity::Error, fmt, std::forward<Args>(args)...);
+		}
+
+		template<class... Args>
+		inline void ToastFatal(std::string_view group, fmt::string_view fmt, Args... args) {
+			ToastMessage(group, Severity::Fatal, fmt, std::forward<Args>(args)...);
+		}
+
 		/**
 		 * Draw the current contents of the log buffer.
 		 * Updates lifetime.
@@ -95,6 +127,7 @@ namespace xenomods {
 		 */
 		struct LoggerMessage {
 			std::string text;
+			std::string group;
 			std::int16_t lifetime {};
 			Severity severity {};
 		};
@@ -109,6 +142,7 @@ namespace xenomods {
 		 * Xenoblade runs at 30fps (or at least tries to) and 5 seconds sounds like a good length.
 		 */
 		constexpr static auto LINE_LIFETIME = 5 * 30;
+		constexpr static auto TOAST_LIFETIME = 2 * 30;
 		/**
 		 * When the alpha fadeout of the line starts.
 		 */
@@ -117,14 +151,20 @@ namespace xenomods {
 		/**
 		 * Draw a message.
 		 */
-		void DrawInternal(LoggerMessage& msg, std::uint16_t x, std::uint16_t y) const;
+		void DrawInternal(LoggerMessage& msg, std::uint16_t x, std::uint16_t y, bool showSeverity = true) const;
 
 		/**
 		 * Add a message.
 		 */
 		void AddMessageInternal(Severity severity, const std::string& message);
 
+		/**
+		 * Add a toast message.
+		 */
+		void AddToastInternal(const std::string& group, Severity severity, const std::string& message);
+
 		std::vector<LoggerMessage> lines;
+		std::vector<LoggerMessage> toastLines;
 		bool debug_enabled = false;
 	};
 

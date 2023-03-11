@@ -48,6 +48,11 @@ namespace xenomods {
 		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught @ %s:%d : %s", file, line, message);
 	}
 
+	void toastVersion() {
+		g_Logger->ToastInfo("xm_version1", "xenomods{} - {}", version::IsDebug() ? " (debug)" : "", version::GitVersion());
+		g_Logger->ToastInfo("xm_version2", "built {}", version::BuildTimestamp());
+	}
+
 	void update() {
 		// lazy
 		using enum xenomods::Keybind;
@@ -103,6 +108,11 @@ namespace xenomods {
 			g_Logger->LogWarning("test warning message! {}", ml::mtRandf2());
 			g_Logger->LogError("test error message! {}", ml::mtRandf3());
 			g_Logger->LogFatal("test fatal message! {}", nn::os::GetSystemTick());
+
+			toastVersion();
+			int group = ml::mtRand(100, 999);
+			g_Logger->ToastWarning(fmt::format("{}", group), "random group ({})", group);
+			g_Logger->ToastMessage("logger test", Logger::Severity::Info, "system tick in seconds: {:2f}", nn::os::GetSystemTick() / 19200000.);
 		}
 
 		// Update modules
@@ -122,7 +132,7 @@ namespace xenomods {
 		fw::FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #endif
 
-		g_Logger->LogInfo("xenomods{} - {} initialized (built {})", version::IsDebug() ? " (debug)" : "", version::GitVersion(), version::BuildTimestamp());
+		toastVersion();
 	}
 
 } // namespace xenomods

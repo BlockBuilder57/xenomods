@@ -9,6 +9,12 @@
 
 namespace fw::debug {
 
+	template<class FormatString, typename... Args>
+	inline int drawFontFmtGetWidth(const FormatString& format, Args&&... args) {
+		auto formatted = fmt::vformat(format, fmt::make_format_args(args...));
+		return drawFontGetWidth("%s", formatted.c_str());
+	}
+
 	template<class... Args>
 	void drawFontShadow(int x, int y, mm::Col4 color, const char* fmt, Args... args) {
 		drawFont(x + 1, y + 1, color * 0.1f, fmt, std::forward<Args>(args)...);

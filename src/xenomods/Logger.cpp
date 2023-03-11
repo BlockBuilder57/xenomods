@@ -2,8 +2,8 @@
 
 #include <nn/diag.h>
 
-#include "xenomods/DebugWrappers.hpp"
 #include "skylaunch/logger/Logger.hpp"
+#include "xenomods/DebugWrappers.hpp"
 
 namespace xenomods {
 
@@ -28,6 +28,7 @@ namespace xenomods {
 		// Allocate space for logger messages upfront,
 		// so the logger doesn't actually allocate memory while in use.
 		lines.reserve(Logger::MAX_LINES);
+		toastLines.reserve(Logger::MAX_LINES);
 
 #if _DEBUG
 		SetDebugEnabled(true);
@@ -57,6 +58,16 @@ namespace xenomods {
 		AddMessageInternal(severity, formatted);
 	}
 
+	void Logger::VToastMessage(std::string_view group, Severity severity, fmt::string_view format, fmt::format_args args) {
+		auto formatted = fmt::vformat(format, args);
+
+		// Don't post Debug severity messages if we shouldn't.
+		if(severity == Logger::Severity::Debug && !GetDebugEnabled())
+			return;
+
+		AddToastInternal(std::string(group), severity, formatted);
+	}
+
 	void Logger::Draw() {
 		for(std::size_t i = 0; i < lines.size(); ++i) {
 			auto& msg = lines[i];
@@ -68,9 +79,22 @@ namespace xenomods {
 				// erase the current index but decrement i so we try again with the next one
 				lines.erase(lines.begin() + i--);
 		}
+
+		for(std::size_t i = 0; i < toastLines.size(); ++i) {
+			auto& msg = toastLines[i];
+
+			// check lifetime greater than 0, but also decrement it for next time
+			if(--msg.lifetime > 0) {
+				// we're right-aligned, we need the width
+				int width = fw::debug::drawFontFmtGetWidth("{}", msg.text);
+				DrawInternal(msg, 1280 - width - 5, 5 + (i * 16), false);
+			} else if(!lines.empty())
+				// erase the current index but decrement i so we try again with the next one
+				toastLines.erase(toastLines.begin() + i--);
+		}
 	}
 
-	void Logger::DrawInternal(LoggerMessage& msg, std::uint16_t x, std::uint16_t y) const {
+	void Logger::DrawInternal(LoggerMessage& msg, std::uint16_t x, std::uint16_t y, bool showSeverity) const {
 		mm::Col4 colMain = ColorForSeverity(msg.severity);
 
 		if(msg.lifetime <= 0) {
@@ -81,8 +105,11 @@ namespace xenomods {
 			colMain.a = msg.lifetime / (float)FADEOUT_START;
 		}
 
-		// these are passed as an arg to avoid printf stack fuckery in the formatted message
-		fw::debug::drawFontFmtShadow(x, y, colMain, "[{}] {}", msg.severity, msg.text);
+		// these are passed as format arguments to avoid fuckery in the message
+		if(showSeverity)
+			fw::debug::drawFontFmtShadow(x, y, colMain, "[{}] {}", msg.severity, msg.text);
+		else
+			fw::debug::drawFontFmtShadow(x, y, colMain, "{}", msg.text);
 	}
 
 	void Logger::AddMessageInternal(Severity severity, const std::string& message) {
@@ -96,6 +123,39 @@ namespace xenomods {
 		lines.push_back({ .text = message,
 						  .lifetime = Logger::LINE_LIFETIME,
 						  .severity = severity });
+	}
+
+	void Logger::AddToastInternal(const std::string& group, Severity severity, const std::string& message) {
+		if(toastLines.size() >= Logger::MAX_LINES) {
+			// erase the oldest message
+			toastLines.erase(toastLines.begin());
+		}
+
+		LoggerMessage* groupMessage = nullptr;
+		for(auto& line : toastLines) {
+			/*if (groupMessage != nullptr) {
+				LogError("Multiple toasts with same group!!");
+				toastLines.clear();
+				break;
+			}*/
+			if(line.group == group) {
+				groupMessage = &line;
+				break;
+			}
+		}
+
+		if(groupMessage != nullptr) {
+			// we already have a message in this group, update its properties
+			groupMessage->text = message;
+			groupMessage->severity = severity;
+			groupMessage->lifetime = Logger::TOAST_LIFETIME;
+		} else {
+			// create a new message!
+			toastLines.push_back({ .text = message,
+									.group = group,
+									.lifetime = Logger::TOAST_LIFETIME,
+									.severity = severity });
+		}
 	}
 
 	// The logger instance.

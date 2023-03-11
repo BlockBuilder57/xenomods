@@ -231,22 +231,19 @@ namespace xenomods {
 		if(Freecam.isOn) {
 			static float lastFOVPress = MAXFLOAT;
 			static float lastRollPress = MAXFLOAT;
-			static float lastSpeedPress = MAXFLOAT;
 			float now = nn::os::GetSystemTick() / 19200000.;
 
+			bool speedChanged = false;
 			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_UP)) {
 				Freecam.camSpeed *= 2.f;
-				lastSpeedPress = now;
+				speedChanged = true;
 			} else if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_DOWN)) {
 				Freecam.camSpeed /= 2.f;
-				lastSpeedPress = now;
+				speedChanged = true;
 			}
 
-			if(DebugStuff::enableDebugRendering && std::abs(now - lastSpeedPress) < 1.5f) {
-				std::string speed = fmt::format("Freecam speed: {}", Freecam.camSpeed);
-				int width = fw::debug::drawFontGetWidth(speed.c_str());
-				fw::debug::drawFontFmtShadow(1280 - width - 3, 3, mm::Col4::white, speed);
-			}
+			if (speedChanged)
+				g_Logger->ToastInfo("freecamSpeed", "Freecam speed: {}", Freecam.camSpeed);
 
 			if(GetPlayer(2)->InputHeldStrict(Keybind::FREECAM_FOVHOLD)) {
 				// holding down the button, so modify fov
