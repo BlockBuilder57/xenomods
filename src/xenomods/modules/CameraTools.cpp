@@ -42,7 +42,8 @@ namespace {
 				if(this_pointer != this_pointer->ScnPtr->getCam(-1)) {
 					// not our active cam, move on
 					Orig(this_pointer, matrix);
-					camColor.a = 0.1f;
+					return;
+					//camColor.a = 0.1f;
 				} else {
 					// the active camera!
 
@@ -89,19 +90,54 @@ namespace {
 	};
 
 #if XENOMODS_CODENAME(bfsw)
-	struct FrameworkCameraPilot : skylaunch::hook::Trampoline<FrameworkCameraPilot> {
+	struct FrameworkCameraUpdate : skylaunch::hook::Trampoline<FrameworkCameraUpdate> {
 		static void Hook(fw::Camera* this_pointer) {
 			Orig(this_pointer);
 
 			if(xenomods::CameraTools::Freecam.isOn) {
 				xenomods::CameraTools::DoFreeCameraMovement(xenomods::CameraTools::Freecam.matrixUI);
 
-				this_pointer->Matrix1 = xenomods::CameraTools::Freecam.matrixUI;
-				this_pointer->Matrix2 = xenomods::CameraTools::Freecam.matrixUI;
+				this_pointer->matrix = xenomods::CameraTools::Freecam.matrixUI;
+				this_pointer->matrix2 = xenomods::CameraTools::Freecam.matrixUI;
 
 				this_pointer->fov = xenomods::CameraTools::Freecam.fov;
 			} else
-				xenomods::CameraTools::Freecam.matrixUI = this_pointer->Matrix1;
+				xenomods::CameraTools::Freecam.matrixUI = this_pointer->matrix;
+		}
+	};
+#else
+	struct FrameworkCameraUpdate : skylaunch::hook::Trampoline<FrameworkCameraUpdate> {
+		// strictly handles fov updates
+		static void Hook(fw::Camera* this_pointer) {
+			Orig(this_pointer);
+
+			if(xenomods::CameraTools::Freecam.isOn)
+				this_pointer->fov = xenomods::CameraTools::Freecam.fov;
+		}
+	};
+
+	struct BackupSetLookAt : skylaunch::hook::Trampoline<BackupSetLookAt> {
+		static void Hook(fw::Camera* this_pointer, const mm::Vec3& pos, const mm::Vec3& target, float roll) {
+			std::string camName = std::string(this_pointer->getName());
+			//if(xenomods::DebugStuff::enableDebugRendering)
+			//	xenomods::g_Logger->ToastInfo("freecamCamInfo" + camName, "{} prio {} fov {}", camName, this_pointer->CAMERA_PRIO, this_pointer->fov);
+
+			if(xenomods::CameraTools::Freecam.isOn) {
+				// 2 and Torna camera matricies are not world-space
+				mm::Mat44 trueMatrix = glm::inverse(static_cast<const glm::mat4&>(xenomods::CameraTools::Freecam.matrix));
+				this_pointer->matrix = trueMatrix;
+				this_pointer->fov = xenomods::CameraTools::Freecam.fov;
+			} else {
+				Orig(this_pointer, pos, target, roll);
+
+				// explicitly <= because multiple cameras can have the same prio
+				if(camName != "SubViewCamera" && this_pointer->CAMERA_PRIO <= xenomods::CameraTools::highestCameraPrio) {
+					xenomods::CameraTools::highestCameraPrio = this_pointer->CAMERA_PRIO;
+
+					xenomods::CameraTools::Freecam.matrix = glm::inverse(static_cast<const glm::mat4&>(this_pointer->matrix));
+					xenomods::CameraTools::Freecam.fov = this_pointer->fov;
+				}
+			}
 		}
 	};
 #endif
@@ -119,6 +155,8 @@ namespace xenomods {
 		.fov = 45.f,
 		.camSpeed = 1.f
 	};
+
+	unsigned int CameraTools::highestCameraPrio = -1;
 
 	void CameraTools::DoFreeCameraMovement(glm::mat4& matrix) {
 		// controls:
@@ -213,12 +251,12 @@ namespace xenomods {
 
 #if XENOMODS_CODENAME(bfsw)
 		SetCameraMatrix::HookAt(&ml::ScnObjCam::setWorldMatrix);
-
-		FrameworkCameraPilot::HookAt(&fw::Camera::update);
 #else
 		SetCameraMatrix::HookAt(&ml::ScnObjCam::setViewMatrix);
+		BackupSetLookAt::HookAt(&fw::Camera::setLookAt);
 #endif
 
+		FrameworkCameraUpdate::HookAt(&fw::Camera::update);
 		UpdateFOVNearFar::HookAt(&ml::ScnObjCam::updateFovNearFar);
 	}
 
@@ -227,6 +265,8 @@ namespace xenomods {
 			Freecam.isOn = !Freecam.isOn;
 			g_Logger->LogInfo("Toggling freecam: {}", Freecam.isOn);
 		}
+
+		highestCameraPrio = -1;
 
 		if(Freecam.isOn) {
 			static float lastFOVPress = MAXFLOAT;
@@ -242,7 +282,7 @@ namespace xenomods {
 				speedChanged = true;
 			}
 
-			if (speedChanged)
+			if(speedChanged)
 				g_Logger->ToastInfo("freecamSpeed", "Freecam speed: {}", Freecam.camSpeed);
 
 			if(GetPlayer(2)->InputHeldStrict(Keybind::FREECAM_FOVHOLD)) {

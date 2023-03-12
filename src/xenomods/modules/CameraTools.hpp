@@ -21,6 +21,8 @@ namespace xenomods {
 		};
 		static FreecamState Freecam;
 
+		static unsigned int highestCameraPrio;
+
 		static void DoFreeCameraMovement(glm::mat4& matrix);
 
 		void Initialize() override;
