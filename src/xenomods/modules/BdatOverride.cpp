@@ -10,7 +10,6 @@
 #include <xenomods/Utils.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
-#include "../main.hpp"
 #include "xenomods/engine/bdat/Bdat.hpp"
 
 namespace {

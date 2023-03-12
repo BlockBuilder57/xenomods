@@ -6,8 +6,6 @@
 #include <xenomods/Utils.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
-#include "../State.hpp"
-#include "../main.hpp"
 #include "xenomods/engine/bdat/Bdat.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/stuff/utils/util.hpp"

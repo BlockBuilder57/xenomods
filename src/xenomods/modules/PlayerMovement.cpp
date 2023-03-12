@@ -7,7 +7,6 @@
 #include <xenomods/Utils.hpp>
 
 #include "../State.hpp"
-#include "../main.hpp"
 #include "DebugStuff.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 #include "xenomods/engine/game/CharacterController.hpp"

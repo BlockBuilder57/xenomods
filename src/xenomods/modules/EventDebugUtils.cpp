@@ -10,7 +10,7 @@
 #include <xenomods/Utils.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
-#include "../main.hpp"
+#include "../State.hpp"
 #include "DebugStuff.hpp"
 #include "xenomods/engine/event/Manager.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"

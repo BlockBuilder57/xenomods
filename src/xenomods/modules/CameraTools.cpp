@@ -9,8 +9,6 @@
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
 
-#include "../State.hpp"
-#include "../main.hpp"
 #include "DebugStuff.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"

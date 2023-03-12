@@ -8,7 +8,6 @@
 
 #include "../State.hpp"
 #include "../Version.hpp"
-#include "../main.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
 #include "xenomods/engine/ui/UIObjectAcc.hpp"

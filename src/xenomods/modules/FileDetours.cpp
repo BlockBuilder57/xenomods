@@ -4,7 +4,7 @@
 
 #include "FileDetours.hpp"
 
-#include "../main.hpp"
+#include "../State.hpp"
 #include "xenomods/DebugWrappers.hpp"
 #include "xenomods/Logger.hpp"
 #include "xenomods/NnFile.hpp"
