@@ -262,18 +262,18 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bfsw)
 			fw::PadManager::enableDebugDraw(enableDebugRendering);
 #endif
-			g_Logger->LogInfo("Debug rendering: {}", enableDebugRendering);
+			g_Logger->ToastInfo(STRINGIFY(enableDebugRendering), "Debug rendering: {}", enableDebugRendering);
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::ACCESS_CLOSED_LANDMARKS)) {
 			accessClosedLandmarks = !accessClosedLandmarks;
-			g_Logger->LogInfo("Access closed landmarks: {}", accessClosedLandmarks);
+			g_Logger->ToastInfo(STRINGIFY(accessClosedLandmarks), "Access closed landmarks: {}", accessClosedLandmarks);
 		}
 
 		else if(GetPlayer(2)->InputDownStrict(Keybind::TEMPINT_INC)) {
 			state.tempInt++;
-			g_Logger->LogInfo("TempInt++, now {}", state.tempInt);
+			g_Logger->ToastInfo(STRINGIFY(state.tempInt), "TempInt++, now {}", state.tempInt);
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::TEMPINT_DEC)) {
 			state.tempInt--;
-			g_Logger->LogInfo("TempInt--, now {}", state.tempInt);
+			g_Logger->ToastInfo(STRINGIFY(state.tempInt), "TempInt--, now {}", state.tempInt);
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::MAPJUMP_JUMP)) {
 			g_Logger->LogInfo("Attempting jump to MapJump {}", state.tempInt);
 			DoMapJump(state.tempInt);

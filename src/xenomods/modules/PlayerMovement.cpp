@@ -138,16 +138,20 @@ namespace xenomods {
 	void PlayerMovement::Update() {
 		moonJump = GetPlayer(1)->InputHeld(Keybind::MOONJUMP);
 
+		bool movementSpeedChanged = false;
 		if(GetPlayer(2)->InputDownStrict(Keybind::MOVEMENT_SPEED_UP)) {
 			movementSpeedMult *= 2.0f;
-			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", movementSpeedMult);
+			movementSpeedChanged = true;
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::MOVEMENT_SPEED_DOWN)) {
 			movementSpeedMult /= 2.0f;
-			g_Logger->LogInfo("Movement speed multiplier set to {:.2f}", movementSpeedMult);
+			movementSpeedChanged = true;
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::DISABLE_FALL_DAMAGE)) {
 			disableFallDamage = !disableFallDamage;
-			g_Logger->LogInfo("Disable fall damage: {}", disableFallDamage);
+			g_Logger->ToastInfo(STRINGIFY(disableFallDamage), "Disable fall damage: {}", disableFallDamage);
 		}
+
+		if (movementSpeedChanged)
+			g_Logger->ToastInfo("movementSpeedMult", "Move speed: {}x", movementSpeedMult);
 	}
 
 	XENOMODS_REGISTER_MODULE(PlayerMovement);

@@ -80,6 +80,7 @@ namespace xenomods {
 				lines.erase(lines.begin() + i--);
 		}
 
+		auto validToasts = 0;
 		for(std::size_t i = 0; i < toastLines.size(); ++i) {
 			auto& msg = toastLines[i];
 
@@ -87,7 +88,8 @@ namespace xenomods {
 			if(--msg.lifetime > 0) {
 				// we're right-aligned, we need the width
 				int width = fw::debug::drawFontFmtGetWidth("{}", msg.text);
-				DrawInternal(msg, 1280 - width - 5, 5 + (i * 16), false);
+				DrawInternal(msg, 1280 - width - 5, 5 + (validToasts * 16), false);
+				validToasts++;
 			} else if(!lines.empty())
 				// erase the current index but decrement i so we try again with the next one
 				toastLines.erase(toastLines.begin() + i--);

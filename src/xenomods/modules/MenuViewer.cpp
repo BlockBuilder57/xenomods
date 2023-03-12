@@ -176,7 +176,7 @@ namespace xenomods {
 
 		if(GetPlayer(2)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {
 			enableUIRendering = !enableUIRendering;
-			g_Logger->LogInfo("UI rendering: {}", enableUIRendering);
+			g_Logger->ToastInfo(STRINGIFY(enableUIRendering), "UI rendering: {}", enableUIRendering);
 		}
 		else if (GetPlayer(2)->InputDownStrict(Keybind::STRAIGHTEN_FONT)) {
 			straightenFont = !straightenFont;

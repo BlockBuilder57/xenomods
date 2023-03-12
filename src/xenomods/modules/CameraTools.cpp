@@ -261,7 +261,7 @@ namespace xenomods {
 	void CameraTools::Update() {
 		if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TOGGLE)) {
 			Freecam.isOn = !Freecam.isOn;
-			g_Logger->LogInfo("Toggling freecam: {}", Freecam.isOn);
+			g_Logger->ToastInfo(STRINGIFY(Freecam.isOn), "Freecam: {}", Freecam.isOn);
 		}
 
 		highestCameraPrio = -1;
