@@ -4,6 +4,7 @@
 
 #include <xenomods/engine/mm/MathTypes.hpp>
 #include <xenomods/engine/mm/mtl/RTTI.hpp>
+#include <xenomods/engine/mm/mtl/IntrusiveList.hpp>
 
 #include "Document.hpp"
 
@@ -12,9 +13,10 @@ namespace fw {
 	class Camera {
 	   public:
 #if XENOMODS_CODENAME(bfsw)
-		void* field1_0x8;
-		void* field2_0x10;
-		void* field3_0x18;
+		int m_RefCount;
+		int pad;
+		mm::mtl::IntrusiveListNodeBase* next;
+		mm::mtl::IntrusiveListNodeBase* prev;
 		unsigned int CAMERA_PRIO;
 		unsigned int unk1;
 		unsigned int unk2;
@@ -28,8 +30,8 @@ namespace fw {
 #else
 		int m_RefCount;
 		int pad;
-		void* field1_0x10;
-		void* field3_0x18;
+		mm::mtl::IntrusiveListNodeBase* next;
+		mm::mtl::IntrusiveListNodeBase* prev;
 		void* field4_0x20;
 		unsigned int CAMERA_PRIO;
 		float fov;
@@ -66,21 +68,50 @@ namespace fw {
 
 	class CameraLayer {
 	   public:
-		INSERT_PADDING_BYTES(0xd0);
+		mm::mtl::IntrusiveListBase listCamera;
+		mm::mtl::IntrusiveListBase listCameraPlugin;
+		ml::ScnObjCam* objCam;
+#if XENOMODS_CODENAME(bfsw)
+		INSERT_PADDING_BYTES(0x8);
+		mm::Mat44 matCurrent;
+		mm::Mat44 matTarget;
+		float unknown;
+		float lerpProgress;
+		float lerpTime;
+		bool willLerp;
+#else
+		mm::Mat44 matCurrent;
+		mm::Mat44 matTarget;
+		float lerpProgress;
+		float lerpTime;
+		bool willLerp;
+#endif
 
-		void update(const fw::UpdateInfo& updateInfo);
+		void getCameraPosition() const;
+
+#if XENOMODS_CODENAME(bfsw)
+		void update(const fw::Document& document, const fw::UpdateInfo& updateInfo);
+#else
+		virtual void update(const fw::UpdateInfo& updateInfo);
+#endif
 	};
 
 	class CameraManager {
 	   public:
+#if XENOMODS_CODENAME(bfsw)
+		INSERT_PADDING_BYTES(0x10);
+		CameraLayer Layers[8];
+#else
 		INSERT_PADDING_BYTES(0x20);
-		CameraLayer Layer0;
-		CameraLayer Layer1;
-		CameraLayer Layer2;
-		CameraLayer Layer3;
-		void* notTheCamera;
+		CameraLayer Layers[4];
+#endif
+		fw::Camera* notTheCamera;
 
-		void update(const fw::UpdateInfo& updateInfo);
+#if XENOMODS_CODENAME(bfsw)
+		void update(const fw::Document& document, const fw::UpdateInfo& updateInfo);
+#else
+		virtual void update(const fw::UpdateInfo& updateInfo);
+#endif
 	};
 
 } // namespace fw

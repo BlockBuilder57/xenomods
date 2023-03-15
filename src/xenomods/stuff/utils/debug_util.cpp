@@ -90,17 +90,25 @@ namespace dbgutil {
 #ifndef NOLOG
 		static constexpr char NIBBLE_LOOKUP[] = "0123456789ABCDEF";
 
+		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "Memory @ %p - size %x", address, len);
+
 		uint8_t* addressAsBytes = static_cast<uint8_t*>(address);
 		char printBuffer[len * 3];
+		memset(&printBuffer, 0, sizeof(printBuffer));
 		for(auto i = 0u; i < len; i++) {
-			auto printBufferOffset = i * 3;
+			auto printBufferOffset = (i % 0x20) * 3;
 			printBuffer[printBufferOffset] = NIBBLE_LOOKUP[addressAsBytes[i] >> 4];
 			printBuffer[printBufferOffset + 1] = NIBBLE_LOOKUP[addressAsBytes[i] & 0xF];
 			printBuffer[printBufferOffset + 2] = ' ';
+			if (printBufferOffset == (0x20-1) * 3) {
+				printBuffer[printBufferOffset + 3] = '\0';
+				NN_DIAG_LOG(nn::diag::LogSeverity::Info, "%s", printBuffer);
+				memset(&printBuffer, 0, sizeof(printBuffer));
+			}
 		}
-		printBuffer[len * 3 - 1] = '\0';
+		//printBuffer[len * 3 - 1] = '\0';
 
-		LOG("{}", printBuffer);
+		//LOG("{}", printBuffer);
 #endif
 	}
 

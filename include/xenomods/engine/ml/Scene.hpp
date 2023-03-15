@@ -10,23 +10,37 @@
 namespace ml {
 
 	struct AttrTransform {
-		mm::Vec3 pos;							//0x4
-		INSERT_PADDING_BYTES(0x4)				//0xc
-		INSERT_PADDING_BYTES(sizeof(mm::Vec3)); //0x10
-		INSERT_PADDING_BYTES(0x4)				//0x1c
-		INSERT_PADDING_BYTES(0x50)				//0x20
-		mm::Mat44 CamInverseMatrix;				//0x70
-		mm::Mat44 weirdMatrix;					//0xb0
-		mm::Vec3 eulerAngles;					//0xf0
-	};
-
-	// This seems to be a struct that continues AttrTransform
-	// (the pointer to it in ScnObjCam is a AttrTransform*
-	// I would define it as such, but I've not no clue as to what
-	// the true length is.
-	struct AttrTransformInheriter {
-		INSERT_PADDING_BYTES(0x1e8)
+		mm::Vec3 pos;
+		INSERT_PADDING_BYTES(0x4);
+		mm::Vec3 camPos;
+		INSERT_PADDING_BYTES(0x4);
+		INSERT_PADDING_BYTES(sizeof(mm::Vec3));
+		INSERT_PADDING_BYTES(0x4);
+		INSERT_PADDING_BYTES(sizeof(mm::Mat44));
+		mm::Mat44 viewMatInverse;
+		mm::Mat44 viewMat;
+		mm::Vec3 eulerAngles;
+		INSERT_PADDING_BYTES(0x4);
+		mm::Vec3 camRot;
+		INSERT_PADDING_BYTES(0x4);
+		INSERT_PADDING_BYTES(sizeof(mm::Vec3));
+		INSERT_PADDING_BYTES(0x4);
+		INSERT_PADDING_BYTES(sizeof(mm::Vec3));
+		INSERT_PADDING_BYTES(0x4);
+		INSERT_PADDING_BYTES(sizeof(mm::Vec3));
+		INSERT_PADDING_BYTES(0x4);
+		mm::Vec3 target;
+		INSERT_PADDING_BYTES(0x4);
+		INSERT_PADDING_BYTES(sizeof(mm::Vec3));
+		INSERT_PADDING_BYTES(0x4);
+		mm::Mat44 frustum;
+		mm::Mat44 projection;
+		mm::Pnt<int> camSize;
 		float fov;
+		float field_492_0x1ec;
+		float camAspect;
+		float zNear;
+		float zFar;
 	};
 
 	class Scn;
@@ -36,7 +50,7 @@ namespace ml {
 		INSERT_PADDING_BYTES(0x8)
 		Scn* ScnPtr {};
 		INSERT_PADDING_BYTES(0x70)
-		AttrTransformInheriter* AttrTransformPtr {};
+		AttrTransform* AttrTransformPtr {};
 
 		void setWorldMatrix(const mm::Mat44& matrix);
 		void setViewMatrix(const mm::Mat44& matrix);
