@@ -12,7 +12,7 @@ Below is an example, with defaults. Note that all are optional, excluding them w
 # Port the TCP logger will use.
 port = 6969
 
-# List of title screen overrides, by BDAT id
+# List of title screen overrides, by Bdat id
 # This list contains all chapters, game clears, and NG+ clears
 titleEvents = [10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609]
 # A bitflag for event debugging defaults. The list is in EventDebugUtils.cpp
@@ -22,6 +22,8 @@ eventDebugBits = 0b1
 dumpFileReads = false
 # Reads overrides from /config/xenomods/{game}/override/
 enableFileOverrides = true
+# Skips overriding these specific Bdat sheets (due to heavy performance penalties)
+bdatSkipOverrides = ["CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr", "CHR_EnArrange"]
 
 # Using a header can override configs for specific games
 

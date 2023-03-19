@@ -21,8 +21,8 @@ namespace xenomods {
 	struct BdatOverrideBase {
 		struct SheetData {
 			unsigned char* buffer;
-			std::string_view name;
-			std::string_view member;
+			const char* name;
+			const char* member;
 			unsigned short row;
 		};
 
@@ -38,7 +38,9 @@ namespace xenomods {
 	struct BdatOverride : public UpdatableModule {
 		static std::vector<BdatOverrideBase*> Callbacks;
 		static toml::table TOMLTable;
+		static std::vector<std::string> BlockedSheets;
 		static std::unordered_map<std::string_view, unsigned short> SheetMaxIDs;
+		//static std::unordered_map<std::string_view, unsigned long> HotPath;
 
 		static void RegisterCallback(xenomods::BdatOverrideBase* override);
 		void Initialize() override;
