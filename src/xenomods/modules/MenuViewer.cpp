@@ -49,7 +49,7 @@ namespace {
 			modVersion.uiObject->name.set("TXT_mod_version");
 
 			// make the version string...
-			auto modVersionStr = fmt::format("xenomods {}", xenomods::version::GitVersion());
+			auto modVersionStr = fmt::format("xenomods {}", xenomods::version::BuildGitVersion());
 			auto modVersionUIStr = ui::UIStr(modVersionStr.c_str(), true);
 			modVersion.setText(modVersionUIStr);
 
@@ -71,7 +71,7 @@ namespace {
 
 			modBuildDate.uiObject->name.set("TXT_mod_builddate");
 
-			auto modBuildDateUIStr = ui::UIStr(xenomods::version::BuildTimestamp().data(), true);
+			auto modBuildDateUIStr = ui::UIStr(xenomods::version::BuildTimestamp(), true);
 			modBuildDate.setText(modBuildDateUIStr);
 
 			modBuildDate.getRect(scratchRect, 2);

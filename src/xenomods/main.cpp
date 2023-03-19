@@ -60,7 +60,7 @@ namespace xenomods {
 	}
 
 	void toastVersion() {
-		g_Logger->ToastInfo("xm_version1", "xenomods{} - {}", version::IsDebug() ? " (debug)" : "", version::GitVersion());
+		g_Logger->ToastInfo("xm_version1", "xenomods{} - {}", version::BuildIsDebug() ? " (debug)" : "", version::BuildGitVersion());
 		g_Logger->ToastInfo("xm_version2", "built {}", version::BuildTimestamp());
 	}
 
