@@ -176,15 +176,16 @@ namespace xenomods {
 		auto path = fmt::format("sd:/config/xenomods/{}/bdatOverride.toml", XENOMODS_CODENAME_STR);
 		toml::parse_result res = toml::parse_file(path);
 
+		SheetMaxIDs.clear();
+		TOMLTable.clear();
+
 		if(!res) {
 			auto error = std::move(res).error();
 			g_Logger->LogDebug("Bdat override file error: ({})", error.description());
 			return;
 		}
 
-		SheetMaxIDs.clear();
 		TOMLTable = std::move(res).table();
-
 		TOMLTable.for_each([&](auto& sheetKey, auto& sheetEl) {
 			if constexpr(toml::is_table<decltype(sheetEl)>) {
 				toml::table sheetName = sheetEl;
@@ -202,6 +203,8 @@ namespace xenomods {
 				//g_Logger->LogDebug("Adding {} with {} max", sheetKey.data(), maxRow);
 			}
 		});
+
+		g_Logger->LogInfo("Loaded Bdat override file successfully!");
 	}
 
 	XENOMODS_REGISTER_MODULE(BdatOverride);
