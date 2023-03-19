@@ -60,8 +60,9 @@ namespace xenomods {
 	}
 
 	void toastVersion() {
-		g_Logger->ToastInfo("xm_version1", "xenomods{} - {}", version::BuildIsDebug() ? " (debug)" : "", version::BuildGitVersion());
-		g_Logger->ToastInfo("xm_version2", "built {}", version::BuildTimestamp());
+		g_Logger->ToastInfo("xm_version1", "xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug() ? " (debug)" : "", XENOMODS_CODENAME_STR);
+		g_Logger->ToastDebug("xm_version2", "compiled on {}", version::BuildTimestamp());
+		g_Logger->ToastDebug("xm_version3", "running {}, version {}", version::RuntimeGame(), version::RuntimeVersion());
 	}
 
 	void update() {
@@ -110,7 +111,9 @@ namespace xenomods {
 		 * Check buttons
 		 */
 
-		if(P2->InputDownStrict(RELOAD_CONFIG)) {
+		if(P2->InputDownStrict(DISPLAY_VERSION)) {
+			toastVersion();
+		} else if(P2->InputDownStrict(RELOAD_CONFIG)) {
 			GetState().config.LoadFromFile();
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
@@ -120,7 +123,6 @@ namespace xenomods {
 			g_Logger->LogError("test error message! {}", ml::mtRandf3());
 			g_Logger->LogFatal("test fatal message! {}", nn::os::GetSystemTick());
 
-			toastVersion();
 			int group = ml::mtRand(100, 999);
 			g_Logger->ToastWarning(fmt::format("{}", group), "random group ({})", group);
 			g_Logger->ToastMessage("logger test", Logger::Severity::Info, "system tick in seconds: {:2f}", nn::os::GetSystemTick() / 19200000.);

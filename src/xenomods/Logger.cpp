@@ -19,9 +19,9 @@ namespace xenomods {
 				return mm::Col4::red;
 			case Logger::Severity::Fatal:
 				return mm::Col4::magenta;
-			default:
-				assert(false && "You shouldn't get here!!!");
 		};
+		assert(false && "You shouldn't get here!!!");
+		return mm::Col4::zero;
 	}
 
 	Logger::Logger() {
@@ -60,6 +60,11 @@ namespace xenomods {
 
 	void Logger::VToastMessage(std::string_view group, Severity severity, fmt::string_view format, fmt::format_args args) {
 		auto formatted = fmt::vformat(format, args);
+
+		// by god I wish I didn't have to deal with this
+		skylaunch::logger::s_Instance->LogFormat("[xenomods|%s~%s] %s", group.data(), fmt::format("{}", severity).c_str(), formatted.c_str());
+
+		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[xenomods|%s~%s] %s", group.data(), fmt::format("{}", severity).c_str(), formatted.c_str());
 
 		// Don't post Debug severity messages if we shouldn't.
 		if(severity == Logger::Severity::Debug && !GetDebugEnabled())

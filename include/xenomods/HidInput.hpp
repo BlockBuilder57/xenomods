@@ -106,6 +106,7 @@ namespace xenomods {
 		FREECAM_SPEED_DOWN = nn::hid::KEY_L,
 
 		LOGGER_TEST = nn::hid::KEY_PLUS | nn::hid::KEY_R,
+		DISPLAY_VERSION = nn::hid::KEY_PLUS | nn::hid::KEY_MINUS,
 	};
 
 }; // namespace xenomods
