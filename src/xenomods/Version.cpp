@@ -7,6 +7,13 @@
 
 namespace xenomods::version {
 
+	const char* BuildGitVersion() {
+		return fullTag;
+	}
+	const char* BuildTimestamp() {
+		return __DATE__ " " __TIME__;
+	}
+
 	unsigned long RuntimeProgramID() {
 		static unsigned long progid = 0;
 

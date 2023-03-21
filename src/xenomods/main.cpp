@@ -59,7 +59,7 @@ namespace xenomods {
 	}
 
 	void toastVersion() {
-		g_Logger->ToastInfo("xm_version1", "xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug() ? " (debug)" : "", XENOMODS_CODENAME_STR);
+		g_Logger->ToastInfo("xm_version1", "xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
 		g_Logger->ToastDebug("xm_version2", "compiled on {}", version::BuildTimestamp());
 		g_Logger->ToastDebug("xm_version3", "running {}, version {}", version::RuntimeGame(), version::RuntimeVersion());
 		g_Logger->ToastDebug("xm_version4", "exefs {}", version::RuntimeBuildRevision());

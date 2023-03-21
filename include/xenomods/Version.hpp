@@ -29,8 +29,8 @@ namespace xenomods::version {
 		}
 	};
 
-	inline const char* BuildGitVersion() { return fullTag; }
-	inline const char* BuildTimestamp() { return __DATE__ " " __TIME__; }
+	const char* BuildGitVersion();
+	const char* BuildTimestamp();
 	const GameType BuildGame =
 #if XENOMODS_CODENAME(bf2)
 	GameType::BF2;
@@ -41,13 +41,12 @@ namespace xenomods::version {
 #elif XXENOMODS_CODENAME(bf3)
 	GameType::BF3;
 #endif
-	inline bool BuildIsDebug() {
+	const bool BuildIsDebug =
 #if _DEBUG
-		return true;
+	true;
 #else
-		return false;
+	false;
 #endif
-	}
 
 	unsigned long RuntimeProgramID();
 	GameType RuntimeGame();
