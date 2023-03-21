@@ -1,6 +1,6 @@
 // Created by block on 2/10/2023.
 
-#include "Version.hpp"
+#include "xenomods/Version.hpp"
 
 #include "nn/oe.h"
 #include "skylaunch/nx/kernel/svc.h"

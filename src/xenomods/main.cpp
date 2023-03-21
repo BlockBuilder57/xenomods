@@ -1,18 +1,17 @@
 #include "main.hpp"
 
 #include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/engine/fw/Document.hpp>
-#include <xenomods/engine/ml/Filesystem.hpp>
-#include <xenomods/engine/ml/Rand.hpp>
-#include <xenomods/engine/mm/MathTypes.hpp>
+#include <xenomods/DebugWrappers.hpp>
+#include <xenomods/HidInput.hpp>
+#include <xenomods/Logger.hpp>
+#include <xenomods/NnFile.hpp>
+#include <xenomods/Version.hpp>
 
 #include "State.hpp"
-#include "Version.hpp"
 #include "modules/DebugStuff.hpp"
-#include "xenomods/DebugWrappers.hpp"
-#include "xenomods/HidInput.hpp"
-#include "xenomods/Logger.hpp"
-#include "xenomods/NnFile.hpp"
+#include "xenomods/engine/fw/Document.hpp"
+#include "xenomods/engine/ml/Filesystem.hpp"
+#include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 
 namespace {
@@ -63,6 +62,7 @@ namespace xenomods {
 		g_Logger->ToastInfo("xm_version1", "xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug() ? " (debug)" : "", XENOMODS_CODENAME_STR);
 		g_Logger->ToastDebug("xm_version2", "compiled on {}", version::BuildTimestamp());
 		g_Logger->ToastDebug("xm_version3", "running {}, version {}", version::RuntimeGame(), version::RuntimeVersion());
+		g_Logger->ToastDebug("xm_version4", "exefs {}", version::RuntimeBuildRevision());
 	}
 
 	void update() {

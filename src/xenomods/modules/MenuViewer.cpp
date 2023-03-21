@@ -1,13 +1,13 @@
 #include "MenuViewer.hpp"
 #include "DebugStuff.hpp"
 
+#include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
-#include <skylaunch/hookng/Hooks.hpp>
+#include <xenomods/Version.hpp>
 
 #include "../State.hpp"
-#include "../Version.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
 #include "xenomods/engine/ui/UIObjectAcc.hpp"

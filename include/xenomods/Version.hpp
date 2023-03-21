@@ -3,10 +3,11 @@
 #pragma once
 
 #include <string_view>
-#include <xenomods/Utils.hpp>
 
+#include "Utils.hpp"
 #include "fmt/core.h"
 #include "gitversion.h"
+#include "xenomods/engine/ml/ProcDesktop.hpp"
 
 namespace xenomods::version {
 
@@ -51,6 +52,7 @@ namespace xenomods::version {
 	unsigned long RuntimeProgramID();
 	GameType RuntimeGame();
 	SemVer RuntimeVersion();
+	inline const char* RuntimeBuildRevision() { return ml::ProcDesktop::getBuildRevision()->buffer; }
 
 } // namespace xenomods::version
 
