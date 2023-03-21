@@ -21,7 +21,8 @@ namespace xenomods {
 		virtual void Update() {
 		}
 
-		virtual void OnConfigUpdate(Config& config) = 0;
+		virtual void OnConfigUpdate(Config& config) {
+		}
 	};
 
 	namespace detail {

@@ -23,6 +23,7 @@ namespace xenomods {
 #define CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT true
 #define CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT { "CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr", "CHR_EnArrange" }
 #define CONFIG_MOUNT_TORNA_CONTENT_DEFAULT false
+#define CONFIG_ENABLE_60FPS_DEFAULT false
 
 		/**
 		 * Reset to default values.
@@ -42,6 +43,8 @@ namespace xenomods {
 		std::vector<std::string> bdatSkipOverrides {};
 
 		bool mountTornaContent {};
+
+		bool enable60FPS {};
 	   private:
 		void InitializeFromTable(const toml::table& table, bool respectDefaults);
 

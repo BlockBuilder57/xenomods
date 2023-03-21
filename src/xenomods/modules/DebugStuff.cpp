@@ -252,11 +252,6 @@ namespace xenomods {
 			// temp space for tests
 
 			//gf::GfPlayFactory::createOpenMenu(state.tempInt, nullptr);
-
-			/*if(state.tempInt < 0)
-				fw::Framework::setUpdateSpeed(1.f / abs(state.tempInt));
-			else if(state.tempInt > 0)
-				fw::Framework::setUpdateSpeed(state.tempInt);*/
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::DEBUG_RENDER_TOGGLE)) {
 			enableDebugRendering = !enableDebugRendering;
 #if !XENOMODS_CODENAME(bfsw)

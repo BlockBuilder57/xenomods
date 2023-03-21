@@ -19,6 +19,8 @@ namespace xenomods {
 		bdatSkipOverrides = CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT;
 
 		mountTornaContent = CONFIG_MOUNT_TORNA_CONTENT_DEFAULT;
+
+		enable60FPS = CONFIG_ENABLE_60FPS_DEFAULT;
 	}
 
 	void Config::LoadFromFile() {
@@ -96,6 +98,9 @@ namespace xenomods {
 
 		if (respectDefaults || table[STRINGIFY(mountTornaContent)].type() != toml::node_type::none)
 			mountTornaContent = table[STRINGIFY(mountTornaContent)].value_or(CONFIG_MOUNT_TORNA_CONTENT_DEFAULT);
+
+		if (respectDefaults || table[STRINGIFY(enable60FPS)].type() != toml::node_type::none)
+			enable60FPS = table[STRINGIFY(enable60FPS)].value_or(CONFIG_ENABLE_60FPS_DEFAULT);
 
 		if (respectDefaults && table[XENOMODS_CODENAME_STR].is_table()) {
 			//g_Logger->LogDebug("Found {} as a category, loading...", XENOMODS_CODENAME_STR);
