@@ -21,8 +21,8 @@ namespace xenomods {
 		// steps to add frame skipping will go here
 	}
 
-	void FrameratePatch::OnConfigUpdate(xenomods::Config& config) {
-		if (config.enable60FPS)
+	void FrameratePatch::OnConfigUpdate() {
+		if (GetState().config.enable60FPS)
 			ml::DevGraph::setVSync(1);
 		else
 			ml::DevGraph::setVSync(2);

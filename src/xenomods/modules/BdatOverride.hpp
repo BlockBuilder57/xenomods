@@ -43,7 +43,7 @@ namespace xenomods {
 		//static std::unordered_map<std::string_view, unsigned long> HotPath;
 
 		void Initialize() override;
-		void OnConfigUpdate(Config& config) override;
+		void OnConfigUpdate() override;
 
 		static void RegisterCallback(xenomods::BdatOverrideBase* override);
 		void LoadFromFile();

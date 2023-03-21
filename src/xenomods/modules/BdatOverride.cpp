@@ -180,7 +180,7 @@ namespace xenomods {
 		LoadFromFile();
 	}
 
-	void BdatOverride::OnConfigUpdate(xenomods::Config& config) {
+	void BdatOverride::OnConfigUpdate() {
 		LoadFromFile();
 
 		/*unsigned long total = 0;
