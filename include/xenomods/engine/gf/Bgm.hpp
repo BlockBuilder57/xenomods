@@ -14,7 +14,7 @@ namespace gf {
 
 		virtual ~BgmTrack() = default;
 
-		virtual char* getTrackName() const {return "BgmTrack";};
+		virtual char* getTrackName() const;
 		virtual bool isPlaying() const;
 		virtual void update(const fw::UpdateInfo& update);
 

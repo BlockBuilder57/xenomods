@@ -11,6 +11,10 @@
 	"pool_partition":	0,
 	"is_64_bit":	true,
 	"address_space_type":	3,
+	"system_resource_size":	"0",
+	"optimize_memory_allocation":	false,
+	"disable_device_address_space_merge":	false,
+	"signature_key_generation":	0,
 	"filesystem_access": {
 		"permissions": "0xFFFFFFFFFFFFFFFF"
 	},

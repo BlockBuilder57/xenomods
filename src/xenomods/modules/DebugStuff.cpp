@@ -114,24 +114,26 @@ namespace {
 				return;
 
 			const int height = fw::debug::drawFontGetHeight();
-			std::string trackName = this_pointer->getTrackName();
+			if (this_pointer->getTrackName() != nullptr) {
+				std::string trackName = this_pointer->getTrackName();
 
-			if (trackName == "EventBGM")
-				return; // already shown by event::BgmManager
+				if(trackName == "EventBGM")
+					return; // already shown by event::BgmManager
 
-			if(this_pointer->isPlaying()) {
-				mm::mtl::FixStr<64> bgmFileName {};
+				if(this_pointer->isPlaying()) {
+					mm::mtl::FixStr<64> bgmFileName {};
 
-				if(!this_pointer->makePlayFileName(bgmFileName)) {
-					// failed to make a filename, just fall back to playingBgmFileName
-					bgmFileName.set(this_pointer->playingBgmFileName);
+					if(!this_pointer->makePlayFileName(bgmFileName)) {
+						// failed to make a filename, just fall back to playingBgmFileName
+						bgmFileName.set(this_pointer->playingBgmFileName);
+					}
+
+					fw::debug::drawFontFmtShadow(0, 720 - (xenomods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white,
+												 "{}: {} {:.1f}/{:.1f}{}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop() ? " (∞)" : "");
+				} else {
+					// uncomment if you want every BgmTrack instance to show
+					//fw::debug::drawFontFmtShadow(0, 720 - (xenomods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white, "{}: not playing", trackName);
 				}
-
-				fw::debug::drawFontFmtShadow(0, 720 - (xenomods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white,
-											 "{}: {} {:.1f}/{:.1f}{}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop() ? " (∞)" : "");
-			} else {
-				// uncomment if you want every BgmTrack instance to show
-				//fw::debug::drawFontFmtShadow(0, 720 - (xenomods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white, "{}: not playing", trackName);
 			}
 		}
 	};

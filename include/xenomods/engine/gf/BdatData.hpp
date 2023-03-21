@@ -6,13 +6,15 @@
 
 namespace gf {
 
-	namespace GfDataEvent {
+	class GfDataEvent {
+	   public:
 		static char* getEventName(unsigned int eventId);
 		static unsigned int getEventID(const char* evtName);
 		static bool isWatchedEventFlag(unsigned int eventId);
 	};
 
-	namespace GfDataBdat {
+	class GfDataBdat {
+	   public:
 		static unsigned char* getFP(unsigned int idx);
 	};
 
