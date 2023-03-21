@@ -104,6 +104,7 @@ namespace xenomods {
 		FREECAM_ROLLHOLD = nn::hid::KEY_RSTICK,
 		FREECAM_SPEED_UP = nn::hid::KEY_ZL,
 		FREECAM_SPEED_DOWN = nn::hid::KEY_L,
+		FREECAM_TELEPORT = FREECAM_TOGGLE | nn::hid::KEY_L | nn::hid::KEY_R,
 
 		LOGGER_TEST = nn::hid::KEY_PLUS | nn::hid::KEY_R,
 		DISPLAY_VERSION = nn::hid::KEY_PLUS | nn::hid::KEY_MINUS,

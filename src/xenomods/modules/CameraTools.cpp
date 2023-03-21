@@ -15,6 +15,7 @@
 #include "xenomods/engine/apps/FrameworkLauncher.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 #include "xenomods/engine/game/MenuModelView.hpp"
+#include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/engine/ml/Scene.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
@@ -154,7 +155,8 @@ namespace xenomods {
 		if(std::abs(Freecam.fov) < 45.f)
 			lookMult *= Freecam.fov / 45.f;
 
-		if(GetPlayer(2)->InputHeld(FREECAM_ROLLHOLD))
+		// extra deadzone for roll, it's sensitive on joycons
+		if(GetPlayer(2)->InputHeld(FREECAM_ROLLHOLD) && glm::length(lStick) > 0.4f)
 			look = { 0, 0, -rStick.x * 0.5f }; // only roll
 		else
 			look = { rStick.y * lookMult, -rStick.x * lookMult, 0 }; // pitch and yaw
@@ -242,19 +244,24 @@ namespace xenomods {
 				g_Logger->ToastInfo("freecamSpeed", "Freecam speed: {}", Freecam.camSpeed);
 
 			if(GetPlayer(2)->InputHeldStrict(Keybind::FREECAM_FOVHOLD)) {
-				// holding down the button, so modify fov
-				// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
-				Freecam.fov = std::clamp(Freecam.fov + -GetPlayer(2)->stateCur.LAxis.y * 0.25f, -179.f, 179.f);
+				glm::vec2 lStick = GetPlayer(2)->stateCur.LAxis;
+
+				// deadzone
+				if (glm::length(lStick) > 0.15f) {
+					// holding down the button, so modify fov
+					// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
+					Freecam.fov = std::clamp(Freecam.fov + -lStick.y * 0.25f, -179.f, 179.f);
+				}
 			}
 
 			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_FOVHOLD)) {
-				if(std::abs(now - lastFOVPress) < 0.2f)
+				if(std::abs(now - lastFOVPress) < 0.3f)
 					Freecam.fov = 80;
 
 				lastFOVPress = now;
 			}
 			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_ROLLHOLD)) {
-				if(std::abs(now - lastRollPress) < 0.2f) {
+				if(std::abs(now - lastRollPress) < 0.3f) {
 					glm::vec3 pos {};
 					glm::quat rot {};
 					glm::vec3 scale {};
@@ -271,6 +278,15 @@ namespace xenomods {
 				}
 
 				lastRollPress = now;
+			}
+
+			if (GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TELEPORT)) {
+#if !XENOMODS_CODENAME(bfsw)
+				gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
+				if (trans != nullptr) {
+					trans->setPosition(Meta.pos);
+				}
+#endif
 			}
 		}
 

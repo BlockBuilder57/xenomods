@@ -11,6 +11,15 @@ namespace gf {
 		void* ptr;
 	};
 
+	struct GfComTransform {
+	   public:
+		mm::Vec3* getPosition() const;
+		mm::Quat* getRotation() const;
+
+		void setPosition(const mm::Vec3& pos);
+		void setRotation(const mm::Quat& rot);
+	};
+
 	class GfObjAcc {
 	   public:
 		GfObjAcc(GF_OBJ_HANDLE* handle);
