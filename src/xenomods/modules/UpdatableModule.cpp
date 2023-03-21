@@ -49,4 +49,9 @@ namespace xenomods {
 				continue;
 	}
 
+	void ConfigUpdateForAllRegisteredModules() {
+		for(int i = 0; i < moduleIndex; ++i)
+			registeredModules[i]->OnConfigUpdate(xenomods::GetState().config);
+	}
+
 } // namespace xenomods

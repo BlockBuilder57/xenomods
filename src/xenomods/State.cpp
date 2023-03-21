@@ -1,8 +1,9 @@
 #include "State.hpp"
 
-#include <xenomods/stuff/utils/debug_util.hpp>
+#include <xenomods/Logger.hpp>
 
-#include "xenomods/Logger.hpp"
+#include "modules/UpdatableModule.hpp"
+#include "xenomods/stuff/utils/debug_util.hpp"
 
 namespace xenomods {
 
@@ -34,6 +35,7 @@ namespace xenomods {
 
 		InitializeFromTable(tomlTable, true);
 
+		ConfigUpdateForAllRegisteredModules();
 		g_Logger->LogInfo("Loaded config.toml successfully!");
 	}
 

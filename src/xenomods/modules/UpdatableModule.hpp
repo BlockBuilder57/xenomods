@@ -2,6 +2,8 @@
 
 #include <type_traits>
 
+#include "../State.hpp"
+
 namespace xenomods {
 
 	/**
@@ -18,6 +20,8 @@ namespace xenomods {
 
 		virtual void Update() {
 		}
+
+		virtual void OnConfigUpdate(Config& config) = 0;
 	};
 
 	namespace detail {
@@ -43,4 +47,10 @@ namespace xenomods {
 	 * Update all registered modules.
 	 */
 	void UpdateAllRegisteredModules();
+
+	/**
+	 * Marker for doing stuff after the config updates for all registered modules.
+	 * NOTE: Only done on a successful config reload.
+	 */
+	void ConfigUpdateForAllRegisteredModules();
 } // namespace xenomods

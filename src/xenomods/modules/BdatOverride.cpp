@@ -10,7 +10,6 @@
 #include <xenomods/Logger.hpp>
 #include <xenomods/Utils.hpp>
 
-#include "../State.hpp"
 #include "xenomods/engine/bdat/Bdat.hpp"
 
 namespace {
@@ -181,21 +180,19 @@ namespace xenomods {
 		LoadFromFile();
 	}
 
-	void BdatOverride::Update() {
-		if(GetPlayer(2)->InputDownStrict(Keybind::RELOAD_CONFIG)) {
-			LoadFromFile();
+	void BdatOverride::OnConfigUpdate(xenomods::Config& config) {
+		LoadFromFile();
 
-			/*unsigned long total = 0;
-			std::map<unsigned long, std::string_view, std::greater<>> sorted;
-			for (auto& it : HotPath) {
-				sorted[it.second] = it.first;
-				total += it.second;
-			}
-			for (auto& it : sorted) {
-				g_Logger->LogDebug("{}: {:.2f}% ({})", it.second, ((float)it.first / total) * 100.f, it.first);
-			}
-			HotPath.clear();*/
+		/*unsigned long total = 0;
+		std::map<unsigned long, std::string_view, std::greater<>> sorted;
+		for (auto& it : HotPath) {
+			sorted[it.second] = it.first;
+			total += it.second;
 		}
+		for (auto& it : sorted) {
+			g_Logger->LogDebug("{}: {:.2f}% ({})", it.second, ((float)it.first / total) * 100.f, it.first);
+		}
+		HotPath.clear();*/
 	}
 
 	void BdatOverride::LoadFromFile() {

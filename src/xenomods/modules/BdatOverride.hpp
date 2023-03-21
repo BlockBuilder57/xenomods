@@ -42,13 +42,10 @@ namespace xenomods {
 		static std::unordered_map<std::string_view, unsigned short> SheetMaxIDs;
 		//static std::unordered_map<std::string_view, unsigned long> HotPath;
 
-		static void RegisterCallback(xenomods::BdatOverrideBase* override);
 		void Initialize() override;
-		bool NeedsUpdate() const override {
-			return true;
-		}
-		void Update() override;
+		void OnConfigUpdate(Config& config) override;
 
+		static void RegisterCallback(xenomods::BdatOverrideBase* override);
 		void LoadFromFile();
 
 	};
