@@ -43,7 +43,10 @@ namespace game {
 
 		float getFallHeight();
 
+		void syncFrame();
+
 		void applyMoveVec(const mm::Vec3&, bool param_2);
+		void setWarp(const mm::Vec3& pos, int usually5);
 	};
 
 } // namespace game

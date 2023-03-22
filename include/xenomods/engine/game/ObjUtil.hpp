@@ -2,16 +2,17 @@
 
 #pragma once
 
+#include "CharacterController.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 
-#include "CharacterController.hpp"
-
+#if XENOMODS_CODENAME(bfsw)
 namespace game {
 
 	class ObjUtil {
 	   public:
-		static void getPartyHandle(const fw::Document& doc, unsigned short index);
+		static unsigned int getPartyHandle(const fw::Document& doc, unsigned short index);
 		static CharacterController* getCharacterController(const fw::Document& doc, unsigned int handle);
 	};
 
-}
+} // namespace game
+#endif

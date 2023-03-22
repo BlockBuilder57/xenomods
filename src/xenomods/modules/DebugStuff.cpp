@@ -192,16 +192,16 @@ namespace xenomods {
 #else
 		game::MapJumpSetupInfo info;
 
-		if(fw::document == nullptr) {
+		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't do a map jump cause no doc ptr!");
 			return;
 		}
 
-		g_Logger->LogInfo("going to make info");
-		game::SeqUtil::makeMapJumpSetupInfoFromLandmark(info, *fw::document, mapjumpId);
-		g_Logger->LogInfo("made info, going to request jump");
-		game::SeqUtil::requestMapJump(*fw::document, info);
-		g_Logger->LogInfo("jump requested");
+		//g_Logger->LogInfo("going to make info");
+		game::SeqUtil::makeMapJumpSetupInfoFromLandmark(info, *DocumentPtr, mapjumpId);
+		//g_Logger->LogInfo("made info, going to request jump");
+		game::SeqUtil::requestMapJump(*DocumentPtr, info);
+		//g_Logger->LogInfo("jump requested");
 #endif
 	}
 
@@ -215,11 +215,12 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bfsw)
 		tl::TitleMain::returnTitle((gf::SAVESLOT)slot);
 #else
-		if(fw::document == nullptr) {
+		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't return to title cause no doc ptr!");
 			return;
 		}
-		game::SeqUtil::returnTitle(*fw::document);
+
+		game::SeqUtil::returnTitle(*DocumentPtr);
 #endif
 	}
 

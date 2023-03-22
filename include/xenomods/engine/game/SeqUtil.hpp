@@ -7,6 +7,7 @@
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 
+#if XENOMODS_CODENAME(bfsw)
 namespace game {
 
 	struct MapJumpSetupInfo {
@@ -29,3 +30,4 @@ namespace game {
 	}
 
 }
+#endif

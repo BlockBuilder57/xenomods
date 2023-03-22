@@ -31,8 +31,10 @@ namespace {
 		static void Hook(fw::Document* doc, void* FrameworkController) {
 			Orig(doc, FrameworkController);
 
-			if(doc != nullptr && doc->applet != nullptr)
+			if(doc != nullptr && doc->applet != nullptr) {
+				xenomods::DocumentPtr = doc;
 				xenomods::update(&doc->applet->updateInfo);
+			}
 		}
 	};
 #endif
@@ -52,7 +54,11 @@ namespace {
 
 namespace xenomods {
 
-	void fmt_assert_failed(const char* file, int line, const char* message) {
+#if XENOMODS_CODENAME(bfsw)
+	fw::Document* DocumentPtr = {};
+#endif
+
+void fmt_assert_failed(const char* file, int line, const char* message) {
 		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught @ %s:%d : %s", file, line, message);
 	}
 

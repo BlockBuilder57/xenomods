@@ -8,6 +8,7 @@
 
 #include "UpdateInfo.hpp"
 
+#if XENOMODS_CODENAME(bfsw)
 namespace fw {
 
 	class Applet {
@@ -21,6 +22,11 @@ namespace fw {
 		Applet* applet;
 	};
 
-	extern Document* document;
-
 } // namespace fw
+
+namespace xenomods {
+
+	extern fw::Document* DocumentPtr;
+
+} // namespace xenomods
+#endif

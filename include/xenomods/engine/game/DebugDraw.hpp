@@ -4,6 +4,7 @@
 
 #include <xenomods/Utils.hpp>
 
+#if XENOMODS_CODENAME(bfsw)
 namespace game {
 
 	class DebugDraw {
@@ -16,3 +17,4 @@ namespace game {
 	};
 
 } // namespace game
+#endif
