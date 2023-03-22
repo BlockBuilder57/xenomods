@@ -1,10 +1,10 @@
 #include "DebugStuff.hpp"
 
+#include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
 #include <xenomods/Utils.hpp>
-#include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
 #include "xenomods/engine/bdat/Bdat.hpp"
@@ -15,8 +15,10 @@
 #include "xenomods/engine/game/MapJump.hpp"
 #include "xenomods/engine/gf/BdatData.hpp"
 #include "xenomods/engine/gf/Bgm.hpp"
+#include "xenomods/engine/gf/Manager.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/gf/PlayFactory.hpp"
+#include "xenomods/engine/gf/Weather.hpp"
 #include "xenomods/engine/ml/DebugDrawing.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/engine/ml/Scene.hpp"
@@ -239,6 +241,8 @@ namespace xenomods {
 		JumpToClosedLandmarks_Zone::HookAt(&gf::GfMenuObjWorldMap::isOpenLandmark);
 
 		ReplaceTitleEvent::HookAt("_ZN2tl9TitleMain14playTitleEventEj");
+
+		DispRexCrystal
 #else
 		GetWinIDOverride::HookAt("_ZN2ml7DebDraw15getCacheDrawWIDEv");
 		RenderViewHook::HookAt("_ZN2ml7WinView10renderViewEv");
@@ -252,8 +256,12 @@ namespace xenomods {
 
 		if(GetPlayer(2)->InputDownStrict(Keybind::TEST_BUTTON)) {
 			// temp space for tests
+			g_Logger->LogDebug("Test button pressed!");
 
 			//gf::GfPlayFactory::createOpenMenu(state.tempInt, nullptr);
+			//gf::GfFieldWeather::setCloudSeaForDebug(0, (gf::CLOUD_SEA)state.tempInt);
+			//gf::GfFieldWeather::clear();
+			//gf::GfFieldManager::clear();
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::DEBUG_RENDER_TOGGLE)) {
 			enableDebugRendering = !enableDebugRendering;
 #if !XENOMODS_CODENAME(bfsw)

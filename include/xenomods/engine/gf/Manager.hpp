@@ -21,4 +21,9 @@ namespace gf {
 		static bool isControlFree();
 	};
 
+	struct GfFieldManager {
+	   public:
+		static void clear(); // RESETS PLAYTIME!!
+	};
+
 } // namespace gf
