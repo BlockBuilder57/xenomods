@@ -12,7 +12,7 @@
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 #include "xenomods/engine/game/DebugDraw.hpp"
-#include "xenomods/engine/game/MapJump.hpp"
+#include "xenomods/engine/game/SeqUtil.hpp"
 #include "xenomods/engine/gf/BdatData.hpp"
 #include "xenomods/engine/gf/Bgm.hpp"
 #include "xenomods/engine/gf/Manager.hpp"
@@ -250,7 +250,7 @@ namespace xenomods {
 #endif
 	}
 
-	void DebugStuff::Update() {
+	void DebugStuff::Update(fw::UpdateInfo* updateInfo) {
 		auto& state = GetState();
 
 		bgmTrackIndex = 0;

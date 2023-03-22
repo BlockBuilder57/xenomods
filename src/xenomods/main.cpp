@@ -10,6 +10,7 @@
 #include "State.hpp"
 #include "modules/DebugStuff.hpp"
 #include "xenomods/engine/fw/Document.hpp"
+#include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/ml/Filesystem.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
@@ -18,23 +19,20 @@ namespace {
 
 #if !XENOMODS_CODENAME(bfsw)
 	struct FrameworkUpdateHook : skylaunch::hook::Trampoline<FrameworkUpdateHook> {
-		static void Hook(void* framework) {
+		static void Hook(fw::Framework* framework) {
 			Orig(framework);
-			xenomods::update();
+
+			if (framework != nullptr)
+				xenomods::update(framework->getUpdateInfo());
 		}
 	};
 #else
-	fw::Document* document;
-
 	struct FrameworkUpdater_updateStdHook : skylaunch::hook::Trampoline<FrameworkUpdater_updateStdHook> {
 		static void Hook(fw::Document* doc, void* FrameworkController) {
 			Orig(doc, FrameworkController);
 
-			if(doc != nullptr && document == nullptr) {
-				document = doc;
-			}
-
-			xenomods::update();
+			if(doc != nullptr && doc->applet != nullptr)
+				xenomods::update(&doc->applet->updateInfo);
 		}
 	};
 #endif
@@ -65,7 +63,7 @@ namespace xenomods {
 		g_Logger->ToastDebug("xm_version4", "exefs {}", version::RuntimeBuildRevision());
 	}
 
-	void update() {
+	void update(fw::UpdateInfo* updateInfo) {
 		// lazy
 		using enum xenomods::Keybind;
 
@@ -129,7 +127,7 @@ namespace xenomods {
 		}
 
 		// Update modules
-		xenomods::UpdateAllRegisteredModules();
+		xenomods::UpdateAllRegisteredModules(updateInfo);
 
 		// draw log messages
 		g_Logger->Draw();

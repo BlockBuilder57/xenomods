@@ -136,7 +136,7 @@ namespace xenomods {
 #endif
 	}
 
-	void PlayerMovement::Update() {
+	void PlayerMovement::Update(fw::UpdateInfo* updateInfo) {
 		moonJump = GetPlayer(1)->InputHeld(Keybind::MOONJUMP);
 
 		bool movementSpeedChanged = false;

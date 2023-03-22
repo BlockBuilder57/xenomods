@@ -3,6 +3,7 @@
 #include <type_traits>
 
 #include "../State.hpp"
+#include "xenomods/engine/fw/UpdateInfo.hpp"
 
 namespace xenomods {
 
@@ -21,7 +22,7 @@ namespace xenomods {
 			return false;
 		}
 
-		virtual void Update() {
+		virtual void Update(fw::UpdateInfo* updateInfo) {
 		}
 
 		virtual void OnConfigUpdate() {
@@ -50,7 +51,7 @@ namespace xenomods {
 	/**
 	 * Update all registered modules.
 	 */
-	void UpdateAllRegisteredModules();
+	void UpdateAllRegisteredModules(fw::UpdateInfo* updateInfo);
 
 	/**
 	 * Marker for doing stuff after the config updates for all registered modules.

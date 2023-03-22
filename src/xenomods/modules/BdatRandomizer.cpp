@@ -58,7 +58,7 @@ namespace xenomods {
 		BdatOverride::RegisterCallback(&MsOverride());
 	}
 
-	void BdatRandomizer::Update() {
+	void BdatRandomizer::Update(fw::UpdateInfo* updateInfo) {
 		if(GetPlayer(2)->InputDownStrict(Keybind::BDAT_MSSCRAMBLETYPE_SWITCH)) {
 			reinterpret_cast<std::underlying_type_t<decltype(msScrambleType)>&>(msScrambleType) += 1;
 

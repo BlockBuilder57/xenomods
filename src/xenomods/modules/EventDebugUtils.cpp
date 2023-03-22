@@ -80,7 +80,7 @@ namespace xenomods {
 
 	bool EventDebugUtils::ShouldUpdate = false;
 
-	void EventDebugUtils::Update() {
+	void EventDebugUtils::Update(fw::UpdateInfo* updateInfo) {
 		if(FuncNames.size() != RegistrationIndex) {
 			xenomods::g_Logger->LogError("Event function names not the same size as regist index {} vs {}", FuncNames.size(), RegistrationIndex);
 			return;

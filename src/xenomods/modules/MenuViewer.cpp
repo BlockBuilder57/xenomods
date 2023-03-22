@@ -172,7 +172,7 @@ namespace xenomods {
 #endif
 	}
 
-	void MenuViewer::Update() {
+	void MenuViewer::Update(fw::UpdateInfo* updateInfo) {
 		auto& state = GetState();
 
 		if(GetPlayer(2)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {

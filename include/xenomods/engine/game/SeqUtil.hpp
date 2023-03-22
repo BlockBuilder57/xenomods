@@ -18,9 +18,14 @@ namespace game {
 	};
 
 	namespace SeqUtil {
+		struct WarpPcPartyParams {
+
+		};
+
 		void makeMapJumpSetupInfoFromLandmark(MapJumpSetupInfo& info, const fw::Document& doc, ushort landmarkId);
 		void requestMapJump(const fw::Document& doc, const MapJumpSetupInfo& info);
 		void returnTitle(const fw::Document& doc);
+		void warpPcParty(const WarpPcPartyParams& params);
 	}
 
 }

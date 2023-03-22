@@ -227,7 +227,7 @@ namespace xenomods {
 		CopyCurrentCameraState::HookAt(&ml::ScnObjCam::updateFovNearFar);
 	}
 
-	void CameraTools::Update() {
+	void CameraTools::Update(fw::UpdateInfo* updateInfo) {
 		if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TOGGLE)) {
 			Freecam.isOn = !Freecam.isOn;
 			g_Logger->ToastInfo(STRINGIFY(Freecam.isOn), "Freecam: {}", Freecam.isOn);

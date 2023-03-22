@@ -41,10 +41,10 @@ namespace xenomods {
 			registeredModules[i]->Initialize();
 	}
 
-	void UpdateAllRegisteredModules() {
+	void UpdateAllRegisteredModules(fw::UpdateInfo* updateInfo) {
 		for(int i = 0; i < moduleIndex; ++i)
 			if(registeredModules[i]->NeedsUpdate())
-				registeredModules[i]->Update();
+				registeredModules[i]->Update(updateInfo);
 			else
 				continue;
 	}

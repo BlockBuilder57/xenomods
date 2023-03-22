@@ -23,7 +23,7 @@ namespace xenomods {
 		bool NeedsUpdate() const override {
 			return ShouldUpdate;
 		}
-		void Update() override;
+		void Update(fw::UpdateInfo* updateInfo) override;
 	};
 
 } // namespace xenomods

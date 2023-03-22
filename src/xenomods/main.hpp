@@ -11,7 +11,7 @@ namespace xenomods {
 	/**
  	 * Called on each Framework update.
  	 */
-	void update();
+	void update(fw::UpdateInfo* updateInfo);
 
 	/**
  	 * Called from skylaunch when ready.
