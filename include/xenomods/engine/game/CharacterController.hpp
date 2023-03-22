@@ -7,6 +7,7 @@
 
 #include "Actor.hpp"
 
+#if XENOMODS_CODENAME(bfsw)
 namespace game {
 
 	class CharacterController {
@@ -50,3 +51,4 @@ namespace game {
 	};
 
 } // namespace game
+#endif
