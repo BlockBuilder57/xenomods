@@ -26,8 +26,6 @@ namespace xenomods {
 		};
 		static FreecamMeta Meta;
 
-		static void DoFreeCameraMovement(glm::mat4& matrix, FreecamMeta* meta = nullptr);
-
 		void Initialize() override;
 		bool NeedsUpdate() const override {
 			return true;

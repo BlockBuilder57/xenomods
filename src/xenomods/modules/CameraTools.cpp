@@ -110,7 +110,7 @@ namespace xenomods {
 
 	CameraTools::FreecamMeta CameraTools::Meta = {};
 
-	void CameraTools::DoFreeCameraMovement(glm::mat4& matrix, FreecamMeta* meta) {
+	void DoFreeCameraMovement(fw::UpdateInfo* updateInfo) {
 		// controls:
 		// Left stick: Y: forward/back, X: left/right
 		// Right stick: XY: Look movement
@@ -118,14 +118,8 @@ namespace xenomods {
 		// for future reference:
 		//auto seconds = nn::os::GetSystemTick()/19200000.;
 
-#if !XENOMODS_CODENAME(bfsw)
-		fw::UpdateInfo* update = fw::Framework::getUpdateInfo();
-#else
-		// FIXME: find a way for DE to get update infos
-		fw::UpdateInfo bad {};
-		bad.deltaTime = 1.0f / 30.0f;
-		fw::UpdateInfo* update = &bad;
-#endif
+		auto fc = &CameraTools::Freecam;
+		auto meta = &CameraTools::Meta;
 
 		glm::vec3 pos {};
 		glm::quat rot {};
@@ -134,7 +128,7 @@ namespace xenomods {
 		glm::vec4 perspective {};
 
 		// decompose existing matrix
-		glm::decompose(matrix, scale, rot, pos, skew, perspective);
+		glm::decompose(static_cast<glm::mat4&>(fc->matrix), scale, rot, pos, skew, perspective);
 
 		glm::vec2 lStick = GetPlayer(2)->stateCur.LAxis;
 		glm::vec2 rStick = GetPlayer(2)->stateCur.RAxis;
@@ -147,30 +141,30 @@ namespace xenomods {
 
 		// movement
 		glm::vec3 move {};
-		float fovMult = 30.f * update->deltaTime;
+		float fovMult = 30.f * updateInfo->deltaTime;
 
 		// slow the zoom at lower fovs
-		if(Freecam.fov != 0.0f && std::abs(Freecam.fov) < 20.f)
-			fovMult *= std::lerp(0.01f, 1.0f, std::abs(Freecam.fov) / 20.f);
+		if(fc->fov != 0.0f && std::abs(fc->fov) < 20.f)
+			fovMult *= std::lerp(0.01f, 1.0f, std::abs(fc->fov) / 20.f);
 
 		if(GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {
 			// holding down the button, so modify fov
 			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
-			Freecam.fov = std::clamp(Freecam.fov + -lStick.y * fovMult, -179.f, 179.f);
+			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
 		} else {
 			move = { lStick.x, 0, -lStick.y };
-			move = rot * move * update->deltaTime; // rotate movement to local space
-			move *= Freecam.camSpeed;			   // multiply by cam speed
+			move = rot * move * updateInfo->deltaTime; // rotate movement to local space
+			move *= fc->camSpeed;			   // multiply by cam speed
 		}
 
 		// rotation
 		glm::vec3 look {};
-		float lookMult = 60.f * update->deltaTime;
-		float rollMult = 10.f * update->deltaTime;
+		float lookMult = 70.f * updateInfo->deltaTime;
+		float rollMult = 10.f * updateInfo->deltaTime;
 
 		// slow the camera down at lower fovs
-		if(Freecam.fov != 0.0f && std::abs(Freecam.fov) < 40.f)
-			lookMult *= Freecam.fov / 40.f;
+		if(fc->fov != 0.0f && std::abs(fc->fov) < 40.f)
+			lookMult *= fc->fov / 40.f;
 
 		if(GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE))
 			look = { 0, 0, -rStick.x * rollMult }; // only roll
@@ -196,21 +190,19 @@ namespace xenomods {
 		float angle = glm::angle(rot);
 		glm::vec3 axis = glm::axis(rot);
 
-		if(meta != nullptr) {
-			meta->pos = pos;
-			meta->rot = rot;
+		meta->pos = pos;
+		meta->rot = rot;
 
-			glm::vec3 forward = mm::Vec3::unitZ;
-			glm::vec3 up = mm::Vec3::unitY;
-			meta->forward = rot * forward;
-			meta->up = rot * up;
-		}
+		glm::vec3 forward = mm::Vec3::unitZ;
+		glm::vec3 up = mm::Vec3::unitY;
+		meta->forward = rot * forward;
+		meta->up = rot * up;
 
 		glm::mat4 newmat = glm::mat4(1.f);
 		newmat = glm::translate(newmat, pos + move);
 		newmat = glm::rotate(newmat, angle, axis);
 
-		matrix = newmat;
+		fc->matrix = newmat;
 	}
 
 	void CameraTools::Initialize() {
@@ -279,7 +271,7 @@ namespace xenomods {
 #endif
 			}
 
-			DoFreeCameraMovement(static_cast<glm::mat4&>(Freecam.matrix), &Meta);
+			DoFreeCameraMovement(updateInfo);
 
 #if 0
 			if (xenomods::DebugStuff::enableDebugRendering && GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {
