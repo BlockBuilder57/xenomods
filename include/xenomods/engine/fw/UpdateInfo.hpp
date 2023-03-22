@@ -9,7 +9,7 @@
 namespace fw {
 
 	struct UpdateInfo {
-		float unk;
+		float updateRate;
 #if XENOMODS_CODENAME(bfsw)
 		float unk2;
 #endif

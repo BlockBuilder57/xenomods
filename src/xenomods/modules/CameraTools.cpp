@@ -13,8 +13,10 @@
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"
 #include "xenomods/engine/apps/FrameworkLauncher.hpp"
-#include "xenomods/engine/fw/UpdateInfo.hpp"
+#include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/game/MenuModelView.hpp"
+#include "xenomods/engine/game/ObjUtil.hpp"
+#include "xenomods/engine/game/Scripts.hpp"
 #include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/engine/ml/Scene.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
@@ -103,7 +105,7 @@ namespace xenomods {
 		.isOn = false,
 		.matrix = glm::identity<glm::mat4>(),
 		.fov = 40.f,
-		.camSpeed = 1.f
+		.camSpeed = 8.f
 	};
 
 	CameraTools::FreecamMeta CameraTools::Meta = {};
@@ -112,13 +114,18 @@ namespace xenomods {
 		// controls:
 		// Left stick: Y: forward/back, X: left/right
 		// Right stick: XY: Look movement
-		// LStick hold: Y: fov up/down
-		// RStick hold: X: roll left/right
 
 		// for future reference:
 		//auto seconds = nn::os::GetSystemTick()/19200000.;
 
-		using enum xenomods::Keybind;
+#if !XENOMODS_CODENAME(bfsw)
+		fw::UpdateInfo* update = fw::Framework::getUpdateInfo();
+#else
+		// FIXME: find a way for DE to get update infos
+		fw::UpdateInfo bad {};
+		bad.deltaTime = 1.0f / 30.0f;
+		fw::UpdateInfo* update = &bad;
+#endif
 
 		glm::vec3 pos {};
 		glm::quat rot {};
@@ -140,24 +147,33 @@ namespace xenomods {
 
 		// movement
 		glm::vec3 move {};
+		float fovMult = 30.f * update->deltaTime;
 
-		if(!GetPlayer(2)->InputHeld(FREECAM_FOVHOLD)) {
+		// slow the zoom at lower fovs
+		if(Freecam.fov != 0.0f && std::abs(Freecam.fov) < 20.f)
+			fovMult *= std::lerp(0.01f, 1.0f, std::abs(Freecam.fov) / 20.f);
+
+		if(GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {
+			// holding down the button, so modify fov
+			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
+			Freecam.fov = std::clamp(Freecam.fov + -lStick.y * fovMult, -179.f, 179.f);
+		} else {
 			move = { lStick.x, 0, -lStick.y };
-			move = rot * move;		  // rotate movement to local space
-			move *= Freecam.camSpeed; // multiply by cam speed
+			move = rot * move * update->deltaTime; // rotate movement to local space
+			move *= Freecam.camSpeed;			   // multiply by cam speed
 		}
 
 		// rotation
 		glm::vec3 look {};
-		float lookMult = 3.f;
+		float lookMult = 60.f * update->deltaTime;
+		float rollMult = 10.f * update->deltaTime;
 
 		// slow the camera down at lower fovs
-		if(std::abs(Freecam.fov) < 45.f)
-			lookMult *= Freecam.fov / 45.f;
+		if(Freecam.fov != 0.0f && std::abs(Freecam.fov) < 40.f)
+			lookMult *= Freecam.fov / 40.f;
 
-		// extra deadzone for roll, it's sensitive on joycons
-		if(GetPlayer(2)->InputHeld(FREECAM_ROLLHOLD) && glm::length(lStick) > 0.4f)
-			look = { 0, 0, -rStick.x * 0.5f }; // only roll
+		if(GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE))
+			look = { 0, 0, -rStick.x * rollMult }; // only roll
 		else
 			look = { rStick.y * lookMult, -rStick.x * lookMult, 0 }; // pitch and yaw
 
@@ -179,16 +195,6 @@ namespace xenomods {
 		// get angle+axis to rotate the matrix by
 		float angle = glm::angle(rot);
 		glm::vec3 axis = glm::axis(rot);
-
-#if 0
-		int yPos = 200;
-		const int height = fw::debug::drawFontGetHeight();
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "- freecam debug -");
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "pos: {:1}", pos);
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "rot: {:1}", glm::degrees(glm::eulerAngles(rot)));
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "speed: {}", Freecam.camSpeed);
-		fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "fov: {:.1f}", Freecam.fov);
-#endif
 
 		if(meta != nullptr) {
 			meta->pos = pos;
@@ -228,10 +234,6 @@ namespace xenomods {
 		}
 
 		if(Freecam.isOn) {
-			static float lastFOVPress = MAXFLOAT;
-			static float lastRollPress = MAXFLOAT;
-			float now = nn::os::GetSystemTick() / 19200000.;
-
 			bool speedChanged = false;
 			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_UP)) {
 				Freecam.camSpeed *= 2.f;
@@ -242,57 +244,55 @@ namespace xenomods {
 			}
 
 			if(speedChanged)
-				g_Logger->ToastInfo("freecamSpeed", "Freecam speed: {}", Freecam.camSpeed);
+				g_Logger->ToastInfo("freecamSpeed", "Freecam speed: {}m/s", Freecam.camSpeed);
 
-			if(GetPlayer(2)->InputHeldStrict(Keybind::FREECAM_FOVHOLD)) {
-				glm::vec2 lStick = GetPlayer(2)->stateCur.LAxis;
+			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_FOVRESET))
+				Freecam.fov = 80;
+			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_ROTRESET)) {
+				glm::vec3 pos {};
+				glm::quat rot {};
+				glm::vec3 scale {};
+				glm::vec3 skew {};
+				glm::vec4 perspective {};
 
-				// deadzone
-				if (glm::length(lStick) > 0.15f) {
-					// holding down the button, so modify fov
-					// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
-					Freecam.fov = std::clamp(Freecam.fov + -lStick.y * 0.25f, -179.f, 179.f);
-				}
-			}
+				// decompose existing matrix
+				glm::decompose(static_cast<const glm::mat4&>(Freecam.matrix), scale, rot, pos, skew, perspective);
 
-			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_FOVHOLD)) {
-				if(std::abs(now - lastFOVPress) < 0.3f)
-					Freecam.fov = 80;
+				glm::mat4 newmat = glm::identity<glm::mat4>();
+				newmat = glm::translate(newmat, pos);
+				// just don't apply any rotation
 
-				lastFOVPress = now;
-			}
-			if(GetPlayer(2)->InputDownStrict(Keybind::FREECAM_ROLLHOLD)) {
-				if(std::abs(now - lastRollPress) < 0.3f) {
-					glm::vec3 pos {};
-					glm::quat rot {};
-					glm::vec3 scale {};
-					glm::vec3 skew {};
-					glm::vec4 perspective {};
-
-					// decompose existing matrix
-					glm::decompose(static_cast<const glm::mat4&>(Freecam.matrix), scale, rot, pos, skew, perspective);
-					glm::mat4 newmat = glm::identity<glm::mat4>();
-					newmat = glm::translate(newmat, pos);
-					// just don't apply any rotation
-
-					Freecam.matrix = newmat;
-				}
-
-				lastRollPress = now;
+				Freecam.matrix = newmat;
 			}
 
 			if (GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TELEPORT)) {
 #if !XENOMODS_CODENAME(bfsw)
 				gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
-				if (trans != nullptr) {
+				if (trans != nullptr)
 					trans->setPosition(Meta.pos);
-				}
+#else
+				// doesn't work
+				/*void* thingy = game::ScriptUnit::getPartyHandle(0);
+				if (thingy != nullptr) {
+					game::ScriptUnit::setWarp(thingy, Meta.pos);
+				}*/
 #endif
 			}
-		}
 
-		if(Freecam.isOn)
 			DoFreeCameraMovement(static_cast<glm::mat4&>(Freecam.matrix), &Meta);
+
+#if 0
+			if (xenomods::DebugStuff::enableDebugRendering && GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {
+				const int height = fw::debug::drawFontGetHeight();
+				int yPos = (720 / 2) - ((height * 5) / 2);
+				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "- Freecam -");
+				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Pos: {:1}", Meta.pos);
+				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Rot: {:1}", glm::degrees(glm::eulerAngles(Meta.rot)));
+				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Speed: {}m/s", Freecam.camSpeed);
+				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "FOV: {:.1f}", Freecam.fov);
+			}
+#endif
+		}
 	}
 
 	XENOMODS_REGISTER_MODULE(CameraTools);
