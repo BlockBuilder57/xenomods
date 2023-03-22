@@ -171,6 +171,7 @@ namespace xenomods {
 	}
 
 	void BdatOverride::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up Bdat overrides...");
 
 		GetValHook::HookAt(Bdat::getVal);

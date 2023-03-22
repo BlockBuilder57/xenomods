@@ -119,6 +119,7 @@ namespace xenomods {
 	float PlayerMovement::movementSpeedMult = 1.f;
 
 	void PlayerMovement::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up player movement hooks...");
 
 #if !XENOMODS_CODENAME(bfsw)

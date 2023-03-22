@@ -51,7 +51,8 @@ namespace xenomods {
 
 	void ConfigUpdateForAllRegisteredModules() {
 		for(int i = 0; i < moduleIndex; ++i)
-			registeredModules[i]->OnConfigUpdate();
+			if(registeredModules[i]->HasInitialized)
+				registeredModules[i]->OnConfigUpdate();
 	}
 
 } // namespace xenomods

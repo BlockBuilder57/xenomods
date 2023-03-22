@@ -12,7 +12,10 @@ namespace xenomods {
 	struct UpdatableModule {
 		virtual ~UpdatableModule() = default;
 
-		virtual void Initialize() = 0;
+		virtual void Initialize() {
+			HasInitialized = true;
+		};
+		bool HasInitialized = false;
 
 		virtual bool NeedsUpdate() const {
 			return false;

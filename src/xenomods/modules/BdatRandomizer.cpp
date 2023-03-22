@@ -52,6 +52,7 @@ namespace xenomods {
 	BdatRandomizer::BdatMSScrambleType BdatRandomizer::msScrambleType = BdatRandomizer::BdatMSScrambleType::Off;
 
 	void BdatRandomizer::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up Bdat randomizer...");
 
 		BdatOverride::RegisterCallback(&MsOverride());

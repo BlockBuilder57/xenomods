@@ -117,6 +117,7 @@ namespace xenomods {
 	}
 
 	void EventDebugUtils::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up event debug utils...");
 
 		ActiveBits = xenomods::GetState().config.eventDebugBits;

@@ -208,6 +208,7 @@ namespace xenomods {
 	}
 
 	void CameraTools::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up camera tools...");
 
 #if !XENOMODS_CODENAME(bfsw)

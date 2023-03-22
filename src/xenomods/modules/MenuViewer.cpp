@@ -157,6 +157,7 @@ namespace xenomods {
 	bool MenuViewer::straightenFont = false;
 
 	void MenuViewer::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up menu viewer...");
 
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");

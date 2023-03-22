@@ -224,6 +224,7 @@ namespace xenomods {
 	}
 
 	void DebugStuff::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up debug stuff...");
 
 		MMAssert::HookAt("_ZN2mm9MMStdBase8mmAssertEPKcS2_j");
@@ -242,7 +243,7 @@ namespace xenomods {
 
 		ReplaceTitleEvent::HookAt("_ZN2tl9TitleMain14playTitleEventEj");
 
-		DispRexCrystal
+		//DispRexCrystal
 #else
 		GetWinIDOverride::HookAt("_ZN2ml7DebDraw15getCacheDrawWIDEv");
 		RenderViewHook::HookAt("_ZN2ml7WinView10renderViewEv");

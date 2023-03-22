@@ -170,6 +170,7 @@ namespace {
 namespace xenomods {
 
 	void FileDetours::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up file detours...");
 
 		ReadFileHook::HookAt("_ZN2ml13DevFileUtilNx8readFileERPNS_12FileHandleThERN2nn2fs10FileHandleEilPvjRNS_14FileReadResultE");

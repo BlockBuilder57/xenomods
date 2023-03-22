@@ -12,8 +12,18 @@
 
 namespace xenomods {
 
+	void VSyncUpdate() {
+		if (GetState().config.enable60FPS)
+			ml::DevGraph::setVSync(1);
+		else
+			ml::DevGraph::setVSync(2);
+	}
+
 	void FrameratePatch::Initialize() {
+		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up framerate patch...");
+
+		VSyncUpdate();
 
 		// this only works well in DE right now as it properly has frame skipping
 		// 2/Torna do not have it, so the game becomes a slow mess when it can't hit 60 (as is usually the case)
@@ -22,10 +32,7 @@ namespace xenomods {
 	}
 
 	void FrameratePatch::OnConfigUpdate() {
-		if (GetState().config.enable60FPS)
-			ml::DevGraph::setVSync(1);
-		else
-			ml::DevGraph::setVSync(2);
+		VSyncUpdate();
 	}
 
 #if XENOMODS_CODENAME(bfsw)
