@@ -13,6 +13,7 @@
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"
 #include "xenomods/engine/apps/FrameworkLauncher.hpp"
+#include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/game/MenuModelView.hpp"
 #include "xenomods/engine/game/ObjUtil.hpp"
@@ -263,11 +264,21 @@ namespace xenomods {
 				if (trans != nullptr)
 					trans->setPosition(Meta.pos);
 #else
-				// doesn't work
-				/*void* thingy = game::ScriptUnit::getPartyHandle(0);
-				if (thingy != nullptr) {
-					game::ScriptUnit::setWarp(thingy, Meta.pos);
-				}*/
+				if(DocumentPtr == nullptr) {
+					g_Logger->LogError("can't teleport player cause no doc ptr!");
+					return;
+				}
+
+				unsigned int handle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
+				g_Logger->LogDebug("party (leader?) handle: {}", handle);
+				if (handle != 0) {
+					game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, handle);
+					g_Logger->LogDebug("supposed controller: {}", reinterpret_cast<void*>(control));
+					if (control != nullptr) {
+						control->syncFrame();
+						control->setWarp(Meta.pos, 5);
+					}
+				}
 #endif
 			}
 
