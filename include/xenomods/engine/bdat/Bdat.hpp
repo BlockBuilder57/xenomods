@@ -53,4 +53,6 @@ namespace Bdat {
 	char* getSheetName(unsigned char* pBdat);
 	char* getMemberName(unsigned char* somethin, int index);
 
+	unsigned char* getFP(const char* sheetName);
+
 } // namespace Bdat

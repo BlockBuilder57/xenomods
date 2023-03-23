@@ -179,12 +179,25 @@ namespace xenomods {
 
 	int DebugStuff::bgmTrackIndex = 0;
 
-	void DebugStuff::DoMapJump(unsigned int mapjumpId) {
+	void DebugStuff::DoMapJump(int mapjumpId) {
+		if (mapjumpId == 0)
+			return;
+
+		int end = 1;
+		unsigned char* pBdat =
 #if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
-		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, 297);
+		Bdat::getFP("SYS_MapJumpList");
 #elif XENOMODS_CODENAME(bfsw)
-		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, 487);
+		Bdat::getFP("landmarklist");
 #endif
+		if (pBdat != nullptr)
+			end = Bdat::getIdEnd(pBdat);
+
+		// can input negative numbers to wrap to the end
+		if (mapjumpId < 0)
+			mapjumpId = end - (std::abs(mapjumpId) - 1);
+
+		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, end);
 
 #if !XENOMODS_CODENAME(bfsw)
 		gf::GfPlayFactory::createSkipTravel(mapjumpId);
