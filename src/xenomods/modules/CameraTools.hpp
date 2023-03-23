@@ -26,6 +26,17 @@ namespace xenomods {
 		};
 		static FreecamMeta Meta;
 
+		struct RenderParmForces {
+			bool DisableDOF;
+			bool DisableMotionBlur;
+			bool DisableColorFilter;
+
+			bool Any() {
+				return DisableDOF || DisableMotionBlur || DisableColorFilter;
+			}
+		};
+		static RenderParmForces RenderParameters;
+
 		void Initialize() override;
 		bool NeedsUpdate() const override {
 			return true;

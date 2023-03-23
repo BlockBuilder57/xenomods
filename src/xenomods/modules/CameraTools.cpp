@@ -111,6 +111,8 @@ namespace xenomods {
 
 	CameraTools::FreecamMeta CameraTools::Meta = {};
 
+	CameraTools::RenderParmForces CameraTools::RenderParameters = {};
+
 	void DoFreeCameraMovement(fw::UpdateInfo* updateInfo) {
 		// controls:
 		// Left stick: Y: forward/back, X: left/right
@@ -148,7 +150,7 @@ namespace xenomods {
 		if(fc->fov != 0.0f && std::abs(fc->fov) < 20.f)
 			fovMult *= std::lerp(0.01f, 1.0f, std::abs(fc->fov) / 20.f);
 
-		if(GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {
+		if(GetPlayer(2)->InputHeld(Keybind::CAMERA_COMBO)) {
 			// holding down the button, so modify fov
 			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
 			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
@@ -167,7 +169,7 @@ namespace xenomods {
 		if(fc->fov != 0.0f && std::abs(fc->fov) < 40.f)
 			lookMult *= fc->fov / 40.f;
 
-		if(GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE))
+		if(GetPlayer(2)->InputHeld(Keybind::CAMERA_COMBO))
 			look = { 0, 0, -rStick.x * rollMult }; // only roll
 		else
 			look = { rStick.y * lookMult, -rStick.x * lookMult, 0 }; // pitch and yaw
@@ -270,10 +272,10 @@ namespace xenomods {
 				}
 
 				unsigned int handle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
-				g_Logger->LogDebug("party (leader?) handle: {}", handle);
+				//g_Logger->LogDebug("party (leader?) handle: {}", handle);
 				if (handle != 0) {
 					game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, handle);
-					g_Logger->LogDebug("supposed controller: {}", reinterpret_cast<void*>(control));
+					//g_Logger->LogDebug("supposed controller: {}", reinterpret_cast<void*>(control));
 					if (control != nullptr) {
 						control->syncFrame();
 						control->setWarp(Meta.pos, 5);
@@ -295,6 +297,55 @@ namespace xenomods {
 				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "FOV: {:.1f}", Freecam.fov);
 			}
 #endif
+		}
+
+		if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_1)) {
+			auto acc = ml::ScnRenderDrSysParmAcc();
+			// done this way because 2/Torna do not have is/setDispMap
+			acc.drMan->hideMap = !acc.drMan->hideMap;
+			g_Logger->ToastInfo("freecamRenderToggle", "Toggled map: {}", !acc.drMan->hideMap);
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_2)) {
+			auto acc = ml::ScnRenderDrSysParmAcc();
+			static bool fogSkip;
+			fogSkip = !fogSkip;
+			acc.setFogSkip(fogSkip);
+			g_Logger->ToastInfo("freecamRenderToggle", "Toggled fog: {}", !fogSkip);
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_3)) {
+			auto acc = ml::ScnRenderDrSysParmAcc();
+			acc.setBloom(!acc.isBloomOn());
+			g_Logger->ToastInfo("freecamRenderToggle", "Toggled bloom: {}", acc.isBloomOn());
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_4)) {
+			auto acc = ml::ScnRenderDrSysParmAcc();
+			acc.setToneMap(!acc.isToneMap());
+			g_Logger->ToastInfo("freecamRenderToggle", "Toggled tone mapping: {}", acc.isToneMap());
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_5)) {
+			RenderParameters.DisableDOF = !RenderParameters.DisableDOF;
+			g_Logger->ToastInfo("freecamRenderToggle", "Toggled depth of field: {}", !RenderParameters.DisableDOF);
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_6)) {
+			RenderParameters.DisableMotionBlur = !RenderParameters.DisableMotionBlur;
+			g_Logger->ToastInfo("freecamRenderToggle", "Toggled motion blur: {}", !RenderParameters.DisableMotionBlur);
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_7)) {
+			RenderParameters.DisableColorFilter = !RenderParameters.DisableColorFilter;
+			g_Logger->ToastInfo("freecamRenderToggle", "Toggled color filter: {}", !RenderParameters.DisableColorFilter);
+		}
+
+		if (RenderParameters.Any()) {
+			auto acc = ml::ScnRenderDrSysParmAcc();
+
+			if (RenderParameters.DisableDOF) {
+				acc.setDOFOverride(true);
+				acc.setDOF(false);
+			}
+			if (RenderParameters.DisableMotionBlur) {
+				acc.setMotBlurOverride(true);
+				acc.setMotBlur(false);
+			}
+			if (RenderParameters.DisableColorFilter) {
+				acc.setColorFilterOverride(true);
+				acc.setColorFilterNum(0);
+				acc.setColorFilterFarNum(0);
+				acc.setColorFilterFrm(0);
+			}
 		}
 	}
 

@@ -1,6 +1,6 @@
 ## Config
 
-xenomods has an optional TOML config file located on the SD card. By default, the file does not exist, but can be created at `sd:/config/xenomods/config.toml`.
+Xenomods has an optional TOML config file located on the SD card. The file is not packaged with releases, but can be created at `sd:/config/xenomods/config.toml`.
 
 ---
 
