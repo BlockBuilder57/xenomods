@@ -25,5 +25,6 @@ namespace skylaunch::logger {
 		std::string FriendlyName() override {
 			return "TcpLogger";
 		}
+		void Flush() override;
 	};
 }; // namespace skylaunch::logger

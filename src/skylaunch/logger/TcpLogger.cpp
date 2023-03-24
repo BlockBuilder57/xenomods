@@ -72,6 +72,10 @@ namespace skylaunch::logger {
 		}
 	}
 
+	void TcpLogger::Flush() {
+		if (!(*gClientSockets).empty())
+			Logger::Flush();
+	}
 
 	constexpr size_t poolSize = 0x100000;
 	static void* socketPool = memalign(0x4000, poolSize);

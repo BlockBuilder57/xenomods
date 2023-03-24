@@ -15,6 +15,7 @@ namespace skylaunch::logger {
 		virtual void Initialize() = 0;
 		virtual void SendRaw(void*, size_t) = 0;
 		virtual std::string FriendlyName() = 0;
+		virtual void Flush() = 0;
 
 #ifndef NOLOG
 		void StartThread();
@@ -23,7 +24,6 @@ namespace skylaunch::logger {
 		void LogFormat(const char* format, ...);
 		void SendRaw(const char*);
 		void SendRawFormat(const char*, ...);
-		void Flush();
 #else
 		inline void StartThread() {
 		}
@@ -36,8 +36,6 @@ namespace skylaunch::logger {
 		inline void SendRaw(const char*) {
 		}
 		inline void SendRawFormat(const char*, ...) {
-		}
-		inline void Flush() {
 		}
 #endif
 	};
