@@ -71,6 +71,11 @@ add_executable(xenomods
 
 add_dependencies(xenomods __xenomods_gittag)
 
+add_custom_target(version_toucher
+		COMMAND ${CMAKE_COMMAND} -E touch_nocreate ${CMAKE_CURRENT_SOURCE_DIR}/xenomods/Version.cpp)
+
+add_dependencies(xenomods version_toucher)
+
 set_target_properties(xenomods PROPERTIES
 		CXX_STANDARD 20
 		CXX_STANDARD_REQUIRED ON
