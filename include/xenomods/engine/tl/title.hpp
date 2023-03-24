@@ -10,9 +10,10 @@ namespace tl {
 
 	class TitleMain {
 	   public:
-		static void returnTitle(gf::SAVESLOT slot);
 		unsigned int getChapterIdFromSaveData();
 		void* getSaveBuffer();
+		static void returnTitle(gf::SAVESLOT slot);
+		void playTitleEvent(uint event_id);
 	};
 
 } // namespace tl

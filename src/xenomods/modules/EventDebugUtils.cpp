@@ -4,15 +4,18 @@
 
 #include "EventDebugUtils.hpp"
 
+#include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
 #include <xenomods/Utils.hpp>
-#include <skylaunch/hookng/Hooks.hpp>
 
 #include "../State.hpp"
 #include "DebugStuff.hpp"
 #include "xenomods/engine/event/Manager.hpp"
+#include "xenomods/engine/gf/BdatData.hpp"
+#include "xenomods/engine/ml/Rand.hpp"
+#include "xenomods/engine/tl/title.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 
 namespace {
@@ -68,6 +71,78 @@ namespace {
 	int ManagerDisplay<TManager>::registeredIndex = 0;
 
 	int DrawEventManagerInfo::registeredIndex = 0;
+
+
+	void PrintEventInfo(const char* evtName) {
+		std::string eventName = evtName;
+		if(eventName.size() > 10)
+			eventName.resize(10);
+		uint eventId = gf::GfDataEvent::getEventID(eventName.c_str());
+
+		if(eventId > 0)
+			xenomods::g_Logger->LogDebug("Creating event {} (id {})", evtName, eventId);
+		else
+			xenomods::g_Logger->LogDebug("Creating event {}", evtName);
+	}
+
+	struct EventStartInfo : skylaunch::hook::Trampoline<EventStartInfo> {
+		static void Hook(void* this_pointer, const char* evtName, void* objHandle, uint param_3, uint param_4, uint param_5, uint param_6, mm::Vec3* playerPos, float param_8) {
+			PrintEventInfo(evtName);
+			Orig(this_pointer, evtName, objHandle, param_3, param_4, param_5, param_6, playerPos, param_8);
+		}
+	};
+
+	struct EventStartInfo_Earlier : skylaunch::hook::Trampoline<EventStartInfo_Earlier> {
+		static void Hook(void* this_pointer, const char* evtName, void* objHandle, uint param_3, uint param_4, uint param_5, uint param_6) {
+			PrintEventInfo(evtName);
+			Orig(this_pointer, evtName, objHandle, param_3, param_4, param_5, param_6);
+		}
+	};
+
+	struct ReplaceTitleEvent : skylaunch::hook::Trampoline<ReplaceTitleEvent> {
+		static void Hook(tl::TitleMain* this_pointer, uint eventId) {
+			uint newEventId = eventId;
+
+			// no randomizing new games!! only allow the intended call through
+			auto stack = dbgutil::getStackTrace();
+			// ow my soul, find a better way to do this
+			if (dbgutil::getSymbol(stack[1], true) != "_ZN2tl20TitleStateMainScreen6updateEPNS_9TitleMainERKN2fw10UpdateInfoE") {
+				xenomods::g_Logger->LogDebug("Not replacing title event {} (id {}) as it would cause a lock (called by {})", gf::GfDataEvent::getEventName(eventId), eventId, dbgutil::getSymbol(stack[1]));
+				return Orig(this_pointer, eventId);
+			}
+
+			// get the clear count from the save because that's what everything else seems to do
+			uint clearCount = *reinterpret_cast<uint*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
+			uint chapter = this_pointer->getChapterIdFromSaveData();
+#if XENOMODS_CODENAME(ira)
+			chapter = 0; // it's always 10!
+#endif
+			chapter |= clearCount << 16; // "encodes" as 0x00010006 for 1 clear on ch6
+
+			//xenomods::g_Logger->LogDebug("Chapter info: {:#x}", chapter);
+
+			// we need to have started the game, as the opening cutscene just continues off the titlescreen
+			if(chapter > 0) {
+				auto& events = xenomods::GetState().config.titleEvents;
+
+				if(!events.empty()) {
+					const auto eventsDefault = std::vector<uint16_t>(CONFIG_TITLEEVENTS_DEFAULT);
+					if (events == eventsDefault && chapter <= 10) {
+						// we're still the default, so let's be fancy and progressively reveal chapters
+						// once the user clears the game at least once this path will never be run,
+						// so the extra stuff in the default (post-credits titlescreens) won't be shown
+						newEventId = events[(ml::mtRand() % (chapter + 1))]; // +1 for the initial titlescreen
+					}
+					else
+						newEventId = events[(ml::mtRand() % events.size())];
+				}
+			}
+
+			if(newEventId != eventId)
+				xenomods::g_Logger->LogDebug("Replacing title event {} (id {}) with {} (id {})", gf::GfDataEvent::getEventName(eventId), eventId, gf::GfDataEvent::getEventName(newEventId), newEventId);
+			Orig(this_pointer, newEventId);
+		}
+	};
 
 } // namespace
 
@@ -148,6 +223,14 @@ namespace xenomods {
 		ManagerDisplay<event::TodoManager>::HookIt();
 		ManagerDisplay<event::VoiceManager>::HookIt();
 		ManagerDisplay<event::VolumeManager>::HookIt();
+
+		// earlier versions didn't include the last two parameters
+		if (skylaunch::hook::detail::ResolveSymbolBase("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef") == 0xDEADDEAD)
+			EventStartInfo_Earlier::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjj");
+		else
+			EventStartInfo::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef");
+
+		ReplaceTitleEvent::HookAt(&tl::TitleMain::playTitleEvent);
 	}
 
 #if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
