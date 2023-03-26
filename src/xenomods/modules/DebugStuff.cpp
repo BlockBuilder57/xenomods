@@ -81,24 +81,6 @@ namespace {
 		}
 	};
 
-#if XENOMODS_CODENAME(bfsw)
-	static unsigned int ForceWinID = 0;
-
-	struct GetWinIDOverride : skylaunch::hook::Trampoline<GetWinIDOverride> {
-		static unsigned int Hook() {
-			return ForceWinID;
-		}
-	};
-
-	struct RenderViewHook : skylaunch::hook::Trampoline<RenderViewHook> {
-		static void Hook(ml::WinView* this_pointer) {
-			ForceWinID = this_pointer->windowID;
-			//xenomods::g_Logger->LogInfo("winview {} winid {} equal? {}", this_pointer->windowID, ml::DebDraw::getCacheDrawWID(), this_pointer->windowID == ml::DebDraw::getCacheDrawWID());
-			Orig(this_pointer);
-		}
-	};
-#endif
-
 }
 
 namespace xenomods {
@@ -177,9 +159,6 @@ namespace xenomods {
 
 		JumpToClosedLandmarks_World::HookAt(&gf::GfMenuObjWorldMap::isEnterMap);
 		JumpToClosedLandmarks_Zone::HookAt(&gf::GfMenuObjWorldMap::isOpenLandmark);
-#else
-		GetWinIDOverride::HookAt("_ZN2ml7DebDraw15getCacheDrawWIDEv");
-		RenderViewHook::HookAt("_ZN2ml7WinView10renderViewEv");
 #endif
 	}
 

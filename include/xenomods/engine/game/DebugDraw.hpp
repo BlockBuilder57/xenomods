@@ -13,6 +13,7 @@ namespace game {
 
 		};
 
+		static void drawFont(Group group, int x, int y, const mm::Col4& color, const char* text, float unk1);
 		static void setEnable(Group group, bool enable);
 	};
 
