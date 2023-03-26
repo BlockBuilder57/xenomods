@@ -19,44 +19,17 @@
 namespace {
 
 	void CleanPath(std::string& path, bool flat = false) {
-		// https://en.cppreference.com/w/cpp/string/basic_string/replace
-		auto replace_all = [](std::string& inout, std::string_view what, std::string_view with) {
-			std::size_t count {};
-			for(std::string::size_type pos {};
-				inout.npos != (pos = inout.find(what.data(), pos, what.length()));
-				pos += with.length(), ++count) {
-				inout.replace(pos, what.length(), with.data(), with.length());
-			}
-			return count;
-		};
-
 		if(path.starts_with("/"))
 			path.erase(0, 1);
 
 		if(flat)
-			replace_all(path, "/", "_");
-		replace_all(path, ":", "_");
-		replace_all(path, "//", "/");
+			xenomods::StringReplace(path, "/", "_");
+		xenomods::StringReplace(path, ":", "_");
+		xenomods::StringReplace(path, "//", "/");
 	}
 
 	bool EnsurePath(std::string& path, bool createPaths = true) {
-		// https://stackoverflow.com/a/44495206
-		auto split = [](const std::string& input, std::string_view delimiter) {
-			size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-			std::string token;
-			std::vector<std::string> res;
-
-			while((pos_end = input.find(delimiter, pos_start)) != std::string::npos) {
-				token = input.substr(pos_start, pos_end - pos_start);
-				pos_start = pos_end + delim_len;
-				res.push_back(token);
-			}
-
-			res.push_back(input.substr(pos_start));
-			return res;
-		};
-
-		auto splits = split(path, "/");
+		auto splits = xenomods::StringSplit(path, "/");
 
 		std::stringstream ss;
 

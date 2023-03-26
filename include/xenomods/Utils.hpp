@@ -2,7 +2,9 @@
 
 #include <cstdint>
 #include <cstring>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 // ghidra typedefs
 using undefined = uint8_t;
@@ -147,6 +149,33 @@ namespace xenomods {
     struct T : public xenomods::ConvertTo<U, size> { \
         using ConvertTo<U, size>::ConvertTo;  \
     }
+
+	// https://stackoverflow.com/a/44495206
+	inline std::vector<std::string> StringSplit(const std::string& input, std::string_view delimiter) {
+		size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+		std::string token{};
+		std::vector<std::string> res{};
+
+		while((pos_end = input.find(delimiter, pos_start)) != std::string::npos) {
+			token = input.substr(pos_start, pos_end - pos_start);
+			pos_start = pos_end + delim_len;
+			res.push_back(token);
+		}
+
+		res.push_back(input.substr(pos_start));
+		return res;
+	}
+
+	// https://en.cppreference.com/w/cpp/string/basic_string/replace
+	inline std::size_t StringReplace(std::string& inout, std::string_view what, std::string_view with) {
+		std::size_t count {};
+		for(std::string::size_type pos {};
+			inout.npos != (pos = inout.find(what.data(), pos, what.length()));
+			pos += with.length(), ++count) {
+			inout.replace(pos, what.length(), with.data(), with.length());
+		}
+		return count;
+	}
 
 } // namespace xenomods
 
