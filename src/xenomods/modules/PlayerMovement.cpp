@@ -11,6 +11,7 @@
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 #include "xenomods/engine/game/CharacterController.hpp"
 #include "xenomods/engine/gf/PlayerController.hpp"
+#include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/engine/mm/mtl/RTTI.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/stuff/utils/util.hpp"
@@ -117,6 +118,7 @@ namespace xenomods {
 	bool PlayerMovement::moonJump = false;
 	bool PlayerMovement::disableFallDamage = true;
 	float PlayerMovement::movementSpeedMult = 1.f;
+	glm::vec3 PlayerMovement::warpLocation = {-9999, -9999, -9999};
 
 	void PlayerMovement::Initialize() {
 		UpdatableModule::Initialize();
@@ -149,6 +151,20 @@ namespace xenomods {
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::DISABLE_FALL_DAMAGE)) {
 			disableFallDamage = !disableFallDamage;
 			g_Logger->ToastInfo(STRINGIFY(disableFallDamage), "Disable fall damage: {}", disableFallDamage);
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::SAVE_WARP)) {
+			gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
+			if (trans != nullptr) {
+				mm::Vec3* pos = trans->getPosition();
+				warpLocation = *pos;
+			}
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::LOAD_WARP)) {
+			if (warpLocation.y > -900) {
+				gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
+				if (trans != nullptr) {
+					mm::Vec3 dest = warpLocation;
+					trans->setPosition(dest);
+				}
+			}
 		}
 
 		if (movementSpeedChanged)

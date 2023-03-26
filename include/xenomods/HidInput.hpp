@@ -118,6 +118,8 @@ namespace xenomods {
 
 		LOGGER_TEST = nn::hid::KEY_PLUS | nn::hid::KEY_R,
 		DISPLAY_VERSION = nn::hid::KEY_PLUS | nn::hid::KEY_MINUS,
+		SAVE_WARP = nn::hid::KEY_ZL | nn::hid::KEY_L | nn::hid::KEY_DLEFT,
+		LOAD_WARP = nn::hid::KEY_ZL | nn::hid::KEY_L | nn::hid::KEY_DRIGHT,
 	};
 
 }; // namespace xenomods

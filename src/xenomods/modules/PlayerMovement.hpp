@@ -9,6 +9,7 @@ namespace xenomods {
 		static bool moonJump;
 		static bool disableFallDamage;
 		static float movementSpeedMult;
+		static glm::vec3 warpLocation;
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {
