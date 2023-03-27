@@ -8,7 +8,7 @@ namespace gf {
 
 	struct GF_OBJ_HANDLE {
 	   public:
-		void* ptr;
+		unsigned long unk;
 	};
 
 	struct GfComTransform {
@@ -25,6 +25,11 @@ namespace gf {
 		GfObjAcc(GF_OBJ_HANDLE* handle);
 
 		bool getObjPosRot(mm::Vec3& pos, float& rot);
+	};
+
+	class GfObjUtil {
+	   public:
+		static void* getProperty(GF_OBJ_HANDLE* handle);
 	};
 
 } // namespace gf

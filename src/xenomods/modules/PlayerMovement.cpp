@@ -120,7 +120,7 @@ namespace xenomods {
 	bool PlayerMovement::moonJump = false;
 	bool PlayerMovement::disableFallDamage = true;
 	float PlayerMovement::movementSpeedMult = 1.f;
-	glm::vec3 PlayerMovement::warpLocation = {};
+	PlayerMovement::WarpData PlayerMovement::Warp = {};
 
 	glm::vec3 PlayerMovement::GetPartyPosition() {
 #if !XENOMODS_CODENAME(bfsw)
@@ -143,7 +143,6 @@ namespace xenomods {
 #endif
 		return {};
 	}
-
 	void PlayerMovement::SetPartyPosition(glm::vec3 pos) {
 #if !XENOMODS_CODENAME(bfsw)
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
@@ -159,8 +158,106 @@ namespace xenomods {
 		if (leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
 			if (control != nullptr) {
-				control->syncFrame();
 				control->setWarp(pos, 5);
+				control->clearLanding();
+			}
+		}
+#endif
+	}
+	glm::quat PlayerMovement::GetPartyRotation() {
+#if !XENOMODS_CODENAME(bfsw)
+		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
+		if(trans != nullptr)
+			return *trans->getRotation();
+#else
+		if(DocumentPtr == nullptr) {
+			g_Logger->LogError("can't get party position cause no doc ptr!");
+			return {};
+		}
+
+		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
+		if (leadHandle != 0) {
+			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
+			if (control != nullptr) {
+				return control->rotation;
+			}
+		}
+#endif
+		return {};
+	}
+	void PlayerMovement::SetPartyRotation(glm::quat rot) {
+#if !XENOMODS_CODENAME(bfsw)
+		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
+		if (trans != nullptr)
+			trans->setRotation(rot);
+#else
+		if(DocumentPtr == nullptr) {
+			g_Logger->LogError("can't set party position cause no doc ptr!");
+			return;
+		}
+
+		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
+		if (leadHandle != 0) {
+			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
+			if (control != nullptr) {
+				control->setQuat(rot);
+			}
+		}
+#endif
+	}
+
+	glm::vec3 PlayerMovement::GetPartyVelocity() {
+#if !XENOMODS_CODENAME(bfsw)
+		// TODO
+		/*gf::GF_OBJ_HANDLE* handle = gf::GfGameParty::getLeader();
+		if (handle != nullptr) {
+			g_Logger->LogInfo("Got handle - {}", reinterpret_cast<unsigned long>(handle));
+			void* thing = gf::GfObjUtil::getProperty(handle);
+			g_Logger->LogInfo("What's the thing? {}", thing);
+			auto* behavior = reinterpret_cast<gf::GfComPropertyPc*>(thing);
+			if (behavior != nullptr) {
+				g_Logger->LogInfo("where is its rtti? {}", reinterpret_cast<void*>(behavior->getRTTI()));
+				if (behavior->getRTTI() != nullptr) {
+					g_Logger->LogInfo("rtti says: {}", behavior->getRTTI()->szName);
+					if (behavior->getRTTI()->isKindOf(&gf::GfComPropertyPc::m_rtti)) {
+						g_Logger->LogInfo("Wario");
+					}
+				}
+				else
+					g_Logger->LogInfo("uh oh, no RTTI");
+			}
+		}*/
+#else
+		if(DocumentPtr == nullptr) {
+			g_Logger->LogError("can't get party position cause no doc ptr!");
+			return {};
+		}
+
+		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
+		if (leadHandle != 0) {
+			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
+			if (control != nullptr) {
+				return control->velocity;
+			}
+		}
+#endif
+		return {};
+	}
+	void PlayerMovement::SetPartyVelocity(glm::vec3 vel) {
+#if !XENOMODS_CODENAME(bfsw)
+		// TODO
+#else
+		if(DocumentPtr == nullptr) {
+			g_Logger->LogError("can't set party position cause no doc ptr!");
+			return;
+		}
+
+		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
+		if (leadHandle != 0) {
+			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
+			if (control != nullptr) {
+				control->clearVelocity();
+				control->addLinearVelocity(vel);
 			}
 		}
 #endif
@@ -198,12 +295,17 @@ namespace xenomods {
 			disableFallDamage = !disableFallDamage;
 			g_Logger->ToastInfo(STRINGIFY(disableFallDamage), "Disable fall damage: {}", disableFallDamage);
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::SAVE_WARP)) {
-			warpLocation = GetPartyPosition();
-			g_Logger->LogInfo("Saved warp at {:3}", warpLocation);
+			Warp.position = GetPartyPosition();
+			Warp.rotation = GetPartyRotation();
+			Warp.velocity = GetPartyVelocity();
+			Warp.initialized = true;
+			g_Logger->LogInfo("Saved warp at {:3} (rot {} vel {})", Warp.position, Warp.rotation, Warp.velocity);
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::LOAD_WARP)) {
-			if(glm::length(warpLocation) > 0.f) {
-				SetPartyPosition(warpLocation);
-				g_Logger->LogInfo("Warped party to {:3}", warpLocation);
+			if(Warp.initialized) {
+				SetPartyPosition(Warp.position);
+				SetPartyRotation(Warp.rotation);
+				SetPartyVelocity(Warp.velocity);
+				g_Logger->LogInfo("Warped party to {:3}", Warp.position);
 			}
 		}
 

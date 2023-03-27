@@ -2,6 +2,7 @@
 
 #include "xenomods/Utils.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
+#include "xenomods/engine/mm/mtl/RTTI.hpp"
 
 namespace gf {
 
@@ -59,6 +60,9 @@ namespace gf {
 		mm::Vec3 velocityActual;
 		INSERT_PADDING_BYTES(648);
 		unsigned int flags;
+
+		static mm::mtl::RTTI m_rtti;
+		virtual mm::mtl::RTTI* getRTTI() const;
 
 		/**
 		 * this is a hack

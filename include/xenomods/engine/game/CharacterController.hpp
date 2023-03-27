@@ -32,9 +32,11 @@ namespace game {
 		ActorAccessor* actorAccessor;
 		INSERT_PADDING_BYTES(0x38)
 		mm::Vec3 position;
-		INSERT_PADDING_BYTES(0xD4)
+		INSERT_PADDING_BYTES(0x4);
+		mm::Quat rotation;
+		INSERT_PADDING_BYTES(0xC0);
 		mm::Vec3 velocity;
-		INSERT_PADDING_BYTES(0x114)
+		INSERT_PADDING_BYTES(0x104)
 		Flags flags;
 
 		bool isAdsorptionSnap() const;
@@ -45,9 +47,13 @@ namespace game {
 		float getFallHeight();
 
 		void syncFrame();
+		void clearVelocity();
+		void clearLanding();
 
 		void applyMoveVec(const mm::Vec3&, bool param_2);
+		void addLinearVelocity(const mm::Vec3&);
 		void setWarp(const mm::Vec3& pos, int usually5);
+		void setQuat(const mm::Quat& quat);
 	};
 
 } // namespace game
