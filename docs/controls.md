@@ -7,18 +7,20 @@ Check out the list below to see what does what.
 ---
 
 ### Gameplay:
-| Action              | Control               | Description                                                                                                             |
-|---------------------|-----------------------|-------------------------------------------------------------------------------------------------------------------------|
-| Moonjump            | R+B, **P1**           | Hold to make the player infinitely fly in the air.                                                                      |
-| Movement Speed Up   | Dpad Up, **P2**       | Multiplies the player's movement speed by 2.                                                                            |
-| Movement Speed Down | Dpad Down, **P2**     | Divides the player's movement speed by 2.                                                                               |
-| Fall Damage Toggle  | A, **P2**             | Toggles taking fall damage. Incredibly useful so you don't fall to your death with the moonjump.<br/>**On by default.** |
-| Return To Title     | L+R+ZL+ZR, **P2**     | Returns the player to the title screen.                                                                                 |
-| Temp Int Increment  | ZL+Dpad Right, **P2** | Increments the temp int.                                                                                                |
-| Temp Int Decrement  | ZL+Dpad Left, **P2**  | Decrements the temp int.                                                                                                |
-| Jump to MapJump     | ZL+Dpad Down, **P2**  | Jumps to the MapJump with the id of the temp int. Look below for a list.                                                |
-| Play Sound Effect   | ZL+Minus, **P2**      | Plays a common sound effect with the id of the temp int.                                                                |
-| Straighten Font     | L+Y, **P2**           | Straightens out the font used in 2 and Torna. Nice meme.                                                                |
+| Action              | Control                 | Description                                                                                                             |
+|---------------------|-------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| Moonjump            | R+B, **P1**             | Hold to make the player infinitely fly in the air.                                                                      |
+| Movement Speed Up   | Dpad Up, **P2**         | Multiplies the player's movement speed by 2.                                                                            |
+| Movement Speed Down | Dpad Down, **P2**       | Divides the player's movement speed by 2.                                                                               |
+| Save Warp           | L+ZL+Dpad Left, **P2**  | Saves the location of the party lead.                                                                                   |
+| Load Warp           | L+ZL+Dpad Right, **P2** | Loads the saved location of the party lead.                                                                             |
+| Fall Damage Toggle  | A, **P2**               | Toggles taking fall damage. Incredibly useful so you don't fall to your death with the moonjump.<br/>**On by default.** |
+| Return To Title     | L+R+ZL+ZR, **P2**       | Returns the player to the title screen.                                                                                 |
+| Temp Int Increment  | ZL+Dpad Right, **P2**   | Increments the temp int.                                                                                                |
+| Temp Int Decrement  | ZL+Dpad Left, **P2**    | Decrements the temp int.                                                                                                |
+| Jump to MapJump     | ZL+Dpad Down, **P2**    | Jumps to the MapJump with the id of the temp int. Look below for a list.                                                |
+| Play Sound Effect   | ZL+Minus, **P2**        | Plays a common sound effect with the id of the temp int.                                                                |
+| Straighten Font     | L+Y, **P2**             | Straightens out the font used in 2 and Torna. Nice meme.                                                                |
 
 MapJump/Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/common/SYS_MapJumpList.html) for 2/Torna and [here](https://xenoblade.github.io/xb1de/bdat/bdat_common/landmarklist.html) for DE.
 
