@@ -11,6 +11,9 @@ namespace xenomods {
 		static float movementSpeedMult;
 		static glm::vec3 warpLocation;
 
+		static glm::vec3 GetPartyPosition();
+		static void SetPartyPosition(glm::vec3 pos);
+
 		void Initialize() override;
 		bool NeedsUpdate() const override {
 			return true;
