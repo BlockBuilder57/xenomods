@@ -8,8 +8,11 @@
 
 #include "../State.hpp"
 #include "DebugStuff.hpp"
+#include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 #include "xenomods/engine/game/CharacterController.hpp"
+#include "xenomods/engine/game/ObjUtil.hpp"
+#include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/engine/gf/PlayerController.hpp"
 #include "xenomods/engine/mm/mtl/RTTI.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
@@ -117,6 +120,51 @@ namespace xenomods {
 	bool PlayerMovement::moonJump = false;
 	bool PlayerMovement::disableFallDamage = true;
 	float PlayerMovement::movementSpeedMult = 1.f;
+	glm::vec3 PlayerMovement::warpLocation = {};
+
+	glm::vec3 PlayerMovement::GetPartyPosition() {
+#if !XENOMODS_CODENAME(bfsw)
+		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
+		if(trans != nullptr)
+			return *trans->getPosition();
+#else
+		if(DocumentPtr == nullptr) {
+			g_Logger->LogError("can't get party position cause no doc ptr!");
+			return {};
+		}
+
+		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
+		if (leadHandle != 0) {
+			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
+			if (control != nullptr) {
+				return control->position;
+			}
+		}
+#endif
+		return {};
+	}
+
+	void PlayerMovement::SetPartyPosition(glm::vec3 pos) {
+#if !XENOMODS_CODENAME(bfsw)
+		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
+		if (trans != nullptr)
+			trans->setPosition(pos);
+#else
+		if(DocumentPtr == nullptr) {
+			g_Logger->LogError("can't set party position cause no doc ptr!");
+			return;
+		}
+
+		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
+		if (leadHandle != 0) {
+			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
+			if (control != nullptr) {
+				control->syncFrame();
+				control->setWarp(pos, 5);
+			}
+		}
+#endif
+	}
 
 	void PlayerMovement::Initialize() {
 		UpdatableModule::Initialize();
@@ -149,6 +197,14 @@ namespace xenomods {
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::DISABLE_FALL_DAMAGE)) {
 			disableFallDamage = !disableFallDamage;
 			g_Logger->ToastInfo(STRINGIFY(disableFallDamage), "Disable fall damage: {}", disableFallDamage);
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::SAVE_WARP)) {
+			warpLocation = GetPartyPosition();
+			g_Logger->LogInfo("Saved warp at {:3}", warpLocation);
+		} else if(GetPlayer(2)->InputDownStrict(Keybind::LOAD_WARP)) {
+			if(glm::length(warpLocation) > 0.f) {
+				SetPartyPosition(warpLocation);
+				g_Logger->LogInfo("Warped party to {:3}", warpLocation);
+			}
 		}
 
 		if (movementSpeedChanged)

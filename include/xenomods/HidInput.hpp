@@ -76,6 +76,8 @@ namespace xenomods {
 
 		MOVEMENT_SPEED_UP = nn::hid::KEY_DUP,
 		MOVEMENT_SPEED_DOWN = nn::hid::KEY_DDOWN,
+		SAVE_WARP = nn::hid::KEY_DLEFT | nn::hid::KEY_ZL | nn::hid::KEY_L,
+		LOAD_WARP = nn::hid::KEY_DRIGHT | nn::hid::KEY_ZL | nn::hid::KEY_L,
 
 		TEST_BUTTON = nn::hid::KEY_MINUS | nn::hid::KEY_A,
 		TEMPINT_INC = nn::hid::KEY_DRIGHT | nn::hid::KEY_ZL,

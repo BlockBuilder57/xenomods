@@ -3,13 +3,14 @@
 //
 
 #include "CameraTools.hpp"
+#include "DebugStuff.hpp"
+#include "PlayerMovement.hpp"
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
 
-#include "DebugStuff.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"
 #include "xenomods/engine/apps/FrameworkLauncher.hpp"
@@ -261,27 +262,7 @@ namespace xenomods {
 			}
 
 			if (GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TELEPORT)) {
-#if !XENOMODS_CODENAME(bfsw)
-				gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
-				if (trans != nullptr)
-					trans->setPosition(Meta.pos);
-#else
-				if(DocumentPtr == nullptr) {
-					g_Logger->LogError("can't teleport player cause no doc ptr!");
-					return;
-				}
-
-				unsigned int handle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
-				//g_Logger->LogDebug("party (leader?) handle: {}", handle);
-				if (handle != 0) {
-					game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, handle);
-					//g_Logger->LogDebug("supposed controller: {}", reinterpret_cast<void*>(control));
-					if (control != nullptr) {
-						control->syncFrame();
-						control->setWarp(Meta.pos, 5);
-					}
-				}
-#endif
+				PlayerMovement::SetPartyPosition(Meta.pos);
 			}
 
 			DoFreeCameraMovement(updateInfo);
