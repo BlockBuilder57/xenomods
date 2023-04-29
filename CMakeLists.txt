@@ -30,8 +30,8 @@ configure_file(linkerscripts/switch.specs.in ${PROJECT_BINARY_DIR}/switch.specs)
 set(VERSION_FILENAME gitversion.h)
 
 add_custom_target(__xenomods_gittag
-		COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/gittag.py ${VERSION_FILENAME}
-		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+		COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/gittag.py ${PROJECT_BINARY_DIR}/${VERSION_FILENAME}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		SOURCES ${PROJECT_BINARY_DIR}/${VERSION_FILENAME}
 		)
 set_source_files_properties(${PROJECT_BINARY_DIR}/${VERSION_FILENAME} PROPERTIES GENERATED TRUE)
