@@ -158,6 +158,7 @@ namespace xenomods {
 		if (leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
 			if (control != nullptr) {
+				control->syncFrame();
 				control->setWarp(pos, 5);
 				control->clearLanding();
 			}
