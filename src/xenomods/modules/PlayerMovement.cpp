@@ -209,10 +209,14 @@ namespace xenomods {
 	glm::vec3 PlayerMovement::GetPartyVelocity() {
 #if !XENOMODS_CODENAME(bfsw)
 		// TODO
-		/*gf::GF_OBJ_HANDLE* handle = gf::GfGameParty::getLeader();
-		if (handle != nullptr) {
-			g_Logger->LogInfo("Got handle - {}", reinterpret_cast<unsigned long>(handle));
-			void* thing = gf::GfObjUtil::getProperty(handle);
+		/*gf::GF_OBJ_HANDLE handle = gf::GfGameParty::getLeader();
+		if (handle.IsValid()) {
+			g_Logger->LogInfo("Got handle - {}", reinterpret_cast<unsigned long>(handle.Ptr()));
+
+			auto acc = gf::GfObjAcc(handle.Ptr());
+			g_Logger->LogInfo("Supposed type: {}", (int)acc.getType());
+
+			void* thing = gf::GfObjUtil::getProperty(handle.Ptr());
 			g_Logger->LogInfo("What's the thing? {}", thing);
 			auto* behavior = reinterpret_cast<gf::GfComPropertyPc*>(thing);
 			if (behavior != nullptr) {

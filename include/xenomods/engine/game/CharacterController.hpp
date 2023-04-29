@@ -30,13 +30,13 @@ namespace game {
 
 		INSERT_PADDING_BYTES(0x10)
 		ActorAccessor* actorAccessor;
-		INSERT_PADDING_BYTES(0x38)
+		INSERT_PADDING_BYTES(0x38);
 		mm::Vec3 position;
 		INSERT_PADDING_BYTES(0x4);
 		mm::Quat rotation;
 		INSERT_PADDING_BYTES(0xC0);
 		mm::Vec3 velocity;
-		INSERT_PADDING_BYTES(0x104)
+		INSERT_PADDING_BYTES(0x114);
 		Flags flags;
 
 		bool isAdsorptionSnap() const;

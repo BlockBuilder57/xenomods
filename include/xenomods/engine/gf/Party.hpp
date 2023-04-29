@@ -27,7 +27,8 @@ namespace gf {
 
 		static void getCurrentPartyInfo(gf::RQ_SETUP_PARTY_DRIVER&);
 
-		static gf::GF_OBJ_HANDLE* getLeader();
+		static gf::GF_OBJ_HANDLE getLeader();
+		static gf::GF_OBJ_HANDLE getHandleMover(unsigned int );
 		static GfComTransform* getLeaderTransform();
 	};
 

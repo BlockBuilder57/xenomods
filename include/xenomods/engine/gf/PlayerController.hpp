@@ -51,39 +51,18 @@ namespace gf {
 			InAir = BIT(9),
 		};
 
-		uint8_t pad_bytes[0x60];
+		INSERT_PADDING_BYTES(0x58);
 		mm::Vec2 inputReal;
-		INSERT_PADDING_BYTES(8);
+		INSERT_PADDING_BYTES(0x8);
 		mm::Vec2 inputDupe;
-		INSERT_PADDING_BYTES(8);
+		INSERT_PADDING_BYTES(0x8);
 		mm::Vec3 velocityWish;
 		mm::Vec3 velocityActual;
-		INSERT_PADDING_BYTES(648);
+		INSERT_PADDING_BYTES(0x288);
 		unsigned int flags;
 
 		static mm::mtl::RTTI m_rtti;
 		virtual mm::mtl::RTTI* getRTTI() const;
-
-		/**
-		 * this is a hack
-		 */
-		inline GfComAsm* ComAsm() {
-			// ghidra says
-			// *(GfComAsm **)(*(longlong *)&param_1->field_0x8 + 0x48);
-			// attempt to decompose
-			// *(void*)&param_1->field_0x8 = void**? which is then dereferenced
-			// + 0x48 = inlined baseclass
-			//
-			// my c++brain (re-seperating this out into seperate expressions) says:
-			auto* funny = reinterpret_cast<std::uint8_t*>(
-			this->pad_bytes[0x8]); // pointer to some vtable like thing for bases
-			// idklol
-			return reinterpret_cast<GfComAsm*>(*funny + 0x48);
-
-			// auto this_0x8 = reinterpret_cast<std::uint8_t**>((this + 0x8)); // this
-			// kinda looks fugly being seperate tbh return
-			// *reinterpret_cast<GfComAsm**>(this_0x8 + 0x48);
-		}
 	};
 
 	struct GfComBehaviorPc {
