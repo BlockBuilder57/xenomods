@@ -94,6 +94,7 @@ namespace xenomods {
 		if (mapjumpId == 0)
 			return;
 
+#if !XENOMODS_CODENAME(bf3)
 		int end = 1;
 		unsigned char* pBdat =
 #if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
@@ -109,6 +110,7 @@ namespace xenomods {
 			mapjumpId = end - (std::abs(mapjumpId) - 1);
 
 		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, end);
+#endif
 
 #if !XENOMODS_CODENAME(bfsw)
 		gf::GfPlayFactory::createSkipTravel(mapjumpId);

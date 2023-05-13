@@ -58,6 +58,24 @@
         "CMAKE_BUILD_TYPE": "Release",
         "XENOMODS_CODENAME": "bfsw"
       }
+    },
+    {
+      "name": "debug-bf3",
+      "generator": "Ninja",
+      "toolchainFile": "cmake/NintendoSwitch.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "XENOMODS_CODENAME": "bf3"
+      }
+    },
+    {
+      "name": "release-bf3",
+      "generator": "Ninja",
+      "toolchainFile": "cmake/NintendoSwitch.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "XENOMODS_CODENAME": "bf3"
+      }
     }
   ]
 }

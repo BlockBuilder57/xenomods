@@ -3,6 +3,7 @@
 
 #include <nn/ro.h>
 
+#include <skylaunch/utils/cpputils.hpp>
 #include <skylaunch/inlinehook/And64InlineHook.hpp>
 #include <bit>
 #include <string_view>

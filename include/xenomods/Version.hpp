@@ -38,7 +38,7 @@ namespace xenomods::version {
 	GameType::IRA;
 #elif XENOMODS_CODENAME(bfsw)
 	GameType::BFSW;
-#elif XXENOMODS_CODENAME(bf3)
+#elif XENOMODS_CODENAME(bf3)
 	GameType::BF3;
 #endif
 	const bool BuildIsDebug =
@@ -51,7 +51,11 @@ namespace xenomods::version {
 	unsigned long RuntimeProgramID();
 	GameType RuntimeGame();
 	SemVer RuntimeVersion();
+#if !XENOMODS_CODENAME(bf3)
 	inline const char* RuntimeBuildRevision() { return ml::ProcDesktop::getBuildRevision()->buffer; }
+#else
+	inline const char* RuntimeBuildRevision() { return ":)"; }
+#endif
 
 } // namespace xenomods::version
 

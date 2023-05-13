@@ -8,7 +8,7 @@
 
 #include "UpdateInfo.hpp"
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
 namespace fw {
 
 	class Applet {

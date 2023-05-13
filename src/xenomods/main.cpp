@@ -17,7 +17,7 @@
 
 namespace {
 
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
 	struct FrameworkUpdateHook : skylaunch::hook::Trampoline<FrameworkUpdateHook> {
 		static void Hook(fw::Framework* framework) {
 			Orig(framework);
@@ -50,11 +50,17 @@ namespace {
 	};
 #endif
 
+	struct NpadStyleSetOverride : skylaunch::hook::Trampoline<NpadStyleSetOverride> {
+		static void Hook(int) {
+			return Orig(3);
+		}
+	};
+
 } // namespace
 
 namespace xenomods {
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
 	fw::Document* DocumentPtr = {};
 #endif
 
@@ -104,8 +110,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		 */
 		static bool hasUpdated;
 		if(!hasUpdated) {
-			nn::hid::SetSupportedNpadStyleSet(3);
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
 			fw::PadManager::enableDebugDraw(true);
 #endif
 			hasUpdated = true;
@@ -136,7 +141,9 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		xenomods::UpdateAllRegisteredModules(updateInfo);
 
 		// draw log messages
+#if !XENOMODS_CODENAME(bf3)
 		g_Logger->Draw();
+#endif
 	}
 
 	void main() {
@@ -155,11 +162,15 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 #endif
 
 		// hook our updater
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
 		FrameworkUpdateHook::HookAt("_ZN2fw9Framework6updateEv");
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
+#elif XENOMODS_CODENAME(bf3)
+		FrameworkUpdater_updateStdHook::HookAt(skylaunch::utils::g_MainTextAddr + 0x6734c);
 #endif
+
+		NpadStyleSetOverride::HookAt(&nn::hid::SetSupportedNpadStyleSet);
 
 		toastVersion();
 	}

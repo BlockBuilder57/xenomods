@@ -160,9 +160,13 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up menu viewer...");
 
+#if !XENOMODS_CODENAME(bf3)
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
+#else
+		SkipLayerRendering::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f808);
+#endif
 
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(bfsw)
 		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
 
 		//BigOlUIDebugger::HookAt("_ZN2ui8UIObject6updateEv");
@@ -175,7 +179,7 @@ namespace xenomods {
 	void MenuViewer::Update(fw::UpdateInfo* updateInfo) {
 		auto& state = GetState();
 
-		if(GetPlayer(2)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {
+		if(GetPlayer(1)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {
 			enableUIRendering = !enableUIRendering;
 			g_Logger->ToastInfo(STRINGIFY(enableUIRendering), "UI rendering: {}", enableUIRendering);
 		}
