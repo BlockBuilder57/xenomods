@@ -28,7 +28,7 @@
 namespace {
 
 	struct PilotCameraLayers : skylaunch::hook::Trampoline<PilotCameraLayers> {
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
 		static void Hook(fw::CameraLayer* this_pointer, const fw::Document& document, const fw::UpdateInfo& updateInfo) {
 #else
 		static void Hook(fw::CameraLayer* this_pointer, const fw::UpdateInfo& updateInfo) {
@@ -36,13 +36,14 @@ namespace {
 			if (reinterpret_cast<void*>(this_pointer->listCamera.head) != &this_pointer->listCamera) {
 				size_t ptrOffset = 0x10; //offsetof(fw::Camera, next);
 				auto realHead = reinterpret_cast<fw::Camera*>(reinterpret_cast<u8*>(this_pointer->listCamera.head) - ptrOffset);
-				//xenomods::g_Logger->LogDebug("list @ {} - head == {}, count {}", reinterpret_cast<void*>(&this_pointer->listCamera), reinterpret_cast<void*>(this_pointer->listCamera.head), this_pointer->listCamera.count);
+				xenomods::g_Logger->LogDebug("list @ {} - head == {}, count {}", reinterpret_cast<void*>(&this_pointer->listCamera), reinterpret_cast<void*>(this_pointer->listCamera.head), this_pointer->listCamera.count);
 
 				while (true) {
 					//xenomods::g_Logger->LogDebug("so no head? {} -> {}", reinterpret_cast<void*>(realHead), reinterpret_cast<void*>(realHead->next));
+					//xenomods::g_Logger->LogDebug("say,  head? {} -> {}", reinterpret_cast<void*>(realHead), reinterpret_cast<void*>(realHead->prev));
 					//dbgutil::logMemory(realHead, sizeof(fw::Camera));
 
-					if (realHead->getRTTI()->isKindOf(&fw::Camera::m_rtti)) {
+					//if (realHead->getRTTI()->isKindOf(&fw::Camera::m_rtti)) {
 						if (xenomods::CameraTools::Freecam.isOn) {
 							realHead->matrix = glm::inverse(static_cast<const glm::mat4&>(xenomods::CameraTools::Freecam.matrix));;
 							realHead->fov = xenomods::CameraTools::Freecam.fov;
@@ -56,9 +57,12 @@ namespace {
 
 							//fw::debug::drawFontFmtShadow3D(xenomods::CameraTools::Meta.pos, mm::Col4::white, "Camera: {} prio {}", namey, realHead->CAMERA_PRIO);
 						}
-					}
+					//}
 
 					if (realHead->next == nullptr || reinterpret_cast<void*>(realHead->next) == &this_pointer->listCamera)
+						break;
+
+					if (realHead->prev == realHead->next)
 						break;
 
 					realHead = reinterpret_cast<fw::Camera*>(reinterpret_cast<u8*>(realHead->next) - ptrOffset);
@@ -72,7 +76,7 @@ namespace {
 				this_pointer->matCurrent = xenomods::CameraTools::Freecam.matrix;
 			}
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
 			Orig(this_pointer, document, updateInfo);
 #else
 			Orig(this_pointer, updateInfo);
@@ -80,7 +84,9 @@ namespace {
 
 			if (xenomods::CameraTools::Freecam.isOn) {
 				this_pointer->objCam->AttrTransformPtr->fov = xenomods::CameraTools::Freecam.fov;
+#if !XENOMODS_CODENAME(bf3)
 				this_pointer->objCam->updateFovNearFar();
+#endif
 			}
 		}
 	};
@@ -213,14 +219,16 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up camera tools...");
 
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
 		// intermittently reads the address as 0x0... let's just use the actual symbol for now
 		// TODO: why *is* the function reference not exporting?
 		PilotCameraLayers::HookAt("_ZN2fw11CameraLayer6updateERKNS_10UpdateInfoE");
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		PilotCameraLayers::HookAt(&fw::CameraLayer::update);
+#elif XENOMODS_CODENAME(bf3)
+		PilotCameraLayers::HookAt(skylaunch::utils::g_MainTextAddr + 0x13708);
 #endif
-		CopyCurrentCameraState::HookAt(&ml::ScnObjCam::updateFovNearFar);
+		//CopyCurrentCameraState::HookAt(&ml::ScnObjCam::updateFovNearFar);
 	}
 
 	void CameraTools::Update(fw::UpdateInfo* updateInfo) {

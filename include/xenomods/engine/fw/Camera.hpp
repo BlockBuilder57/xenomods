@@ -12,7 +12,7 @@ namespace fw {
 
 	class Camera {
 	   public:
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
 		int m_RefCount;
 		int pad;
 		mm::mtl::IntrusiveListNodeBase* next;
@@ -68,6 +68,19 @@ namespace fw {
 
 	class CameraLayer {
 	   public:
+#if XENOMODS_CODENAME(bf3)
+		mm::mtl::IntrusiveListBase listCamera;
+		mm::mtl::IntrusiveListBase listCameraPlugin;
+		INSERT_PADDING_BYTES(0x98);
+		ml::ScnObjCam* objCam;
+		INSERT_PADDING_BYTES(0x48);
+		mm::Mat44 matCurrent;
+		mm::Mat44 matTarget;
+		float unknown;
+		float lerpProgress;
+		float lerpTime;
+		bool willLerp;
+#else
 		mm::mtl::IntrusiveListBase listCamera;
 		mm::mtl::IntrusiveListBase listCameraPlugin;
 		ml::ScnObjCam* objCam;
@@ -85,6 +98,7 @@ namespace fw {
 		float lerpProgress;
 		float lerpTime;
 		bool willLerp;
+#endif
 #endif
 
 		void getCameraPosition() const;
