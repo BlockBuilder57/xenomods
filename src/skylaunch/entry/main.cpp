@@ -5,6 +5,8 @@
 #include "../../xenomods/main.hpp"
 #include "skylaunch/utils/ipc.hpp"
 
+#include <nn/diag.h>
+
 // For handling exceptions
 char ALIGNA(0x1000) exception_handler_stack[0x4000];
 nn::os::UserExceptionInfo exception_info;
@@ -43,19 +45,18 @@ struct RomMountedHook : skylaunch::hook::Trampoline<RomMountedHook> {
 };
 
 struct DisableSingleModeHook : skylaunch::hook::Trampoline<DisableSingleModeHook> {
-	static void Hook(nn::hid::ControllerSupportResultInfo* resultInfo, nn::hid::ControllerSupportArg* supportArg) {
-		nn::hid::NpadFullKeyState p1State {};
-		nn::hid::GetNpadState(&p1State, nn::hid::CONTROLLER_PLAYER_1);
+	static int Hook(nn::hid::ControllerSupportResultInfo* resultInfo, nn::hid::ControllerSupportArg* supportArg) {
 
-		if(p1State.Flags & nn::hid::NpadFlags::NPAD_CONNECTED) {
-			// We have a player 1 at this point, so disable single-controller only mode
-			// That way if another controller is connected while the game is running, we can allow it to be P2
-			// Monolib actually passes the (according to switchbrew) default arguments to this,
-			// so we technically get 4 max controllers for free!
+		if (nn::oe::GetOperationMode() == nn::oe::OperationMode::Handheld) {
+			// single mode only applies when the console is in handheld
+			// other controllers will try to take control (ie so you can use a pro controller while handled)
+			// monolib just uses the default arguments (0 min, 4 max, single mode false)
+			// meaning we are fine to skip if we're docked
 			supportArg->mSingleMode = false;
+			return Orig(resultInfo, supportArg);
 		}
 
-		Orig(resultInfo, supportArg);
+		return 0;
 	}
 };
 

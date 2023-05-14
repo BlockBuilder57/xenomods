@@ -52,7 +52,7 @@ namespace {
 
 	struct NpadStyleSetOverride : skylaunch::hook::Trampoline<NpadStyleSetOverride> {
 		static void Hook(int) {
-			return Orig(3);
+			return Orig(7);
 		}
 	};
 
@@ -126,6 +126,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 			GetState().config.LoadFromFile();
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
+#if !XENOMODS_CODENAME(bf3)
 			g_Logger->LogDebug("test debug message! {}", ml::mtRand());
 			g_Logger->LogInfo("test info message! {}", ml::mtRandf1());
 			g_Logger->LogWarning("test warning message! {}", ml::mtRandf2());
@@ -135,6 +136,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 			int group = ml::mtRand(100, 999);
 			g_Logger->ToastWarning(fmt::format("{}", group), "random group ({})", group);
 			g_Logger->ToastMessage("logger test", Logger::Severity::Info, "system tick in seconds: {:2f}", nn::os::GetSystemTick() / 19200000.);
+#endif
 		}
 
 		// Update modules
