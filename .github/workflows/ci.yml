@@ -55,6 +55,12 @@ jobs:
           - name: release-bfsw
             preset: release-bfsw
             codename: bfsw
+          - name: debug-bf3
+            preset: debug-bf3
+            codename: bf3
+          - name: release-bf3
+            preset: release-bf3
+            codename: bf3
 
     steps:
       - uses: actions/checkout@v3
