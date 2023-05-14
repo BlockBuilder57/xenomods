@@ -318,6 +318,8 @@ namespace xenomods {
 			g_Logger->ToastInfo("movementSpeedMult", "Move speed: {}x", movementSpeedMult);
 	}
 
+#if !XENOMODS_CODENAME(bf3)
 	XENOMODS_REGISTER_MODULE(PlayerMovement);
+#endif
 
 } // namespace xenomods

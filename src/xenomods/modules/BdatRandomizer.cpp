@@ -69,6 +69,8 @@ namespace xenomods {
 		}
 	}
 
+#if !XENOMODS_CODENAME(bf3)
 	XENOMODS_REGISTER_MODULE(BdatRandomizer);
+#endif
 
 } // namespace xenomods

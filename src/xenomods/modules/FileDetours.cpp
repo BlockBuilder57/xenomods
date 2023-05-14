@@ -146,8 +146,10 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up file detours...");
 
+#if !XENOMODS_CODENAME(bf3)
 		ReadFileHook::HookAt("_ZN2ml13DevFileUtilNx8readFileERPNS_12FileHandleThERN2nn2fs10FileHandleEilPvjRNS_14FileReadResultE");
 		ReadFileSliceHook::HookAt("_ZN2ml13DevFileUtilNx13readFileSliceEPNS_12FileHandleThERN2nn2fs10FileHandleEllPvjRNS_14FileReadResultE");
+#endif
 	}
 
 	XENOMODS_REGISTER_MODULE(FileDetours);
