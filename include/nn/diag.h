@@ -7,6 +7,8 @@
 
 #include "types.h"
 
+#include <stdint.h>
+
 namespace nn {
 	namespace diag {
 		enum class LogSeverity : u8 {
@@ -18,7 +20,7 @@ namespace nn {
 		};
 
 		struct LogMetaData {
-			std::uint32_t lineNo;
+			unsigned int lineNo;
 			LogSeverity severity;
 			const char* fileName;
 			const char* function;
