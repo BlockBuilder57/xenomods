@@ -50,9 +50,41 @@ namespace {
 	};
 #endif
 
+	// Multi-controller stuff
+
+	// Can accept handheld, dual joycons, and pro controller
 	struct NpadStyleSetOverride : skylaunch::hook::Trampoline<NpadStyleSetOverride> {
 		static void Hook(int) {
 			return Orig(7);
+		}
+	};
+
+	struct DisableControllerSingleMode : skylaunch::hook::Trampoline<DisableControllerSingleMode> {
+		static void Hook(nn::hid::ControllerSupportResultInfo* resultInfo, nn::hid::ControllerSupportArg* supportArg) {
+			nn::hid::NpadFullKeyState p1State {};
+			nn::hid::GetNpadState(&p1State, nn::hid::CONTROLLER_PLAYER_1);
+
+			if(p1State.Flags & nn::hid::NpadFlags::NPAD_CONNECTED) {
+				// We have a player 1 at this point, so disable single-controller only mode
+				// That way if another controller is connected while the game is running, we can allow it to be P2
+				// Monolib actually passes the (according to switchbrew) default arguments to this,
+				// so we technically get 4 max controllers for free!
+				supportArg->mSingleMode = false;
+			}
+
+			Orig(resultInfo, supportArg);
+		}
+	};
+
+	// Monolib gets very upset in 3 when the controller count is above 1, so let's clamp that down
+	struct ClampNumberOfControllers : skylaunch::hook::Trampoline<ClampNumberOfControllers> {
+		static int Hook() {
+			int result = Orig();
+
+			if (result > 1)
+				return 1;
+
+			return result;
 		}
 	};
 
@@ -124,7 +156,9 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 			toastVersion();
 		} else if(P2->InputDownStrict(RELOAD_CONFIG)) {
 			GetState().config.LoadFromFile();
+#if !XENOMODS_CODENAME(bf3)
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
+#endif
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
 #if !XENOMODS_CODENAME(bf3)
 			g_Logger->LogDebug("test debug message! {}", ml::mtRand());
@@ -172,7 +206,14 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		FrameworkUpdater_updateStdHook::HookAt(skylaunch::utils::g_MainTextAddr + 0x6734c);
 #endif
 
+		// Multiple controller support
 		NpadStyleSetOverride::HookAt(&nn::hid::SetSupportedNpadStyleSet);
+		DisableControllerSingleMode::HookAt(nn::hid::ShowControllerSupport);
+#if !XENOMODS_CODENAME(bf3)
+		ClampNumberOfControllers::HookAt("_ZN2ml8DevPadNx23getLocalConnectPadCountEv");
+#else
+		ClampNumberOfControllers::HookAt(skylaunch::utils::g_MainTextAddr + 0x1251bcc);
+#endif
 
 		toastVersion();
 	}
