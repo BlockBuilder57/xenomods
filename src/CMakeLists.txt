@@ -108,8 +108,9 @@ target_compile_definitions(xenomods PUBLIC
 )
 
 # NPDM/NSO output.
-add_npdm(xenomods ${PROJECT_SOURCE_DIR}/npdm/${XENOMODS_CODENAME}.json main)
+add_npdm(xenomods ${PROJECT_SOURCE_DIR}/npdm/${XENOMODS_CODENAME}.json main-unpatched)
 add_nso_target(xenomods)
+patch_npdm(main-unpatched main)
 
 # FTP transfer
 

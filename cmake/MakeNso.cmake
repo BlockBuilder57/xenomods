@@ -41,4 +41,14 @@ function(add_nso_target target)
     )
 	#add_dependencies
 endfunction()
-	
+
+function(patch_npdm in out)
+	add_custom_command(TARGET xenomods
+			POST_BUILD
+			COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/patchNpdm.py ${in}.npdm ${out}.npdm
+			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+			USES_TERMINAL
+			VERBATIM
+			COMMENT "Patching NPDM ${out}"
+			)
+endfunction()
