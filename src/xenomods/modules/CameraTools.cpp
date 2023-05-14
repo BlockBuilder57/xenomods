@@ -36,7 +36,10 @@ namespace {
 			if (reinterpret_cast<void*>(this_pointer->listCamera.head) != &this_pointer->listCamera) {
 				size_t ptrOffset = 0x10; //offsetof(fw::Camera, next);
 				auto realHead = reinterpret_cast<fw::Camera*>(reinterpret_cast<u8*>(this_pointer->listCamera.head) - ptrOffset);
-				xenomods::g_Logger->LogDebug("list @ {} - head == {}, count {}", reinterpret_cast<void*>(&this_pointer->listCamera), reinterpret_cast<void*>(this_pointer->listCamera.head), this_pointer->listCamera.count);
+				//xenomods::g_Logger->LogDebug("list @ {} - head == {}, count {}", reinterpret_cast<void*>(&this_pointer->listCamera), reinterpret_cast<void*>(this_pointer->listCamera.head), this_pointer->listCamera.count);
+
+				if (realHead == nullptr)
+					return;
 
 				while (true) {
 					//xenomods::g_Logger->LogDebug("so no head? {} -> {}", reinterpret_cast<void*>(realHead), reinterpret_cast<void*>(realHead->next));
@@ -59,10 +62,10 @@ namespace {
 						}
 					//}
 
-					if (realHead->next == nullptr || reinterpret_cast<void*>(realHead->next) == &this_pointer->listCamera)
+					if (realHead->prev == realHead->next)
 						break;
 
-					if (realHead->prev == realHead->next)
+					if (realHead->next == nullptr || reinterpret_cast<void*>(realHead->next) == &this_pointer->listCamera)
 						break;
 
 					realHead = reinterpret_cast<fw::Camera*>(reinterpret_cast<u8*>(realHead->next) - ptrOffset);
@@ -82,7 +85,7 @@ namespace {
 			Orig(this_pointer, updateInfo);
 #endif
 
-			if (xenomods::CameraTools::Freecam.isOn) {
+			if (xenomods::CameraTools::Freecam.isOn && this_pointer->objCam != nullptr) {
 				this_pointer->objCam->AttrTransformPtr->fov = xenomods::CameraTools::Freecam.fov;
 #if !XENOMODS_CODENAME(bf3)
 				this_pointer->objCam->updateFovNearFar();
@@ -95,7 +98,11 @@ namespace {
 			static void Hook(ml::ScnObjCam* this_pointer) {
 				Orig(this_pointer);
 
-				if(this_pointer->ScnPtr != nullptr && this_pointer == this_pointer->ScnPtr->getCam(-1)) {
+#if !XENOMODS_CODENAME(bf3)
+				if(this_pointer->ScnPtr != nullptr && this_pointer->AttrTransformPtr != nullptr && this_pointer == this_pointer->ScnPtr->getCam(-1)) {
+#else
+				if(this_pointer->AttrTransformPtr != nullptr) {
+#endif
 					if(!xenomods::CameraTools::Freecam.isOn) {
 						// read state from current camera
 						xenomods::CameraTools::Freecam.matrix = this_pointer->AttrTransformPtr->viewMatInverse;
@@ -120,7 +127,7 @@ namespace xenomods {
 
 	CameraTools::RenderParmForces CameraTools::RenderParameters = {};
 
-	void DoFreeCameraMovement(fw::UpdateInfo* updateInfo) {
+	void DoFreeCameraMovement(float deltaTime) {
 		// controls:
 		// Left stick: Y: forward/back, X: left/right
 		// Right stick: XY: Look movement
@@ -151,7 +158,7 @@ namespace xenomods {
 
 		// movement
 		glm::vec3 move {};
-		float fovMult = 30.f * updateInfo->deltaTime;
+		float fovMult = 30.f * deltaTime;
 
 		// slow the zoom at lower fovs
 		if(fc->fov != 0.0f && std::abs(fc->fov) < 20.f)
@@ -163,14 +170,14 @@ namespace xenomods {
 			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
 		} else {
 			move = { lStick.x, 0, -lStick.y };
-			move = rot * move * updateInfo->deltaTime; // rotate movement to local space
+			move = rot * move * deltaTime; // rotate movement to local space
 			move *= fc->camSpeed;			   // multiply by cam speed
 		}
 
 		// rotation
 		glm::vec3 look {};
-		float lookMult = 70.f * updateInfo->deltaTime;
-		float rollMult = 10.f * updateInfo->deltaTime;
+		float lookMult = 70.f * deltaTime;
+		float rollMult = 10.f * deltaTime;
 
 		// slow the camera down at lower fovs
 		if(fc->fov != 0.0f && std::abs(fc->fov) < 40.f)
@@ -203,8 +210,8 @@ namespace xenomods {
 		meta->pos = pos;
 		meta->rot = rot;
 
-		glm::vec3 forward = mm::Vec3::unitZ;
-		glm::vec3 up = mm::Vec3::unitY;
+		glm::vec3 forward = { 0, 0, 1 };
+		glm::vec3 up = { 0, 1, 0 };
 		meta->forward = rot * forward;
 		meta->up = rot * up;
 
@@ -228,7 +235,12 @@ namespace xenomods {
 #elif XENOMODS_CODENAME(bf3)
 		PilotCameraLayers::HookAt(skylaunch::utils::g_MainTextAddr + 0x13708);
 #endif
-		//CopyCurrentCameraState::HookAt(&ml::ScnObjCam::updateFovNearFar);
+
+#if !XENOMODS_CODENAME(bf3)
+		CopyCurrentCameraState::HookAt(&ml::ScnObjCam::updateFovNearFar);
+#else
+		CopyCurrentCameraState::HookAt(skylaunch::utils::g_MainTextAddr + 0x12702ec);
+#endif
 	}
 
 	void CameraTools::Update(fw::UpdateInfo* updateInfo) {
@@ -273,7 +285,12 @@ namespace xenomods {
 				PlayerMovement::SetPartyPosition(Meta.pos);
 			}
 
-			DoFreeCameraMovement(updateInfo);
+#if XENOMODS_CODENAME(bf3)
+			// TODO: find deltaTime again
+			DoFreeCameraMovement(1/30.f);
+#else
+			DoFreeCameraMovement(updateInfo->deltaTime);
+#endif
 
 #if 0
 			if (xenomods::DebugStuff::enableDebugRendering && GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {

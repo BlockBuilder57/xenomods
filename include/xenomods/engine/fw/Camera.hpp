@@ -103,7 +103,7 @@ namespace fw {
 
 		void getCameraPosition() const;
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
 		void update(const fw::Document& document, const fw::UpdateInfo& updateInfo);
 #else
 		virtual void update(const fw::UpdateInfo& updateInfo);

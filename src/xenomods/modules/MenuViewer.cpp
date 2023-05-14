@@ -179,7 +179,7 @@ namespace xenomods {
 	void MenuViewer::Update(fw::UpdateInfo* updateInfo) {
 		auto& state = GetState();
 
-		if(GetPlayer(1)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {
+		if(GetPlayer(2)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {
 			enableUIRendering = !enableUIRendering;
 			g_Logger->ToastInfo(STRINGIFY(enableUIRendering), "UI rendering: {}", enableUIRendering);
 		}
