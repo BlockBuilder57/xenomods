@@ -7,7 +7,7 @@
 
 #include "types.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace nn {
 	namespace diag {
@@ -20,7 +20,7 @@ namespace nn {
 		};
 
 		struct LogMetaData {
-			unsigned int lineNo;
+			std::uint32_t lineNo;
 			LogSeverity severity;
 			const char* fileName;
 			const char* function;
