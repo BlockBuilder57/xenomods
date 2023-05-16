@@ -9,15 +9,23 @@
 
 #include "../State.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
+#include "xenomods/engine/layer/LayerManager.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
 #include "xenomods/engine/ui/UIObjectAcc.hpp"
 
 namespace {
 
 	struct SkipLayerRendering : skylaunch::hook::Trampoline<SkipLayerRendering> {
-		static void Hook(void* this_pointer, void* IDrDrawWorkInfo) {
+		static void Hook(layer::LayerManager* this_pointer, ml::IDrDrawWorkInfo* info) {
 			if(xenomods::MenuViewer::enableUIRendering)
-				Orig(this_pointer, IDrDrawWorkInfo);
+				Orig(this_pointer, info);
+		}
+	};
+
+	struct SkipLayer2Rendering : skylaunch::hook::Trampoline<SkipLayer2Rendering> {
+		static void Hook(layer::LayerManager* this_pointer, ml::IDrDrawWorkInfo* info) {
+			if(xenomods::MenuViewer::enableUIRendering)
+				Orig(this_pointer, info);
 		}
 	};
 
@@ -163,7 +171,8 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 #else
-		SkipLayerRendering::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f808);
+		SkipLayerRendering::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f790);
+		SkipLayer2Rendering::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f808);
 #endif
 
 #if XENOMODS_OLD_ENGINE

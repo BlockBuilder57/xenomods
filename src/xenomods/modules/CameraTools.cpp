@@ -285,12 +285,7 @@ namespace xenomods {
 				PlayerMovement::SetPartyPosition(Meta.pos);
 			}
 
-#if XENOMODS_CODENAME(bf3)
-			// TODO: find deltaTime again
-			DoFreeCameraMovement(1/30.f);
-#else
-			DoFreeCameraMovement(updateInfo->deltaTime);
-#endif
+			DoFreeCameraMovement(updateInfo->updateDelta);
 
 #if 0
 			if (xenomods::DebugStuff::enableDebugRendering && GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {

@@ -9,11 +9,14 @@
 namespace fw {
 
 	struct UpdateInfo {
-		float updateRate;
 #if XENOMODS_CODENAME(bfsw)
-		float unk2;
+		float unk1;
 #endif
-		float deltaTime;
+#if XENOMODS_OLD_ENGINE
+		float updateRate;
+#endif
+		float updateDelta;
+		float updateRatio;
 	};
 
 }
