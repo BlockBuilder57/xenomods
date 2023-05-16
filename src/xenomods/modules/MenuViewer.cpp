@@ -166,12 +166,11 @@ namespace xenomods {
 		SkipLayerRendering::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f808);
 #endif
 
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(bfsw)
+#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
 		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
 
 		//BigOlUIDebugger::HookAt("_ZN2ui8UIObject6updateEv");
 
-		// doesn't seem to work in DE, but does at least hook
 		StraightensYourXenoblade::HookAt("_ZN5layer12LayerObjFont17updateShaderParmsEPKNS_15LayerRenderViewERKNS_14LayerResMatrixERKNS_13LayerResColorE");
 #endif
 	}
