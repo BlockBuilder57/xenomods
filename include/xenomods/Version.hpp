@@ -7,6 +7,7 @@
 #include "Utils.hpp"
 #include "fmt/core.h"
 #include "gitversion.h"
+#include "skylaunch/utils/cpputils.hpp"
 #include "xenomods/engine/ml/ProcDesktop.hpp"
 
 namespace xenomods::version {
@@ -54,7 +55,7 @@ namespace xenomods::version {
 #if !XENOMODS_CODENAME(bf3)
 	inline const char* RuntimeBuildRevision() { return ml::ProcDesktop::getBuildRevision()->buffer; }
 #else
-	inline const char* RuntimeBuildRevision() { return ":)"; }
+	inline const char* RuntimeBuildRevision() { return reinterpret_cast<mm::mtl::FixStr<64>*>(skylaunch::utils::g_MainTextAddr + 0x1b6f500)->buffer; }
 #endif
 
 } // namespace xenomods::version

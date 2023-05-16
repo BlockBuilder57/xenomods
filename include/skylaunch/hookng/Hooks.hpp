@@ -54,6 +54,13 @@ namespace skylaunch::hook {
 		static inline void HookAt(std::string_view symbolName) {
 			(void)detail::HookFunction(detail::ResolveSymbol<ReplaceHookType<>>(symbolName), &Impl::Hook);
 		}
+
+		static inline void HookFromBase(uintptr_t address) {
+			if (address > 0x7100000000)
+				address -= 0x7100000000;
+
+			(void)detail::HookFunction(reinterpret_cast<ReplaceHookType<>>(skylaunch::utils::g_MainTextAddr + address), &Impl::Hook);
+		}
 	};
 
 	/**
@@ -86,6 +93,13 @@ namespace skylaunch::hook {
 
 		static inline void HookAt(std::string_view symbolName) {
 			Backup() = detail::HookFunction(detail::ResolveSymbol<TrampolineHookType<>>(symbolName), &Impl::Hook);
+		}
+
+		static inline void HookFromBase(uintptr_t address) {
+			if (address > 0x7100000000)
+				address -= 0x7100000000;
+
+			Backup() = detail::HookFunction(reinterpret_cast<TrampolineHookType<>>(skylaunch::utils::g_MainTextAddr + address), &Impl::Hook);
 		}
 
 		static auto& Backup() {

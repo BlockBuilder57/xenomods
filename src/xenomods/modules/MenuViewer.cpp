@@ -171,8 +171,8 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 #else
-		SkipLayerRendering::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f790);
-		SkipLayer2Rendering::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f808);
+		SkipLayerRendering::HookFromBase(0x710100f790);
+		SkipLayer2Rendering::HookFromBase(0x710100f808);
 #endif
 
 #if XENOMODS_OLD_ENGINE

@@ -233,13 +233,13 @@ namespace xenomods {
 #elif XENOMODS_CODENAME(bfsw)
 		PilotCameraLayers::HookAt(&fw::CameraLayer::update);
 #elif XENOMODS_CODENAME(bf3)
-		PilotCameraLayers::HookAt(skylaunch::utils::g_MainTextAddr + 0x13708);
+		PilotCameraLayers::HookFromBase(0x7100013708);
 #endif
 
 #if !XENOMODS_CODENAME(bf3)
 		CopyCurrentCameraState::HookAt(&ml::ScnObjCam::updateFovNearFar);
 #else
-		CopyCurrentCameraState::HookAt(skylaunch::utils::g_MainTextAddr + 0x12702ec);
+		CopyCurrentCameraState::HookFromBase(0x71012702ec);
 #endif
 	}
 

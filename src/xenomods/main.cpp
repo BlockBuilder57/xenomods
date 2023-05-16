@@ -203,7 +203,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 #elif XENOMODS_CODENAME(bfsw)
 		FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #elif XENOMODS_CODENAME(bf3)
-		FrameworkUpdater_updateStdHook::HookAt(skylaunch::utils::g_MainTextAddr + 0x6734c);
+		FrameworkUpdater_updateStdHook::HookFromBase(0x710006734c);
 #endif
 
 		// Multiple controller support
@@ -212,7 +212,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 #if !XENOMODS_CODENAME(bf3)
 		ClampNumberOfControllers::HookAt("_ZN2ml8DevPadNx23getLocalConnectPadCountEv");
 #else
-		ClampNumberOfControllers::HookAt(skylaunch::utils::g_MainTextAddr + 0x1251bcc);
+		ClampNumberOfControllers::HookFromBase(0x7101251bcc);
 #endif
 
 		toastVersion();

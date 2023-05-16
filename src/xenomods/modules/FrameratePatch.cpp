@@ -42,8 +42,8 @@ namespace xenomods {
 
 		if (GetState().config.enable60FPS) {
 #if XENOMODS_CODENAME(bf3)
-			LayerManagerCtorHook::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f260);
-			VSyncHook::HookAt(skylaunch::utils::g_MainTextAddr + 0x1249648);
+			LayerManagerCtorHook::HookFromBase(0x710100f260);
+			VSyncHook::HookFromBase(0x7101249648);
 #else
 			LayerManagerCtorHook::HookAt("_ZN5layer12LayerManagerC1EPN2ml3ScnEN3mtl12ALLOC_HANDLEEj"); // can't hook ctors yet?
 			VSyncHook::HookAt(&ml::DevGraph::setVSync);
