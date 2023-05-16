@@ -4,7 +4,7 @@
 
 #include "xenomods/engine/mm/mtl/RTTI.hpp"
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_NEW_ENGINE
 namespace game {
 
 	// move these out of here?

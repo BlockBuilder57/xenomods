@@ -166,7 +166,7 @@ namespace xenomods {
 		SkipLayerRendering::HookAt(skylaunch::utils::g_MainTextAddr + 0x100f808);
 #endif
 
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+#if XENOMODS_OLD_ENGINE
 		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
 
 		//BigOlUIDebugger::HookAt("_ZN2ui8UIObject6updateEv");

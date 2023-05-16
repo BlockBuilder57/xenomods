@@ -233,7 +233,7 @@ namespace xenomods {
 		ReplaceTitleEvent::HookAt(&tl::TitleMain::playTitleEvent);
 	}
 
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+#if XENOMODS_OLD_ENGINE
 	XENOMODS_REGISTER_MODULE(EventDebugUtils);
 #endif
 } // namespace xenomods

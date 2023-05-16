@@ -7,7 +7,7 @@
 
 #include "Actor.hpp"
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_NEW_ENGINE
 namespace game {
 
 	class CharacterController {

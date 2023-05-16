@@ -20,7 +20,7 @@
 
 namespace {
 
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 	struct ApplyVelocityChanges : skylaunch::hook::Trampoline<ApplyVelocityChanges> {
 		static void Hook(gf::GfComBehaviorPc* this_pointer, fw::UpdateInfo* updateInfo, gf::GfComPropertyPc* pcProperty) {
 			//using enum gf::GfComPropertyPc::Flags;
@@ -123,7 +123,7 @@ namespace xenomods {
 	PlayerMovement::WarpData PlayerMovement::Warp = {};
 
 	glm::vec3 PlayerMovement::GetPartyPosition() {
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if(trans != nullptr)
 			return *trans->getPosition();
@@ -144,7 +144,7 @@ namespace xenomods {
 		return {};
 	}
 	void PlayerMovement::SetPartyPosition(glm::vec3 pos) {
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if (trans != nullptr)
 			trans->setPosition(pos);
@@ -166,7 +166,7 @@ namespace xenomods {
 #endif
 	}
 	glm::quat PlayerMovement::GetPartyRotation() {
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if(trans != nullptr)
 			return *trans->getRotation();
@@ -187,7 +187,7 @@ namespace xenomods {
 		return {};
 	}
 	void PlayerMovement::SetPartyRotation(glm::quat rot) {
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if (trans != nullptr)
 			trans->setRotation(rot);
@@ -208,7 +208,7 @@ namespace xenomods {
 	}
 
 	glm::vec3 PlayerMovement::GetPartyVelocity() {
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		// TODO
 		/*gf::GF_OBJ_HANDLE handle = gf::GfGameParty::getLeader();
 		if (handle.IsValid()) {
@@ -249,7 +249,7 @@ namespace xenomods {
 		return {};
 	}
 	void PlayerMovement::SetPartyVelocity(glm::vec3 vel) {
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		// TODO
 #else
 		if(DocumentPtr == nullptr) {
@@ -272,14 +272,14 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up player movement hooks...");
 
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		ApplyVelocityChanges::HookAt("_ZN2gf15GfComBehaviorPc19integrateMoveNormalERKN2fw10UpdateInfoERNS_15GfComPropertyPcE");
 
 		DisableFallDamagePlugin::HookAt("_ZNK2gf2pc18FallDistancePlugin12calcDistanceERKN2mm4Vec3E");
 		DisableStateUtilFallDamage::HookAt("_ZN2gf2pc9StateUtil20setFallDamageDisableERNS_15GfComBehaviorPcEb");
 
 		CorrectCameraTarget::HookAt("_ZN2gf18PlayerCameraTarget15writeTargetInfoEv");
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		ApplyVelocityChanges::HookAt(&game::CharacterController::applyMoveVec);
 		DisableFallDamage::HookAt(&game::CharacterController::getFallHeight);
 		// TODO: look into game::PcStateUtil::updateClimbMove for vertical climbing speed

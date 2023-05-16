@@ -59,6 +59,12 @@ using ulong = uint64_t;
 #define XENOMODS_CODENAME(cn) defined __XENOMODS_CODENAME_##cn
 #define XENOMODS_CODENAME_STR _XENOMODS_CODENAME_STR
 
+// There seems to be two generations of
+// the engine so far, the one used in 2/Torna,
+// and the version used in DE and 3 (the one with Document)
+// Let's borrow some familiar terminology here...
+#define XENOMODS_OLD_ENGINE (XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira))
+#define XENOMODS_NEW_ENGINE (XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3))
 
 namespace xenomods {
 	// FIXME: const/by-value versions?

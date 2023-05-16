@@ -4,7 +4,7 @@
 
 #include <xenomods/Utils.hpp>
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_NEW_ENGINE
 namespace game {
 
 	class DebugDraw {

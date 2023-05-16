@@ -97,7 +97,7 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 		int end = 1;
 		unsigned char* pBdat =
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+#if XENOMODS_OLD_ENGINE
 		Bdat::getFP("SYS_MapJumpList");
 #elif XENOMODS_CODENAME(bfsw)
 		Bdat::getFP("landmarklist");
@@ -179,7 +179,7 @@ namespace xenomods {
 			//gf::GfFieldManager::clear();
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::DEBUG_RENDER_TOGGLE)) {
 			enableDebugRendering = !enableDebugRendering;
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 			fw::PadManager::enableDebugDraw(enableDebugRendering);
 #endif
 			g_Logger->ToastInfo(STRINGIFY(enableDebugRendering), "Debug rendering: {}", enableDebugRendering);

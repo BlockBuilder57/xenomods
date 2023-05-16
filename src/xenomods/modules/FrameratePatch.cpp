@@ -57,7 +57,7 @@ namespace xenomods {
 		// steps to add frame skipping will go here
 	}
 
-#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
+#if XENOMODS_NEW_ENGINE
 	XENOMODS_REGISTER_MODULE(FrameratePatch);
 #endif
 

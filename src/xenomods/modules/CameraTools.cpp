@@ -28,7 +28,7 @@
 namespace {
 
 	struct PilotCameraLayers : skylaunch::hook::Trampoline<PilotCameraLayers> {
-#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
+#if XENOMODS_NEW_ENGINE
 		static void Hook(fw::CameraLayer* this_pointer, const fw::Document& document, const fw::UpdateInfo& updateInfo) {
 #else
 		static void Hook(fw::CameraLayer* this_pointer, const fw::UpdateInfo& updateInfo) {
@@ -79,7 +79,7 @@ namespace {
 				this_pointer->matCurrent = xenomods::CameraTools::Freecam.matrix;
 			}
 
-#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
+#if XENOMODS_NEW_ENGINE
 			Orig(this_pointer, document, updateInfo);
 #else
 			Orig(this_pointer, updateInfo);
@@ -226,7 +226,7 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up camera tools...");
 
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+#if XENOMODS_OLD_ENGINE
 		// intermittently reads the address as 0x0... let's just use the actual symbol for now
 		// TODO: why *is* the function reference not exporting?
 		PilotCameraLayers::HookAt("_ZN2fw11CameraLayer6updateERKNS_10UpdateInfoE");

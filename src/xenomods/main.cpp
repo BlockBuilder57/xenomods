@@ -17,7 +17,7 @@
 
 namespace {
 
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+#if XENOMODS_OLD_ENGINE
 	struct FrameworkUpdateHook : skylaunch::hook::Trampoline<FrameworkUpdateHook> {
 		static void Hook(fw::Framework* framework) {
 			Orig(framework);
@@ -92,7 +92,7 @@ namespace {
 
 namespace xenomods {
 
-#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
+#if XENOMODS_NEW_ENGINE
 	fw::Document* DocumentPtr = {};
 #endif
 
@@ -142,7 +142,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		 */
 		static bool hasUpdated;
 		if(!hasUpdated) {
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+#if XENOMODS_OLD_ENGINE
 			fw::PadManager::enableDebugDraw(true);
 #endif
 			hasUpdated = true;
@@ -198,7 +198,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 #endif
 
 		// hook our updater
-#if XENOMODS_CODENAME(bf2) || XENOMODS_CODENAME(ira)
+#if XENOMODS_OLD_ENGINE
 		FrameworkUpdateHook::HookAt("_ZN2fw9Framework6updateEv");
 #elif XENOMODS_CODENAME(bfsw)
 		FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");

@@ -5,7 +5,7 @@
 #include "CharacterController.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_NEW_ENGINE
 namespace game {
 
 	class ObjUtil {

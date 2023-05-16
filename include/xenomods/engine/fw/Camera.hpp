@@ -12,7 +12,7 @@ namespace fw {
 
 	class Camera {
 	   public:
-#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
+#if XENOMODS_NEW_ENGINE
 		int m_RefCount;
 		int pad;
 		mm::mtl::IntrusiveListNodeBase* next;
@@ -50,7 +50,7 @@ namespace fw {
 
 		void setPosRot(const mm::Vec3& pos, const mm::Quat& rot);
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_NEW_ENGINE
 		void update(const fw::Document& doc, const fw::UpdateInfo& updateInfo);
 #else
 		void update(const fw::UpdateInfo& updateInfo);
@@ -84,7 +84,7 @@ namespace fw {
 		mm::mtl::IntrusiveListBase listCamera;
 		mm::mtl::IntrusiveListBase listCameraPlugin;
 		ml::ScnObjCam* objCam;
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_NEW_ENGINE
 		INSERT_PADDING_BYTES(0x8);
 		mm::Mat44 matCurrent;
 		mm::Mat44 matTarget;
@@ -103,7 +103,7 @@ namespace fw {
 
 		void getCameraPosition() const;
 
-#if XENOMODS_CODENAME(bfsw) || XENOMODS_CODENAME(bf3)
+#if XENOMODS_NEW_ENGINE
 		void update(const fw::Document& document, const fw::UpdateInfo& updateInfo);
 #else
 		virtual void update(const fw::UpdateInfo& updateInfo);
@@ -121,7 +121,7 @@ namespace fw {
 #endif
 		fw::Camera* notTheCamera;
 
-#if XENOMODS_CODENAME(bfsw)
+#if XENOMODS_NEW_ENGINE
 		void update(const fw::Document& document, const fw::UpdateInfo& updateInfo);
 #else
 		virtual void update(const fw::UpdateInfo& updateInfo);
