@@ -149,6 +149,9 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 		ReadFileHook::HookAt("_ZN2ml13DevFileUtilNx8readFileERPNS_12FileHandleThERN2nn2fs10FileHandleEilPvjRNS_14FileReadResultE");
 		ReadFileSliceHook::HookAt("_ZN2ml13DevFileUtilNx13readFileSliceEPNS_12FileHandleThERN2nn2fs10FileHandleEllPvjRNS_14FileReadResultE");
+#else
+		ReadFileHook::HookFromBase(0x71012562a4);
+		ReadFileSliceHook::HookFromBase(0x7101254ab0);
 #endif
 	}
 
