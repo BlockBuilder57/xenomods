@@ -11,8 +11,11 @@ namespace apps {
 
 	class FrameworkLauncher {
 	   public:
-		INSERT_PADDING_BYTES(0x2b8); // travesty
-		ml::Scn* ScnPtr;
+		INSERT_PADDING_BYTES(424)
+		ml::IScnRender scnRender;
+		INSERT_PADDING_BYTES(250); // travesty
+		ml::Scn* ScnPtr; // 696
+		ml::WinView* winView;
 
 		static FrameworkLauncher* s_instance;
 	};

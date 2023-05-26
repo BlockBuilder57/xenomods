@@ -16,6 +16,7 @@ namespace game {
 		mm::Vec3 maybeVec;
 		mm::Vec3 jump_pos;
 		mm::Vec3 jump_rot;
+		INSERT_PADDING_BYTES(0x20);
 	};
 
 	namespace SeqUtil {

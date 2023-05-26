@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "WinView.hpp"
 #include "xenomods/Utils.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 
@@ -58,14 +59,35 @@ namespace ml {
 	};
 
 	enum class SCNCAM : std::uint32_t {};
-	enum class SCNPRIO_CB : std::uint32_t {};
+	enum class SCNPRIO_CB : std::uint32_t {
+		debug = 0xe
+	};
+
+	class IScnRender {
+	};
+
+	class ScnSetup {
+
+	};
+
+	class ScnDebug : public ml::IScnRender {
+
+	};
 
 	class Scn {
 	   public:
 		INSERT_PADDING_BYTES(0x38)
+		ml::ScnDebug* scnDebug;
 		void* somePointer;
+
+		//static Scn* create(ScnSetup const*);
+
 		// will this work? lol
 		ScnObjCam* getCam(int index);
+
+		void addRenderCB(IScnRender* scnRender, SCNPRIO_CB prio, bool param_3, bool param_4);
+
+		void renderStop();
 
 		void setDebDraw(SCNCAM cam, SCNPRIO_CB prio);
 		bool enableScnDebug(bool nuts);

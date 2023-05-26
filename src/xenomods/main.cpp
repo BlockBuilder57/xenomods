@@ -11,6 +11,7 @@
 #include "modules/DebugStuff.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
+#include "xenomods/engine/fw/Managers.hpp"
 #include "xenomods/engine/ml/Filesystem.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
@@ -39,6 +40,8 @@ namespace {
 	};
 #endif
 
+	// Game-specific
+
 #if XENOMODS_CODENAME(bf2)
 	struct FixIraOnBF2Mount : skylaunch::hook::Trampoline<FixIraOnBF2Mount> {
 		static bool Hook(const char* path) {
@@ -46,6 +49,17 @@ namespace {
 			if(view.starts_with("menu_ira"))
 				return false;
 			return Orig(path);
+		}
+	};
+#endif
+
+#if XENOMODS_CODENAME(bfsw)
+	struct EnableDebugDrawing : skylaunch::hook::Trampoline<EnableDebugDrawing> {
+		static void Hook(fw::SceneManager* this_pointer, fw::Document& doc) {
+			Orig(this_pointer, doc);
+
+			this_pointer->scene->addRenderCB(this_pointer->scene->scnDebug, ml::SCNPRIO_CB::debug, false, false);
+			this_pointer->scene->setDebDraw(static_cast<ml::SCNCAM>(0), ml::SCNPRIO_CB::debug);
 		}
 	};
 #endif
@@ -178,7 +192,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 
 		// draw log messages
 #if !XENOMODS_CODENAME(bf3)
-		g_Logger->Draw();
+		g_Logger->Draw(updateInfo);
 #endif
 	}
 
@@ -195,6 +209,10 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 				ml::DevFileTh::registArchive(ml::MEDIA::Default, "ira-xm.arh", "ira-xm.ard", "aoc1:/");
 			}
 		}
+#endif
+
+#if XENOMODS_CODENAME(bfsw)
+		EnableDebugDrawing::HookAt(&fw::SceneManager::initialize);
 #endif
 
 		// hook our updater

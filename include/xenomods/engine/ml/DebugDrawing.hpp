@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Scene.hpp"
 #include "xenomods/Utils.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 
@@ -24,6 +25,16 @@ namespace ml {
 		//void setForceRenderQueue(bool enable);
 		static unsigned int getCacheDrawWID();
 
+	};
+
+	class FontLayer {
+	   public:
+		void* vtable;
+		void* DevFontLayer;
+
+		int fontGetHeight() const;
+
+		void fontSetMaxQue(unsigned int);
 	};
 
 }
