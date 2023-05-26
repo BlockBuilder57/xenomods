@@ -73,12 +73,14 @@ namespace xenomods {
 		AddToastInternal(std::string(group), severity, formatted);
 	}
 
-	void Logger::Draw() {
+	void Logger::Draw(fw::UpdateInfo* updateInfo) {
 		for(std::size_t i = 0; i < lines.size(); ++i) {
 			auto& msg = lines[i];
 
+			msg.lifetime -= updateInfo->updateDelta;
+
 			// check lifetime greater than 0, but also decrement it for next time
-			if(--msg.lifetime > 0)
+			if(msg.lifetime > 0)
 				DrawInternal(msg, 5, 5 + (i * 16));
 			else if(!lines.empty())
 				// erase the current index but decrement i so we try again with the next one
@@ -89,8 +91,10 @@ namespace xenomods {
 		for(std::size_t i = 0; i < toastLines.size(); ++i) {
 			auto& msg = toastLines[i];
 
+			msg.lifetime -= updateInfo->updateDelta;
+
 			// check lifetime greater than 0, but also decrement it for next time
-			if(--msg.lifetime > 0) {
+			if(msg.lifetime > 0) {
 				// we're right-aligned, we need the width
 				int width = fw::debug::drawFontFmtGetWidth("{}", msg.text);
 				DrawInternal(msg, 1280 - width - 5, 5 + (validToasts * 16), false);
@@ -109,7 +113,7 @@ namespace xenomods {
 			colMain.a = 0.f;
 		} else if(msg.lifetime <= FADEOUT_START) {
 			// make the text fade out before it gets removed
-			colMain.a = msg.lifetime / (float)FADEOUT_START;
+			colMain.a = msg.lifetime / FADEOUT_START;
 		}
 
 		// these are passed as format arguments to avoid fuckery in the message

@@ -9,6 +9,8 @@
 #include "Utils.hpp"
 #include "fmt/format.h"
 
+#include "xenomods/engine/fw/UpdateInfo.hpp"
+
 namespace xenomods {
 
 	/**
@@ -105,7 +107,7 @@ namespace xenomods {
 		 * Draw the current contents of the log buffer.
 		 * Updates lifetime.
 		 */
-		void Draw();
+		void Draw(fw::UpdateInfo* updateInfo);
 
 		/**
 		 * Get whether Debug severity messages should be
@@ -128,7 +130,7 @@ namespace xenomods {
 		struct LoggerMessage {
 			std::string text;
 			std::string group;
-			std::int16_t lifetime {};
+			float lifetime {};
 			Severity severity {};
 		};
 
@@ -139,14 +141,13 @@ namespace xenomods {
 		constexpr static auto MAX_LINES = 8;
 		/**
 		 * The lifetime in frames of logger lines.
-		 * Xenoblade runs at 30fps (or at least tries to) and 5 seconds sounds like a good length.
 		 */
-		constexpr static auto LINE_LIFETIME = 5 * 30;
-		constexpr static auto TOAST_LIFETIME = 2 * 30;
+		constexpr static auto LINE_LIFETIME = 5.f;
+		constexpr static auto TOAST_LIFETIME = 2.f;
 		/**
 		 * When the alpha fadeout of the line starts.
 		 */
-		constexpr static auto FADEOUT_START = 15;
+		constexpr static auto FADEOUT_START = 0.5f;
 
 		/**
 		 * Draw a message.
