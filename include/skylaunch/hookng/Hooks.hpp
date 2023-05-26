@@ -14,6 +14,7 @@ namespace skylaunch::hook {
 	namespace detail {
 
 		void* HookFunctionBase(void* function, void* replacement);
+		void InlineHookBase(void* addr, void* handler);
 		uintptr_t ResolveSymbolBase(std::string_view symbolName);
 
 		template<class Func, class FuncHook>
@@ -105,6 +106,21 @@ namespace skylaunch::hook {
 		static auto& Backup() {
 			constinit static TrampolineHookType<> backup {};
 			return backup;
+		}
+	};
+
+	// FIXME(lily): Doesn't seem to work quite right at the moment.. Don't know why
+	template<class Impl>
+	struct InlineHook {
+		template<class Delayed = Impl>
+		using ImplHookType = decltype(&Delayed::Handler);
+
+		using ExpectedHookType = void(*)(InlineCtx);
+
+		static inline void HookAt(uintptr_t address) {
+			static_assert(std::is_same_v<ImplHookType<>, ExpectedHookType>, "need an Handler function please");
+			A64InlineHook(reinterpret_cast<void*>(address), reinterpret_cast<void*>(&Impl::Handler));
+			//detail::InlineHookBase(reinterpret_cast<void*>(Impl::Handler), reinterpret_cast<void*>(address));
 		}
 	};
 

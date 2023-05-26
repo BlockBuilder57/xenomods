@@ -13,6 +13,11 @@ namespace skylaunch::hook::detail {
 		return backup;
 	}
 
+	void InlineHookBase(void* addr, void* handler) {
+		xenomods::g_Logger->LogDebug("[hook-ng] Inline hooking @ {}", addr);
+		A64InlineHook(addr, handler);
+	}
+
 	uintptr_t ResolveSymbolBase(std::string_view symbolName) {
 		uintptr_t addr;
 
