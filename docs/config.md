@@ -24,6 +24,8 @@ dumpFileReads = false
 enableFileOverrides = true
 # Skips overriding these specific Bdat sheets (due to heavy performance penalties)
 bdatSkipOverrides = ["CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr", "CHR_EnArrange"]
+# Load Future Connected by default if it was the last saved game
+loadFcLatest = true
 
 # Using a header can override configs for specific games
 

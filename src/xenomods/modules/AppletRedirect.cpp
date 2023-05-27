@@ -14,7 +14,7 @@
 namespace {
 	struct SelectMostRecentGame : skylaunch::hook::Trampoline<SelectMostRecentGame> {
 		static void Hook() {
-			if(xenomods::AppletRedirect::Config.useRecentGame && xenomods::AppletRedirect::IsMeliaRecentGame()) {
+			if(xenomods::GetState().config.loadFcLatest && xenomods::AppletRedirect::IsMeliaRecentGame()) {
 				applet::GameTitleMelia::execute();
 				return;
 			}
@@ -24,10 +24,6 @@ namespace {
 } // namespace
 
 namespace xenomods {
-	AppletRedirect::ConfigState AppletRedirect::Config = {
-		.useRecentGame = true
-	};
-
 	void AppletRedirect::Initialize() {
 		SelectMostRecentGame::HookAt(&applet::GameTitle::execute);
 	}
