@@ -10,20 +10,23 @@
 namespace xenomods {
 
 	struct Config {
-
 		// very yucky, but this way it's in one spot
 #define CONFIG_PORT_DEFAULT 6969
 #if XENOMODS_CODENAME(bf2)
-#define CONFIG_TITLEEVENTS_DEFAULT { 10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609 } // all chapters, game clear, and NG+ clear
+	#define CONFIG_TITLEEVENTS_DEFAULT \
+		{ 10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609 } // all chapters, game clear, and NG+ clear
 #else
-#define CONFIG_TITLEEVENTS_DEFAULT {}
+	#define CONFIG_TITLEEVENTS_DEFAULT \
+		{}
 #endif
 #define CONFIG_EVENT_DEBUG_BITS_DEFAULT 0b1
 #define CONFIG_DUMP_FILE_READS_DEFAULT false
 #define CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT true
-#define CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT { "CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr" }
+#define CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT \
+	{ "CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr" }
 #define CONFIG_MOUNT_TORNA_CONTENT_DEFAULT false
 #define CONFIG_ENABLE_60FPS_DEFAULT false
+#define CONFIG_LOAD_FC_LATEST_DEFAULT true
 
 		/**
 		 * Reset to default values.
@@ -45,6 +48,9 @@ namespace xenomods {
 		bool mountTornaContent {};
 
 		bool enable60FPS {};
+
+		bool loadFcLatest {};
+
 	   private:
 		void InitializeFromTable(const toml::table& table, bool respectDefaults);
 

@@ -2,8 +2,8 @@
 
 #include <nn/fs.h>
 
-#include <string_view>
 #include <bit>
+#include <string_view>
 
 namespace xenomods {
 
@@ -14,7 +14,7 @@ namespace xenomods {
 		enum class SeekDirection : u8 {
 			Beg, ///< Relative to the beginning of the file
 			Cur, ///< Relative to the current file pointer.
-			End ///< Relative to the end of the file (use negative offsets).
+			End	 ///< Relative to the end of the file (use negative offsets).
 		};
 
 		NnFile() = default;
@@ -112,6 +112,15 @@ namespace xenomods {
 		 * \return true if able to preallocate; false otherwise
 		 */
 		[[nodiscard]] static bool Preallocate(std::string_view path, s64 size);
+
+		/**
+		 * Get the time the file was last modified.
+		 *
+		 * \param[in] path the full path to the file
+		 * \return the POSIX time this file was last modified, or 0
+		 * if it could not be fetched.
+		 */
+		static u64 GetLastModified(const char* path);
 
 	   private:
 		nn::fs::FileHandle fh {};

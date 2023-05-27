@@ -34,6 +34,10 @@ mountTornaContent = true
 [ira]
 # This list contains the start and post-credits titlescreen
 titleEvents = [10709, 10710]
+
+[bfsw]
+# Load Future Connected by default if it was the last saved game
+loadFcLatest = true
 ```
 
 A list of event IDs can be found in [EVT_listBf](https://xenoblade.github.io/xb2/bdat/common/EVT_listBf.html).
