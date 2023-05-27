@@ -140,18 +140,18 @@ namespace {
 
 			mm::Col4 transparentWhite = {1, 1, 1, 0.8f};
 
-			fw::debug::drawFontFmt(textX, textY += 0, transparentWhite, "{}", this_pointer->name.buffer);
-			//fw::debug::drawFontFmt(textX, textY += height, mm::Col4::white, "flags: {}", static_cast<uint>(this_pointer->flags));
+			xenomods::debug::drawFontFmt(textX, textY += 0, transparentWhite, "{}", this_pointer->name.buffer);
+			//xenomods::debug::drawFontFmt(textX, textY += height, mm::Col4::white, "flags: {}", static_cast<uint>(this_pointer->flags));
 
 			if (this_pointer->getRTTI()->isKindOf(&ui::UITextObject::m_rtti)) {
-				//fw::debug::drawFontFmt(textX, textY += height, transparentWhite, "alignH: {}", objAcc.getTextAlignH());
-				//fw::debug::drawFontFmt(textX, textY += height, transparentWhite, "alignV: {}", objAcc.getTextAlignV());
-				//fw::debug::drawFontFmt(textX, textY += height, transparentWhite, "dispmode: {}", static_cast<byte>(this_pointer->displayInfo.displayMode));
+				//xenomods::debug::drawFontFmt(textX, textY += height, transparentWhite, "alignH: {}", objAcc.getTextAlignH());
+				//xenomods::debug::drawFontFmt(textX, textY += height, transparentWhite, "alignV: {}", objAcc.getTextAlignV());
+				//xenomods::debug::drawFontFmt(textX, textY += height, transparentWhite, "dispmode: {}", static_cast<byte>(this_pointer->displayInfo.displayMode));
 			}
 
 			/*ui::UIObjectPlugin* plugin = this_pointer->latestPlugin;
 			while (plugin != nullptr) {
-				fw::debug::drawFontFmt(textX, textY += height, transparentWhite, "Plugin: {}", plugin->getRTTI()->szName);
+				xenomods::debug::drawFontFmt(textX, textY += height, transparentWhite, "Plugin: {}", plugin->getRTTI()->szName);
 				plugin = plugin->prevPlugin;
 			}*/
 		}

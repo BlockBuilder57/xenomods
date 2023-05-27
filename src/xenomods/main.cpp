@@ -145,20 +145,20 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 
 		/*std::string p1Buttons = fmt::format("{:#08x} - P1 - {:#08x}", P1->stateCur.Buttons, P1->statePrev.Buttons);
 		std::string p2Buttons = fmt::format("{:#08x} - P2 - {:#08x}", P2->stateCur.Buttons, P2->statePrev.Buttons);
-		int buttonsP1Width = fw::debug::drawFontGetWidth(p1Buttons.c_str());
-		int buttonsP2Width = fw::debug::drawFontGetWidth(p2Buttons.c_str());
-		fw::debug::drawFontShadow(1280-buttonsP1Width-5, 5, mm::Col4::white, p1Buttons.c_str());
-		fw::debug::drawFontShadow(1280-buttonsP2Width-5, 5+16, mm::Col4::white, p2Buttons.c_str());
+		int buttonsP1Width = xenomods::debug::drawFontGetWidth(p1Buttons.c_str());
+		int buttonsP2Width = xenomods::debug::drawFontGetWidth(p2Buttons.c_str());
+		xenomods::debug::drawFontShadow(1280-buttonsP1Width-5, 5, mm::Col4::white, p1Buttons.c_str());
+		xenomods::debug::drawFontShadow(1280-buttonsP2Width-5, 5+16, mm::Col4::white, p2Buttons.c_str());
 
 		auto testcombo = nn::hid::KEY_A;
 		if(P2->InputHeld(testcombo))
-			fw::debug::drawFontShadow(1280/2, 0, mm::Col4::cyan, "combo held!");
+			xenomods::debug::drawFontShadow(1280/2, 0, mm::Col4::cyan, "combo held!");
 		if (P2->InputDown(testcombo))
 			g_Logger->LogDebug("combo down...");
 		if (P2->InputUp(testcombo))
 			g_Logger->LogDebug("combo up!");
 		if(P2->InputHeldStrict(testcombo))
-			fw::debug::drawFontShadow(1280/2, 16, mm::Col4::cyan, "strict combo held!");
+			xenomods::debug::drawFontShadow(1280/2, 16, mm::Col4::cyan, "strict combo held!");
 		if (P2->InputDownStrict(testcombo))
 			g_Logger->LogDebug("strict combo down...");
 		if (P2->InputUpStrict(testcombo))

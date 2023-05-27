@@ -163,7 +163,7 @@ namespace xenomods {
 
 		bool changed = false;
 
-		//fw::debug::drawFontFmtShadow(0, 720-16, mm::Col4::white, "Manager bits: {:0b}", ActiveBits);
+		//xenomods::debug::drawFontFmtShadow(0, 720-16, mm::Col4::white, "Manager bits: {:0b}", ActiveBits);
 
 		if(GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_PREV)) {
 			CurrentIndex--;

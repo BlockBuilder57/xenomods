@@ -98,7 +98,7 @@ namespace xenomods {
 			// check lifetime greater than 0, but also decrement it for next time
 			if(msg.lifetime > 0) {
 				// we're right-aligned, we need the width
-				int width = fw::debug::drawFontFmtGetWidth("{}", msg.text);
+				int width = xenomods::debug::drawFontFmtGetWidth("{}", msg.text);
 				DrawInternal(msg, 1280 - width - 5, 5 + (validToasts * 16), false);
 				validToasts++;
 			} else if(!lines.empty())
@@ -120,9 +120,9 @@ namespace xenomods {
 
 		// these are passed as format arguments to avoid fuckery in the message
 		if(showSeverity)
-			fw::debug::drawFontFmtShadow(x, y, colMain, "[{}] {}", msg.severity, msg.text);
+			xenomods::debug::drawFontFmtShadow(x, y, colMain, "[{}] {}", msg.severity, msg.text);
 		else
-			fw::debug::drawFontFmtShadow(x, y, colMain, "{}", msg.text);
+			xenomods::debug::drawFontFmtShadow(x, y, colMain, "{}", msg.text);
 	}
 
 	void Logger::AddMessageInternal(Severity severity, const std::string& message) {

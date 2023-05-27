@@ -58,7 +58,7 @@ namespace {
 							//std::string namey = std::string(realHead->getName());
 							//xenomods::g_Logger->ToastInfo("ball" + namey, "{} prio {} fov {:.2f}", namey, realHead->CAMERA_PRIO, realHead->fov);
 
-							//fw::debug::drawFontFmtShadow3D(xenomods::CameraTools::Meta.pos, mm::Col4::white, "Camera: {} prio {}", namey, realHead->CAMERA_PRIO);
+							//xenomods::debug::drawFontFmtShadow3D(xenomods::CameraTools::Meta.pos, mm::Col4::white, "Camera: {} prio {}", namey, realHead->CAMERA_PRIO);
 						}
 					//}
 
@@ -291,11 +291,11 @@ namespace xenomods {
 			if (xenomods::DebugStuff::enableDebugRendering && GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {
 				const int height = fw::debug::drawFontGetHeight();
 				int yPos = (720 / 2) - ((height * 5) / 2);
-				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "- Freecam -");
-				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Pos: {:1}", Meta.pos);
-				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Rot: {:1}", glm::degrees(glm::eulerAngles(Meta.rot)));
-				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Speed: {}m/s", Freecam.camSpeed);
-				fw::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "FOV: {:.1f}", Freecam.fov);
+				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "- Freecam -");
+				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Pos: {:1}", Meta.pos);
+				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Rot: {:1}", glm::degrees(glm::eulerAngles(Meta.rot)));
+				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Speed: {}m/s", Freecam.camSpeed);
+				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "FOV: {:.1f}", Freecam.fov);
 			}
 #endif
 		}
