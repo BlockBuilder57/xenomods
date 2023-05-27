@@ -96,4 +96,12 @@ namespace xenomods {
 		return true;
 	}
 
+    u64 NnFile::GetLastModified(const char* path) {
+        nn::fs::FileTimeStamp timestamp{};
+        if (R_FAILED(nn::fs::GetFileTimeStampForDebug(&timestamp, path))) {
+            return 0;
+        }
+        return timestamp.modified;
+    }
+
 } // namespace xenomods

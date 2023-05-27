@@ -21,6 +21,7 @@ add_executable(xenomods
 		xenomods/modules/PlayerMovement.cpp
 		xenomods/modules/BdatRandomizer.cpp
 		xenomods/modules/FrameratePatch.cpp
+        xenomods/modules/AppletRedirect.cpp
 
         xenomods/stuff/utils/debug_util.cpp
 		xenomods/stuff/utils/util.cpp
