@@ -57,7 +57,14 @@ namespace mm {
 
 	XENOMODS_CONVERTTO_TYPE(Quat, glm::quat, sizeof(glm::quat));
 
-	XENOMODS_CONVERTTO_TYPE(alignas(0x10) Mat44, glm::mat4, sizeof(glm::mat4));
+	struct alignas(0x10) Mat44 : public xenomods::ConvertTo<glm::mat4, sizeof(glm::mat4)> {
+		// We actually want to add members to Mat44 so
+		//XENOMODS_CONVERTTO_TYPE(alignas(0x10) Mat44, glm::mat4, sizeof(glm::mat4));
+		// won't work. Ugly using, but oh well.
+		using ConvertTo<glm::mat4, sizeof(glm::mat4)>::ConvertTo;
+
+		static const Mat44 identity;
+	};
 
 	static_assert(sizeof(Mat44) == 0x40, "[mm::Mat44] size 0x40");
 	static_assert(alignof(mm::Mat44) == 0x10, "[mm::Mat44] align 0x10");

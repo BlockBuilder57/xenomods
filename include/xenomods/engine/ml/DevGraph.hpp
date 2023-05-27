@@ -18,6 +18,9 @@ namespace ml {
 
 		static void setRenderMode(DevGraphModeType mode);
 		static DevGraphModeType getRenderMode();
+
+		static void cmdOpenDisplayList(unsigned int num);
+		static void cmdCloseDisplayList();
 	};
 
 	namespace dg {

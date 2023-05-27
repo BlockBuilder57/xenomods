@@ -62,6 +62,7 @@ namespace ml {
 	enum class SCNPRIO_CB : std::uint32_t {
 		debug = 0xe
 	};
+	enum class SCNCB : std::uint32_t {};
 
 	class IScnRender {
 	};
@@ -86,6 +87,8 @@ namespace ml {
 		ScnObjCam* getCam(int index);
 
 		void addRenderCB(IScnRender* scnRender, SCNPRIO_CB prio, bool param_3, bool param_4);
+
+		void callbackToListener(SCNCB callback);
 
 		void renderStop();
 

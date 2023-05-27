@@ -12,6 +12,7 @@
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
+#include "xenomods/engine/ml/DevGraph.hpp"
 #include "xenomods/engine/ml/Filesystem.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
@@ -55,11 +56,23 @@ namespace {
 
 #if XENOMODS_CODENAME(bfsw)
 	struct EnableDebugDrawing : skylaunch::hook::Trampoline<EnableDebugDrawing> {
-		static void Hook(fw::SceneManager* this_pointer, fw::Document& doc) {
-			Orig(this_pointer, doc);
+		static void Hook(ml::Scn* this_pointer, ml::SCNCB callback) {
+			Orig(this_pointer, callback);
 
-			this_pointer->scene->addRenderCB(this_pointer->scene->scnDebug, ml::SCNPRIO_CB::debug, false, false);
-			this_pointer->scene->setDebDraw(static_cast<ml::SCNCAM>(0), ml::SCNPRIO_CB::debug);
+			ml::DevGraph::cmdOpenDisplayList(0);
+			ml::DebDraw::flushPrio(-2, mm::Mat44::identity, mm::Mat44::identity);
+			ml::DevGraph::cmdCloseDisplayList();
+		}
+	};
+#elif XENOMODS_CODENAME(bf3)
+	struct EnableDebugDrawing : skylaunch::hook::Trampoline<EnableDebugDrawing> {
+		static void Hook(ml::Scn* this_pointer, ml::SCNCB callback) {
+			Orig(this_pointer, callback);
+
+			mm::Mat44 identity = {};
+			((void(*)(unsigned int))(skylaunch::utils::g_MainTextAddr + 0x1248774))(0);
+			((void(*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::g_MainTextAddr + 0x124bdec))(-1, identity, identity);
+			((void(*)())(skylaunch::utils::g_MainTextAddr + 0x1248798))();
 		}
 	};
 #endif
@@ -174,26 +187,22 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
 #endif
 		} else if(P2->InputDownStrict(LOGGER_TEST)) {
-#if !XENOMODS_CODENAME(bf3)
-			g_Logger->LogDebug("test debug message! {}", ml::mtRand());
-			g_Logger->LogInfo("test info message! {}", ml::mtRandf1());
-			g_Logger->LogWarning("test warning message! {}", ml::mtRandf2());
-			g_Logger->LogError("test error message! {}", ml::mtRandf3());
+			g_Logger->LogDebug("test debug message! {}", nn::os::GetSystemTick() / 19200000.);
+			g_Logger->LogInfo("test info message! {}", nn::os::GetSystemTick() / 19200000.);
+			g_Logger->LogWarning("test warning message! {}", nn::os::GetSystemTick() / 19200000.);
+			g_Logger->LogError("test error message! {}", nn::os::GetSystemTick() / 19200000.);
 			g_Logger->LogFatal("test fatal message! {}", nn::os::GetSystemTick());
 
-			int group = ml::mtRand(100, 999);
+			int group = nn::os::GetSystemTick() % 9;
 			g_Logger->ToastWarning(fmt::format("{}", group), "random group ({})", group);
 			g_Logger->ToastMessage("logger test", Logger::Severity::Info, "system tick in seconds: {:2f}", nn::os::GetSystemTick() / 19200000.);
-#endif
 		}
 
 		// Update modules
 		xenomods::UpdateAllRegisteredModules(updateInfo);
 
 		// draw log messages
-#if !XENOMODS_CODENAME(bf3)
 		g_Logger->Draw(updateInfo);
-#endif
 	}
 
 	void main() {
@@ -212,7 +221,9 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 #endif
 
 #if XENOMODS_CODENAME(bfsw)
-		EnableDebugDrawing::HookAt(&fw::SceneManager::initialize);
+		EnableDebugDrawing::HookAt(&ml::Scn::callbackToListener);
+#elif XENOMODS_CODENAME(bf3)
+		EnableDebugDrawing::HookFromBase(0x126dd38);
 #endif
 
 		// hook our updater

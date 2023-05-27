@@ -16,7 +16,7 @@ namespace ml {
 		int idk;
 		unsigned int windowID; // 80
 		INSERT_PADDING_BYTES(0x150);
-		ml::FontLayer fontLayer;
+		void* fontLayer;
 		INSERT_PADDING_BYTES(0x200);
 		unsigned int renderingFlags;
 	};

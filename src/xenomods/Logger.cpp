@@ -8,20 +8,22 @@
 namespace xenomods {
 
 	static mm::Col4 ColorForSeverity(const Logger::Severity& severity) {
+		// we have all these fancy mm::Col4 constants, but cannot use them easily in 3
+
 		switch(severity) {
 			case Logger::Severity::Debug:
-				return { 0.25f, 0.5f, 1.f, 1.f };
+				return { 0.25f, 0.5f, 1.f, 1.f }; // blueish
 			case Logger::Severity::Info:
-				return mm::Col4::white;
+				return { 1.f, 1.f, 1.f, 1.f }; // white
 			case Logger::Severity::Warning:
-				return mm::Col4::yellow;
+				return { 1.f, 1.f, 0.f, 1.f }; // yellow
 			case Logger::Severity::Error:
-				return mm::Col4::red;
+				return { 1.f, 0.f, 0.f, 1.f }; // red
 			case Logger::Severity::Fatal:
-				return mm::Col4::magenta;
+				return { 1.f, 0.f, 1.f, 1.f }; // magenta
 		};
 		assert(false && "You shouldn't get here!!!");
-		return mm::Col4::zero;
+		return { 0.f, 0.f, 0.f, 1.f }; // black
 	}
 
 	Logger::Logger() {
