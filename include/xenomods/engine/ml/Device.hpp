@@ -1,9 +1,9 @@
 namespace ml {
-    struct Device {
-        struct InitParam {};
-    };
+	struct Device {
+		struct InitParam {};
+	};
 
-    struct DeviceNx {
-        static void initializeSDK(ml::Device::InitParam const&);
-    };
-}
+	struct DeviceNx {
+		static void initializeSDK(ml::Device::InitParam const&);
+	};
+} // namespace ml

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include"UpdatableModule.hpp"
+#include "UpdatableModule.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 
 namespace xenomods {

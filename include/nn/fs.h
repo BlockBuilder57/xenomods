@@ -14,8 +14,8 @@ namespace nn {
 	namespace fs {
 		typedef u64 UserId;
 
-        constexpr s64 PathNameMax = 0x300;
-        constexpr s64 DirEntryNameSize = PathNameMax + 1;
+		constexpr s64 PathNameMax = 0x300;
+		constexpr s64 DirEntryNameSize = PathNameMax + 1;
 
 		struct DirectoryEntry {
 			char name[DirEntryNameSize];
@@ -65,12 +65,12 @@ namespace nn {
 				return op;
 			}
 		};
-        
-        struct FileTimeStamp {
-            u64 created;
-            u64 modified;
-            u64 accessed;
-        };
+
+		struct FileTimeStamp {
+			u64 created;
+			u64 modified;
+			u64 accessed;
+		};
 
 		// ROM
 		Result QueryMountRomCacheSize(u64* size);
@@ -98,7 +98,7 @@ namespace nn {
 		Result ReadFile(nn::fs::FileHandle handle, s64 offset, void* buffer, u64 bufferSize);
 		Result WriteFile(FileHandle handle, s64 fileOffset, void const* buff, u64 size, WriteOption const& option);
 		Result GetFileSize(s64* size, FileHandle fileHandle);
-        Result GetFileTimeStampForDebug(FileTimeStamp* out, char const* path);
+		Result GetFileTimeStampForDebug(FileTimeStamp* out, char const* path);
 
 		// DIRECTORY
 		// there are three open modes; dir, file, all
