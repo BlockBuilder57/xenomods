@@ -6,7 +6,7 @@
 #include "nn/account.h"
 #include "nn/fs.h"
 #include "xenomods/NnFile.hpp"
-#include "xenomods/engine/applet/GameApplet.h"
+#include "xenomods/engine/applet/GameApplet.hpp"
 #include "xenomods/engine/ml/Device.hpp"
 #include "xenomods/engine/ml/Filesystem.hpp"
 

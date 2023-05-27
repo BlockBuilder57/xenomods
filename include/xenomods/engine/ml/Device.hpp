@@ -1,3 +1,5 @@
+#pragma once
+
 namespace ml {
 	struct Device {
 		struct InitParam {};

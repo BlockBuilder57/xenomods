@@ -1,3 +1,5 @@
+#pragma once
+
 namespace applet {
 	class GameTitle {
 	   public:

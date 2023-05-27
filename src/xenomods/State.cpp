@@ -102,12 +102,13 @@ namespace xenomods {
 		if(respectDefaults || table[STRINGIFY(enable60FPS)].type() != toml::node_type::none)
 			enable60FPS = table[STRINGIFY(enable60FPS)].value_or(CONFIG_ENABLE_60FPS_DEFAULT);
 
+		if(respectDefaults || table[STRINGIFY(loadFcLatest)].type() != toml::node_type::none)
+			loadFcLatest = table[STRINGIFY(loadFcLatest)].value_or(CONFIG_LOAD_FC_LATEST_DEFAULT);
+
 		if(respectDefaults && table[XENOMODS_CODENAME_STR].is_table()) {
 			//g_Logger->LogDebug("Found {} as a category, loading...", XENOMODS_CODENAME_STR);
 			InitializeFromTable(*table[XENOMODS_CODENAME_STR].as_table(), false);
 		}
-		if(respectDefaults || table[STRINGIFY(loadFcLatest)].type() != toml::node_type::none)
-			loadFcLatest = table[STRINGIFY(loadFcLatest)].value_or(CONFIG_LOAD_FC_LATEST_DEFAULT);
 	}
 
 	XenomodsState& GetState() {

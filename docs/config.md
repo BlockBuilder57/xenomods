@@ -24,8 +24,6 @@ dumpFileReads = false
 enableFileOverrides = true
 # Skips overriding these specific Bdat sheets (due to heavy performance penalties)
 bdatSkipOverrides = ["CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr", "CHR_EnArrange"]
-# Load Future Connected by default if it was the last saved game
-loadFcLatest = true
 
 # Using a header can override configs for specific games
 
@@ -36,6 +34,10 @@ mountTornaContent = true
 [ira]
 # This list contains the start and post-credits titlescreen
 titleEvents = [10709, 10710]
+
+[bfsw]
+# Load Future Connected by default if it was the last saved game
+loadFcLatest = true
 ```
 
 A list of event IDs can be found in [EVT_listBf](https://xenoblade.github.io/xb2/bdat/common/EVT_listBf.html).
