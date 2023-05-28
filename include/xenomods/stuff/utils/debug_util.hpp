@@ -34,6 +34,7 @@ namespace dbgutil {
 
 	void logMemory(void* address, size_t len);
 
+	void dumpMemory(void* address, size_t len);
 
 } // namespace dbgutil
 
