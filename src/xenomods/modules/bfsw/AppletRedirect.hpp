@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UpdatableModule.hpp"
+#include "../UpdatableModule.hpp"
 
 #if XENOMODS_CODENAME(bfsw)
 

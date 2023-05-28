@@ -10,8 +10,8 @@
 #include <xenomods/Logger.hpp>
 #include <xenomods/Utils.hpp>
 
-#include "../State.hpp"
-#include "DebugStuff.hpp"
+#include "../../State.hpp"
+#include "../DebugStuff.hpp"
 #include "xenomods/engine/event/Manager.hpp"
 #include "xenomods/engine/gf/BdatData.hpp"
 #include "xenomods/engine/ml/Rand.hpp"

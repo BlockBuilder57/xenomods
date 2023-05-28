@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include "UpdatableModule.hpp"
 #include <string>
 #include <vector>
+
+#include "../UpdatableModule.hpp"
 
 namespace xenomods {
 

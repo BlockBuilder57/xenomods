@@ -16,12 +16,12 @@ add_executable(xenomods
 		xenomods/modules/FileDetours.cpp
 		xenomods/modules/BdatOverride.cpp
 		xenomods/modules/CameraTools.cpp
-		xenomods/modules/EventDebugUtils.cpp
 		xenomods/modules/MenuViewer.cpp
 		xenomods/modules/PlayerMovement.cpp
 		xenomods/modules/BdatRandomizer.cpp
 		xenomods/modules/FrameratePatch.cpp
-		xenomods/modules/AppletRedirect.cpp
+		xenomods/modules/bf2/EventDebugUtils.cpp
+		xenomods/modules/bfsw/AppletRedirect.cpp
 
         xenomods/stuff/utils/debug_util.cpp
 		xenomods/stuff/utils/util.cpp
