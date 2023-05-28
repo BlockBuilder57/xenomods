@@ -75,7 +75,7 @@ namespace {
 #else
 
 	bool ValidToChange(game::CharacterController* cc) {
-		if(cc->actorAccessor != nullptr) {
+		if(cc->actorAccessor != nullptr && cc->actorAccessor->isValid()) {
 			auto behavior = cc->actorAccessor->getBehaviorComponent();
 			if(behavior->getRTTI()->isKindOf(&game::BehaviorPc::m_rtti))
 				return true;

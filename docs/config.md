@@ -25,7 +25,7 @@ enableFileOverrides = true
 # Skips overriding these specific Bdat sheets (due to heavy performance penalties)
 bdatSkipOverrides = ["CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr", "CHR_EnArrange"]
 
-# Multiplies final attack damage (2/Torna only)
+# Multiplies final attack damage (2/Torna/DE only)
 damagePlayerMult = 1.0
 damageEnemyMult = 1.0
 

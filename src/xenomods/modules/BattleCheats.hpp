@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../UpdatableModule.hpp"
+#include "UpdatableModule.hpp"
 
 namespace xenomods {
 
