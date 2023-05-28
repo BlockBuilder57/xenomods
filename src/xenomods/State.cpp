@@ -23,6 +23,9 @@ namespace xenomods {
 		enable60FPS = CONFIG_ENABLE_60FPS_DEFAULT;
 
 		loadFcLatest = CONFIG_LOAD_FC_LATEST_DEFAULT;
+
+		damagePlayerMult = CONFIG_DAMAGE_PLAYER_MULT_DEFAULT;
+		damageEnemyMult = CONFIG_DAMAGE_ENEMY_MULT_DEFAULT;
 	}
 
 	void Config::LoadFromFile() {
@@ -104,6 +107,11 @@ namespace xenomods {
 
 		if(respectDefaults || table[STRINGIFY(loadFcLatest)].type() != toml::node_type::none)
 			loadFcLatest = table[STRINGIFY(loadFcLatest)].value_or(CONFIG_LOAD_FC_LATEST_DEFAULT);
+
+		if(respectDefaults || table[STRINGIFY(damagePlayerMult)].type() != toml::node_type::none)
+			damagePlayerMult = table[STRINGIFY(damagePlayerMult)].value_or(CONFIG_DAMAGE_PLAYER_MULT_DEFAULT);
+		if(respectDefaults || table[STRINGIFY(damageEnemyMult)].type() != toml::node_type::none)
+			damageEnemyMult = table[STRINGIFY(damageEnemyMult)].value_or(CONFIG_DAMAGE_ENEMY_MULT_DEFAULT);
 
 		if(respectDefaults && table[XENOMODS_CODENAME_STR].is_table()) {
 			//g_Logger->LogDebug("Found {} as a category, loading...", XENOMODS_CODENAME_STR);

@@ -20,6 +20,7 @@ add_executable(xenomods
 		xenomods/modules/PlayerMovement.cpp
 		xenomods/modules/BdatRandomizer.cpp
 		xenomods/modules/FrameratePatch.cpp
+		xenomods/modules/bf2/BattleCheats.cpp
 		xenomods/modules/bf2/EventDebugUtils.cpp
 		xenomods/modules/bfsw/AppletRedirect.cpp
 

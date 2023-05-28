@@ -27,6 +27,8 @@ namespace xenomods {
 #define CONFIG_MOUNT_TORNA_CONTENT_DEFAULT false
 #define CONFIG_ENABLE_60FPS_DEFAULT false
 #define CONFIG_LOAD_FC_LATEST_DEFAULT true
+#define CONFIG_DAMAGE_PLAYER_MULT_DEFAULT 1.0
+#define CONFIG_DAMAGE_ENEMY_MULT_DEFAULT 1.0
 
 		/**
 		 * Reset to default values.
@@ -50,6 +52,9 @@ namespace xenomods {
 		bool enable60FPS {};
 
 		bool loadFcLatest {};
+
+		float damagePlayerMult {};
+		float damageEnemyMult {};
 
 	   private:
 		void InitializeFromTable(const toml::table& table, bool respectDefaults);
