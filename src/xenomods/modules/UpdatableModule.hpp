@@ -2,7 +2,8 @@
 
 #include <type_traits>
 
-#include "../State.hpp"
+#include <xenomods/State.hpp>
+
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 
 namespace xenomods {

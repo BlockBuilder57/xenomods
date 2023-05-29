@@ -1,10 +1,11 @@
 #pragma once
 
-#include <xenomods/engine/mm/MathTypes.hpp>
+#include "modules/UpdatableModule.hpp"
+
+#include <xenomods/State.hpp>
 #include <nn/hid.hpp>
 
-#include "State.hpp"
-#include "modules/UpdatableModule.hpp"
+#include "xenomods/engine/mm/MathTypes.hpp"
 
 namespace xenomods {
 

@@ -1,21 +1,21 @@
 #include "main.hpp"
+#include "modules/DebugStuff.hpp"
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
 #include <xenomods/NnFile.hpp>
+#include <xenomods/State.hpp>
 #include <xenomods/Version.hpp>
+#include <xenomods/stuff/utils/debug_util.hpp>
 
-#include "State.hpp"
-#include "modules/DebugStuff.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
 #include "xenomods/engine/ml/DevGraph.hpp"
 #include "xenomods/engine/ml/Filesystem.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
-#include "xenomods/stuff/utils/debug_util.hpp"
 
 namespace {
 

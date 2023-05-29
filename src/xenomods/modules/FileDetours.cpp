@@ -4,17 +4,17 @@
 
 #include "FileDetours.hpp"
 
-#include "../State.hpp"
-#include "xenomods/DebugWrappers.hpp"
-#include "xenomods/Logger.hpp"
-#include "xenomods/NnFile.hpp"
-#include "xenomods/Utils.hpp"
+#include <skylaunch/hookng/Hooks.hpp>
+#include <xenomods/DebugWrappers.hpp>
+#include <xenomods/Logger.hpp>
+#include <xenomods/NnFile.hpp>
+#include <xenomods/State.hpp>
+#include <xenomods/Utils.hpp>
+
 #include "xenomods/engine/ml/Filesystem.hpp"
 #include "xenomods/engine/mm/FixStr.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/stuff/utils/util.hpp"
-
-#include <skylaunch/hookng/Hooks.hpp>
 
 namespace {
 

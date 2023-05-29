@@ -4,9 +4,9 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
 
-#include "../State.hpp"
 #include "DebugStuff.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"

@@ -1,5 +1,4 @@
-#include "State.hpp"
-
+#include <xenomods/State.hpp>
 #include <xenomods/Logger.hpp>
 
 #include "modules/UpdatableModule.hpp"
