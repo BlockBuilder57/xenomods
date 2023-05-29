@@ -44,7 +44,10 @@ namespace xenomods::debug {
 #if XENOMODS_CODENAME(bf3)
 		return 15;
 #else
-		return fw::debug::drawFontGetHeight();
+		static Lazy<int> lazy([]() {
+			return fw::debug::drawFontGetHeight();
+		});
+		return lazy();
 #endif
 	}
 

@@ -123,6 +123,31 @@ namespace xenomods {
 		}
 	}
 
+
+	/**
+	 * A lazily initialized value. Cached as soon as it's computed
+	 * \tparam Result guess
+	 */
+	template<class Result>
+	struct Lazy {
+		using Resolver = Result(*)(); // context is for losers
+
+		constexpr explicit Lazy(Resolver resolver)
+			: resolver(resolver) {
+		}
+
+		constexpr Result operator()() {
+			if(!resolved)
+				value = resolver();
+			return value;
+		}
+
+	   private:
+		Result value;
+		bool resolved{false};
+		Resolver resolver;
+	};
+
 	template<class TConv, std::size_t Size>
 	struct ConvertTo {
 		static_assert(sizeof(TConv) == Size, "Converted type size and true object size must be the same");
