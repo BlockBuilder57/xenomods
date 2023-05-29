@@ -9,6 +9,8 @@
 #include <xenomods/Version.hpp>
 #include <xenomods/menu/Menu.hpp>
 
+#include "../modules/MenuViewer.hpp"
+
 namespace xenomods {
 
 	mm::Col4 Menu::COLOR_BACKGROUND = { 0, 0, 0, 0.6f };
@@ -36,7 +38,10 @@ namespace xenomods {
 		state->AddOption(&dmgPlayer);
 		state->AddOption(&dmgEnemy);
 
-		RegisterSection("modules", "Modules...");
+		auto modules = RegisterSection("modules", "Modules...");
+
+		static Option<bool> testUI = Option<bool>(MenuViewer::enableUIRendering, "Enable UI rendering");
+		modules->AddOption(&testUI);
 	}
 
 	void Menu::Update(HidInput* input) {

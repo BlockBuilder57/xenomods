@@ -58,12 +58,10 @@ namespace xenomods {
 		}
 
 		for(auto* opt : options) {
-			if(renderNum == g_Menu->curIndex) {
-				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, opt->IsSelected() ? Menu::COLOR_HIGHLIGHT : Menu::COLOR_SECTION, ">{} ", opt->String());
-			}
-			else {
-				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, Menu::COLOR_SECTION, " {} ", opt->GetName());
-			}
+			if(renderNum == g_Menu->curIndex)
+				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, opt->IsSelected() ? Menu::COLOR_HIGHLIGHT : Menu::COLOR_OPTION, ">{} ", opt->String());
+			else
+				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, Menu::COLOR_OPTION, " {} ", opt->String());
 
 			renderNum++;
 		}
