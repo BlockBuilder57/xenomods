@@ -72,10 +72,17 @@ namespace xenomods {
 
 	enum class Keybind : std::uint64_t {
 		RELOAD_CONFIG = nn::hid::KEY_PLUS,
+
+		MENU_OPEN = nn::hid::KEY_MINUS,
+		MENU_UP = nn::hid::KEY_DUP,
+		MENU_DOWN = nn::hid::KEY_DDOWN,
+		MENU_SELECT = nn::hid::KEY_DRIGHT,
+		MENU_BACK = nn::hid::KEY_DLEFT,
+
 		BDAT_MSSCRAMBLETYPE_SWITCH = nn::hid::KEY_X,
 
-		MOVEMENT_SPEED_UP = nn::hid::KEY_DUP,
-		MOVEMENT_SPEED_DOWN = nn::hid::KEY_DDOWN,
+		MOVEMENT_SPEED_UP = nn::hid::KEY_SL, // temporary, will be removed
+		MOVEMENT_SPEED_DOWN = nn::hid::KEY_SR,
 		SAVE_WARP = nn::hid::KEY_DLEFT | nn::hid::KEY_ZL | nn::hid::KEY_L,
 		LOAD_WARP = nn::hid::KEY_DRIGHT | nn::hid::KEY_ZL | nn::hid::KEY_L,
 

@@ -76,6 +76,11 @@ namespace xenomods {
 	}
 
 	void Logger::Draw(fw::UpdateInfo* updateInfo) {
+		DrawMessages(updateInfo);
+		DrawToasts(updateInfo);
+	}
+
+	void Logger::DrawMessages(fw::UpdateInfo* updateInfo) {
 		for(std::size_t i = 0; i < lines.size(); ++i) {
 			auto& msg = lines[i];
 
@@ -88,7 +93,9 @@ namespace xenomods {
 				// erase the current index but decrement i so we try again with the next one
 				lines.erase(lines.begin() + i--);
 		}
+	}
 
+	void Logger::DrawToasts(fw::UpdateInfo* updateInfo) {
 		auto validToasts = 0;
 		for(std::size_t i = 0; i < toastLines.size(); ++i) {
 			auto& msg = toastLines[i];

@@ -104,10 +104,18 @@ namespace xenomods {
 		}
 
 		/**
-		 * Draw the current contents of the log buffer.
-		 * Updates lifetime.
+		 * Draw all current logger lines (toasts and messages.)
 		 */
 		void Draw(fw::UpdateInfo* updateInfo);
+
+		/**
+		 * Draw only current message lines.
+		 */
+		void DrawMessages(fw::UpdateInfo* updateInfo);
+		/**
+		 * Draw only current toast lines.
+		 */
+		void DrawToasts(fw::UpdateInfo* updateInfo);
 
 		/**
 		 * Get whether Debug severity messages should be

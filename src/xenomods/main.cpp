@@ -1,15 +1,16 @@
 #include "main.hpp"
-#include "modules/DebugStuff.hpp"
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/menu/Menu.hpp>
 #include <xenomods/NnFile.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Version.hpp>
 #include <xenomods/stuff/utils/debug_util.hpp>
 
+#include "modules/DebugStuff.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
@@ -129,8 +130,8 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 
 	void toastVersion() {
 		g_Logger->ToastInfo("xm_version1", "xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
-		g_Logger->ToastDebug("xm_version2", "compiled on {}", version::BuildTimestamp());
-		g_Logger->ToastDebug("xm_version3", "running {}, version {}", version::RuntimeGame(), version::RuntimeVersion());
+		g_Logger->ToastDebug("xm_version2", "built {}", version::BuildTimestamp());
+		g_Logger->ToastDebug("xm_version3", "running {:s}, ver {}", version::RuntimeGame(), version::RuntimeVersion());
 		g_Logger->ToastDebug("xm_version4", "exefs {}", version::RuntimeBuildRevision());
 	}
 
@@ -198,14 +199,25 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 			g_Logger->ToastMessage("logger test", Logger::Severity::Info, "system tick in seconds: {:2f}", nn::os::GetSystemTick() / 19200000.);
 		}
 
+		if (P2->InputDownStrict(MENU_OPEN)) {
+			g_Menu->Toggle();
+		}
+
 		// Update modules
 		xenomods::UpdateAllRegisteredModules(updateInfo);
 
-		// draw log messages
-		g_Logger->Draw(updateInfo);
+		// render the menu if open, otherwise draw logger messages
+		if (g_Menu->IsOpen())
+			g_Menu->Update();
+		else
+			g_Logger->DrawMessages(updateInfo);
+
+		// always draw toasts
+		g_Logger->DrawToasts(updateInfo);
 	}
 
 	void main() {
+		g_Menu->Initialize();
 		InitializeAllRegisteredModules();
 
 #if XENOMODS_CODENAME(bf2)

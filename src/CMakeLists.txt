@@ -12,6 +12,10 @@ add_executable(xenomods
 		xenomods/HidInput.cpp
 		xenomods/Version.cpp
 
+		xenomods/menu/Menu.cpp
+		xenomods/menu/Section.cpp
+		xenomods/menu/Option.cpp
+
 		xenomods/modules/DebugStuff.cpp
 		xenomods/modules/FileDetours.cpp
 		xenomods/modules/BdatOverride.cpp
