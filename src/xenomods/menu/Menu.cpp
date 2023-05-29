@@ -32,16 +32,9 @@ namespace xenomods {
 
 		auto state = RegisterSection("state", "State/Config...");
 
-		// TODO: make this allocate
-		static Option<float> dmgPlayer = Option<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
-		static Option<float> dmgEnemy = Option<float>(GetState().config.damageEnemyMult, "Enemy damage multiplier");
-		state->AddOption(&dmgPlayer);
-		state->AddOption(&dmgEnemy);
+		state->AddOption<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
 
 		auto modules = RegisterSection("modules", "Modules...");
-
-		static Option<bool> testUI = Option<bool>(MenuViewer::enableUIRendering, "Enable UI rendering");
-		modules->AddOption(&testUI);
 	}
 
 	void Menu::Update(HidInput* input) {

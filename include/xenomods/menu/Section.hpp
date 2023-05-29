@@ -33,10 +33,10 @@ namespace xenomods {
 
 	   public:
 		Section(const std::string& key, const std::string& display);
+		// for some reason, leaving the dtor in crashes. ???
 		/*~Section() {
 			for(auto* option : options) {
-				option->~OptionBase();
-				free(option);
+				delete option;
 			}
 		}*/
 
@@ -60,8 +60,7 @@ namespace xenomods {
 
 		template<class T, class ...Args>
 		void AddOption(Args&&... args) {
-
-			//options.push_back(new (malloc(sizeof(Option<T>))) Option<T>(static_cast<Args&&>(args)...));
+			options.push_back(new Option<T>(static_cast<Args&&>(args)...));
 		}
 
 		void AddOption(OptionBase* opt) {
