@@ -12,6 +12,20 @@
 
 namespace xenomods::debug {
 
+	inline static mm::Col4 drawFontCurBackColor = {};
+
+	inline void drawFontBackColor(const mm::Col4& color) {
+		drawFontCurBackColor = color;
+
+#if XENOMODS_CODENAME(bf3)
+		auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243890))(-1); // ml::DebDraw::get
+		((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x12450d8))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontBack
+#else
+		auto cacheDraw = ml::DebDraw::getCacheDraw();
+		cacheDraw->fontBack(color);
+#endif
+	}
+
 	template<class... Args>
 	inline int drawFontGetWidth(const char* fmt, Args... args) {
 #if XENOMODS_CODENAME(bf3)
@@ -50,7 +64,18 @@ namespace xenomods::debug {
 
 	template<class... Args>
 	void drawFontShadow(int x, int y, mm::Col4 color, const char* fmt, Args... args) {
+		mm::Col4 backCol = drawFontCurBackColor;
+
+		// back colors will draw twice unless we disable them for the shadow
+		if (backCol.a > 0)
+			drawFontBackColor({});
+
 		drawFont(x + 1, y + 1, color * 0.1f, fmt, std::forward<Args>(args)...);
+
+		// can renable if needed
+		if (backCol.a > 0)
+			drawFontBackColor(backCol);
+
 		drawFont(x, y, color, fmt, std::forward<Args>(args)...);
 	}
 
@@ -88,16 +113,6 @@ namespace xenomods::debug {
 		gf::util::getScreenPos(reinterpret_cast<mm::Vec3&>(screenPoint), pos);
 		if (screenPoint.z > 0)
 			drawFontShadow(screenPoint.x, screenPoint.y, color, "%s", formatted.c_str());
-	}
-
-	inline void drawFontBackColor(const mm::Col4& color) {
-#if XENOMODS_CODENAME(bf3)
-		auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243890))(-1); // ml::DebDraw::get
-		((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x12450d8))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontBack
-#else
-		auto cacheDraw = ml::DebDraw::getCacheDraw();
-		cacheDraw->fontBack(color);
-#endif
 	}
 
 }
