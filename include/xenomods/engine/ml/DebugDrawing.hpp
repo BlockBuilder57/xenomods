@@ -11,7 +11,11 @@
 namespace ml {
 
 	class CacheDraw {
-
+	   public:
+		bool fontColor(const mm::Col4& color);
+		bool fontBack(const mm::Col4& color);
+		bool fontShadow(bool on);
+		bool fontScale(float x, float y);
 	};
 
 	class DebDraw {
@@ -24,6 +28,8 @@ namespace ml {
 		static DebDraw* get(uint32_t maybeIndex); // use -1 for this
 		//void setForceRenderQueue(bool enable);
 		static unsigned int getCacheDrawWID();
+
+		static CacheDraw* getCacheDraw();
 
 		static void flushPrio(int param_1, const mm::Mat44& param_2, const mm::Mat44& param_3);
 

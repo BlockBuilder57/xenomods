@@ -90,4 +90,14 @@ namespace xenomods::debug {
 			drawFontShadow(screenPoint.x, screenPoint.y, color, "%s", formatted.c_str());
 	}
 
+	inline void drawFontBackColor(const mm::Col4& color) {
+#if XENOMODS_CODENAME(bf3)
+		auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243890))(-1); // ml::DebDraw::get
+		((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x12450d8))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontBack
+#else
+		auto cacheDraw = ml::DebDraw::getCacheDraw();
+		cacheDraw->fontBack(color);
+#endif
+	}
+
 }
