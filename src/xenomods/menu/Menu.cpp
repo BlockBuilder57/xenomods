@@ -14,25 +14,29 @@
 namespace xenomods {
 
 	mm::Col4 Menu::COLOR_BACKGROUND = { 0, 0, 0, 0.6f };
+	mm::Col4 Menu::COLOR_TITLE = { 1, 1, 1, 1 };
 	mm::Col4 Menu::COLOR_SECTION = { 1, 1, 1, 1 };
-	mm::Col4 Menu::COLOR_OPTION = { 1, 1, 1, 1 };
-	mm::Col4 Menu::COLOR_TEXTUAL = { 1, 1, 1, 1 };
+	mm::Col4 Menu::COLOR_OPTION = { 0.9f, 0.9f, 0.9f, 1 };
+	mm::Col4 Menu::COLOR_TEXTUAL = { 0.8f, 0.8f, 0.8f, 1 };
 	mm::Col4 Menu::COLOR_HIGHLIGHT = { 0.75f, 0.75f, 1, 1 };
 
 	void Menu::Initialize() {
 		auto about = RegisterSection("about", "About...");
-		about->AddTextual(fmt::format("Compiled on {}", version::BuildTimestamp()));
-		about->AddTextual(fmt::format("Currently running {} ({:c}) version {}", version::RuntimeGame(), version::RuntimeGame(), version::RuntimeVersion()));
+		about->RegisterTextual(fmt::format("Compiled on {}", version::BuildTimestamp()));
+		about->RegisterTextual(fmt::format("Currently running {} ({:c}) version {}", version::RuntimeGame(), version::RuntimeGame(), version::RuntimeVersion()));
 
 		// i love grammar
 		if (std::string_view(version::RuntimeBuildRevision()).starts_with("Rev"))
-			about->AddTextual(fmt::format("Executable {}", version::RuntimeBuildRevision()));
+			about->RegisterTextual(fmt::format("Executable {}", version::RuntimeBuildRevision()));
 		else
-			about->AddTextual(fmt::format("Executable version {}", version::RuntimeBuildRevision()));
+			about->RegisterTextual(fmt::format("Executable version {}", version::RuntimeBuildRevision()));
 
 		auto state = RegisterSection("state", "State/Config...");
 
-		state->AddOption<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
+		state->RegisterOption<bool>(drawBackground, "Draw menu background");
+		state->RegisterOption<int>(GetState().tempInt, "Temp Int");
+		state->RegisterOption<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
+		state->RegisterOption<float>(GetState().config.damageEnemyMult, "Enemy damage multiplier");
 
 		auto modules = RegisterSection("modules", "Modules...");
 	}
@@ -91,14 +95,15 @@ namespace xenomods {
 	}
 
 	void Menu::Render() {
-		xenomods::debug::drawFontBackColor(COLOR_BACKGROUND);
+		if (drawBackground)
+			xenomods::debug::drawFontBackColor(COLOR_BACKGROUND);
 
 		const int fontHeight = xenomods::debug::drawFontGetHeight();
 		const mm::Pnt<int> start { .x = 5, .y = 5 };
 		mm::Pnt<int> pnt = start;
 
 		// //xenomods 1234567~ (debug) [???]
-		xenomods::debug::drawFontFmtShadow(start.x, start.y, COLOR_SECTION, "\x81\x61xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
+		xenomods::debug::drawFontFmtShadow(start.x, start.y, COLOR_TITLE, "\x81\x61xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
 
 		int renderNum = 0;
 
@@ -115,7 +120,8 @@ namespace xenomods {
 		} else
 			curSection->Render(pnt);
 
-		xenomods::debug::drawFontBackColor({});
+		if (drawBackground)
+			xenomods::debug::drawFontBackColor({});
 	}
 
 	void Menu::PollMaxIndex() {
@@ -125,6 +131,36 @@ namespace xenomods {
 			maxIndex = curSection->GetMaxIndex();
 
 		std::clamp(curIndex, 0, maxIndex);
+	}
+
+	Section* FindSectionRecurse(Section* section, const std::string& key) {
+		if (section == nullptr)
+			return nullptr;
+
+		if (section->GetKey() == key)
+			return section;
+
+		// not us, lets check our subsections
+		for (auto& sec : *section->GetSubsections()) {
+			if (sec.GetKey() == key)
+				return &sec;
+
+			// not this subsection, check its subsections
+			auto recurse = FindSectionRecurse(&sec, key);
+			if (recurse != nullptr)
+				return recurse;
+		}
+
+		return nullptr;
+	}
+	Section* Menu::FindSection(const std::string& key) {
+		for (auto& sec : sections) {
+			auto recurse = FindSectionRecurse(&sec, key);
+			if (recurse != nullptr)
+				return recurse;
+		}
+
+		return nullptr;
 	}
 
 	Section* Menu::RegisterSection(const std::string& key, const std::string& display) {

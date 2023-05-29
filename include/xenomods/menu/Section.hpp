@@ -40,17 +40,23 @@ namespace xenomods {
 			}
 		}*/
 
-		int GetMaxIndex() {
-			return subsections.size() + options.size();
-		}
 		std::string GetName() {
 			return display;
+		}
+		std::string GetKey() {
+			return key;
 		}
 		Section* GetParent() {
 			return parent;
 		}
+		int GetMaxIndex() {
+			return subsections.size() + options.size();
+		}
 		bool IsSelectingOption() {
 			return curOption != nullptr;
+		}
+		std::vector<Section>* GetSubsections() {
+			return &subsections;
 		}
 
 		void Update(HidInput* input);
@@ -58,17 +64,20 @@ namespace xenomods {
 
 		void Render(mm::Pnt<int>& pnt);
 
+
+		Section* RegisterSection(const std::string& key, const std::string& display);
+
 		template<class T, class ...Args>
-		void AddOption(Args&&... args) {
+		void RegisterOption(Args&&... args) {
 			options.push_back(new Option<T>(static_cast<Args&&>(args)...));
 		}
 
-		void AddOption(OptionBase* opt) {
+		void RegisterOption(OptionBase* opt) {
 			options.push_back(opt);
 		}
 
-		void AddTextual(const std::string& text, const mm::Col4& color);
-		void AddTextual(const std::string& text) { AddTextual(text, {}); };
+		void RegisterTextual(const std::string& text, const mm::Col4& color);
+		void RegisterTextual(const std::string& text) { RegisterTextual(text, {}); };
 	};
 
 } // namespace xenomods

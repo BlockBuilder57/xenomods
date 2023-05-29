@@ -72,7 +72,13 @@ namespace xenomods {
 
 	}
 
-	void Section::AddTextual(const std::string& text, const mm::Col4& color) {
+	Section* Section::RegisterSection(const std::string& key, const std::string& display) {
+		auto sec = &subsections.emplace_back(key, display);
+		sec->parent = this;
+		return sec;
+	}
+
+	void Section::RegisterTextual(const std::string& text, const mm::Col4& color) {
 		textuals.emplace_back(text, color);
 	}
 
