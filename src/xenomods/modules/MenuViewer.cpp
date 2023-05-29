@@ -5,6 +5,7 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/menu/Menu.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Version.hpp>
 
@@ -182,6 +183,15 @@ namespace xenomods {
 
 		StraightensYourXenoblade::HookAt("_ZN5layer12LayerObjFont17updateShaderParmsEPKNS_15LayerRenderViewERKNS_14LayerResMatrixERKNS_13LayerResColorE");
 #endif
+
+		auto modules = g_Menu->FindSection("modules");
+		if (modules != nullptr) {
+			auto section = modules->RegisterSection(STRINGIFY(MenuViewer), "Menu Viewer");
+			section->RegisterOption<bool>(enableUIRendering, "Enable UI rendering");
+#if XENOMODS_OLD_ENGINE
+			section->RegisterOption<bool>(straightenFont, "Straighten font");
+#endif
+		}
 	}
 
 	void MenuViewer::Update(fw::UpdateInfo* updateInfo) {

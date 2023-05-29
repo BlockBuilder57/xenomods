@@ -4,6 +4,7 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/menu/Menu.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
 
@@ -283,6 +284,15 @@ namespace xenomods {
 		ApplyVelocityChanges::HookAt(&game::CharacterController::applyMoveVec);
 		DisableFallDamage::HookAt(&game::CharacterController::getFallHeight);
 		// TODO: look into game::PcStateUtil::updateClimbMove for vertical climbing speed
+#endif
+
+#if !XENOMODS_CODENAME(bf3) // need to find these for 3
+		auto modules = g_Menu->FindSection("modules");
+		if (modules != nullptr) {
+			auto section = modules->RegisterSection(STRINGIFY(PlayerMovement), "Player Movement");
+			section->RegisterOption<bool>(disableFallDamage, "Disable fall damage");
+			section->RegisterOption<float>(movementSpeedMult, "Movement speed multiplier");
+		}
 #endif
 	}
 

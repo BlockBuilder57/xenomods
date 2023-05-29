@@ -4,10 +4,11 @@
 
 #include "BattleCheats.hpp"
 
-#include "xenomods/DebugWrappers.hpp"
-#include "xenomods/Logger.hpp"
-#include "xenomods/NnFile.hpp"
-#include "xenomods/Utils.hpp"
+#include <xenomods/DebugWrappers.hpp>
+#include <xenomods/Logger.hpp>
+#include <xenomods/menu/Menu.hpp>
+#include <xenomods/NnFile.hpp>
+#include <xenomods/Utils.hpp>
 
 #include "xenomods/engine/btl/Damage.hpp"
 #include "xenomods/engine/fw/Document.hpp"
@@ -70,6 +71,13 @@ namespace xenomods {
 #elif XENOMODS_CODENAME(bfsw)
 		ModifyDamage::HookAt(&game::BattleDamageCalcurator::calcCounterSpike); // last call in calcDamage
 #endif
+
+		auto modules = g_Menu->FindSection("modules");
+		if (modules != nullptr) {
+			auto section = modules->RegisterSection(STRINGIFY(BattleCheats), "Battle Cheats");
+			section->RegisterOption<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
+			section->RegisterOption<float>(GetState().config.damageEnemyMult, "Enemy damage multiplier");
+		}
 	}
 
 	XENOMODS_REGISTER_MODULE(BattleCheats);

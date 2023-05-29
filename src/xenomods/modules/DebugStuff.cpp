@@ -4,6 +4,7 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/menu/Menu.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
 
@@ -162,6 +163,12 @@ namespace xenomods {
 		JumpToClosedLandmarks_World::HookAt(&gf::GfMenuObjWorldMap::isEnterMap);
 		JumpToClosedLandmarks_Zone::HookAt(&gf::GfMenuObjWorldMap::isOpenLandmark);
 #endif
+
+		auto modules = g_Menu->FindSection("modules");
+		if (modules != nullptr) {
+			auto section = modules->RegisterSection(STRINGIFY(DebugStuff), "Debug Stuff");
+			section->RegisterOption<bool>(enableDebugRendering, "Enable debug rendering");
+		}
 	}
 
 	void DebugStuff::Update(fw::UpdateInfo* updateInfo) {

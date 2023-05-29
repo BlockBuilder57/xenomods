@@ -10,6 +10,7 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/menu/Menu.hpp>
 
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"
@@ -241,6 +242,14 @@ namespace xenomods {
 #else
 		CopyCurrentCameraState::HookFromBase(0x71012702ec);
 #endif
+
+		auto modules = g_Menu->FindSection("modules");
+		if (modules != nullptr) {
+			auto section = modules->RegisterSection(STRINGIFY(CameraTools), "Camera Tools");
+			section->RegisterOption<bool>(Freecam.isOn, "Freecam on");
+			section->RegisterOption<float>(Freecam.camSpeed, "Freecam speed (m/s)");
+			section->RegisterOption<float>(Freecam.fov, "Freecam FOV");
+		}
 	}
 
 	void CameraTools::Update(fw::UpdateInfo* updateInfo) {

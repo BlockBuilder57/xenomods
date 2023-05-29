@@ -3,6 +3,7 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/menu/Menu.hpp>
 #include <xenomods/Utils.hpp>
 #include <skylaunch/hookng/Hooks.hpp>
 
@@ -56,6 +57,15 @@ namespace xenomods {
 		g_Logger->LogDebug("Setting up Bdat randomizer...");
 
 		BdatOverride::RegisterCallback(&MsOverride());
+
+#if !XENOMODS_CODENAME(bf3)
+		// TODO: enum options
+		/*auto modules = g_Menu->FindSection("modules");
+		if (modules != nullptr) {
+			auto section = modules->RegisterSection(STRINGIFY(BdatRandomizer), "BDAT Randomizer");
+			section->RegisterOption<BdatMSScrambleType>(msScrambleType, "Scramble type");
+		}*/
+#endif
 	}
 
 	void BdatRandomizer::Update(fw::UpdateInfo* updateInfo) {

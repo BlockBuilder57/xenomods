@@ -31,12 +31,10 @@ namespace xenomods {
 		else
 			about->RegisterTextual(fmt::format("Executable version {}", version::RuntimeBuildRevision()));
 
-		auto state = RegisterSection("state", "State/Config...");
+		auto state = RegisterSection("state", "State...");
 
 		state->RegisterOption<bool>(drawBackground, "Draw menu background");
 		state->RegisterOption<int>(GetState().tempInt, "Temp Int");
-		state->RegisterOption<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
-		state->RegisterOption<float>(GetState().config.damageEnemyMult, "Enemy damage multiplier");
 
 		auto modules = RegisterSection("modules", "Modules...");
 	}
