@@ -55,26 +55,66 @@ namespace xenomods::version {
 #if !XENOMODS_CODENAME(bf3)
 	inline const char* RuntimeBuildRevision() { return ml::ProcDesktop::getBuildRevision()->buffer; }
 #else
-	inline const char* RuntimeBuildRevision() { return reinterpret_cast<mm::mtl::FixStr<64>*>(skylaunch::utils::g_MainTextAddr + 0x1b6f500)->buffer; }
+	inline const char* RuntimeBuildRevision() { return reinterpret_cast<mm::mtl::FixStr<128>*>(skylaunch::utils::g_MainTextAddr + 0x1b6f500)->buffer; }
 #endif
 
 } // namespace xenomods::version
 
 template<>
 struct fmt::formatter<xenomods::version::GameType> : fmt::formatter<std::string_view> {
+	enum class ParseType {
+		Default,
+		Shorter,
+		Codename
+	};
+	ParseType parsetype = ParseType::Default;
+
+	constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+		auto it = ctx.begin(), end = ctx.end();
+
+		if (it != end) {
+			// if there's literally any format
+			if (*it == 's' || *it == 'S')
+				parsetype = ParseType::Shorter;
+			else if (*it == 'c' || *it == 'C')
+				parsetype = ParseType::Codename;
+		}
+
+		return ++it;
+	}
+
 	template<typename FormatContext>
 	inline auto format(xenomods::version::GameType type, FormatContext& ctx) {
 		std::string_view name;
+		using enum xenomods::version::GameType;
 
 		// clang-format off
-		switch(type) {
-			using enum xenomods::version::GameType;
-
-			case BF2: name = "Xenoblade 2"; break;
-			case IRA: name = "Xenoblade 2: Torna"; break;
-			case BFSW: name = "Xenoblade: Definitive Edition"; break;
-			case BF3: name = "Xenoblade 3"; break;
-			case Invalid: default: name = "Invalid game"; break;
+		if (parsetype == ParseType::Default) {
+			switch(type) {
+				case BF2: name = "Xenoblade 2"; break;
+				case IRA: name = "Xenoblade 2: Torna"; break;
+				case BFSW: name = "Xenoblade: Definitive Edition"; break;
+				case BF3: name = "Xenoblade 3"; break;
+				default: name = "Invalid game"; break;
+			}
+		}
+		else if (parsetype == ParseType::Shorter) {
+			switch(type) {
+				case BF2: name = "XB2"; break;
+				case IRA: name = "Torna"; break;
+				case BFSW: name = "XBDE"; break;
+				case BF3: name = "XB3"; break;
+				default: name = "Invalid"; break;
+			}
+		}
+		else if (parsetype == ParseType::Codename) {
+			switch(type) {
+				case BF2: name = "bf2"; break;
+				case IRA: name = "ira"; break;
+				case BFSW: name = "bfsw"; break;
+				case BF3: name = "bf3"; break;
+				default: name = "???"; break;
+			}
 		}
 		// clang-format on
 
