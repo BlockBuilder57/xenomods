@@ -1,6 +1,7 @@
 // Created by block on 5/28/23.
 
 #include <xenomods/DebugWrappers.hpp>
+#include <xenomods/Logger.hpp>
 
 #include "xenomods/menu/Section.hpp"
 #include "xenomods/menu/Menu.hpp"
@@ -15,16 +16,27 @@ namespace xenomods {
 		  textuals() {
 	}
 
-	void Section::Update() {
-
+	void Section::Update(HidInput* input) {
+		if (g_Menu->curIndex < subsections.size()) {
+			curOption = nullptr;
+		}
+		else if (g_Menu->curIndex - subsections.size() < options.size()) {
+			if (curOption != nullptr) {
+				if (curOption->IsSelected())
+					curOption->Update(input);
+				else
+					curOption = nullptr;
+			}
+		}
 	}
 
-	void Section::PerformSelect(int index) {
-		if (index < subsections.size()) {
-			g_Menu->curSection = &subsections[index];
+	void Section::PerformSelect() {
+		if (g_Menu->curIndex < subsections.size()) {
+			g_Menu->curSection = &subsections[g_Menu->curIndex];
 		}
-		else if (index - subsections.size() < options.size()) {
-			// option thing...
+		else if (g_Menu->curIndex - subsections.size() < options.size()) {
+			curOption = options[g_Menu->curIndex - subsections.size()];
+			curOption->SetSelected();
 		}
 	}
 
@@ -45,7 +57,14 @@ namespace xenomods {
 			renderNum++;
 		}
 
-		for(auto& opt : options) {
+		for(auto* opt : options) {
+			if(renderNum == g_Menu->curIndex) {
+				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, opt->IsSelected() ? Menu::COLOR_HIGHLIGHT : Menu::COLOR_SECTION, ">{} ", opt->String());
+			}
+			else {
+				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, Menu::COLOR_SECTION, " {} ", opt->GetName());
+			}
+
 			renderNum++;
 		}
 
@@ -56,8 +75,7 @@ namespace xenomods {
 	}
 
 	void Section::AddTextual(const std::string& text, const mm::Col4& color) {
-		Textual elem = { .text = text, .color = color };
-		textuals.push_back(elem);
+		textuals.emplace_back(text, color);
 	}
 
 } // namespace xenomods

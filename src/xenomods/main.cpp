@@ -116,7 +116,17 @@ namespace {
 		}
 	};
 
-} // namespace
+	struct DisableControllerUpdatingForMenu : skylaunch::hook::Trampoline<DisableControllerUpdatingForMenu> {
+		static void Hook(void* this_pointer) {
+			if (ClampNumberOfControllers::Orig() > 1)
+				return Orig(this_pointer);
+
+			if (!xenomods::g_Menu->IsOpen())
+				return Orig(this_pointer);
+		}
+	};
+
+}; // namespace
 
 namespace xenomods {
 
@@ -199,7 +209,9 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 			g_Logger->ToastMessage("logger test", Logger::Severity::Info, "system tick in seconds: {:2f}", nn::os::GetSystemTick() / 19200000.);
 		}
 
-		if (P2->InputDownStrict(MENU_OPEN)) {
+		// use P2 if it's connected, otherwise we'll drop P1's input to let them use the menu
+		HidInput* menuInput = ClampNumberOfControllers::Orig() > 1 ? P2 : P1;
+		if (menuInput->InputDownStrict(MENU_OPEN)) {
 			g_Menu->Toggle();
 		}
 
@@ -208,7 +220,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 
 		// render the menu if open, otherwise draw logger messages
 		if (g_Menu->IsOpen())
-			g_Menu->Update();
+			g_Menu->Update(menuInput);
 		else
 			g_Logger->DrawMessages(updateInfo);
 
@@ -254,6 +266,13 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		ClampNumberOfControllers::HookAt("_ZN2ml8DevPadNx23getLocalConnectPadCountEv");
 #else
 		ClampNumberOfControllers::HookFromBase(0x7101251bcc);
+#endif
+
+		// Disable inputs from P1 when the Menu is open
+#if !XENOMODS_CODENAME(bf3)
+		DisableControllerUpdatingForMenu::HookAt("_ZN2ml8DevPadNx4Impl10updateNpadEv");
+#else
+		DisableControllerUpdatingForMenu::HookFromBase(0x710124fa34);
 #endif
 
 		toastVersion();

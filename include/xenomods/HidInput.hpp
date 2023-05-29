@@ -73,11 +73,17 @@ namespace xenomods {
 	enum class Keybind : std::uint64_t {
 		RELOAD_CONFIG = nn::hid::KEY_PLUS,
 
-		MENU_OPEN = nn::hid::KEY_MINUS,
+		MENU_OPEN = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR,
 		MENU_UP = nn::hid::KEY_DUP,
 		MENU_DOWN = nn::hid::KEY_DDOWN,
 		MENU_SELECT = nn::hid::KEY_DRIGHT,
 		MENU_BACK = nn::hid::KEY_DLEFT,
+
+		MENU_NUM_INC = nn::hid::KEY_DUP,
+		MENU_NUM_DEC = nn::hid::KEY_DDOWN,
+		MENU_NUM_MULT2 = nn::hid::KEY_B,
+		MENU_NUM_TENS = nn::hid::KEY_A,
+		MENU_NUM_NEGATE = nn::hid::KEY_Y,
 
 		BDAT_MSSCRAMBLETYPE_SWITCH = nn::hid::KEY_X,
 
@@ -97,7 +103,7 @@ namespace xenomods {
 		MOONJUMP = nn::hid::KEY_R | nn::hid::KEY_B,
 		DISABLE_FALL_DAMAGE = nn::hid::KEY_A,
 
-		RETURN_TO_TITLE = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR,
+		RETURN_TO_TITLE = nn::hid::KEY_SL | nn::hid::KEY_SR | nn::hid::KEY_ZL | nn::hid::KEY_ZR, // you too
 
 		UI_RENDER_TOGGLE = nn::hid::KEY_Y,
 		DEBUG_RENDER_TOGGLE = nn::hid::KEY_B,

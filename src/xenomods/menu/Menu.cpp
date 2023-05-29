@@ -11,10 +11,11 @@
 
 namespace xenomods {
 
+	mm::Col4 Menu::COLOR_BACKGROUND = { 0, 0, 0, 0.6f };
 	mm::Col4 Menu::COLOR_SECTION = { 1, 1, 1, 1 };
 	mm::Col4 Menu::COLOR_OPTION = { 1, 1, 1, 1 };
 	mm::Col4 Menu::COLOR_TEXTUAL = { 1, 1, 1, 1 };
-	mm::Col4 Menu::COLOR_HIGHLIGHT = { 0.5f, 0.5f, 1, 1 };
+	mm::Col4 Menu::COLOR_HIGHLIGHT = { 0.75f, 0.75f, 1, 1 };
 
 	void Menu::Initialize() {
 		auto about = RegisterSection("about", "About...");
@@ -27,11 +28,18 @@ namespace xenomods {
 		else
 			about->AddTextual(fmt::format("Executable version {}", version::RuntimeBuildRevision()));
 
-		RegisterSection("state", "State/Config...");
+		auto state = RegisterSection("state", "State/Config...");
+
+		// TODO: make this allocate
+		static Option<float> dmgPlayer = Option<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
+		static Option<float> dmgEnemy = Option<float>(GetState().config.damageEnemyMult, "Enemy damage multiplier");
+		state->AddOption(&dmgPlayer);
+		state->AddOption(&dmgEnemy);
+
 		RegisterSection("modules", "Modules...");
 	}
 
-	void Menu::Update() {
+	void Menu::Update(HidInput* input) {
 		PollMaxIndex();
 
 		pressSelect = false;
@@ -39,29 +47,32 @@ namespace xenomods {
 		bool doSelect = false;
 		bool doBack = false;
 
-		if(GetPlayer(2)->InputDownStrict(Keybind::MENU_UP)) {
-			curIndex--;
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::MENU_DOWN)) {
-			curIndex++;
-		}
+		// only update controls when no option is selected
+		if (curSection == nullptr || !curSection->IsSelectingOption()) {
+			if(input->InputDownStrict(Keybind::MENU_UP)) {
+				curIndex--;
+			} else if(input->InputDownStrict(Keybind::MENU_DOWN)) {
+				curIndex++;
+			}
 
-		// wrap around
-		if(curIndex >= maxIndex)
-			curIndex = 0;
-		if(curIndex < 0)
-			curIndex = maxIndex - 1;
+			// wrap around
+			if(curIndex >= maxIndex)
+				curIndex = 0;
+			if(curIndex < 0)
+				curIndex = maxIndex - 1;
 
-		pressSelect = GetPlayer(2)->InputHeldStrict(Keybind::MENU_SELECT);
-		pressBack = GetPlayer(2)->InputHeldStrict(Keybind::MENU_BACK);
+			pressSelect = input->InputHeldStrict(Keybind::MENU_SELECT);
+			pressBack = input->InputHeldStrict(Keybind::MENU_BACK);
 
-		if(GetPlayer(2)->InputUpStrict(Keybind::MENU_SELECT)) {
-			doSelect = true;
-		} else if(GetPlayer(2)->InputUpStrict(Keybind::MENU_BACK)) {
-			doBack = true;
+			if(input->InputUpStrict(Keybind::MENU_SELECT)) {
+				doSelect = true;
+			} else if(input->InputUpStrict(Keybind::MENU_BACK)) {
+				doBack = true;
+			}
 		}
 
 		if(curSection != nullptr)
-			curSection->Update();
+			curSection->Update(input);
 
 		Render();
 
@@ -76,19 +87,20 @@ namespace xenomods {
 				curSection = &sections[curIndex];
 			} else {
 				// let the section handle stuff
-				curSection->PerformSelect(curIndex);
+				curSection->PerformSelect();
 			}
 		}
 	}
 
 	void Menu::Render() {
-		xenomods::debug::drawFontBackColor({ 0, 0, 0, 0.5f });
+		xenomods::debug::drawFontBackColor(COLOR_BACKGROUND);
 
 		const int fontHeight = xenomods::debug::drawFontGetHeight();
 		const mm::Pnt<int> start { .x = 5, .y = 5 };
 		mm::Pnt<int> pnt = start;
 
-		xenomods::debug::drawFontFmtShadow(start.x, start.y, COLOR_SECTION, "\x81\x61xenomods {}{} [{}] ", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
+		// //xenomods 1234567~ (debug) [???]
+		xenomods::debug::drawFontFmtShadow(start.x, start.y, COLOR_SECTION, "\x81\x61xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
 
 		int renderNum = 0;
 
@@ -105,7 +117,7 @@ namespace xenomods {
 		} else
 			curSection->Render(pnt);
 
-		xenomods::debug::drawFontBackColor({ 0, 0, 0, 0 });
+		xenomods::debug::drawFontBackColor({});
 	}
 
 	void Menu::PollMaxIndex() {

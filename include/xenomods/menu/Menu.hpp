@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <xenomods/HidInput.hpp>
+
 #include "Option.hpp"
 #include "Section.hpp"
 
@@ -9,6 +11,7 @@ namespace xenomods {
 
 	class Menu {
 	   private:
+		static mm::Col4 COLOR_BACKGROUND;
 		static mm::Col4 COLOR_SECTION;
 		static mm::Col4 COLOR_OPTION;
 		static mm::Col4 COLOR_TEXTUAL;
@@ -26,11 +29,10 @@ namespace xenomods {
 
 		void PollMaxIndex();
 
-
 	   public:
 		void Initialize();
 
-		void Update();
+		void Update(HidInput* input);
 
 		void Render();
 
@@ -44,7 +46,7 @@ namespace xenomods {
 		Section* RegisterSection(const std::string& key, const std::string& display);
 
 		friend class Section;
-		friend class Option;
+		friend class OptionBase;
 	};
 
 	extern Menu* g_Menu;

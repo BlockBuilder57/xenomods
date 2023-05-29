@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <xenomods/engine/mm/MathTypes.hpp>
 
@@ -20,14 +21,24 @@ namespace xenomods {
 		struct Textual {
 			std::string text;
 			mm::Col4 color;
+
+			Textual(std::string text, mm::Col4 color) : text(std::move(text)), color(color) {};
 		};
 
 		std::vector<Section> subsections;
-		std::vector<Option> options;
+		std::vector<OptionBase*> options;
 		std::vector<Textual> textuals;
+
+		OptionBase* curOption;
 
 	   public:
 		Section(const std::string& key, const std::string& display);
+		/*~Section() {
+			for(auto* option : options) {
+				option->~OptionBase();
+				free(option);
+			}
+		}*/
 
 		int GetMaxIndex() {
 			return subsections.size() + options.size();
@@ -38,11 +49,24 @@ namespace xenomods {
 		Section* GetParent() {
 			return parent;
 		}
+		bool IsSelectingOption() {
+			return curOption != nullptr;
+		}
 
-		void Update();
-		void PerformSelect(int index);
+		void Update(HidInput* input);
+		void PerformSelect();
 
 		void Render(mm::Pnt<int>& pnt);
+
+		template<class T, class ...Args>
+		void AddOption(Args&&... args) {
+
+			//options.push_back(new (malloc(sizeof(Option<T>))) Option<T>(static_cast<Args&&>(args)...));
+		}
+
+		void AddOption(OptionBase* opt) {
+			options.push_back(opt);
+		}
 
 		void AddTextual(const std::string& text, const mm::Col4& color);
 		void AddTextual(const std::string& text) { AddTextual(text, {}); };
