@@ -289,7 +289,7 @@ namespace xenomods {
 
 #if 0
 			if (xenomods::DebugStuff::enableDebugRendering && GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {
-				const int height = fw::debug::drawFontGetHeight();
+				const int height = xenomods::debug::drawFontGetHeight();
 				int yPos = (720 / 2) - ((height * 5) / 2);
 				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "- Freecam -");
 				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Pos: {:1}", Meta.pos);
@@ -300,6 +300,7 @@ namespace xenomods {
 #endif
 		}
 
+#if !XENOMODS_CODENAME(bf3)
 		if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_1)) {
 			auto acc = ml::ScnRenderDrSysParmAcc();
 			// done this way because 2/Torna do not have is/setDispMap
@@ -348,6 +349,7 @@ namespace xenomods {
 				acc.setColorFilterFrm(0);
 			}
 		}
+#endif
 	}
 
 	XENOMODS_REGISTER_MODULE(CameraTools);

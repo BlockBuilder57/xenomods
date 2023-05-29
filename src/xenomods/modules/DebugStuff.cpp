@@ -44,7 +44,7 @@ namespace {
 			if(!xenomods::DebugStuff::enableDebugRendering)
 				return;
 
-			const int height = fw::debug::drawFontGetHeight();
+			const int height = xenomods::debug::drawFontGetHeight();
 			if (this_pointer->getTrackName() != nullptr) {
 				std::string trackName = this_pointer->getTrackName();
 

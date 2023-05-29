@@ -134,7 +134,7 @@ namespace {
 			mm::Rect<int> rect = {rectS.x, rectS.y, rectS.w, rectS.h};
 			fw::debug::drawLineSquare2D(rect, mm::Col4::white);
 
-			short height = fw::debug::drawFontGetHeight();
+			short height = xenomods::debug::drawFontGetHeight();
 			short textX = rect.x;
 			short textY = rect.y + rect.h - height;
 

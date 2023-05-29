@@ -26,6 +26,14 @@ namespace xenomods::debug {
 #endif
 	}
 
+	inline int drawFontGetHeight() {
+#if XENOMODS_CODENAME(bf3)
+		return 15;
+#else
+		return fw::debug::drawFontGetHeight();
+#endif
+	}
+
 	template<class... Args>
 	void drawFont(int x, int y, mm::Col4 color, const char* fmt, Args... args) {
 #if XENOMODS_CODENAME(bf3)
