@@ -125,7 +125,7 @@ namespace xenomods {
 		.camSpeed = 8.f
 	};
 
-	CameraTools::FreecamMeta CameraTools::Meta = {};
+	CameraTools::CameraMeta CameraTools::Meta = {};
 
 	CameraTools::RenderParmForces CameraTools::RenderParameters = {};
 
@@ -147,6 +147,8 @@ namespace xenomods {
 		glm::vec3 up = { 0, 1, 0 };
 		Meta.forward = rot * forward;
 		Meta.up = rot * up;
+
+		Meta.fov = Freecam.fov;
 	}
 
 	void DoFreeCameraMovement(float deltaTime) {
@@ -188,7 +190,7 @@ namespace xenomods {
 
 		if(GetPlayer(2)->InputHeld(Keybind::CAMERA_COMBO)) {
 			// holding down the button, so modify fov
-			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
+			// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
 			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
 			if (fc->fov == 0)
 				fc->fov = 0.001f;
@@ -239,15 +241,6 @@ namespace xenomods {
 		CameraTools::UpdateMeta();
 	}
 
-	void OnMenuFOVChange() {
-		// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
-		CameraTools::Freecam.fov = std::clamp(CameraTools::Freecam.fov, -179.f, 179.f);
-		if (CameraTools::Freecam.fov == 0)
-			CameraTools::Freecam.fov = 0.001f;
-
-		CameraTools::Freecam.isOn = true;
-	}
-
 	void OnMenuMetaChange() {
 		glm::quat newRot = glm::quat(glm::radians(CameraTools::Meta.euler));
 		float angle = glm::angle(newRot);
@@ -258,6 +251,12 @@ namespace xenomods {
 		newmat = glm::rotate(newmat, angle, axis);
 
 		CameraTools::Freecam.matrix = newmat;
+
+		// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
+		CameraTools::Freecam.fov = std::clamp(CameraTools::Meta.fov, -179.f, 179.f);
+		if (CameraTools::Freecam.fov == 0)
+			CameraTools::Freecam.fov = 0.001f;
+
 		CameraTools::Freecam.isOn = true;
 	}
 
@@ -288,15 +287,15 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(CameraTools), "Camera Tools");
-			section->RegisterOption<bool>(Freecam.isOn, "Freecam on");
+			section->RegisterOption<bool>(Freecam.isOn, "Freecam");
 			section->RegisterOption<float>(Freecam.camSpeed, "Freecam speed (m/s)");
-			section->RegisterOption<float>(Freecam.fov, "Freecam FOV", &OnMenuFOVChange);
 			section->RegisterOption<float>(Meta.pos.x, "Camera pos X", &OnMenuMetaChange);
 			section->RegisterOption<float>(Meta.pos.y, "Camera pos Y", &OnMenuMetaChange);
 			section->RegisterOption<float>(Meta.pos.z, "Camera pos Z", &OnMenuMetaChange);
 			section->RegisterOption<float>(Meta.euler.x, "Camera rot X", &OnMenuMetaChange);
 			section->RegisterOption<float>(Meta.euler.y, "Camera rot Y", &OnMenuMetaChange);
 			section->RegisterOption<float>(Meta.euler.z, "Camera rot Z", &OnMenuMetaChange);
+			section->RegisterOption<float>(Meta.fov, "Camera FOV", &OnMenuMetaChange);
 			section->RegisterOption<void>("Teleport party lead to camera", &TeleportPlayerToCamera);
 		}
 	}

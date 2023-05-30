@@ -185,7 +185,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 
 		// use P2 if it's connected, otherwise we'll drop P1's input to let them use the menu
 		HidInput* menuInput = ClampNumberOfControllers::Orig() > 1 ? P2 : P1;
-		if (menuInput->InputDownStrict(MENU_OPEN)) {
+		if (menuInput->InputDownStrict(MENU_TOGGLE)) {
 			g_Menu->Toggle();
 		}
 

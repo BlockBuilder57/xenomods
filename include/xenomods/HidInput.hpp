@@ -79,7 +79,7 @@ namespace xenomods {
 		EVENT_DEBUG_TOGGLE = nn::hid::KEY_R | nn::hid::KEY_DUP,
 
 		// menu controls + binds
-		MENU_OPEN = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR,
+		MENU_TOGGLE = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR,
 		MENU_UP = nn::hid::KEY_DUP,
 		MENU_DOWN = nn::hid::KEY_DDOWN,
 		MENU_SELECT = nn::hid::KEY_DRIGHT,

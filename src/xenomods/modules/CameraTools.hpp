@@ -18,14 +18,15 @@ namespace xenomods {
 		};
 		static FreecamState Freecam;
 
-		struct FreecamMeta {
+		struct CameraMeta {
 			glm::vec3 pos;
-			glm::vec3 forward;
-			glm::vec3 up;
 			glm::quat rot;
 			glm::vec3 euler;
+			glm::vec3 forward;
+			glm::vec3 up;
+			float fov;
 		};
-		static FreecamMeta Meta;
+		static CameraMeta Meta;
 
 		struct RenderParmForces {
 			bool DisableDOF;
