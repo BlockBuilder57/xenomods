@@ -22,8 +22,10 @@ namespace xenomods {
 		}
 		else if (g_Menu->curIndex - subsections.size() < options.size()) {
 			if (curOption != nullptr) {
-				if (curOption->IsSelected())
-					curOption->Update(input);
+				if (curOption->IsSelected()) {
+					if (curOption->Update(input))
+						curOption->Callback();
+				}
 				else
 					curOption = nullptr;
 			}

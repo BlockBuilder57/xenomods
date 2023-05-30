@@ -23,6 +23,7 @@ namespace xenomods {
 			glm::vec3 forward;
 			glm::vec3 up;
 			glm::quat rot;
+			glm::vec3 euler;
 		};
 		static FreecamMeta Meta;
 
@@ -36,6 +37,8 @@ namespace xenomods {
 			}
 		};
 		static RenderParmForces RenderParameters;
+
+		static void UpdateMeta();
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {

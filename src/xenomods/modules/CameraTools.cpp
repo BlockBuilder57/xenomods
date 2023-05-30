@@ -108,6 +108,7 @@ namespace {
 						// read state from current camera
 						xenomods::CameraTools::Freecam.matrix = this_pointer->AttrTransformPtr->viewMatInverse;
 						xenomods::CameraTools::Freecam.fov = this_pointer->AttrTransformPtr->fov;
+						xenomods::CameraTools::UpdateMeta();
 					}
 				}
 			}
@@ -127,6 +128,26 @@ namespace xenomods {
 	CameraTools::FreecamMeta CameraTools::Meta = {};
 
 	CameraTools::RenderParmForces CameraTools::RenderParameters = {};
+
+	void CameraTools::UpdateMeta() {
+		glm::vec3 pos {};
+		glm::quat rot {};
+		glm::vec3 scale {};
+		glm::vec3 skew {};
+		glm::vec4 perspective {};
+
+		// decompose existing matrix
+		glm::decompose(static_cast<glm::mat4&>(Freecam.matrix), scale, rot, pos, skew, perspective);
+
+		Meta.pos = pos;
+		Meta.rot = rot;
+		Meta.euler = glm::degrees(glm::eulerAngles(rot));
+
+		glm::vec3 forward = { 0, 0, 1 };
+		glm::vec3 up = { 0, 1, 0 };
+		Meta.forward = rot * forward;
+		Meta.up = rot * up;
+	}
 
 	void DoFreeCameraMovement(float deltaTime) {
 		// controls:
@@ -208,19 +229,33 @@ namespace xenomods {
 		float angle = glm::angle(rot);
 		glm::vec3 axis = glm::axis(rot);
 
-		meta->pos = pos;
-		meta->rot = rot;
-
-		glm::vec3 forward = { 0, 0, 1 };
-		glm::vec3 up = { 0, 1, 0 };
-		meta->forward = rot * forward;
-		meta->up = rot * up;
-
 		glm::mat4 newmat = glm::mat4(1.f);
 		newmat = glm::translate(newmat, pos + move);
 		newmat = glm::rotate(newmat, angle, axis);
 
 		fc->matrix = newmat;
+		CameraTools::UpdateMeta();
+	}
+
+	void OnMenuFOVChange() {
+		// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
+		CameraTools::Freecam.fov = std::clamp(CameraTools::Freecam.fov, -179.f, 179.f);
+	}
+
+	void OnMenuMetaChange() {
+		glm::quat newRot = glm::quat(glm::radians(CameraTools::Meta.euler));
+		float angle = glm::angle(newRot);
+		glm::vec3 axis = glm::axis(newRot);
+
+		glm::mat4 newmat = glm::mat4(1.f);
+		newmat = glm::translate(newmat, CameraTools::Meta.pos);
+		newmat = glm::rotate(newmat, angle, axis);
+
+		CameraTools::Freecam.matrix = newmat;
+	}
+
+	void TeleportPlayerToCamera() {
+		PlayerMovement::SetPartyPosition(CameraTools::Meta.pos);
 	}
 
 	void CameraTools::Initialize() {
@@ -248,7 +283,14 @@ namespace xenomods {
 			auto section = modules->RegisterSection(STRINGIFY(CameraTools), "Camera Tools");
 			section->RegisterOption<bool>(Freecam.isOn, "Freecam on");
 			section->RegisterOption<float>(Freecam.camSpeed, "Freecam speed (m/s)");
-			section->RegisterOption<float>(Freecam.fov, "Freecam FOV");
+			section->RegisterOption<float>(Freecam.fov, "Freecam FOV", &OnMenuFOVChange);
+			section->RegisterOption<float>(Meta.pos.x, "Camera pos X", &OnMenuMetaChange);
+			section->RegisterOption<float>(Meta.pos.y, "Camera pos Y", &OnMenuMetaChange);
+			section->RegisterOption<float>(Meta.pos.z, "Camera pos Z", &OnMenuMetaChange);
+			section->RegisterOption<float>(Meta.euler.x, "Camera rot X", &OnMenuMetaChange);
+			section->RegisterOption<float>(Meta.euler.y, "Camera rot Y", &OnMenuMetaChange);
+			section->RegisterOption<float>(Meta.euler.z, "Camera rot Z", &OnMenuMetaChange);
+			section->RegisterOption<void>("Teleport party lead to camera", &TeleportPlayerToCamera);
 		}
 	}
 

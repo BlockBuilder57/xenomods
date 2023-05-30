@@ -10,11 +10,20 @@ namespace xenomods {
 	struct OptionBase {
 
 		template<class T>
+		explicit constexpr OptionBase(T& v, const std::string& name, void(*callback)())
+			: value(&v), name(name), callback(callback) {
+		}
+
+		template<class T>
 		explicit constexpr OptionBase(T& v, const std::string& name)
-			: value(&v), name(name) {
+			: OptionBase(v, name, nullptr) {
 		}
 
 		virtual bool Update(HidInput* input);
+		void Callback() {
+			if (callback != nullptr)
+				callback();
+		};
 
 		virtual std::string String() const = 0;
 
@@ -46,14 +55,39 @@ namespace xenomods {
 
 	   private:
 		void* value;
+		void(*callback)();
 	};
 
 	template<class T>
 	struct Option;
 
 
+	template<>
+	struct Option<void> : OptionBase {
+		explicit constexpr Option(const std::string& name, void(*callback)())
+			: OptionBase(dummy, name, callback) {
+		}
+
+		bool Update(HidInput* input) override {
+			// automatically return so we run the callback
+			selected = false;
+			return true;
+		}
+
+		std::string String() const override {
+			return name;
+		}
+
+	   private:
+		struct Dummy{} dummy;
+	};
+
 	template<class T> requires(std::is_arithmetic_v<T>)
 	struct Option<T> : OptionBase {
+		explicit constexpr Option(T& f, const std::string& name, void(*callback)())
+			: OptionBase(f, name, callback) {
+		}
+
 		explicit constexpr Option(T& f, const std::string& name)
 			: OptionBase(f, name) {
 		}
@@ -61,6 +95,8 @@ namespace xenomods {
 		bool Update(HidInput* input) override {
 			if(!OptionBase::Update(input))
 				return false;
+
+			bool changed = false;
 
 			T& val = ValueAs<T>();
 
@@ -79,6 +115,8 @@ namespace xenomods {
 					val += std::pow(10, tens);
 				else
 					val++;
+
+				changed = true;
 			} else if(input->InputDown(Keybind::MENU_NUM_DEC)) {
 				if(by2)
 					val /= 2;
@@ -86,13 +124,16 @@ namespace xenomods {
 					val -= std::pow(10, tens);
 				else
 					val--;
+
+				changed = true;
 			}
 
 			if (input->InputDown(Keybind::MENU_NUM_NEGATE)) {
 				val = -val;
+				changed = true;
 			}
 
-			return true;
+			return changed;
 		}
 
 		std::string String() const override {
@@ -122,6 +163,10 @@ namespace xenomods {
 
 	template<>
 	struct Option<bool> : OptionBase {
+		explicit constexpr Option(bool& f, const std::string& name, void(*callback)())
+			: OptionBase(f, name, callback) {
+		}
+
 		explicit constexpr Option(bool& f, const std::string& name)
 			: OptionBase(f, name) {
 		}
@@ -130,12 +175,16 @@ namespace xenomods {
 			if(!OptionBase::Update(input))
 				return false;
 
+			bool changed = false;
+
 			bool& val = ValueAs<bool>();
 
-			if (input->InputDown(Keybind::MENU_NUM_INC) || input->InputDown(Keybind::MENU_NUM_DEC) || input->InputDown(Keybind::MENU_NUM_NEGATE))
+			if (input->InputDown(Keybind::MENU_NUM_INC) || input->InputDown(Keybind::MENU_NUM_DEC) || input->InputDown(Keybind::MENU_NUM_NEGATE)) {
 				val = !val;
+				changed = true;
+			}
 
-			return true;
+			return changed;
 		}
 
 		std::string String() const override {
