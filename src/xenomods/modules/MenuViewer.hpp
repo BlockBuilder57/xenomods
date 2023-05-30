@@ -10,9 +10,8 @@ namespace xenomods {
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {
-			return true;
+			return false;
 		}
-		void Update(fw::UpdateInfo* updateInfo) override;
 	};
 
 } // namespace xenomods

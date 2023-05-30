@@ -67,17 +67,6 @@ namespace xenomods {
 #endif
 	}
 
-	void BdatRandomizer::Update(fw::UpdateInfo* updateInfo) {
-		if(GetPlayer(2)->InputDownStrict(Keybind::BDAT_MSSCRAMBLETYPE_SWITCH)) {
-			reinterpret_cast<std::underlying_type_t<decltype(msScrambleType)>&>(msScrambleType) += 1;
-
-			if(msScrambleType >= BdatMSScrambleType::Count)
-				msScrambleType = BdatMSScrambleType::Off;
-
-			g_Logger->LogInfo("Bdat text scramble type set to {}", msScrambleType);
-		}
-	}
-
 #if !XENOMODS_CODENAME(bf3)
 	XENOMODS_REGISTER_MODULE(BdatRandomizer);
 #endif

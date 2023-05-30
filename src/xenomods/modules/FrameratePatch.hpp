@@ -8,6 +8,9 @@ namespace xenomods {
 
 	struct FrameratePatch : public xenomods::UpdatableModule {
 		void Initialize() override;
+		bool NeedsUpdate() const override {
+			return false;
+		}
 	};
 
 } // namespace xenomods

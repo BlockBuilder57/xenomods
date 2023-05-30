@@ -81,8 +81,6 @@ namespace xenomods {
 		 */
 		void Reset() {
 			config.Reset();
-
-			tempInt = 1;
 		}
 
 		static void ReloadConfig() {
@@ -90,8 +88,6 @@ namespace xenomods {
 		}
 
 		Config config {};
-
-		int tempInt {};
 	};
 
 } // namespace xenomods

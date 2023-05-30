@@ -9,11 +9,14 @@ namespace xenomods {
 		static bool enableDebugRendering;
 		static bool accessClosedLandmarks;
 
+		static int tempInt;
 		static int bgmTrackIndex;
 
 		static void DoMapJump(int mapjumpId);
 		static void PlaySE(unsigned int soundEffect);
 		static void ReturnTitle(unsigned int slot = -1);
+
+		static void UpdateDebugRendering();
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {

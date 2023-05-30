@@ -28,7 +28,6 @@ namespace xenomods {
 		auto state = RegisterSection("state", "State...");
 
 		state->RegisterOption<bool>(drawBackground, "Draw menu background");
-		state->RegisterOption<int>(GetState().tempInt, "Temp Int");
 		state->RegisterOption<void>("Reload config/bdat overrides", &XenomodsState::ReloadConfig);
 
 		// about

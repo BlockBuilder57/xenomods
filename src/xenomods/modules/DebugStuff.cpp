@@ -89,6 +89,7 @@ namespace xenomods {
 	bool DebugStuff::enableDebugRendering = true;
 	bool DebugStuff::accessClosedLandmarks = true;
 
+	int DebugStuff::tempInt = 0;
 	int DebugStuff::bgmTrackIndex = 0;
 
 	void DebugStuff::DoMapJump(int mapjumpId) {
@@ -113,7 +114,7 @@ namespace xenomods {
 		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, end);
 #endif
 
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		gf::GfPlayFactory::createSkipTravel(mapjumpId);
 		gf::GfMenuObjUtil::playSE(gf::GfMenuObjUtil::SEIndex::mapjump);
 #else
@@ -132,10 +133,18 @@ namespace xenomods {
 #endif
 	}
 
+	void MenuDoMapJump() {
+		DebugStuff::DoMapJump(DebugStuff::tempInt);
+	}
+
 	void DebugStuff::PlaySE(unsigned int soundEffect) {
 #if !XENOMODS_CODENAME(bfsw)
 		gf::GfMenuObjUtil::playSE(soundEffect);
 #endif
+	}
+
+	void MenuPlaySE() {
+		DebugStuff::PlaySE(DebugStuff::tempInt);
 	}
 
 	void DebugStuff::ReturnTitle(unsigned int slot) {
@@ -148,6 +157,16 @@ namespace xenomods {
 		}
 
 		game::SeqUtil::returnTitle(*DocumentPtr);
+#endif
+	}
+
+	void MenuReturnTitle() {
+		DebugStuff::ReturnTitle(-1);
+	}
+
+	void DebugStuff::UpdateDebugRendering() {
+#if XENOMODS_OLD_ENGINE
+		fw::PadManager::enableDebugDraw(enableDebugRendering);
 #endif
 	}
 
@@ -167,52 +186,22 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(DebugStuff), "Debug Stuff");
-			section->RegisterOption<bool>(enableDebugRendering, "Enable debug rendering");
+
+			section->RegisterOption<bool>(enableDebugRendering, "Enable debug rendering", &DebugStuff::UpdateDebugRendering);
+#if !XENOMODS_CODENAME(bf3)
+			section->RegisterOption<bool>(accessClosedLandmarks, "Access closed landmarks");
+			section->RegisterOption<int>(tempInt, "Temp Int");
+			section->RegisterOption<void>("Jump to Landmark", &MenuDoMapJump);
+#if XENOMODS_OLD_ENGINE
+			section->RegisterOption<void>("Play common sound effect", &MenuPlaySE);
+#endif
+			section->RegisterOption<void>("Return to Title", &MenuReturnTitle);
+#endif
 		}
 	}
 
 	void DebugStuff::Update(fw::UpdateInfo* updateInfo) {
-		auto& state = GetState();
-
 		bgmTrackIndex = 0;
-
-		if(GetPlayer(2)->InputDownStrict(Keybind::TEST_BUTTON)) {
-			// temp space for tests
-			g_Logger->LogDebug("Test button pressed!");
-
-			//gf::GfPlayFactory::createOpenMenu(state.tempInt, nullptr);
-			//gf::GfFieldWeather::setCloudSeaForDebug(0, (gf::CLOUD_SEA)state.tempInt);
-			//gf::GfFieldWeather::clear();
-			//gf::GfFieldManager::clear();
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::DEBUG_RENDER_TOGGLE)) {
-			enableDebugRendering = !enableDebugRendering;
-#if XENOMODS_OLD_ENGINE
-			fw::PadManager::enableDebugDraw(enableDebugRendering);
-#endif
-			g_Logger->ToastInfo(STRINGIFY(enableDebugRendering), "Debug rendering: {}", enableDebugRendering);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::ACCESS_CLOSED_LANDMARKS)) {
-			accessClosedLandmarks = !accessClosedLandmarks;
-			g_Logger->ToastInfo(STRINGIFY(accessClosedLandmarks), "Access closed landmarks: {}", accessClosedLandmarks);
-		}
-
-		else if(GetPlayer(2)->InputDownStrict(Keybind::TEMPINT_INC)) {
-			state.tempInt++;
-			g_Logger->ToastInfo(STRINGIFY(state.tempInt), "TempInt++, now {}", state.tempInt);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::TEMPINT_DEC)) {
-			state.tempInt--;
-			g_Logger->ToastInfo(STRINGIFY(state.tempInt), "TempInt--, now {}", state.tempInt);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::MAPJUMP_JUMP)) {
-			g_Logger->LogInfo("Attempting jump to MapJump {}", state.tempInt);
-			DoMapJump(state.tempInt);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::PLAYSE)) {
-			g_Logger->LogInfo("Sound effect {} (0x{:x})", state.tempInt, state.tempInt);
-			PlaySE(state.tempInt);
-		}
-
-		else if(GetPlayer(2)->InputDownStrict(Keybind::RETURN_TO_TITLE)) {
-			PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
-			ReturnTitle(-1);
-		}
 	}
 
 #if !XENOMODS_CODENAME(bf3)

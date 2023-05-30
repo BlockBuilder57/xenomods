@@ -327,25 +327,6 @@ namespace xenomods {
 
 	void PlayerMovement::Update(fw::UpdateInfo* updateInfo) {
 		moonJump = GetPlayer(1)->InputHeld(Keybind::MOONJUMP);
-
-		bool movementSpeedChanged = false;
-		if(GetPlayer(2)->InputDownStrict(Keybind::MOVEMENT_SPEED_UP)) {
-			movementSpeedMult *= 2.0f;
-			movementSpeedChanged = true;
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::MOVEMENT_SPEED_DOWN)) {
-			movementSpeedMult /= 2.0f;
-			movementSpeedChanged = true;
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::DISABLE_FALL_DAMAGE)) {
-			disableFallDamage = !disableFallDamage;
-			g_Logger->ToastInfo(STRINGIFY(disableFallDamage), "Disable fall damage: {}", disableFallDamage);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::SAVE_WARP)) {
-			SaveWarp();
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::LOAD_WARP)) {
-			LoadWarp();
-		}
-
-		if (movementSpeedChanged)
-			g_Logger->ToastInfo("movementSpeedMult", "Move speed: {}x", movementSpeedMult);
 	}
 
 #if !XENOMODS_CODENAME(bf3)

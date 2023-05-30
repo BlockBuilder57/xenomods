@@ -138,13 +138,6 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught @ %s:%d : %s", file, line, message);
 	}
 
-	void toastVersion() {
-		g_Logger->ToastInfo("xm_version1", "xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
-		g_Logger->ToastDebug("xm_version2", "built {}", version::BuildTimestamp());
-		g_Logger->ToastDebug("xm_version3", "running {:s}, ver {}", version::RuntimeGame(), version::RuntimeVersion());
-		g_Logger->ToastDebug("xm_version4", "exefs {}", version::RuntimeBuildRevision());
-	}
-
 	void update(fw::UpdateInfo* updateInfo) {
 		// lazy
 		using enum xenomods::Keybind;
@@ -189,25 +182,6 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		/*
 		 * Check buttons
 		 */
-
-		if(P2->InputDownStrict(DISPLAY_VERSION)) {
-			toastVersion();
-		} else if(P2->InputDownStrict(RELOAD_CONFIG)) {
-			GetState().config.LoadFromFile();
-#if !XENOMODS_CODENAME(bf3)
-			DebugStuff::PlaySE(gf::GfMenuObjUtil::SEIndex::Sort);
-#endif
-		} else if(P2->InputDownStrict(LOGGER_TEST)) {
-			g_Logger->LogDebug("test debug message! {}", nn::os::GetSystemTick() / 19200000.);
-			g_Logger->LogInfo("test info message! {}", nn::os::GetSystemTick() / 19200000.);
-			g_Logger->LogWarning("test warning message! {}", nn::os::GetSystemTick() / 19200000.);
-			g_Logger->LogError("test error message! {}", nn::os::GetSystemTick() / 19200000.);
-			g_Logger->LogFatal("test fatal message! {}", nn::os::GetSystemTick());
-
-			int group = nn::os::GetSystemTick() % 9;
-			g_Logger->ToastWarning(fmt::format("{}", group), "random group ({})", group);
-			g_Logger->ToastMessage("logger test", Logger::Severity::Info, "system tick in seconds: {:2f}", nn::os::GetSystemTick() / 19200000.);
-		}
 
 		// use P2 if it's connected, otherwise we'll drop P1's input to let them use the menu
 		HidInput* menuInput = ClampNumberOfControllers::Orig() > 1 ? P2 : P1;
@@ -274,8 +248,6 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 #else
 		DisableControllerUpdatingForMenu::HookFromBase(0x710124fa34);
 #endif
-
-		toastVersion();
 	}
 
 } // namespace xenomods

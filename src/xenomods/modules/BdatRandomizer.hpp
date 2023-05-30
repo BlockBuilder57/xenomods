@@ -19,10 +19,6 @@ namespace xenomods {
 		static BdatMSScrambleType msScrambleType;
 
 		void Initialize() override;
-		bool NeedsUpdate() const override {
-			return true;
-		}
-		void Update(fw::UpdateInfo* updateInfo) override;
 	};
 
 } // namespace xenomods

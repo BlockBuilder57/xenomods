@@ -190,6 +190,8 @@ namespace xenomods {
 			// holding down the button, so modify fov
 			// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
 			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
+			if (fc->fov == 0)
+				fc->fov = 0.001f;
 		} else {
 			move = { lStick.x, 0, -lStick.y };
 			move = rot * move * deltaTime; // rotate movement to local space
@@ -238,8 +240,12 @@ namespace xenomods {
 	}
 
 	void OnMenuFOVChange() {
-		// note: game hard crashes during rendering when |fov| >= ~179.5, it needs clamping
+		// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
 		CameraTools::Freecam.fov = std::clamp(CameraTools::Freecam.fov, -179.f, 179.f);
+		if (CameraTools::Freecam.fov == 0)
+			CameraTools::Freecam.fov = 0.001f;
+
+		CameraTools::Freecam.isOn = true;
 	}
 
 	void OnMenuMetaChange() {
@@ -252,6 +258,7 @@ namespace xenomods {
 		newmat = glm::rotate(newmat, angle, axis);
 
 		CameraTools::Freecam.matrix = newmat;
+		CameraTools::Freecam.isOn = true;
 	}
 
 	void TeleportPlayerToCamera() {
@@ -330,10 +337,6 @@ namespace xenomods {
 				// just don't apply any rotation
 
 				Freecam.matrix = newmat;
-			}
-
-			if (GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TELEPORT)) {
-				PlayerMovement::SetPartyPosition(Meta.pos);
 			}
 
 			DoFreeCameraMovement(updateInfo->updateDelta);

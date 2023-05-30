@@ -194,18 +194,6 @@ namespace xenomods {
 		}
 	}
 
-	void MenuViewer::Update(fw::UpdateInfo* updateInfo) {
-		auto& state = GetState();
-
-		if(GetPlayer(2)->InputDownStrict(Keybind::UI_RENDER_TOGGLE)) {
-			enableUIRendering = !enableUIRendering;
-			g_Logger->ToastInfo(STRINGIFY(enableUIRendering), "UI rendering: {}", enableUIRendering);
-		}
-		else if (GetPlayer(2)->InputDownStrict(Keybind::STRAIGHTEN_FONT)) {
-			straightenFont = !straightenFont;
-		}
-	}
-
 	XENOMODS_REGISTER_MODULE(MenuViewer);
 
 } // namespace xenomods

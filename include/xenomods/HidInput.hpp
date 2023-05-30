@@ -71,8 +71,14 @@ namespace xenomods {
 	HidInput* GetPlayer(int player);
 
 	enum class Keybind : std::uint64_t {
-		RELOAD_CONFIG = nn::hid::KEY_PLUS,
+		// in-game controls
+		MOONJUMP = nn::hid::KEY_R | nn::hid::KEY_B,
 
+		EVENT_DEBUG_PREV = nn::hid::KEY_R | nn::hid::KEY_DLEFT,
+		EVENT_DEBUG_NEXT = nn::hid::KEY_R | nn::hid::KEY_DRIGHT,
+		EVENT_DEBUG_TOGGLE = nn::hid::KEY_R | nn::hid::KEY_DUP,
+
+		// menu controls + binds
 		MENU_OPEN = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR,
 		MENU_UP = nn::hid::KEY_DUP,
 		MENU_DOWN = nn::hid::KEY_DDOWN,
@@ -86,35 +92,6 @@ namespace xenomods {
 		MENU_NUM_NEGATE = nn::hid::KEY_Y,
 		MENU_NUM_SET0 = nn::hid::KEY_X,
 
-		BDAT_MSSCRAMBLETYPE_SWITCH = nn::hid::KEY_X,
-
-		MOVEMENT_SPEED_UP = nn::hid::KEY_SL, // temporary, will be removed
-		MOVEMENT_SPEED_DOWN = nn::hid::KEY_SR,
-		SAVE_WARP = nn::hid::KEY_DLEFT | nn::hid::KEY_ZL | nn::hid::KEY_L,
-		LOAD_WARP = nn::hid::KEY_DRIGHT | nn::hid::KEY_ZL | nn::hid::KEY_L,
-
-		TEST_BUTTON = nn::hid::KEY_MINUS | nn::hid::KEY_A,
-		TEMPINT_INC = nn::hid::KEY_DRIGHT | nn::hid::KEY_ZL,
-		TEMPINT_DEC = nn::hid::KEY_DLEFT | nn::hid::KEY_ZL,
-
-		MAPJUMP_JUMP = nn::hid::KEY_DDOWN | nn::hid::KEY_ZL,
-		ACCESS_CLOSED_LANDMARKS = nn::hid::KEY_DUP | nn::hid::KEY_ZL,
-		PLAYSE = nn::hid::KEY_MINUS | nn::hid::KEY_ZL,
-
-		MOONJUMP = nn::hid::KEY_R | nn::hid::KEY_B,
-		DISABLE_FALL_DAMAGE = nn::hid::KEY_A,
-
-		RETURN_TO_TITLE = nn::hid::KEY_SL | nn::hid::KEY_SR | nn::hid::KEY_ZL | nn::hid::KEY_ZR, // you too
-
-		UI_RENDER_TOGGLE = nn::hid::KEY_Y,
-		DEBUG_RENDER_TOGGLE = nn::hid::KEY_B,
-
-		STRAIGHTEN_FONT = nn::hid::KEY_L | nn::hid::KEY_Y,
-
-		EVENT_DEBUG_PREV = nn::hid::KEY_R | nn::hid::KEY_DLEFT,
-		EVENT_DEBUG_NEXT = nn::hid::KEY_R | nn::hid::KEY_DRIGHT,
-		EVENT_DEBUG_TOGGLE = nn::hid::KEY_R | nn::hid::KEY_DUP,
-
 		CAMERA_COMBO = nn::hid::KEY_L | nn::hid::KEY_R,
 		FREECAM_TOGGLE = nn::hid::KEY_LSTICK | nn::hid::KEY_RSTICK,
 
@@ -122,7 +99,6 @@ namespace xenomods {
 		FREECAM_ROTRESET = CAMERA_COMBO | nn::hid::KEY_RSTICK,
 		FREECAM_SPEED_UP = CAMERA_COMBO | nn::hid::KEY_PLUS,
 		FREECAM_SPEED_DOWN = CAMERA_COMBO | nn::hid::KEY_MINUS,
-		FREECAM_TELEPORT = CAMERA_COMBO | nn::hid::KEY_B,
 
 		CAMERA_RENDER_TOGGLE_1 = CAMERA_COMBO | nn::hid::KEY_DUP,
 		CAMERA_RENDER_TOGGLE_2 = CAMERA_COMBO | nn::hid::KEY_DLEFT,
@@ -131,9 +107,6 @@ namespace xenomods {
 		CAMERA_RENDER_TOGGLE_5 = CAMERA_COMBO | nn::hid::KEY_Y,
 		CAMERA_RENDER_TOGGLE_6 = CAMERA_COMBO | nn::hid::KEY_X,
 		CAMERA_RENDER_TOGGLE_7 = CAMERA_COMBO | nn::hid::KEY_A,
-
-		LOGGER_TEST = nn::hid::KEY_PLUS | nn::hid::KEY_R,
-		DISPLAY_VERSION = nn::hid::KEY_PLUS | nn::hid::KEY_MINUS,
 	};
 
 }; // namespace xenomods
