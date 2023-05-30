@@ -296,7 +296,9 @@ namespace xenomods {
 			section->RegisterOption<float>(Meta.euler.y, "Camera rot Y", &OnMenuMetaChange);
 			section->RegisterOption<float>(Meta.euler.z, "Camera rot Z", &OnMenuMetaChange);
 			section->RegisterOption<float>(Meta.fov, "Camera FOV", &OnMenuMetaChange);
+#if !XENOMODS_CODENAME(bf3)
 			section->RegisterOption<void>("Teleport party lead to camera", &TeleportPlayerToCamera);
+#endif
 		}
 	}
 

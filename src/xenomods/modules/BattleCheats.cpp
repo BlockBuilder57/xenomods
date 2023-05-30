@@ -72,6 +72,7 @@ namespace xenomods {
 		ModifyDamage::HookAt(&game::BattleDamageCalcurator::calcCounterSpike); // last call in calcDamage
 #endif
 
+
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(BattleCheats), "Battle Cheats");
@@ -80,6 +81,8 @@ namespace xenomods {
 		}
 	}
 
+#if !XENOMODS_CODENAME(bf3)
 	XENOMODS_REGISTER_MODULE(BattleCheats);
+#endif
 
 } // namespace xenomods
