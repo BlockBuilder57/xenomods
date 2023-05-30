@@ -24,6 +24,8 @@ include(MakeNso)
 
 # Generate switch.specs for this build
 set(SKYLAUNCH_LINKERSCRIPTS_DIR "${PROJECT_SOURCE_DIR}/linkerscripts")
+# ugh
+msys_to_cmake("${SKYLAUNCH_LINKERSCRIPTS_DIR}" SKYLAUNCH_LINKERSCRIPTS_DIR)
 configure_file(linkerscripts/switch.specs.in ${PROJECT_BINARY_DIR}/switch.specs)
 
 # Generate version

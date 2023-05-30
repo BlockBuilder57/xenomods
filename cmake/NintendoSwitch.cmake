@@ -15,7 +15,7 @@ set(NX TRUE)
 
 
 macro(msys_to_cmake MsysPath ResultingPath)
-	if(WIN32)
+	if("$ENV{MSYSTEM}" STREQUAL "MSYS")
         # Instead of a hacky regex, we can ask msys2 nicely since it comes with a convenient
         # built in utility to do path conversion for us.
         # Yes, this means I unfortunately have to seed the path here,
@@ -40,14 +40,14 @@ endif()
 # (at least, not using the Windows installer)
 # change out when this is fixed've by the dkp team
 # 2021 update: they haven't done anything to fix it
-set(DEVKITA64 "${DEVKITPRO}/devkitA64")
+set(DEVKITA64 "$ENV{DEVKITPRO}/devkitA64")
 if(NOT IS_DIRECTORY ${DEVKITA64})
 	message(FATAL_ERROR "devkitA64 not found, please install to compile NX applications")
 endif()
 
 
-if(WIN32)
-    set(CMAKE_C_COMPILER "${DEVKITA64}/bin/aarch64-none-elf-gcc.exe")
+if(WIN32 OR "$ENV{MSYSTEM}" STREQUAL "MSYS")
+	set(CMAKE_C_COMPILER "${DEVKITA64}/bin/aarch64-none-elf-gcc.exe")
     set(CMAKE_CXX_COMPILER "${DEVKITA64}/bin/aarch64-none-elf-g++.exe")
     set(CMAKE_ASM_COMPILER "${DEVKITA64}/bin/aarch64-none-elf-gcc.exe")
     set(CMAKE_AR "${DEVKITA64}/bin/aarch64-none-elf-gcc-ar.exe")
