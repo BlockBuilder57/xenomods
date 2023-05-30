@@ -17,6 +17,8 @@ namespace xenomods {
 	}
 
 	void Section::Update(HidInput* input) {
+		SavedIndex = g_Menu->curIndex;
+
 		if(g_Menu->curIndex < subsections.size()) {
 			// we're within the subsections, clear the current option
 			curOption = nullptr;
@@ -39,6 +41,7 @@ namespace xenomods {
 		if(g_Menu->curIndex < subsections.size()) {
 			// we're within the subsections, select the currently highlighted section
 			g_Menu->curSection = &subsections[g_Menu->curIndex];
+			g_Menu->curIndex = g_Menu->curSection->SavedIndex;
 		} else if(g_Menu->curIndex - subsections.size() < options.size()) {
 			// we're in the options, and we want to select this one
 			curOption = options[g_Menu->curIndex - subsections.size()];

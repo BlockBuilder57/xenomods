@@ -33,6 +33,8 @@ namespace xenomods {
 		OptionBase* curOption {};
 
 	   public:
+		int SavedIndex {};
+
 		Section(const std::string& key, const std::string& display);
 		// for some reason, leaving the dtor in crashes. ???
 		/*~Section() {
@@ -51,7 +53,7 @@ namespace xenomods {
 			return parent;
 		}
 		int GetMaxIndex() {
-			return subsections.size() + options.size();
+			return subsections.size() + options.size() - 1;
 		}
 		bool IsSelectingOption() {
 			return curOption != nullptr;

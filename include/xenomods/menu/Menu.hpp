@@ -26,6 +26,7 @@ namespace xenomods {
 
 		int maxIndex {};
 		int curIndex {};
+		int savedSectionIndex {};
 		bool pressSelect {};
 		bool pressBack {};
 

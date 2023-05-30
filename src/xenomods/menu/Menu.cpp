@@ -59,10 +59,14 @@ namespace xenomods {
 			}
 
 			// wrap around
-			if(curIndex >= maxIndex)
+			if(maxIndex > 0) {
+				if(curIndex > maxIndex)
+					curIndex = 0;
+				else if(curIndex < 0)
+					curIndex = maxIndex;
+			} else {
 				curIndex = 0;
-			if(curIndex < 0)
-				curIndex = maxIndex - 1;
+			}
 
 			pressSelect = input->InputHeldStrict(Keybind::MENU_SELECT);
 			pressBack = input->InputHeldStrict(Keybind::MENU_BACK);
@@ -82,12 +86,20 @@ namespace xenomods {
 		// intentionally switching sections after rendering, so we draw the selection highlight
 
 		if(doBack) {
-			if(curSection != nullptr)
+			if(curSection != nullptr) {
 				curSection = curSection->GetParent();
+				if (curSection != nullptr)
+					// set the index to the last one the section had
+					curIndex = curSection->SavedIndex;
+				else
+					// set from the saved index
+					curIndex = savedSectionIndex;
+			}
 		} else if(doSelect) {
 			if(curSection == nullptr) {
 				// on root menu, can just pick
 				curSection = &sections[curIndex];
+				savedSectionIndex = curIndex;
 			} else {
 				// let the section handle stuff
 				curSection->PerformSelect();
@@ -105,6 +117,22 @@ namespace xenomods {
 
 		// //xenomods 1234567~ (debug) [???]
 		xenomods::debug::drawFontFmtShadow(start.x, start.y, COLOR_TITLE, "\x81\x61xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
+
+#if 0
+		mm::Pnt<int> dbgpnt = start;
+		dbgpnt.x = 1280/2;
+		dbgpnt.y = -fontHeight;
+
+		xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "Menu: idx {}/{}, savedSectionIndex {}", curIndex, maxIndex, savedSectionIndex);
+
+		if (curSection != nullptr) {
+			dbgpnt.y += fontHeight;
+			xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "{}: {}", curSection->GetKey(), curSection->GetName());
+			if (curSection->GetParent() != nullptr)
+				xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "Parent: {}", curSection->GetParent()->GetName());
+			xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "SavedIndex: {}", curSection->SavedIndex);
+		}
+#endif
 
 		int renderNum = 0;
 
@@ -128,11 +156,9 @@ namespace xenomods {
 
 	void Menu::PollMaxIndex() {
 		if(curSection == nullptr)
-			maxIndex = sections.size();
+			maxIndex = sections.size() - 1;
 		else
 			maxIndex = curSection->GetMaxIndex();
-
-		std::clamp(curIndex, 0, maxIndex);
 	}
 
 	Section* FindSectionRecurse(Section* section, const std::string& key) {
