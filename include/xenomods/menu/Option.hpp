@@ -8,9 +8,8 @@
 namespace xenomods {
 
 	struct OptionBase {
-
 		template<class T>
-		explicit constexpr OptionBase(T& v, const std::string& name, void(*callback)())
+		explicit constexpr OptionBase(T& v, const std::string& name, void (*callback)())
 			: value(&v), name(name), callback(callback) {
 		}
 
@@ -21,7 +20,7 @@ namespace xenomods {
 
 		virtual bool Update(HidInput* input);
 		void Callback() {
-			if (callback != nullptr)
+			if(callback != nullptr)
 				callback();
 		};
 
@@ -55,16 +54,15 @@ namespace xenomods {
 
 	   private:
 		void* value {};
-		void(*callback)() {};
+		void (*callback)() {};
 	};
 
 	template<class T>
 	struct Option;
 
-
 	template<>
 	struct Option<void> : OptionBase {
-		explicit constexpr Option(const std::string& name, void(*callback)())
+		explicit constexpr Option(const std::string& name, void (*callback)())
 			: OptionBase(dummy, name, callback) {
 		}
 
@@ -79,12 +77,14 @@ namespace xenomods {
 		}
 
 	   private:
-		struct Dummy{} dummy;
+		struct Dummy {
+		} dummy;
 	};
 
-	template<class T> requires(std::is_arithmetic_v<T>)
+	template<class T>
+		requires(std::is_arithmetic_v<T>)
 	struct Option<T> : OptionBase {
-		explicit constexpr Option(T& f, const std::string& name, void(*callback)())
+		explicit constexpr Option(T& f, const std::string& name, void (*callback)())
 			: OptionBase(f, name, callback) {
 		}
 
@@ -105,7 +105,7 @@ namespace xenomods {
 			by10s = input->InputHeld(Keybind::MENU_NUM_TENS);
 
 			// don't let the log return 0
-			if (tens <= 0)
+			if(tens <= 0)
 				tens = 1;
 
 			if(input->InputDown(Keybind::MENU_NUM_INC)) {
@@ -126,10 +126,11 @@ namespace xenomods {
 					val--;
 
 				changed = true;
-			}
-
-			if (input->InputDown(Keybind::MENU_NUM_NEGATE)) {
+			} else if(input->InputDown(Keybind::MENU_NUM_NEGATE)) {
 				val = -val;
+				changed = true;
+			} else if(input->InputDown(Keybind::MENU_NUM_SET0)) {
+				val = 0;
 				changed = true;
 			}
 
@@ -139,14 +140,12 @@ namespace xenomods {
 		std::string String() const override {
 			std::string extra;
 
-			if (selected) {
-				if (!by2 && !by10s) {
+			if(selected) {
+				if(!by2 && !by10s) {
 					extra = " \x81\x7D""1"; // +- 1
-				}
-				else if (by2) {
-					extra = " \x81\x7E/\x81\x80""2"; // x/div 2
-				}
-				else if (by10s) {
+				} else if(by2) {
+					extra = " \x81\x7E/\x81\x80" "2"; // x/div 2
+				} else if(by10s) {
 					// 0x7D is }, so it gets mad when trying to emit it on its own
 					extra = fmt::format(" {}{}", "\x81\x7D", std::pow(10, tens)); // +- 10^tens
 				}
@@ -163,7 +162,7 @@ namespace xenomods {
 
 	template<>
 	struct Option<bool> : OptionBase {
-		explicit constexpr Option(bool& f, const std::string& name, void(*callback)())
+		explicit constexpr Option(bool& f, const std::string& name, void (*callback)())
 			: OptionBase(f, name, callback) {
 		}
 
@@ -179,7 +178,7 @@ namespace xenomods {
 
 			bool& val = ValueAs<bool>();
 
-			if (input->InputDown(Keybind::MENU_NUM_INC) || input->InputDown(Keybind::MENU_NUM_DEC) || input->InputDown(Keybind::MENU_NUM_NEGATE)) {
+			if(input->InputDown(Keybind::MENU_NUM_INC) || input->InputDown(Keybind::MENU_NUM_DEC) || input->InputDown(Keybind::MENU_NUM_NEGATE)) {
 				val = !val;
 				changed = true;
 			}
@@ -191,6 +190,5 @@ namespace xenomods {
 			return fmt::format("{}: {}", name, ValueAs<bool>());
 		}
 	};
-
 
 } // namespace xenomods

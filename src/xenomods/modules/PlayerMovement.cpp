@@ -269,6 +269,30 @@ namespace xenomods {
 #endif
 	}
 
+	void PlayerMovement::SaveWarp() {
+		Warp.position = GetPartyPosition();
+		Warp.rotation = GetPartyRotation();
+		Warp.velocity = GetPartyVelocity();
+		Warp.initialized = true;
+		g_Logger->ToastInfo("warp", "Saved warp at {:3}", Warp.position);
+		g_Logger->ToastInfo("warp2", "(rot {} vel {})", Warp.rotation, Warp.velocity);
+	}
+
+	void PlayerMovement::LoadWarp() {
+		if(Warp.initialized) {
+			SetPartyPosition(Warp.position);
+			if (Warp.rotation != glm::identity<glm::quat>())
+				SetPartyRotation(Warp.rotation); // can cause fun errors
+			SetPartyVelocity(Warp.velocity);
+			g_Logger->ToastInfo("warp", "Warped party to {:3}", Warp.position);
+			g_Logger->ToastInfo("warp2", "(rot {} vel {})", Warp.rotation, Warp.velocity);
+		}
+	}
+
+	void OnMenuWarpUpdate() {
+		PlayerMovement::Warp.initialized = true;
+	}
+
 	void PlayerMovement::Initialize() {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up player movement hooks...");
@@ -292,6 +316,11 @@ namespace xenomods {
 			auto section = modules->RegisterSection(STRINGIFY(PlayerMovement), "Player Movement");
 			section->RegisterOption<bool>(disableFallDamage, "Disable fall damage");
 			section->RegisterOption<float>(movementSpeedMult, "Movement speed multiplier");
+			section->RegisterOption<void>("Save Warp", &PlayerMovement::SaveWarp);
+			section->RegisterOption<void>("Load Warp", &PlayerMovement::LoadWarp);
+			section->RegisterOption<float>(Warp.position.x, "Warp pos X", &OnMenuWarpUpdate);
+			section->RegisterOption<float>(Warp.position.y, "Warp pos Y", &OnMenuWarpUpdate);
+			section->RegisterOption<float>(Warp.position.z, "Warp pos Z", &OnMenuWarpUpdate);
 		}
 #endif
 	}
@@ -310,18 +339,9 @@ namespace xenomods {
 			disableFallDamage = !disableFallDamage;
 			g_Logger->ToastInfo(STRINGIFY(disableFallDamage), "Disable fall damage: {}", disableFallDamage);
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::SAVE_WARP)) {
-			Warp.position = GetPartyPosition();
-			Warp.rotation = GetPartyRotation();
-			Warp.velocity = GetPartyVelocity();
-			Warp.initialized = true;
-			g_Logger->LogInfo("Saved warp at {:3} (rot {} vel {})", Warp.position, Warp.rotation, Warp.velocity);
+			SaveWarp();
 		} else if(GetPlayer(2)->InputDownStrict(Keybind::LOAD_WARP)) {
-			if(Warp.initialized) {
-				SetPartyPosition(Warp.position);
-				SetPartyRotation(Warp.rotation);
-				SetPartyVelocity(Warp.velocity);
-				g_Logger->LogInfo("Warped party to {:3}", Warp.position);
-			}
+			LoadWarp();
 		}
 
 		if (movementSpeedChanged)

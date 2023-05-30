@@ -18,6 +18,9 @@ namespace xenomods {
 		};
 		static WarpData Warp;
 
+		static void SaveWarp();
+		static void LoadWarp();
+
 		static glm::vec3 GetPartyPosition();
 		static void SetPartyPosition(glm::vec3 pos);
 		static glm::quat GetPartyRotation();

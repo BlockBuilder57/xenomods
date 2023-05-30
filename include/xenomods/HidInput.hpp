@@ -84,6 +84,7 @@ namespace xenomods {
 		MENU_NUM_MULT2 = nn::hid::KEY_B,
 		MENU_NUM_TENS = nn::hid::KEY_A,
 		MENU_NUM_NEGATE = nn::hid::KEY_Y,
+		MENU_NUM_SET0 = nn::hid::KEY_X,
 
 		BDAT_MSSCRAMBLETYPE_SWITCH = nn::hid::KEY_X,
 
