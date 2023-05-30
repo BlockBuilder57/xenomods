@@ -21,6 +21,17 @@ namespace xenomods {
 	mm::Col4 Menu::COLOR_HIGHLIGHT = { 0.75f, 0.75f, 1, 1 };
 
 	void Menu::Initialize() {
+		// modules
+		auto modules = RegisterSection("modules", "Modules...");
+
+		// state
+		auto state = RegisterSection("state", "State...");
+
+		state->RegisterOption<bool>(drawBackground, "Draw menu background");
+		state->RegisterOption<int>(GetState().tempInt, "Temp Int");
+		state->RegisterOption<void>("Reload config/bdat overrides", &XenomodsState::ReloadConfig);
+
+		// about
 		auto about = RegisterSection("about", "About...");
 		about->RegisterTextual(fmt::format("Compiled on {}", version::BuildTimestamp()));
 		about->RegisterTextual(fmt::format("Currently running {} ({:c}) version {}", version::RuntimeGame(), version::RuntimeGame(), version::RuntimeVersion()));
@@ -30,13 +41,6 @@ namespace xenomods {
 			about->RegisterTextual(fmt::format("Executable {}", version::RuntimeBuildRevision()));
 		else
 			about->RegisterTextual(fmt::format("Executable version {}", version::RuntimeBuildRevision()));
-
-		auto state = RegisterSection("state", "State...");
-
-		state->RegisterOption<bool>(drawBackground, "Draw menu background");
-		state->RegisterOption<int>(GetState().tempInt, "Temp Int");
-
-		auto modules = RegisterSection("modules", "Modules...");
 	}
 
 	void Menu::Update(HidInput* input) {

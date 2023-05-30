@@ -41,7 +41,7 @@ namespace xenomods {
 
 	   protected:
 		bool selected { false };
-		std::string name;
+		std::string name {};
 
 		template<class T>
 		constexpr T& ValueAs() {
@@ -54,8 +54,8 @@ namespace xenomods {
 		}
 
 	   private:
-		void* value;
-		void(*callback)();
+		void* value {};
+		void(*callback)() {};
 	};
 
 	template<class T>

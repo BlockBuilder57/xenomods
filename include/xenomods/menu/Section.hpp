@@ -14,22 +14,22 @@ namespace xenomods {
 
 	class Section {
 	   protected:
-		std::string key;
-		std::string display;
-		Section* parent;
+		std::string key {};
+		std::string display {};
+		Section* parent {};
 
 		struct Textual {
-			std::string text;
-			mm::Col4 color;
+			std::string text {};
+			mm::Col4 color {};
 
 			Textual(std::string text, mm::Col4 color) : text(std::move(text)), color(color) {};
 		};
 
-		std::vector<Section> subsections;
-		std::vector<OptionBase*> options;
-		std::vector<Textual> textuals;
+		std::vector<Section> subsections {};
+		std::vector<OptionBase*> options {};
+		std::vector<Textual> textuals {};
 
-		OptionBase* curOption;
+		OptionBase* curOption {};
 
 	   public:
 		Section(const std::string& key, const std::string& display);

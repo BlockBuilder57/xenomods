@@ -62,6 +62,13 @@ namespace xenomods {
 		toml::table tomlTable;
 	};
 
+	struct XenomodsState;
+
+	/**
+	 * Get singleton state.
+	 */
+	XenomodsState& GetState();
+
 	struct XenomodsState {
 		explicit XenomodsState() {
 			Reset();
@@ -78,14 +85,13 @@ namespace xenomods {
 			tempInt = 1;
 		}
 
+		static void ReloadConfig() {
+			GetState().config.LoadFromFile();
+		}
+
 		Config config {};
 
 		int tempInt {};
 	};
-
-	/**
-	 * Get singleton state.
-	 */
-	XenomodsState& GetState();
 
 } // namespace xenomods

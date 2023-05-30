@@ -21,13 +21,13 @@ namespace xenomods {
 		bool isOpen { false };
 		bool drawBackground { true };
 
-		std::vector<Section> sections;
-		Section* curSection;
+		std::vector<Section> sections {};
+		Section* curSection {};
 
-		int maxIndex;
-		int curIndex;
-		bool pressSelect;
-		bool pressBack;
+		int maxIndex {};
+		int curIndex {};
+		bool pressSelect {};
+		bool pressBack {};
 
 		void PollMaxIndex();
 
