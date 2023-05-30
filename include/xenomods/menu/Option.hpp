@@ -142,12 +142,12 @@ namespace xenomods {
 
 			if(selected) {
 				if(!by2 && !by10s) {
-					extra = " \x81\x7D""1"; // +- 1
+					extra = "\x81\x7D""1"; // +- 1
 				} else if(by2) {
-					extra = " \x81\x7E/\x81\x80" "2"; // x/div 2
+					extra = "\x81\x7E/\x81\x80" "2"; // x/div 2
 				} else if(by10s) {
 					// 0x7D is }, so it gets mad when trying to emit it on its own
-					extra = fmt::format(" {}{}", "\x81\x7D", std::pow(10, tens)); // +- 10^tens
+					extra = fmt::format("{}{}", "\x81\x7D", std::pow(10, tens)); // +- 10^tens
 				}
 			}
 
@@ -158,6 +158,46 @@ namespace xenomods {
 		int tens;
 		bool by2;
 		bool by10s;
+	};
+
+	template<class T>
+		requires(std::is_enum_v<T>)
+	struct Option<T> : OptionBase {
+		explicit constexpr Option(T& f, const std::string& name, void (*callback)())
+			: OptionBase(f, name, callback) {
+		}
+
+		explicit constexpr Option(T& f, const std::string& name)
+			: OptionBase(f, name) {
+		}
+
+		bool Update(HidInput* input) override {
+			if(!OptionBase::Update(input))
+				return false;
+
+			bool changed = false;
+
+			std::underlying_type_t<T>& val = reinterpret_cast<std::underlying_type_t<T>&>(ValueAs<T>());
+
+			if(input->InputDown(Keybind::MENU_NUM_INC)) {
+				val++;
+				changed = true;
+			} else if(input->InputDown(Keybind::MENU_NUM_DEC)) {
+				val--;
+				changed = true;
+			}
+
+			return changed;
+		}
+
+		std::string String() const override {
+			std::string extra;
+
+			if (selected)
+				extra = "\x81\x7D""1";
+
+			return fmt::format("{}: {}{}", name, OptionBase::ValueAs<T>(), extra);
+		}
 	};
 
 	template<>

@@ -40,7 +40,7 @@ struct fmt::formatter<xenomods::BdatRandomizer::BdatMSScrambleType> : fmt::forma
 			case ScrambleIndex: name = "Scramble Index"; break;
 			case ShowSheetName: name = "Show Sheet/Label Name"; break;
 			case Off: name = "Disabled"; break;
-			case Count: default: name = "Unknown"; break;
+			case Count: default: name = "Unknown - " + std::to_string(reinterpret_cast<std::underlying_type_t<xenomods::BdatRandomizer::BdatMSScrambleType>&>(type)); break;
 		}
 		// clang-format on
 

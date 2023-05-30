@@ -59,12 +59,11 @@ namespace xenomods {
 		BdatOverride::RegisterCallback(&MsOverride());
 
 #if !XENOMODS_CODENAME(bf3)
-		// TODO: enum options
-		/*auto modules = g_Menu->FindSection("modules");
+		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(BdatRandomizer), "BDAT Randomizer");
 			section->RegisterOption<BdatMSScrambleType>(msScrambleType, "Scramble type");
-		}*/
+		}
 #endif
 	}
 
