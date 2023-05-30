@@ -36,7 +36,7 @@ namespace xenomods {
 		about->RegisterTextual(fmt::format("Currently running {} ({:c}) version {}", version::RuntimeGame(), version::RuntimeGame(), version::RuntimeVersion()));
 
 		// i love grammar
-		if (std::string_view(version::RuntimeBuildRevision()).starts_with("Rev"))
+		if(std::string_view(version::RuntimeBuildRevision()).starts_with("Rev"))
 			about->RegisterTextual(fmt::format("Executable {}", version::RuntimeBuildRevision()));
 		else
 			about->RegisterTextual(fmt::format("Executable version {}", version::RuntimeBuildRevision()));
@@ -51,7 +51,7 @@ namespace xenomods {
 		bool doBack = false;
 
 		// only update controls when no option is selected
-		if (curSection == nullptr || !curSection->IsSelectingOption()) {
+		if(curSection == nullptr || !curSection->IsSelectingOption()) {
 			if(input->InputDownStrict(Keybind::MENU_UP)) {
 				curIndex--;
 			} else if(input->InputDownStrict(Keybind::MENU_DOWN)) {
@@ -96,7 +96,7 @@ namespace xenomods {
 	}
 
 	void Menu::Render() {
-		if (drawBackground)
+		if(drawBackground)
 			xenomods::debug::drawFontBackColor(COLOR_BACKGROUND);
 
 		const int fontHeight = xenomods::debug::drawFontGetHeight();
@@ -119,9 +119,10 @@ namespace xenomods {
 				renderNum++;
 			}
 		} else
+			// render the current section
 			curSection->Render(pnt);
 
-		if (drawBackground)
+		if(drawBackground)
 			xenomods::debug::drawFontBackColor({});
 	}
 
@@ -135,29 +136,29 @@ namespace xenomods {
 	}
 
 	Section* FindSectionRecurse(Section* section, const std::string& key) {
-		if (section == nullptr)
+		if(section == nullptr)
 			return nullptr;
 
-		if (section->GetKey() == key)
+		if(section->GetKey() == key)
 			return section;
 
 		// not us, lets check our subsections
-		for (auto& sec : *section->GetSubsections()) {
-			if (sec.GetKey() == key)
+		for(auto& sec : *section->GetSubsections()) {
+			if(sec.GetKey() == key)
 				return &sec;
 
 			// not this subsection, check its subsections
 			auto recurse = FindSectionRecurse(&sec, key);
-			if (recurse != nullptr)
+			if(recurse != nullptr)
 				return recurse;
 		}
 
 		return nullptr;
 	}
 	Section* Menu::FindSection(const std::string& key) {
-		for (auto& sec : sections) {
+		for(auto& sec : sections) {
 			auto recurse = FindSectionRecurse(&sec, key);
-			if (recurse != nullptr)
+			if(recurse != nullptr)
 				return recurse;
 		}
 

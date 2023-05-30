@@ -7,6 +7,9 @@
 
 namespace xenomods {
 
+	/**
+	 * Base class for menu options.
+	 */
 	struct OptionBase {
 		template<class T>
 		explicit constexpr OptionBase(T& v, const std::string& name, void (*callback)())
@@ -18,12 +21,23 @@ namespace xenomods {
 			: OptionBase(v, name, nullptr) {
 		}
 
+		/**
+		 * Called by the menu system when the option is selected.
+		 *
+		 * \param input controller input used by the Menu
+		 * \return true if the provided callback should be called; false otherwise
+		 */
 		virtual bool Update(HidInput* input);
+
 		void Callback() {
 			if(callback != nullptr)
 				callback();
-		};
+		}
 
+		/**
+		 *
+		 * \return A string representation of the option. Usually shows the option's value and any other controls.
+		 */
 		virtual std::string String() const = 0;
 
 		void SetName(const std::string& name);

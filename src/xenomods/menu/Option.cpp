@@ -7,7 +7,7 @@
 namespace xenomods {
 
 	bool OptionBase::Update(HidInput* input) {
-		if (input->InputUpStrict(Keybind::MENU_BACK)) {
+		if(input->InputUpStrict(Keybind::MENU_BACK)) {
 			selected = false;
 			return false;
 		}

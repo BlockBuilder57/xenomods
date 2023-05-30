@@ -1,46 +1,21 @@
 ## Controls
 
-Xenomods mostly utilizes a second controller to interact with the game, as most buttons are already taken up on the first controller. Moonjump and event debugging are notable exceptions to this however, they are used by player 1.
-
-Check out the list below to see what does what.
+Xenomods mostly utilizes a menu to interact with the game, as most buttons are already taken up on the controller. A few specific things like moonjump and event debugging are notable exceptions to this.
 
 ---
 
-### Gameplay:
-| Action                  | Control                 | Description                                                                                                              |
-|-------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| Moonjump                | R+B, **P1**             | Hold to make the player infinitely fly in the air.                                                                       |
-| Fall Damage Toggle      | A, **P2**               | Toggles taking fall damage. Incredibly useful so you don't fall to your death with the moonjump.<br/>**On by default.**  |
-| Movement Speed Up       | Dpad Up, **P2**         | Multiplies the player's movement speed by 2.                                                                             |
-| Movement Speed Down     | Dpad Down, **P2**       | Divides the player's movement speed by 2.                                                                                |
-| Save Warp               | L+ZL+Dpad Left, **P2**  | Saves the location of the party lead.                                                                                    |
-| Load Warp               | L+ZL+Dpad Right, **P2** | Loads the saved location of the party lead.                                                                              |
-| Access Closed Landmarks | ZL+Dpad Up, **P2**      | (Only for 2/Torna) Toggles the accessibility of blocked landmarks (ie, you can visit Indol again)<br/>**On by default.** |
-| Jump to MapJump         | ZL+Dpad Down, **P2**    | Jumps to the MapJump with the id of the temp int. Look below for a list.                                                 |
-| Play Sound Effect       | ZL+Minus, **P2**        | Plays a common sound effect with the id of the temp int.                                                                 |
-| Temp Int Increment      | ZL+Dpad Right, **P2**   | Increments the temp int.                                                                                                 |
-| Temp Int Decrement      | ZL+Dpad Left, **P2**    | Decrements the temp int.                                                                                                 |
-| Straighten Font         | L+Y, **P2**             | Straightens out the font used in 2 and Torna. Nice meme.                                                                 |
+#### P1 controls:
+| Action                | Control      | Description                                                                                                  |
+|-----------------------|--------------|--------------------------------------------------------------------------------------------------------------|
+| Moonjump              | R+B          | Hold to make the player infinitely fly in the air.                                                           |
+| Events - Toggle Debug | R+Dpad Up    | Toggles debug rendering from the currently selected event manager.<br>**Only applicable in 2/Torna events.** |
+| Events - Prev Debug   | R+Dpad Left  | Selects the previous event manager.<br>**Only applicable in 2/Torna events.**                                |
+| Events - Next Debug   | R+Dpad Right | Selects the next event manager.<br>**Only applicable in 2/Torna events.**                                    |
 
-MapJump/Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/common/SYS_MapJumpList.html) for 2/Torna and [here](https://xenoblade.github.io/xb1de/bdat/bdat_common/landmarklist.html) for DE.
+#### Camera controls:
 
-### Debug:
-| Action                  | Control              | Description                                                                                                                                    |
-|-------------------------|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| Return To Title         | L+R+ZL+ZR, **P2**    | Returns the player to the title screen.                                                                                                        |
-| Events - Toggle Debug   | R+Dpad Up, **P1**    | **Only applicable in events.** Toggles debug rendering from the currently selected event manager.                                              |
-| Events - Prev Debug     | R+Dpad Left, **P1**  | **Only applicable in events.** Selects the previous event manager.                                                                             |
-| Events - Next Debug     | R+Dpad Right, **P1** | **Only applicable in events.** Selects the next event manager.                                                                                 |
-| Toggle UI Rendering     | Y, **P2**            | Toggles UI rendering of the engine. (Try this on loading screens!)                                                                             |
-| Toggle Debug Rendering  | B, **P2**            | Toggles various debug displays, both original to the game and custom.<br/>**On by default.**                                                   |
-| Swap BDAT Scramble Type | X, **P2**            | Toggles scrambling the results of text fetches in Bdat tables. Cycles between Disabled, Scramble, and Sheet Name.<br/>**Disabled by default.** |
-| Test Button             | Minus+A, **P2**      | Test button, has no defined usage. Usually does nothing.                                                                                       |
-| Reload Config File      | Plus, **P2**         | Reloads the config file and Bdat override from the SD card.                                                                                    |
-| Test Logger             | Plus+R, **P2**       | A simple test for the logger.                                                                                                                  |
-| Display Version         | Plus+Minus, **P2**   | Displays information about the current version of Xenomods. (And in debug builds, the running game.)                                           |
+Camera controls only exist on P2, so both analog sticks are always free.
 
-
-### Camera:
 | Action                            | Control                | Description                                                                                                                                                 |
 |-----------------------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Freecam Toggle                    | LStick+RStick, **P2**  | Enables the free camera. Left stick controls movement, right stick controls the view.                                                                       |
@@ -57,3 +32,98 @@ MapJump/Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/co
 | Rendering - Toggle Depth of Field | L+R+Y, **P2**          | Toggles the depth of field/blur effect.                                                                                                                     |
 | Rendering - Toggle Motion Blur    | L+R+X, **P2**          | Toggles motion blur. Not too common in this engine, but distinct enough.                                                                                    |
 | Rendering - Toggle Color Filter   | L+R+A, **P2**          | Disables color filters/color correction.                                                                                                                    |
+
+## Menu
+
+Xenomods has a menu for controlling its different modules.
+
+The menu can be opened by P1, but will always be P2 if the controller is connected.
+
+---
+
+#### Basic controls:
+| Action      | Control    | Description                                                              |
+|-------------|------------|--------------------------------------------------------------------------|
+| Toggle Menu | L+R+ZL+ZR  | Opens the Menu. Will take the place of logger messages.                  |
+| Up          | Dpad Up    | Navigates to the previous choice.                                        |
+| Down        | Dpad Down  | Navigates to the next choice.                                            |
+| Select      | Dpad Right | Selects the currently hovered choice. Will automatically call functions. |
+| Back        | Dpad Left  | Returns to the parent section/deselects the current option.              |
+
+#### Option controls:
+
+These are the controls for Options (numbers, booleans, functions).
+
+| Action         | Control   | Description                                                                                                                                 |
+|----------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| Increment      | Dpad Up   | Increments the number or toggles the boolean.                                                                                               |
+| Decrement      | Dpad Down | Decrements the number or toggles the boolean.                                                                                               |
+| Multiply by 2  | B         | Hold while changing a number to instead multiply or divide the number by 2.                                                                 |
+| Change by Tens | A         | Hold while changing a number to increment/decrement by the integer log of the number.<br>(12 would increment by 10, 123 would be 100, etc.) |
+| Negate         | Y         | Press to negate the current number.                                                                                                         |
+| Set to 0       | X         | Sets the current number to 0.                                                                                                               |
+
+
+### Modules
+
+#### Debug Stuff
+| Option                  | Description                                                                                                             |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| Enable debug rendering  | Toggles various debug displays, both original to the game and custom.<br/>**On by default.**                            |
+| Access closed landmarks | Toggles the accessibility of blocked landmarks (ie, you can visit Indol again)<br/>**Only for 2/Torna. On by default.** |
+| Temp Int                | A temporary number for use with the below functions.                                                                    |
+| Jump to Landmark        | Jumps to the MapJump with the id of the temp int. Look below for a list.                                                |
+| Play Sound Effect       | Plays a common sound effect with the id of the temp int.                                                                |
+| Return To Title         | Returns the player to the title screen.                                                                                 |
+
+Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/common/SYS_MapJumpList.html) for 2/Torna and [here](https://xenoblade.github.io/xb1de/bdat/bdat_common/landmarklist.html) for DE.
+
+#### File Detours
+| Option                | Description                                                                 |
+|-----------------------|-----------------------------------------------------------------------------|
+| Dump file reads       | Config option. Dumps files that use compressed blocks to the SD card.       |
+| Enable file overrides | Config option. Overrides compressed block reads using files on the SD card. |
+
+#### Camera Tools
+| Option                        | Description                                                                                            |
+|-------------------------------|--------------------------------------------------------------------------------------------------------|
+| Freecam                       | Toggles the freecam being on or not.                                                                   |
+| Freecam speed (m/s)           | Controls the movement speed of the freecam.                                                            |
+| Camera pos X/Y/Z              | Displays the position of the camera. Modifying the value will enable the freecam and set its position. |
+| Camera rot X/Y/Z              | Displays the rotation of the camera. Modifying the value will enable the freecam and set its rotation. |
+| Camera FOV                    | Displays the field of view of the camera. Modifying the value will enable the freecam and set its FOV. |
+| Teleport party lead to camera | Sets the position of the party lead to the position of the camera.<br>**2/Torna/DE only.**             |
+
+#### Menu Viewer
+| Option              | Description                                                        |
+|---------------------|--------------------------------------------------------------------|
+| Enable UI rendering | Toggles UI rendering of the engine. (Try this on loading screens!) |
+| Straighten font     | Straightens out the font used in 2 and Torna. Nice meme.           |
+
+#### Player Movement
+| Option                    | Description                                                                                                             |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| Disable fall damage       | Toggles taking fall damage. Incredibly useful so you don't fall to your death with the moonjump.<br/>**On by default.** |
+| Movement speed multiplier | Multiplies the player's movement speed by the given amount.                                                             |
+| Save Warp                 | Saves the location of the party lead.                                                                                   |
+| Load Warp                 | Loads the saved location of the party lead.                                                                             |
+| Warp pos X/Y/Z            | Controls the position of the saved warp.                                                                                |
+
+#### BDAT Randomizer
+| Option        | Description                                                                                          |
+|---------------|------------------------------------------------------------------------------------------------------|
+| Scramble type | Toggles scrambling the text in BDAT tables. Cycles between Disabled, Scramble Index, and Sheet Name. |
+
+#### Battle Cheats
+| Option                   | Description                                                     |
+|--------------------------|-----------------------------------------------------------------|
+| Player damage multiplier | Config option. Multiplies the damage done by player characters. |
+| Enemy damage multiplier  | Config option. Multiplies the damage done by enemies.           |
+
+
+### State
+
+| Option                       | Description                                                  |
+|------------------------------|--------------------------------------------------------------|
+| Draw menu background         | Toggles drawing of the Menu's backround.                     |
+| Reload config/BDAT overrides | Reloads the config file and BDAT overrides from the SD card. |
