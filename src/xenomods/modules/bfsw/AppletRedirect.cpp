@@ -61,7 +61,7 @@ namespace xenomods {
 		while(iter != entries.end()) {
 			auto& entry = *iter;
 			auto name_str = std::string(entry.name);
-			if(!name_str.ends_with(".sav") || name_str.starts_with("bfssystem")) {
+			if(!name_str.ends_with(".sav") || !name_str.starts_with("bfs") || name_str.starts_with("bfssystem")) {
 				entries.erase(iter);
 				continue;
 			}
