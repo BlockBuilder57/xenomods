@@ -43,6 +43,22 @@ namespace {
 	};
 
 #if XENOMODS_OLD_ENGINE
+	struct SkipParticleRendering : skylaunch::hook::Trampoline<SkipParticleRendering> {
+		static void Hook(void* this_pointer, void* DrDrawWorkInfoEF, int param_2, bool param_3) {
+			if(!xenomods::RenderingControls::skipParticleRendering)
+				Orig(this_pointer, DrDrawWorkInfoEF, param_2, param_3);
+		}
+	};
+#elif XENOMODS_CODENAME(bfsw)
+	struct SkipParticleRendering : skylaunch::hook::Trampoline<SkipParticleRendering> {
+		static void Hook(void* this_pointer) {
+			if(!xenomods::RenderingControls::skipParticleRendering)
+				Orig(this_pointer);
+		}
+	};
+#endif
+
+#if XENOMODS_OLD_ENGINE
 	struct StraightensYourXenoblade : skylaunch::hook::Trampoline<StraightensYourXenoblade> {
 		static void Hook(layer::LayerObjFont* this_pointer, void* LayerRenderView, void* LayerResMatrix, void* LayerResColor) {
 			float temp = this_pointer->slopeRot;
@@ -78,13 +94,18 @@ namespace xenomods {
 
 #if XENOMODS_OLD_ENGINE
 		StraightensYourXenoblade::HookAt("_ZN5layer12LayerObjFont17updateShaderParmsEPKNS_15LayerRenderViewERKNS_14LayerResMatrixERKNS_13LayerResColorE");
+		SkipParticleRendering::HookAt("_ZN5ptlib15ParticleManager4drawEPKNS_16DrDrawWorkInfoEFEib");
+#elif XENOMODS_CODENAME(bfsw)
+		SkipParticleRendering::HookAt("_ZN4xefb9CEEmitter4drawEv");
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(RenderingControls), "Rendering Controls");
 			section->RegisterOption<bool>(skipUIRendering, "Skip UI rendering");
-			section->RegisterOption<bool>(skipParticleRendering, "Skip particle rendering");
+#if !XENOMODS_CODENAME(bf3)
+			section->RegisterOption<bool>(skipParticleRendering, "Skip particle+overlay rendering");
+#endif
 #if XENOMODS_OLD_ENGINE
 			section->RegisterOption<bool>(straightenFont, "Straighten font");
 #endif
