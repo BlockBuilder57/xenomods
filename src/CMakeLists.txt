@@ -20,7 +20,7 @@ add_executable(xenomods
 		xenomods/modules/FileDetours.cpp
 		xenomods/modules/BdatOverride.cpp
 		xenomods/modules/CameraTools.cpp
-		xenomods/modules/MenuViewer.cpp
+        xenomods/modules/RenderingControls.cpp
 		xenomods/modules/PlayerMovement.cpp
 		xenomods/modules/BdatRandomizer.cpp
 		xenomods/modules/FrameratePatch.cpp

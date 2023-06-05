@@ -9,8 +9,6 @@
 #include <xenomods/Version.hpp>
 #include <xenomods/menu/Menu.hpp>
 
-#include "../modules/MenuViewer.hpp"
-
 namespace xenomods {
 
 	mm::Col4 Menu::COLOR_BACKGROUND = { 0, 0, 0, 0.6f };

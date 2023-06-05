@@ -127,8 +127,6 @@ namespace xenomods {
 
 	CameraTools::CameraMeta CameraTools::Meta = {};
 
-	CameraTools::RenderParmForces CameraTools::RenderParameters = {};
-
 	void CameraTools::UpdateMeta() {
 		glm::vec3 pos {};
 		glm::quat rot {};
@@ -354,57 +352,6 @@ namespace xenomods {
 			}
 #endif
 		}
-
-#if !XENOMODS_CODENAME(bf3)
-		if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_1)) {
-			auto acc = ml::ScnRenderDrSysParmAcc();
-			// done this way because 2/Torna do not have is/setDispMap
-			acc.drMan->hideMap = !acc.drMan->hideMap;
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled map: {}", !acc.drMan->hideMap);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_2)) {
-			auto acc = ml::ScnRenderDrSysParmAcc();
-			static bool fogSkip;
-			fogSkip = !fogSkip;
-			acc.setFogSkip(fogSkip);
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled fog: {}", !fogSkip);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_3)) {
-			auto acc = ml::ScnRenderDrSysParmAcc();
-			acc.setBloom(!acc.isBloomOn());
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled bloom: {}", acc.isBloomOn());
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_4)) {
-			auto acc = ml::ScnRenderDrSysParmAcc();
-			acc.setToneMap(!acc.isToneMap());
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled tone mapping: {}", acc.isToneMap());
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_5)) {
-			RenderParameters.DisableDOF = !RenderParameters.DisableDOF;
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled depth of field: {}", !RenderParameters.DisableDOF);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_6)) {
-			RenderParameters.DisableMotionBlur = !RenderParameters.DisableMotionBlur;
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled motion blur: {}", !RenderParameters.DisableMotionBlur);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::CAMERA_RENDER_TOGGLE_7)) {
-			RenderParameters.DisableColorFilter = !RenderParameters.DisableColorFilter;
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled color filter: {}", !RenderParameters.DisableColorFilter);
-		}
-
-		if (RenderParameters.Any()) {
-			auto acc = ml::ScnRenderDrSysParmAcc();
-
-			if (RenderParameters.DisableDOF) {
-				acc.setDOFOverride(true);
-				acc.setDOF(false);
-			}
-			if (RenderParameters.DisableMotionBlur) {
-				acc.setMotBlurOverride(true);
-				acc.setMotBlur(false);
-			}
-			if (RenderParameters.DisableColorFilter) {
-				acc.setColorFilterOverride(true);
-				acc.setColorFilterNum(0);
-				acc.setColorFilterFarNum(0);
-				acc.setColorFilterFrm(0);
-			}
-		}
-#endif
 	}
 
 	XENOMODS_REGISTER_MODULE(CameraTools);

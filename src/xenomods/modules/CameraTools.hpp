@@ -28,17 +28,6 @@ namespace xenomods {
 		};
 		static CameraMeta Meta;
 
-		struct RenderParmForces {
-			bool DisableDOF;
-			bool DisableMotionBlur;
-			bool DisableColorFilter;
-
-			bool Any() {
-				return DisableDOF || DisableMotionBlur || DisableColorFilter;
-			}
-		};
-		static RenderParmForces RenderParameters;
-
 		static void UpdateMeta();
 
 		void Initialize() override;

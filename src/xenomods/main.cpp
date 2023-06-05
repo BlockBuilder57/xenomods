@@ -4,19 +4,23 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
-#include <xenomods/menu/Menu.hpp>
 #include <xenomods/NnFile.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Version.hpp>
+#include <xenomods/menu/Menu.hpp>
 #include <xenomods/stuff/utils/debug_util.hpp>
 
 #include "modules/DebugStuff.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
+#include "xenomods/engine/gf/MenuObject.hpp"
+#include "xenomods/engine/layer/LayerManager.hpp"
+#include "xenomods/engine/layer/LayerObj.hpp"
 #include "xenomods/engine/ml/DevGraph.hpp"
 #include "xenomods/engine/ml/Filesystem.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
+#include "xenomods/engine/ui/UIObjectAcc.hpp"
 
 namespace {
 
@@ -74,6 +78,71 @@ namespace {
 			((void(*)(unsigned int))(skylaunch::utils::g_MainTextAddr + 0x1248774))(0);
 			((void(*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::g_MainTextAddr + 0x124bdec))(-1, identity, identity);
 			((void(*)())(skylaunch::utils::g_MainTextAddr + 0x1248798))();
+		}
+	};
+#endif
+
+#if XENOMODS_OLD_ENGINE
+	struct MainMenuVersionInfo : skylaunch::hook::Trampoline<MainMenuVersionInfo> {
+		static void Hook(gf::GfMenuObjTitle* this_pointer) {
+			Orig(this_pointer);
+
+			ui::UIObjectAcc titlescreen = ui::UIObjectAcc(this_pointer->rootUIObjAcc);
+			ui::UIObjectAcc versionNum = ui::UIObjectAcc(this_pointer->rootUIObjAcc, "TXT_version_num");
+			if (versionNum.uiObject == nullptr)
+				return;
+
+			// get the offset the game version has
+			mm::Rect<short> versionRect;
+			mm::Rect<short> scratchRect;
+			mm::Pnt<short> scratchPos;
+
+			versionNum.getRect(versionRect, 2);
+			short offsetX = 1280 - versionRect.w - versionRect.x;
+			short offsetY = versionRect.y + versionRect.h;
+
+			// we're duplicating the copyright text for its length
+			// for whatever reason we're still bounded by some size of the ui object,
+			// and it doesn't seem like there's a clear way to change it properly
+			ui::UIObjectAcc modVersion = ui::UIObjectAcc(titlescreen.duplicateChild("TXT_copyright"));
+			if (modVersion.uiObject == nullptr)
+				return;
+
+			modVersion.uiObject->name.set("TXT_mod_version");
+
+			// make the version string...
+			auto modVersionStr = fmt::format("xenomods {}", xenomods::version::BuildGitVersion());
+			auto modVersionUIStr = ui::UIStr(modVersionStr.c_str(), true);
+			modVersion.setText(modVersionUIStr);
+
+			// now we can use the offset for ourselves
+			modVersion.getRect(scratchRect, 2);
+			scratchPos.x = 1280 - offsetX - scratchRect.w;
+			scratchPos.y = offsetY += 2;
+			offsetY += scratchRect.h;
+			modVersion.setPos(scratchPos);
+
+	#if _DEBUG
+			// might as well show a build string too
+			// ideally this would just be a newline in the version string,
+			// but it seems that fixing the text size is more hassle than its worth
+
+			ui::UIObjectAcc modBuildDate = ui::UIObjectAcc(titlescreen.duplicateChild("TXT_copyright"));
+			if (modBuildDate.uiObject == nullptr)
+				return;
+
+			modBuildDate.uiObject->name.set("TXT_mod_builddate");
+
+			auto modBuildDateUIStr = ui::UIStr(xenomods::version::BuildTimestamp(), true);
+			modBuildDate.setText(modBuildDateUIStr);
+
+			modBuildDate.getRect(scratchRect, 2);
+			scratchPos.x = 1280 - offsetX - scratchRect.w;
+			scratchPos.y = offsetY += 2;
+			offsetY += scratchRect.h;
+			modBuildDate.setPos(scratchPos);
+	#endif
+
 		}
 	};
 #endif
@@ -206,6 +275,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		g_Menu->Initialize();
 		InitializeAllRegisteredModules();
 
+#if XENOMODS_OLD_ENGINE
 #if XENOMODS_CODENAME(bf2)
 		if(GetState().config.mountTornaContent) {
 			NnFile file("rom:/ira-xm.arh", nn::fs::OpenMode_Read);
@@ -216,6 +286,8 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 				ml::DevFileTh::registArchive(ml::MEDIA::Default, "ira-xm.arh", "ira-xm.ard", "aoc1:/");
 			}
 		}
+#endif
+		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
 #endif
 
 #if XENOMODS_CODENAME(bfsw)

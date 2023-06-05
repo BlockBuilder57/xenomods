@@ -106,6 +106,8 @@ namespace ml {
 		bool hideChara;
 		bool hideMap;
 
+		DrMan(Scn* scene);
+
 		static DrMan* get();
 	};
 
