@@ -42,6 +42,13 @@ namespace {
 		}
 	};
 
+	struct SkipCloudRendering : skylaunch::hook::Trampoline<SkipCloudRendering> {
+		static void Hook(void* this_pointer, ml::IDrDrawWorkInfo* param_1, void* DrMdoZSortMan) {
+			if(!xenomods::RenderingControls::skipCloudRendering)
+				Orig(this_pointer, param_1, DrMdoZSortMan);
+		}
+	};
+
 #if XENOMODS_OLD_ENGINE
 	struct SkipParticleRendering : skylaunch::hook::Trampoline<SkipParticleRendering> {
 		static void Hook(void* this_pointer, void* DrDrawWorkInfoEF, int param_2, bool param_3) {
@@ -78,6 +85,7 @@ namespace xenomods {
 
 	bool RenderingControls::skipUIRendering = false;
 	bool RenderingControls::skipParticleRendering = false;
+	bool RenderingControls::skipCloudRendering = false;
 	bool RenderingControls::straightenFont = false;
 
 	void RenderingControls::Initialize() {
@@ -87,6 +95,7 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 		AddRenderingOptionsToMenu::HookAt("_ZN2ml5DrManC1EPNS_3ScnE");
+		SkipCloudRendering::HookAt("_ZN5cloud8CloudMan5applyEPKN2ml15IDrDrawWorkInfoEPNS1_13DrMdoZSortManE");
 #else
 		SkipLayerRendering::HookFromBase(0x710100f790);
 		SkipLayer2Rendering::HookFromBase(0x710100f808);
@@ -102,12 +111,13 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(RenderingControls), "Rendering Controls");
+#if XENOMODS_OLD_ENGINE
+			section->RegisterOption<bool>(straightenFont, "Straighten font");
+#endif
 			section->RegisterOption<bool>(skipUIRendering, "Skip UI rendering");
 #if !XENOMODS_CODENAME(bf3)
 			section->RegisterOption<bool>(skipParticleRendering, "Skip particle+overlay rendering");
-#endif
-#if XENOMODS_OLD_ENGINE
-			section->RegisterOption<bool>(straightenFont, "Straighten font");
+			section->RegisterOption<bool>(skipCloudRendering, "Skip cloud rendering");
 #endif
 		}
 	}

@@ -7,6 +7,7 @@ namespace xenomods {
 	struct RenderingControls : public xenomods::UpdatableModule {
 		static bool skipUIRendering;
 		static bool skipParticleRendering;
+		static bool skipCloudRendering;
 		static bool straightenFont;
 
 		struct RenderParmForces {
