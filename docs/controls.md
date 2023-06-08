@@ -25,7 +25,6 @@ Camera controls only exist on P2, so both analog sticks are always free.
 | Freecam - Change FOV              | L+R+LStick, **P2**     | Changes the field of view of the freecam. Up on the stick to tighten in, down to loosen up.<br/>Click to reset to 80.                                       |
 | Freecam - Change Roll             | L+R+RStick, **P2**     | Changes the roll (tilt) of the freecam. The stick controls the amount of added tilt in each direction.<br/>Click to completely reset rotation.              |
 | Freecam - Teleport Player         | L+R+B, **P2**          | Teleports the player to the freecam's position.                                                                                                             |
-| Rendering - Toggle Map            | L+R+Dpad Up, **P2**    | Toggles rendering of the map geometry. Props are included, but certain ones (like interactable objects) remain.                                             |
 | Rendering - Toggle Fog (+ Sky)    | L+R+Dpad Left, **P2**  | Toggles rendering of the fog effect. By extension, this also includes the nice blue sky.                                                                    |
 | Rendering - Toggle Bloom          | L+R+Dpad Right, **P2** | Toggles the bloom effect.                                                                                                                                   |
 | Rendering - Toggle Tonemap        | L+R+Dpad Down, **P2**  | Toggles tonemapping. This simulates what eyes do when entering dark areas. As a result, turning this off makes many scenes dark (sometimes to good effect!) |
@@ -94,11 +93,14 @@ Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/common/SYS
 | Camera FOV                    | Displays the field of view of the camera. Modifying the value will enable the freecam and set its FOV. |
 | Teleport party lead to camera | Sets the position of the party lead to the position of the camera.<br>**2/Torna/DE only.**             |
 
-#### Menu Viewer
-| Option              | Description                                                        |
-|---------------------|--------------------------------------------------------------------|
-| Enable UI rendering | Toggles UI rendering of the engine. (Try this on loading screens!) |
-| Straighten font     | Straightens out the font used in 2 and Torna. Nice meme.           |
+#### Rendering Controls
+| Option                          | Description                                                                                                   |
+|---------------------------------|---------------------------------------------------------------------------------------------------------------|
+| Straighten font                 | Straightens out the font used in 2 and Torna. Nice meme.<br>**2/Torna only.**                                 |
+| Skip UI rendering               | Skips rendering the UI. (Try this on loading screens!)                                                        |
+| Skip particle+overlay rendering | Skips rendering particle effects as well as any screen overlay effects, like visions.<br>**2/Torna/DE only.** |
+| Skip cloud (sea) rendering      | Skips rendering the cloud effect, used by skyboxes in 2 and the cloud sea.<br>**2/Torna/DE only.**            |
+| Skip sky dome rendering         | Skips rendering the "sky dome," the plain sky gradient in the background.<br>**2/Torna/DE only.**             |
 
 #### Player Movement
 | Option                    | Description                                                                                                             |

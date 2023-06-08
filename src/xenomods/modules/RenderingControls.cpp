@@ -126,7 +126,7 @@ namespace xenomods {
 			section->RegisterOption<bool>(skipUIRendering, "Skip UI rendering");
 #if !XENOMODS_CODENAME(bf3)
 			section->RegisterOption<bool>(skipParticleRendering, "Skip particle+overlay rendering");
-			section->RegisterOption<bool>(skipCloudRendering, "Skip cloud rendering");
+			section->RegisterOption<bool>(skipCloudRendering, "Skip cloud (sea) rendering");
 			section->RegisterOption<bool>(skipSkyDomeRendering, "Skip sky dome rendering");
 #endif
 		}
