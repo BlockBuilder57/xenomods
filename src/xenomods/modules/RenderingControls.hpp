@@ -8,6 +8,7 @@ namespace xenomods {
 		static bool skipUIRendering;
 		static bool skipParticleRendering;
 		static bool skipCloudRendering;
+		static bool skipSkyDomeRendering;
 		static bool straightenFont;
 
 		struct RenderParmForces {

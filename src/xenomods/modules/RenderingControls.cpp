@@ -49,6 +49,13 @@ namespace {
 		}
 	};
 
+	struct SkipSkyDomeRendering : skylaunch::hook::Trampoline<SkipSkyDomeRendering> {
+		static void Hook(void* this_pointer) {
+			if(!xenomods::RenderingControls::skipSkyDomeRendering)
+				Orig(this_pointer);
+		}
+	};
+
 #if XENOMODS_OLD_ENGINE
 	struct SkipParticleRendering : skylaunch::hook::Trampoline<SkipParticleRendering> {
 		static void Hook(void* this_pointer, void* DrDrawWorkInfoEF, int param_2, bool param_3) {
@@ -86,6 +93,7 @@ namespace xenomods {
 	bool RenderingControls::skipUIRendering = false;
 	bool RenderingControls::skipParticleRendering = false;
 	bool RenderingControls::skipCloudRendering = false;
+	bool RenderingControls::skipSkyDomeRendering = false;
 	bool RenderingControls::straightenFont = false;
 
 	void RenderingControls::Initialize() {
@@ -96,6 +104,7 @@ namespace xenomods {
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 		AddRenderingOptionsToMenu::HookAt("_ZN2ml5DrManC1EPNS_3ScnE");
 		SkipCloudRendering::HookAt("_ZN5cloud8CloudMan5applyEPKN2ml15IDrDrawWorkInfoEPNS1_13DrMdoZSortManE");
+		SkipSkyDomeRendering::HookAt("_ZN2ml9DrPixlMan13renderSkyDomeEv");
 #else
 		SkipLayerRendering::HookFromBase(0x710100f790);
 		SkipLayer2Rendering::HookFromBase(0x710100f808);
@@ -118,6 +127,7 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 			section->RegisterOption<bool>(skipParticleRendering, "Skip particle+overlay rendering");
 			section->RegisterOption<bool>(skipCloudRendering, "Skip cloud rendering");
+			section->RegisterOption<bool>(skipSkyDomeRendering, "Skip sky dome rendering");
 #endif
 		}
 	}
