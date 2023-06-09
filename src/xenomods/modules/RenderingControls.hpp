@@ -5,13 +5,13 @@
 namespace xenomods {
 
 	struct RenderingControls : public xenomods::UpdatableModule {
+		static bool straightenFont;
 		static bool skipUIRendering;
 		static bool skipParticleRendering;
 		static bool skipCloudRendering;
 		static bool skipSkyDomeRendering;
-		static bool straightenFont;
 
-		struct RenderParmForces {
+		struct ForcedRenderParameters {
 			bool DisableDOF;
 			bool DisableMotionBlur;
 			bool DisableColorFilter;
@@ -20,7 +20,7 @@ namespace xenomods {
 				return DisableDOF || DisableMotionBlur || DisableColorFilter;
 			}
 		};
-		static RenderParmForces RenderParameters;
+		static ForcedRenderParameters ForcedParameters;
 
 		void Initialize() override;
 		void Update(fw::UpdateInfo* updateInfo) override;

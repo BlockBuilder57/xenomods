@@ -16,21 +16,15 @@ Xenomods mostly utilizes a menu to interact with the game, as most buttons are a
 
 Camera controls only exist on P2, so both analog sticks are always free.
 
-| Action                            | Control                | Description                                                                                                                                                 |
-|-----------------------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Freecam Toggle                    | LStick+RStick, **P2**  | Enables the free camera. Left stick controls movement, right stick controls the view.                                                                       |
-| -                                 | -                      | **!! ALL BELOW ONLY FUNCTION WHILE THE FREECAM IS ACTIVE !!**                                                                                               |
-| Freecam - Speed Up                | L+R+Plus, **P2**       | Increases the speed of the freecam.                                                                                                                         |
-| Freecam - Speed Down              | L+R+Minus, **P2**      | Decreases the speed of the freecam.                                                                                                                         |
-| Freecam - Change FOV              | L+R+LStick, **P2**     | Changes the field of view of the freecam. Up on the stick to tighten in, down to loosen up.<br/>Click to reset to 80.                                       |
-| Freecam - Change Roll             | L+R+RStick, **P2**     | Changes the roll (tilt) of the freecam. The stick controls the amount of added tilt in each direction.<br/>Click to completely reset rotation.              |
-| Freecam - Teleport Player         | L+R+B, **P2**          | Teleports the player to the freecam's position.                                                                                                             |
-| Rendering - Toggle Fog (+ Sky)    | L+R+Dpad Left, **P2**  | Toggles rendering of the fog effect. By extension, this also includes the nice blue sky.                                                                    |
-| Rendering - Toggle Bloom          | L+R+Dpad Right, **P2** | Toggles the bloom effect.                                                                                                                                   |
-| Rendering - Toggle Tonemap        | L+R+Dpad Down, **P2**  | Toggles tonemapping. This simulates what eyes do when entering dark areas. As a result, turning this off makes many scenes dark (sometimes to good effect!) |
-| Rendering - Toggle Depth of Field | L+R+Y, **P2**          | Toggles the depth of field/blur effect.                                                                                                                     |
-| Rendering - Toggle Motion Blur    | L+R+X, **P2**          | Toggles motion blur. Not too common in this engine, but distinct enough.                                                                                    |
-| Rendering - Toggle Color Filter   | L+R+A, **P2**          | Disables color filters/color correction.                                                                                                                    |
+| Action                           | Control                | Description                                                                                                                                                 |
+|----------------------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Freecam Toggle                   | LStick+RStick, **P2**  | Enables the free camera. Left stick controls movement, right stick controls the view.                                                                       |
+| -                                | -                      | **!! ALL BELOW ONLY FUNCTION WHILE THE FREECAM IS ACTIVE !!**                                                                                               |
+| Freecam - Speed Up               | L+R+Plus, **P2**       | Increases the speed of the freecam.                                                                                                                         |
+| Freecam - Speed Down             | L+R+Minus, **P2**      | Decreases the speed of the freecam.                                                                                                                         |
+| Freecam - Change FOV             | L+R+LStick, **P2**     | Changes the field of view of the freecam. Up on the stick to tighten in, down to loosen up.<br/>Click to reset to 80.                                       |
+| Freecam - Change Roll            | L+R+RStick, **P2**     | Changes the roll (tilt) of the freecam. The stick controls the amount of added tilt in each direction.<br/>Click to completely reset rotation.              |
+| Freecam - Teleport Player        | L+R+B, **P2**          | Teleports the player to the freecam's position.                                                                                                             |
 
 ## Menu
 
@@ -51,7 +45,7 @@ The menu can be opened by P1, but will always be P2 if the controller is connect
 
 #### Option controls:
 
-These are the controls for Options (numbers, booleans, functions).
+These are the controls for Options (numbers, booleans, enums).
 
 | Action         | Control   | Description                                                                                                                                 |
 |----------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------|
@@ -94,6 +88,18 @@ Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/common/SYS
 | Teleport party lead to camera | Sets the position of the party lead to the position of the camera.<br>**2/Torna/DE only.**             |
 
 #### Rendering Controls
+
+###### Toggles...
+| Option                | Description                                                                                                                                                                         |
+|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Toggle map            | Toggles rendering of the map geometry. Props are included, but any interactable objects or cutscene props remain.<br>**2/Torna/DE only.**                                           |
+| Toggle fog            | Toggles rendering of the fog. For some reason, this also includes the sky dome.<br>**2/Torna/DE only.**                                                                             |
+| Toggle bloom          | Toggles the bloom effect.<br>**2/Torna/DE only.**                                                                                                                                   |
+| Toggle tonemapping    | Toggles tonemapping. This simulates what eyes do when entering dark areas. As a result, turning this off makes many scenes dark (sometimes to cool effect!)<br>**2/Torna/DE only.** |
+| Toggle depth of field | Toggles the depth of field/blur effect.<br>**2/Torna/DE only.**                                                                                                                     |
+| Toggle motion blur    | Toggles motion blur. Not incredibly distracting in this engine, but is often seen in cutscenes.<br>**2/Torna/DE only.**                                                             |
+| Toggle color filter   | Toggles color filters/color correction.<br>**2/Torna/DE only.**                                                                                                                     |
+
 | Option                          | Description                                                                                                   |
 |---------------------------------|---------------------------------------------------------------------------------------------------------------|
 | Straighten font                 | Straightens out the font used in 2 and Torna. Nice meme.<br>**2/Torna only.**                                 |

@@ -16,18 +16,6 @@
 
 namespace {
 
-	struct AddRenderingOptionsToMenu : skylaunch::hook::Trampoline<AddRenderingOptionsToMenu> {
-		static void Hook(ml::DrMan* this_pointer, ml::Scn* scene) {
-			Orig(this_pointer, scene);
-
-			auto section = xenomods::g_Menu->FindSection("RenderingControls");
-			if (section != nullptr) {
-				section->RegisterOption<bool>(this_pointer->hideMap, "Hide map");
-				//section->RegisterOption<bool>(this_pointer->hideChara, "Hide characters");
-			}
-		}
-	};
-
 	struct SkipLayerRendering : skylaunch::hook::Trampoline<SkipLayerRendering> {
 		static void Hook(layer::LayerManager* this_pointer, ml::IDrDrawWorkInfo* info) {
 			if(!xenomods::RenderingControls::skipUIRendering)
@@ -88,7 +76,7 @@ namespace {
 
 namespace xenomods {
 
-	RenderingControls::RenderParmForces RenderingControls::RenderParameters = {};
+	RenderingControls::ForcedRenderParameters RenderingControls::ForcedParameters = {};
 
 	bool RenderingControls::skipUIRendering = false;
 	bool RenderingControls::skipParticleRendering = false;
@@ -96,13 +84,50 @@ namespace xenomods {
 	bool RenderingControls::skipSkyDomeRendering = false;
 	bool RenderingControls::straightenFont = false;
 
+	const std::string toggleKey = std::string(STRINGIFY(RenderingControls)) + "_Toggles";
+
+	void MenuToggleMap() {
+		auto acc = ml::ScnRenderDrSysParmAcc();
+		// done this way because 2/Torna do not have is/setDispMap
+		acc.drMan->hideMap = !acc.drMan->hideMap;
+		g_Logger->ToastInfo(toggleKey, "Toggled map: {}", !acc.drMan->hideMap);
+	}
+	void MenuToggleFog() {
+		auto acc = ml::ScnRenderDrSysParmAcc();
+		static bool fogSkip;
+		fogSkip = !fogSkip;
+		acc.setFogSkip(fogSkip);
+		g_Logger->ToastInfo(toggleKey, "Toggled fog: {}", !fogSkip);
+	}
+	void MenuToggleBloom() {
+		auto acc = ml::ScnRenderDrSysParmAcc();
+		acc.setBloom(!acc.isBloomOn());
+		g_Logger->ToastInfo(toggleKey, "Toggled bloom: {}", acc.isBloomOn());
+	}
+	void MenuToggleTonemapping() {
+		auto acc = ml::ScnRenderDrSysParmAcc();
+		acc.setToneMap(!acc.isToneMap());
+		g_Logger->ToastInfo(toggleKey, "Toggled tone mapping: {}", acc.isToneMap());
+	}
+	void MenuToggleDOF() {
+		RenderingControls::ForcedParameters.DisableDOF = !RenderingControls::ForcedParameters.DisableDOF;
+		g_Logger->ToastInfo(toggleKey, "Toggled depth of field: {}", !RenderingControls::ForcedParameters.DisableDOF);
+	}
+	void MenuToggleMotionBlur() {
+		RenderingControls::ForcedParameters.DisableMotionBlur = !RenderingControls::ForcedParameters.DisableMotionBlur;
+		g_Logger->ToastInfo(toggleKey, "Toggled motion blur: {}", !RenderingControls::ForcedParameters.DisableMotionBlur);
+	}
+	void MenuToggleColorFilter() {
+		RenderingControls::ForcedParameters.DisableColorFilter = !RenderingControls::ForcedParameters.DisableColorFilter;
+		g_Logger->ToastInfo(toggleKey, "Toggled color filter: {}", !RenderingControls::ForcedParameters.DisableColorFilter);
+	}
+
 	void RenderingControls::Initialize() {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up rendering controls...");
 
 #if !XENOMODS_CODENAME(bf3)
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
-		AddRenderingOptionsToMenu::HookAt("_ZN2ml5DrManC1EPNS_3ScnE");
 		SkipCloudRendering::HookAt("_ZN5cloud8CloudMan5applyEPKN2ml15IDrDrawWorkInfoEPNS1_13DrMdoZSortManE");
 		SkipSkyDomeRendering::HookAt("_ZN2ml9DrPixlMan13renderSkyDomeEv");
 #else
@@ -120,6 +145,7 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(RenderingControls), "Rendering Controls");
+
 #if XENOMODS_OLD_ENGINE
 			section->RegisterOption<bool>(straightenFont, "Straighten font");
 #endif
@@ -129,6 +155,17 @@ namespace xenomods {
 			section->RegisterOption<bool>(skipCloudRendering, "Skip cloud (sea) rendering");
 			section->RegisterOption<bool>(skipSkyDomeRendering, "Skip sky dome rendering");
 #endif
+
+#if !XENOMODS_CODENAME(bf3)
+			auto toggles = section->RegisterSection(toggleKey, "Toggles...");
+			toggles->RegisterOption<void>("Toggle map", &MenuToggleMap);
+			toggles->RegisterOption<void>("Toggle fog", &MenuToggleFog);
+			toggles->RegisterOption<void>("Toggle bloom", &MenuToggleBloom);
+			toggles->RegisterOption<void>("Toggle tonemapping", &MenuToggleTonemapping);
+			toggles->RegisterOption<void>("Toggle depth of field", &MenuToggleDOF);
+			toggles->RegisterOption<void>("Toggle motion blur", &MenuToggleMotionBlur);
+			toggles->RegisterOption<void>("Toggle color filter", &MenuToggleColorFilter);
+#endif
 		}
 	}
 
@@ -136,43 +173,18 @@ namespace xenomods {
 		UpdatableModule::Update(updateInfo);
 
 #if !XENOMODS_CODENAME(bf3)
-		if(GetPlayer(2)->InputDownStrict(Keybind::RENDER_TOGGLE_2)) {
-			auto acc = ml::ScnRenderDrSysParmAcc();
-			static bool fogSkip;
-			fogSkip = !fogSkip;
-			acc.setFogSkip(fogSkip);
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled fog: {}", !fogSkip);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::RENDER_TOGGLE_3)) {
-			auto acc = ml::ScnRenderDrSysParmAcc();
-			acc.setBloom(!acc.isBloomOn());
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled bloom: {}", acc.isBloomOn());
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::RENDER_TOGGLE_4)) {
-			auto acc = ml::ScnRenderDrSysParmAcc();
-			acc.setToneMap(!acc.isToneMap());
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled tone mapping: {}", acc.isToneMap());
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::RENDER_TOGGLE_5)) {
-			RenderParameters.DisableDOF = !RenderParameters.DisableDOF;
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled depth of field: {}", !RenderParameters.DisableDOF);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::RENDER_TOGGLE_6)) {
-			RenderParameters.DisableMotionBlur = !RenderParameters.DisableMotionBlur;
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled motion blur: {}", !RenderParameters.DisableMotionBlur);
-		} else if(GetPlayer(2)->InputDownStrict(Keybind::RENDER_TOGGLE_7)) {
-			RenderParameters.DisableColorFilter = !RenderParameters.DisableColorFilter;
-			g_Logger->ToastInfo("freecamRenderToggle", "Toggled color filter: {}", !RenderParameters.DisableColorFilter);
-		}
-
-		if (RenderParameters.Any()) {
+		if (ForcedParameters.Any()) {
 			auto acc = ml::ScnRenderDrSysParmAcc();
 
-			if (RenderParameters.DisableDOF) {
+			if (ForcedParameters.DisableDOF) {
 				acc.setDOFOverride(true);
 				acc.setDOF(false);
 			}
-			if (RenderParameters.DisableMotionBlur) {
+			if (ForcedParameters.DisableMotionBlur) {
 				acc.setMotBlurOverride(true);
 				acc.setMotBlur(false);
 			}
-			if (RenderParameters.DisableColorFilter) {
+			if (ForcedParameters.DisableColorFilter) {
 				acc.setColorFilterOverride(true);
 				acc.setColorFilterNum(0);
 				acc.setColorFilterFarNum(0);
