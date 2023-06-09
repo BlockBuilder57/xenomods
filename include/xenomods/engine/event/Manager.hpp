@@ -77,7 +77,10 @@ namespace event {
 	};
 
 	//DEFINE_MANAGER(ManiManager); // manipulator???
+	//DEFINE_MANAGER(MdlstmManager); // empty
 	DEFINE_MANAGER(MemoryManager);
+	//DEFINE_MANAGER(MemoryManager); // empty
+	//DEFINE_MANAGER(MotstmManager); // empty
 
 	struct MovieManager {
 		void setDisp(bool display) {}
@@ -91,8 +94,11 @@ namespace event {
 	DEFINE_MANAGER(SeamlessManager);
 	DEFINE_MANAGER(SeManager);
 	DEFINE_MANAGER(SeqManager);
+	//DEFINE_MANAGER(SkipManager); // empty
+	//DEFINE_MANAGER(StmManager); // empty
 	DEFINE_MANAGER(TextManager);
 	DEFINE_MANAGER(TodoManager);
+	//DEFINE_MANAGER(UIManager); // empty
 	DEFINE_MANAGER(VoiceManager);
 	DEFINE_MANAGER(VolumeManager);
 
