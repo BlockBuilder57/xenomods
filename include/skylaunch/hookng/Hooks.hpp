@@ -11,6 +11,8 @@
 
 namespace skylaunch::hook {
 
+	const uintptr_t INVALID_FUNCTION_PTR = 0xDEADDEAD;
+
 	namespace detail {
 
 		void* HookFunctionBase(void* function, void* replacement);
