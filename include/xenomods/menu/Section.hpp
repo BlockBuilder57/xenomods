@@ -5,9 +5,9 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <xenomods/engine/mm/MathTypes.hpp>
 
 #include "Option.hpp"
+#include "Textual.hpp"
 //#include "Menu.hpp" // cyclical reference :(
 
 namespace xenomods {
@@ -17,14 +17,6 @@ namespace xenomods {
 		std::string key {};
 		std::string display {};
 		Section* parent {};
-
-		struct Textual {
-			std::string text {};
-			mm::Col4 color {};
-
-			Textual(std::string text, mm::Col4 color)
-				: text(std::move(text)), color(color) {};
-		};
 
 		std::vector<Section*> subsections {};
 		std::vector<OptionBase*> options {};
@@ -78,9 +70,12 @@ namespace xenomods {
 			options.push_back(opt);
 		}
 
-		void RegisterTextual(const std::string& text, const mm::Col4& color);
+		void RegisterTextual(const std::string& text, const mm::Col4& color, std::string (*callback)());
+		void RegisterTextual(const std::string& text, const mm::Col4& color) {
+			RegisterTextual(text, color, nullptr);
+		};
 		void RegisterTextual(const std::string& text) {
-			RegisterTextual(text, {});
+			RegisterTextual(text, {}, nullptr);
 		};
 	};
 

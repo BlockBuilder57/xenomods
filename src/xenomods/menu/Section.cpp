@@ -79,7 +79,7 @@ namespace xenomods {
 		}
 
 		for(auto& tex : textuals) {
-			xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, tex.color.a > 0 ? tex.color : Menu::COLOR_TEXTUAL, " {} ", tex.text);
+			xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, tex.Color().a > 0 ? tex.Color() : Menu::COLOR_TEXTUAL, " {} ", tex.String());
 		}
 	}
 
@@ -90,8 +90,8 @@ namespace xenomods {
 		return sec;
 	}
 
-	void Section::RegisterTextual(const std::string& text, const mm::Col4& color) {
-		textuals.emplace_back(text, color);
+	void Section::RegisterTextual(const std::string& text, const mm::Col4& color, std::string (*callback)()) {
+		textuals.emplace_back(text, color, callback);
 	}
 
 } // namespace xenomods
