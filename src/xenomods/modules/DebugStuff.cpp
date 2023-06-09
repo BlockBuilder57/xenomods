@@ -72,13 +72,14 @@ namespace {
 
 	struct JumpToClosedLandmarks_World : skylaunch::hook::Trampoline<JumpToClosedLandmarks_World> {
 		static bool Hook(unsigned int mapjump) {
-			return xenomods::DebugStuff::accessClosedLandmarks ? true : Orig(mapjump);
+			return xenomods::DebugStuff::accessClosedLandmarks || Orig(mapjump);
 		}
 	};
 
-	struct JumpToClosedLandmarks_Zone : skylaunch::hook::Trampoline<JumpToClosedLandmarks_Zone> {
-		static bool Hook(unsigned int mapjump) {
-			return xenomods::DebugStuff::accessClosedLandmarks ? true : Orig(mapjump);
+	struct JumpToClosedLandmarks_Map : skylaunch::hook::Trampoline<JumpToClosedLandmarks_Map> {
+		static bool Hook(unsigned int mapjump, mm::Pnt<short>* pos) {
+			bool result = Orig(mapjump, pos);
+			return xenomods::DebugStuff::accessClosedLandmarks || result;
 		}
 	};
 
@@ -180,7 +181,7 @@ namespace xenomods {
 		BGMDebugging::HookAt("_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE");
 
 		JumpToClosedLandmarks_World::HookAt(&gf::GfMenuObjWorldMap::isEnterMap);
-		JumpToClosedLandmarks_Zone::HookAt(&gf::GfMenuObjWorldMap::isOpenLandmark);
+		JumpToClosedLandmarks_Map::HookAt(&gf::GfMenuObjWorldMap::chkMapCond);
 #endif
 
 		auto modules = g_Menu->FindSection("modules");

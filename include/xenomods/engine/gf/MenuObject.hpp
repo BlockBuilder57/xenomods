@@ -6,6 +6,8 @@
 
 #include <xenomods/Utils.hpp>
 
+#include "xenomods/engine/mm/MathTypes.hpp"
+
 namespace gf {
 	namespace GfMenuObjUtil {
 		/*
@@ -58,9 +60,13 @@ namespace gf {
 
 	class GfMenuObjWorldMap {
 	   public:
+		static bool chkMapCond(unsigned int mapjump, mm::Pnt<short>* pos);
+
 		static bool isDispMap(unsigned int mapjump);
 		static bool isEnableJump(const MenuZoneMapInfo& nuts);
 		static bool isEnterMap(unsigned int mapjump);
+
+		// DOES NOT EXIST IN 1.0.0
 		static bool isOpenLandmark(unsigned int mapjump);
 	};
 
