@@ -272,6 +272,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 	}
 
 	void main() {
+		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "Running xenomods %s%s [%s]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
 		g_Menu->Initialize();
 		InitializeAllRegisteredModules();
 

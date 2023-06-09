@@ -46,7 +46,7 @@ namespace xenomods {
 		void OnConfigUpdate() override;
 
 		static void RegisterCallback(xenomods::BdatOverrideBase* override);
-		void LoadFromFile();
+		static void LoadFromFile();
 
 	};
 

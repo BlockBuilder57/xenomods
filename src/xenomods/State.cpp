@@ -32,7 +32,7 @@ namespace xenomods {
 
 		if(!res) {
 			auto error = std::move(res).error();
-			g_Logger->LogWarning("Couldn't load config.toml! ({}) Falling back to defaults.", error.description());
+			g_Logger->LogWarning("Couldn't load config! ({}) Falling back to defaults.", error.description());
 			return Reset();
 		}
 
@@ -42,7 +42,7 @@ namespace xenomods {
 		InitializeFromTable(tomlTable, true);
 
 		ConfigUpdateForAllRegisteredModules();
-		g_Logger->LogInfo("Loaded config.toml successfully!");
+		g_Logger->ToastInfo("config", "Loaded config!");
 	}
 
 	void Config::InitializeFromTable(const toml::table& table, bool respectDefaults) {

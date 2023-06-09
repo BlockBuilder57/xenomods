@@ -231,7 +231,9 @@ namespace xenomods {
 
 		if (!TOMLTable.empty()) {
 			RegisterCallback(&TomlOverride());
-			g_Logger->LogInfo("Loaded Bdat override file successfully!");
+			g_Logger->ToastInfo("configbdat", "Loaded Bdat override!");
+		} else {
+			g_Logger->ToastDebug("configbdat", "(Bdat override empty)");
 		}
 	}
 
