@@ -40,7 +40,7 @@ namespace xenomods {
 	void Section::PerformSelect() {
 		if(g_Menu->curIndex < subsections.size()) {
 			// we're within the subsections, select the currently highlighted section
-			g_Menu->curSection = &subsections[g_Menu->curIndex];
+			g_Menu->curSection = subsections[g_Menu->curIndex];
 			g_Menu->curIndex = g_Menu->curSection->SavedIndex;
 		} else if(g_Menu->curIndex - subsections.size() < options.size()) {
 			// we're in the options, and we want to select this one
@@ -58,10 +58,13 @@ namespace xenomods {
 		int renderNum = 0;
 
 		for(auto& sec : subsections) {
+			if (sec == nullptr)
+				continue;
+
 			if(renderNum == g_Menu->curIndex)
-				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, g_Menu->pressSelect ? Menu::COLOR_HIGHLIGHT : Menu::COLOR_SECTION, ">{} ", sec.GetName());
+				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, g_Menu->pressSelect ? Menu::COLOR_HIGHLIGHT : Menu::COLOR_SECTION, ">{} ", sec->GetName());
 			else
-				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, Menu::COLOR_SECTION, " {} ", sec.GetName());
+				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, Menu::COLOR_SECTION, " {} ", sec->GetName());
 
 			renderNum++;
 		}
@@ -81,8 +84,9 @@ namespace xenomods {
 	}
 
 	Section* Section::RegisterSection(const std::string& key, const std::string& display) {
-		auto sec = &subsections.emplace_back(key, display);
+		auto sec = new Section(key, display);
 		sec->parent = this;
+        subsections.push_back(sec);
 		return sec;
 	}
 

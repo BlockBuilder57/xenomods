@@ -96,7 +96,7 @@ namespace xenomods {
 		} else if(doSelect) {
 			if(curSection == nullptr) {
 				// on root menu, can just pick
-				curSection = &sections[curIndex];
+				curSection = sections[curIndex];
 				savedSectionIndex = curIndex;
 			} else {
 				// let the section handle stuff
@@ -125,6 +125,7 @@ namespace xenomods {
 
 		if (curSection != nullptr) {
 			dbgpnt.y += fontHeight;
+			xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "curSection @ {}", reinterpret_cast<void*>(curSection));
 			xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "{}: {}", curSection->GetKey(), curSection->GetName());
 			if (curSection->GetParent() != nullptr)
 				xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "Parent: {}", curSection->GetParent()->GetName());
@@ -137,10 +138,13 @@ namespace xenomods {
 		if(curSection == nullptr) {
 			// render the root sections
 			for(auto& sec : sections) {
+				if (sec == nullptr)
+					continue;
+
 				if(renderNum == curIndex)
-					xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, pressSelect ? COLOR_HIGHLIGHT : COLOR_SECTION, ">{} ", sec.GetName());
+					xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, pressSelect ? COLOR_HIGHLIGHT : COLOR_SECTION, ">{} ", sec->GetName());
 				else
-					xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, COLOR_SECTION, " {} ", sec.GetName());
+					xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, COLOR_SECTION, " {} ", sec->GetName());
 
 				renderNum++;
 			}
@@ -168,11 +172,11 @@ namespace xenomods {
 
 		// not us, lets check our subsections
 		for(auto& sec : *section->GetSubsections()) {
-			if(sec.GetKey() == key)
-				return &sec;
+			if(sec->GetKey() == key)
+				return sec;
 
 			// not this subsection, check its subsections
-			auto recurse = FindSectionRecurse(&sec, key);
+			auto recurse = FindSectionRecurse(sec, key);
 			if(recurse != nullptr)
 				return recurse;
 		}
@@ -181,7 +185,7 @@ namespace xenomods {
 	}
 	Section* Menu::FindSection(const std::string& key) {
 		for(auto& sec : sections) {
-			auto recurse = FindSectionRecurse(&sec, key);
+			auto recurse = FindSectionRecurse(sec, key);
 			if(recurse != nullptr)
 				return recurse;
 		}
@@ -190,7 +194,9 @@ namespace xenomods {
 	}
 
 	Section* Menu::RegisterSection(const std::string& key, const std::string& display) {
-		return &sections.emplace_back(key, display);
+		auto sec = new Section(key, display);
+		sections.push_back(sec);
+		return sec;
 	}
 
 	// The menu instance.

@@ -26,7 +26,7 @@ namespace xenomods {
 				: text(std::move(text)), color(color) {};
 		};
 
-		std::vector<Section> subsections {};
+		std::vector<Section*> subsections {};
 		std::vector<OptionBase*> options {};
 		std::vector<Textual> textuals {};
 
@@ -58,7 +58,7 @@ namespace xenomods {
 		bool IsSelectingOption() {
 			return curOption != nullptr;
 		}
-		std::vector<Section>* GetSubsections() {
+		std::vector<Section*>* GetSubsections() {
 			return &subsections;
 		}
 

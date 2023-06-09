@@ -21,7 +21,7 @@ namespace xenomods {
 		bool isOpen { false };
 		bool drawBackground { true };
 
-		std::vector<Section> sections {};
+		std::vector<Section*> sections {};
 		Section* curSection {};
 
 		int maxIndex {};
