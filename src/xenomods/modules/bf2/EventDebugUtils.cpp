@@ -99,6 +99,13 @@ namespace {
 		}
 	};
 
+	struct EventStartInfo_1_0_0 : skylaunch::hook::Trampoline<EventStartInfo_1_0_0> {
+		static void Hook(void* this_pointer, const char* evtName, void* objHandle, uint param_3, uint param_4, uint param_5, uint param_6, bool param_7) {
+			PrintEventInfo(evtName);
+			Orig(this_pointer, evtName, objHandle, param_3, param_4, param_5, param_6, param_7);
+		}
+	};
+
 	struct ReplaceTitleEvent : skylaunch::hook::Trampoline<ReplaceTitleEvent> {
 		static void Hook(tl::TitleMain* this_pointer, uint eventId) {
 			uint newEventId = eventId;
@@ -225,8 +232,12 @@ namespace xenomods {
 		ManagerDisplay<event::VolumeManager>::HookIt();
 
 		// earlier versions didn't include the last two parameters
-		if (skylaunch::hook::detail::ResolveSymbolBase("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef") == 0xDEADDEAD)
-			EventStartInfo_Earlier::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjj");
+		if (skylaunch::hook::detail::ResolveSymbolBase("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef") == skylaunch::hook::INVALID_FUNCTION_PTR) {
+			if (skylaunch::hook::detail::ResolveSymbolBase("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjj") == skylaunch::hook::INVALID_FUNCTION_PTR)
+				EventStartInfo_1_0_0::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjb");
+			else
+				EventStartInfo_Earlier::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjj");
+		}
 		else
 			EventStartInfo::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef");
 
