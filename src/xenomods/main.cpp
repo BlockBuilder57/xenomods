@@ -310,7 +310,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		NpadStyleSetOverride::HookAt(&nn::hid::SetSupportedNpadStyleSet);
 		DisableControllerSingleMode::HookAt(nn::hid::ShowControllerSupport);
 #if !XENOMODS_CODENAME(bf3)
-		ClampNumberOfControllers::HookAt("_ZN2ml8DevPadNx23getLocalConnectPadCountEvZ");
+		ClampNumberOfControllers::HookAt("_ZN2ml8DevPadNx23getLocalConnectPadCountEv");
 #else
 		ClampNumberOfControllers::HookFromBase(0x7101251bcc);
 #endif
