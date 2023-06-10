@@ -187,7 +187,7 @@ namespace {
 
 	struct DisableControllerUpdatingForMenu : skylaunch::hook::Trampoline<DisableControllerUpdatingForMenu> {
 		static void Hook(void* this_pointer) {
-			if (ClampNumberOfControllers::Orig() > 1)
+			if (ClampNumberOfControllers::HasApplied() && ClampNumberOfControllers::Orig() > 1)
 				return Orig(this_pointer);
 
 			if (!xenomods::g_Menu->IsOpen())
@@ -253,7 +253,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		 */
 
 		// use P2 if it's connected, otherwise we'll drop P1's input to let them use the menu
-		HidInput* menuInput = ClampNumberOfControllers::Orig() > 1 ? P2 : P1;
+		HidInput* menuInput = ClampNumberOfControllers::HasApplied() && ClampNumberOfControllers::Orig() > 1 ? P2 : P1;
 		if (menuInput->InputDownStrict(MENU_TOGGLE)) {
 			g_Menu->Toggle();
 		}
@@ -310,7 +310,7 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 		NpadStyleSetOverride::HookAt(&nn::hid::SetSupportedNpadStyleSet);
 		DisableControllerSingleMode::HookAt(nn::hid::ShowControllerSupport);
 #if !XENOMODS_CODENAME(bf3)
-		ClampNumberOfControllers::HookAt("_ZN2ml8DevPadNx23getLocalConnectPadCountEv");
+		ClampNumberOfControllers::HookAt("_ZN2ml8DevPadNx23getLocalConnectPadCountEvZ");
 #else
 		ClampNumberOfControllers::HookFromBase(0x7101251bcc);
 #endif

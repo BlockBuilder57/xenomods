@@ -75,6 +75,10 @@ namespace skylaunch::hook {
 		template<class DelayedImpl = Impl>
 		using TrampolineHookType = decltype(&DelayedImpl::Hook);
 
+		static bool HasApplied() {
+			return Backup() != nullptr;
+		}
+
 		template<class... Args>
 		static auto Orig(Args&&... args) {
 			return Backup()(static_cast<Args&&>(args)...);
