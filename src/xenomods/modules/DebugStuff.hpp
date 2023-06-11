@@ -7,6 +7,7 @@ namespace xenomods {
 
 	struct DebugStuff : public xenomods::UpdatableModule {
 		static bool enableDebugRendering;
+		static bool enableDebugUnlockAll;
 		static bool accessClosedLandmarks;
 
 		static int tempInt;

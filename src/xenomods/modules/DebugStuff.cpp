@@ -4,15 +4,15 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
-#include <xenomods/menu/Menu.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
+#include <xenomods/menu/Menu.hpp>
 
 #include "xenomods/engine/bdat/Bdat.hpp"
 #include "xenomods/engine/fw/Debug.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
-#include "xenomods/engine/game/DebugDraw.hpp"
+#include "xenomods/engine/game/Debug.hpp"
 #include "xenomods/engine/game/SeqUtil.hpp"
 #include "xenomods/engine/gf/BdatData.hpp"
 #include "xenomods/engine/gf/Bgm.hpp"
@@ -70,6 +70,7 @@ namespace {
 		}
 	};
 
+#if XENOMODS_OLD_ENGINE
 	struct JumpToClosedLandmarks_World : skylaunch::hook::Trampoline<JumpToClosedLandmarks_World> {
 		static bool Hook(unsigned int mapjump) {
 			return xenomods::DebugStuff::accessClosedLandmarks || Orig(mapjump);
@@ -82,13 +83,24 @@ namespace {
 			return xenomods::DebugStuff::accessClosedLandmarks || result;
 		}
 	};
+#endif
+
+#if XENOMODS_CODENAME(bfsw)
+	struct EnableDebugUnlockAll : skylaunch::hook::Trampoline<EnableDebugUnlockAll> {
+		static bool Hook(fw::Document* doc) {
+			// the original always returns 0
+			return xenomods::DebugStuff::enableDebugUnlockAll;
+		}
+	};
+#endif
 
 }
 
 namespace xenomods {
 
 	bool DebugStuff::enableDebugRendering = true;
-	bool DebugStuff::accessClosedLandmarks = true;
+	bool DebugStuff::enableDebugUnlockAll = false;
+	bool DebugStuff::accessClosedLandmarks = false;
 
 	int DebugStuff::tempInt = 0;
 	int DebugStuff::bgmTrackIndex = 0;
@@ -182,6 +194,8 @@ namespace xenomods {
 
 		JumpToClosedLandmarks_World::HookAt(&gf::GfMenuObjWorldMap::isEnterMap);
 		JumpToClosedLandmarks_Map::HookAt(&gf::GfMenuObjWorldMap::chkMapCond);
+#elif XENOMODS_CODENAME(bfsw)
+		EnableDebugUnlockAll::HookAt(&game::IsMenuDebugUnlockAll);
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
@@ -189,13 +203,18 @@ namespace xenomods {
 			auto section = modules->RegisterSection(STRINGIFY(DebugStuff), "Debug Stuff");
 
 			section->RegisterOption<bool>(enableDebugRendering, "Enable debug rendering", &DebugStuff::UpdateDebugRendering);
+#if XENOMODS_CODENAME(bfsw)
+			section->RegisterOption<bool>(enableDebugUnlockAll, "Debug unlock all");
+#endif
 #if !XENOMODS_CODENAME(bf3)
+	#if XENOMODS_OLD_ENGINE
 			section->RegisterOption<bool>(accessClosedLandmarks, "Access closed landmarks");
+	#endif
 			section->RegisterOption<int>(tempInt, "Temp Int");
 			section->RegisterOption<void>("Jump to Landmark", &MenuDoMapJump);
-#if XENOMODS_OLD_ENGINE
+	#if XENOMODS_OLD_ENGINE
 			section->RegisterOption<void>("Play common sound effect", &MenuPlaySE);
-#endif
+	#endif
 			section->RegisterOption<void>("Return to Title", &MenuReturnTitle);
 #endif
 		}

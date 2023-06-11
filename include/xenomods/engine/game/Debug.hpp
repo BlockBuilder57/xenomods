@@ -4,10 +4,15 @@
 
 #include <xenomods/Utils.hpp>
 
+#include "xenomods/engine/fw/Document.hpp"
+
 #if XENOMODS_NEW_ENGINE
 namespace game {
 
-	class DebugDraw {
+	// This seems to unlock all landmarks, maps, and arts
+	bool IsMenuDebugUnlockAll(const fw::Document& doc);
+
+	class Debug {
 	   public:
 		enum class Group : std::uint32_t {
 
