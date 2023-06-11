@@ -3,8 +3,7 @@
 #pragma once
 
 #include "xenomods/Utils.hpp"
-
-#include "xenomods/engine/ml/DriverInterfaces.hpp"
+#include "xenomods/engine/ml/DrawInterfaces.hpp"
 #include "xenomods/engine/ml/Scene.hpp"
 #include "xenomods/engine/mtl/Allocator.hpp"
 

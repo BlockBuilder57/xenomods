@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Draw.hpp"
 #include "WinView.hpp"
 #include "xenomods/Utils.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
@@ -96,25 +97,10 @@ namespace ml {
 		bool enableScnDebug(bool nuts);
 	};
 
-	class DrMan {
-	   public:
-#if XENOMODS_CODENAME(bfsw)
-		INSERT_PADDING_BYTES(0x3958);
-#else
-		INSERT_PADDING_BYTES(0x1D7C);
-#endif
-		bool hideChara;
-		bool hideMap;
-
-		DrMan(Scn* scene);
-
-		static DrMan* get();
-	};
-
 	class ScnRenderDrSysParmAcc {
 	   public:
 		DrMan* drMan;
-		void* drPixlPostParm;
+		DrPixlPostParm* PixlPostParm;
 		int unk;
 
 		ScnRenderDrSysParmAcc();
@@ -178,6 +164,12 @@ namespace ml {
 		bool isAA() const;
 		void setAA(bool);
 
+		bool isSSAO() const;
+		void setSSAO(bool);
+
+		bool isLensFlare() const;
+		void setLensFlare(bool);
+
 		void setAppBlur(bool); // no accompanying
 		void setAutoReduction(bool); // no accompanying
 
@@ -185,7 +177,44 @@ namespace ml {
 		void setGodRay(bool);
 
 		void setShadowStr(float);
+
+		float getSpecularStr() const;
 		void setSpecularStr(float);
+
+		enum class GBuffDebugType {
+			Thing0,
+			Thing1,
+			Thing2,
+			Thing3,
+			Thing4,
+		};
+
+		void setGBuffDebug(bool);
+		void setGBuffDebugDefault();
+		void setGBuffDebugParam(GBuffDebugType, float, float);
 	};
 
 } // namespace ml
+
+template<>
+struct fmt::formatter<ml::ScnRenderDrSysParmAcc::GBuffDebugType> : fmt::formatter<std::string_view> {
+	template<typename FormatContext>
+	inline auto format(ml::ScnRenderDrSysParmAcc::GBuffDebugType type, FormatContext& ctx) {
+		std::string_view name;
+
+		// clang-format off
+		switch(type) {
+			using enum ml::ScnRenderDrSysParmAcc::GBuffDebugType;
+
+			case Thing0: name = "Thing0"; break;
+			case Thing1: name = "Thing1"; break;
+			case Thing2: name = "Thing2"; break;
+			case Thing3: name = "Thing3"; break;
+			case Thing4: name = "Thing4"; break;
+			default: name = "Unknown - " + std::to_string(reinterpret_cast<std::underlying_type_t<ml::ScnRenderDrSysParmAcc::GBuffDebugType>&>(type)); break;
+		}
+		// clang-format on
+
+		return formatter<std::string_view>::format(name, ctx);
+	}
+};

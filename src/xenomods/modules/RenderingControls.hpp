@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UpdatableModule.hpp"
+#include "xenomods/engine/ml/Scene.hpp"
 
 namespace xenomods {
 
@@ -10,6 +11,7 @@ namespace xenomods {
 		static bool skipParticleRendering;
 		static bool skipCloudRendering;
 		static bool skipSkyDomeRendering;
+		static float shadowStrength;
 
 		struct ForcedRenderParameters {
 			bool DisableDOF;

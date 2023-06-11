@@ -78,11 +78,12 @@ namespace xenomods {
 
 	RenderingControls::ForcedRenderParameters RenderingControls::ForcedParameters = {};
 
+	bool RenderingControls::straightenFont = false;
 	bool RenderingControls::skipUIRendering = false;
 	bool RenderingControls::skipParticleRendering = false;
 	bool RenderingControls::skipCloudRendering = false;
 	bool RenderingControls::skipSkyDomeRendering = false;
-	bool RenderingControls::straightenFont = false;
+	float RenderingControls::shadowStrength = 1.0;
 
 	const std::string toggleKey = std::string(STRINGIFY(RenderingControls)) + "_Toggles";
 
@@ -109,6 +110,16 @@ namespace xenomods {
 		acc.setToneMap(!acc.isToneMap());
 		g_Logger->ToastInfo(toggleKey, "Toggled tone mapping: {}", acc.isToneMap());
 	}
+	void MenuToggleAntiAliasing() {
+		auto acc = ml::ScnRenderDrSysParmAcc();
+		acc.setAA(!acc.isAA());
+		g_Logger->ToastInfo(toggleKey, "Toggled anti-aliasing: {}", acc.isAA());
+	}
+	void MenuToggleScreenspaceAmbientOcclusion() {
+		auto acc = ml::ScnRenderDrSysParmAcc();
+		acc.setSSAO(!acc.isSSAO());
+		g_Logger->ToastInfo(toggleKey, "Toggled screenspace ambient occlusion: {}", acc.isSSAO());
+	}
 	void MenuToggleDOF() {
 		RenderingControls::ForcedParameters.DisableDOF = !RenderingControls::ForcedParameters.DisableDOF;
 		g_Logger->ToastInfo(toggleKey, "Toggled depth of field: {}", !RenderingControls::ForcedParameters.DisableDOF);
@@ -120,6 +131,14 @@ namespace xenomods {
 	void MenuToggleColorFilter() {
 		RenderingControls::ForcedParameters.DisableColorFilter = !RenderingControls::ForcedParameters.DisableColorFilter;
 		g_Logger->ToastInfo(toggleKey, "Toggled color filter: {}", !RenderingControls::ForcedParameters.DisableColorFilter);
+	}
+	void MenuSetShadowStrength() {
+		auto acc = ml::ScnRenderDrSysParmAcc();
+		acc.setShadowStr(RenderingControls::shadowStrength);
+	}
+	void MenuSetGBufferDebugReset() {
+		auto acc = ml::ScnRenderDrSysParmAcc();
+		acc.setGBuffDebugDefault();
 	}
 
 	void RenderingControls::Initialize() {
@@ -154,6 +173,7 @@ namespace xenomods {
 			section->RegisterOption<bool>(skipParticleRendering, "Skip particle+overlay rendering");
 			section->RegisterOption<bool>(skipCloudRendering, "Skip cloud (sea) rendering");
 			section->RegisterOption<bool>(skipSkyDomeRendering, "Skip sky dome rendering");
+			section->RegisterOption<float>(shadowStrength, "Shadow strength", &MenuSetShadowStrength);
 #endif
 
 #if !XENOMODS_CODENAME(bf3)
@@ -165,6 +185,8 @@ namespace xenomods {
 			toggles->RegisterOption<void>("Toggle depth of field", &MenuToggleDOF);
 			toggles->RegisterOption<void>("Toggle motion blur", &MenuToggleMotionBlur);
 			toggles->RegisterOption<void>("Toggle color filter", &MenuToggleColorFilter);
+			//toggles->RegisterOption<void>("Toggle AA", &MenuToggleAntiAliasing);
+			//toggles->RegisterOption<void>("Toggle SSAO", &MenuToggleScreenspaceAmbientOcclusion);
 #endif
 		}
 	}
@@ -173,6 +195,34 @@ namespace xenomods {
 		UpdatableModule::Update(updateInfo);
 
 #if !XENOMODS_CODENAME(bf3)
+		static bool hasRun;
+		if (!hasRun) {
+			auto section = g_Menu->FindSection(STRINGIFY(RenderingControls));
+			auto acc = ml::ScnRenderDrSysParmAcc();
+			if (section != nullptr && acc.PixlPostParm != nullptr) {
+				auto gbuffer = section->RegisterSection(std::string(STRINGIFY(RenderingControls)) + "gbuffer", "GBuffer debug...");
+				gbuffer->RegisterOption<bool>(acc.PixlPostParm->GBufferDebug, "GBuffer debug");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[0][0], "Base Color add");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[0][1], "Base Color mult");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[1][0], "Metalness add");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[1][1], "Metalness mult");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[2][0], "Roughness add");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[2][1], "Roughness mult");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[3][0], "Emission add");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[3][1], "Emission mult");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[4][0], "N/A add");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[4][1], "N/A mult");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[5][0], "Ambient Occlusion add");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[5][1], "Ambient Occlusion mult");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[6][0], "Emission 2? add");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[6][1], "Emission 2? mult");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[7][0], "Specular? add");
+				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[7][1], "Specular? mult");
+				gbuffer->RegisterOption<void>("Reset parameters", &MenuSetGBufferDebugReset);
+			}
+			hasRun = true;
+		}
+
 		if (ForcedParameters.Any()) {
 			auto acc = ml::ScnRenderDrSysParmAcc();
 

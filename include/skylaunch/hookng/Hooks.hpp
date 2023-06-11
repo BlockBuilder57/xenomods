@@ -9,6 +9,8 @@
 #include <string_view>
 #include <skylaunch/hookng/FunctionPointers.hpp>
 
+#include <xenomods/Logger.hpp>
+
 namespace skylaunch::hook {
 
 	const uintptr_t INVALID_FUNCTION_PTR = 0xDEADDEAD;
