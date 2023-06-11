@@ -55,7 +55,10 @@ namespace skylaunch::hook {
 		}
 
 		static inline void HookAt(std::string_view symbolName) {
-			(void)detail::HookFunction(detail::ResolveSymbol<ReplaceHookType<>>(symbolName), &Impl::Hook);
+			if (detail::ResolveSymbolBase(symbolName) != INVALID_FUNCTION_PTR)
+				(void)detail::HookFunction(detail::ResolveSymbol<ReplaceHookType<>>(symbolName), &Impl::Hook);
+			else
+				xenomods::g_Logger->LogWarning("[hook-ng] Failed to hook \"{}\"! Something may break.", symbolName);
 		}
 
 		static inline void HookFromBase(uintptr_t address) {
@@ -99,7 +102,10 @@ namespace skylaunch::hook {
 		}
 
 		static inline void HookAt(std::string_view symbolName) {
-			Backup() = detail::HookFunction(detail::ResolveSymbol<TrampolineHookType<>>(symbolName), &Impl::Hook);
+			if (detail::ResolveSymbolBase(symbolName) != INVALID_FUNCTION_PTR)
+				Backup() = detail::HookFunction(detail::ResolveSymbol<TrampolineHookType<>>(symbolName), &Impl::Hook);
+			else
+				xenomods::g_Logger->LogWarning("[hook-ng] Failed to hook \"{}\"! Something may break.", symbolName);
 		}
 
 		static inline void HookFromBase(uintptr_t address) {
