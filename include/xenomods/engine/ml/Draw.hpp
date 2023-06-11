@@ -30,7 +30,11 @@ namespace ml {
 
 	class DrPixlPostParm {
 	   public:
+#if XENOMODS_OLD_ENGINE
 		INSERT_PADDING_BYTES(0x320);
+#else
+		INSERT_PADDING_BYTES(0x328);
+#endif
 		float GBufferDebugParams[8][2];
 		INSERT_PADDING_BYTES(0x128);
 		bool GBufferDebug;
