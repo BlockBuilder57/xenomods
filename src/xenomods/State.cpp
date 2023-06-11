@@ -8,6 +8,7 @@ namespace xenomods {
 
 	void Config::Reset() {
 		port = CONFIG_PORT_DEFAULT;
+		loggingLevel = static_cast<Logger::Severity>(CONFIG_LOGGING_LEVEL_DEFAULT);
 
 		titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 
@@ -41,13 +42,21 @@ namespace xenomods {
 
 		InitializeFromTable(tomlTable, true);
 
+		// update the logger's level
+		g_Logger->SetLoggingLevel(loggingLevel);
+
+		// update modules
 		ConfigUpdateForAllRegisteredModules();
+
 		g_Logger->ToastInfo("config", "Loaded config!");
 	}
 
 	void Config::InitializeFromTable(const toml::table& table, bool respectDefaults) {
 		if(respectDefaults || table[STRINGIFY(port)].type() != toml::node_type::none)
 			port = table[STRINGIFY(port)].value_or(CONFIG_PORT_DEFAULT);
+
+		if(respectDefaults || table[STRINGIFY(loggingLevel)].type() != toml::node_type::none)
+			loggingLevel = static_cast<Logger::Severity>(table[STRINGIFY(loggingLevel)].value_or(CONFIG_LOGGING_LEVEL_DEFAULT));
 
 		if(table[STRINGIFY(titleEvents)].is_array()) {
 			const toml::array* arr = table[STRINGIFY(titleEvents)].as_array();

@@ -31,18 +31,14 @@ namespace xenomods {
 		// so the logger doesn't actually allocate memory while in use.
 		lines.reserve(Logger::MAX_LINES);
 		toastLines.reserve(Logger::MAX_LINES);
-
-#if _DEBUG
-		SetDebugEnabled(true);
-#endif
 	}
 
-	bool Logger::GetDebugEnabled() const {
-		return debug_enabled;
+	Logger::Severity Logger::GetLoggingLevel() const {
+		return loggingLevel;
 	}
 
-	void Logger::SetDebugEnabled(bool debug_enabled) {
-		this->debug_enabled = debug_enabled;
+	void Logger::SetLoggingLevel(Logger::Severity level) {
+		loggingLevel = level;
 	}
 
 	void Logger::VLogMessage(Severity severity, fmt::string_view format, fmt::format_args args) {
@@ -53,8 +49,8 @@ namespace xenomods {
 
 		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[xenomods|%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
 
-		// Don't post Debug severity messages if we shouldn't.
-		if(severity == Logger::Severity::Debug && !GetDebugEnabled())
+		// Don't post messages that are less severe than our logging level
+		if(severity < loggingLevel)
 			return;
 
 		AddMessageInternal(severity, formatted);
@@ -68,8 +64,8 @@ namespace xenomods {
 
 		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[xenomods|%s~%s] %s", group.data(), fmt::format("{}", severity).c_str(), formatted.c_str());
 
-		// Don't post Debug severity messages if we shouldn't.
-		if(severity == Logger::Severity::Debug && !GetDebugEnabled())
+		// Don't post messages that are less severe than our logging level
+		if(severity < loggingLevel)
 			return;
 
 		AddToastInternal(std::string(group), severity, formatted);

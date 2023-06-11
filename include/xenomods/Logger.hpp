@@ -118,18 +118,18 @@ namespace xenomods {
 		void DrawToasts(fw::UpdateInfo* updateInfo);
 
 		/**
-		 * Get whether Debug severity messages should be
-		 * printed to the physical screen.
+		 * Get the current level of severity messages will be
+		 * printed at.
 		 */
-		[[nodiscard]] bool GetDebugEnabled() const;
+		[[nodiscard]] Severity GetLoggingLevel() const;
 
 		/**
-		 * Set whether Debug severity messages should be
-		 * printed to the physical screen.
+		 * Sets the level of severity for messages to be
+		 * printed to the screen.
 		 *
 		 * \param[in] debug_enabled Whether or not to enable Debug severity messages.
 		 */
-		void SetDebugEnabled(bool debug_enabled);
+		void SetLoggingLevel(Severity level);
 
 	   private:
 		/**
@@ -174,7 +174,7 @@ namespace xenomods {
 
 		std::vector<LoggerMessage> lines;
 		std::vector<LoggerMessage> toastLines;
-		bool debug_enabled = false;
+		Severity loggingLevel = Severity::Info;
 	};
 
 	extern Logger* g_Logger;

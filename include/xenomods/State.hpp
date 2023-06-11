@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "xenomods/Logger.hpp"
 #include "xenomods/Utils.hpp"
 
 namespace xenomods {
@@ -12,6 +13,7 @@ namespace xenomods {
 	struct Config {
 		// very yucky, but this way it's in one spot
 #define CONFIG_PORT_DEFAULT 6969
+#define CONFIG_LOGGING_LEVEL_DEFAULT underlying_value(Logger::Severity::Info)
 #if XENOMODS_CODENAME(bf2)
 	#define CONFIG_TITLEEVENTS_DEFAULT \
 		{ 10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609 } // all chapters, game clear, and NG+ clear
@@ -38,6 +40,7 @@ namespace xenomods {
 		void LoadFromFile();
 
 		uint16_t port {};
+		Logger::Severity loggingLevel {};
 
 		std::vector<uint16_t> titleEvents {};
 

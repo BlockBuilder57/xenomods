@@ -11,6 +11,8 @@ Below is an example, with defaults. Note that all are optional, excluding them w
 ```toml
 # Port the TCP logger will use.
 port = 6969
+# Logging level of the console. (Debug = 0, Info, Warning, Error, Fatal = 4)
+loggingLevel = 1
 
 # List of title screen overrides, by Bdat id
 # This list contains all chapters, game clears, and NG+ clears
