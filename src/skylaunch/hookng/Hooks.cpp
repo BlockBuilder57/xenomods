@@ -8,6 +8,7 @@ namespace skylaunch::hook::detail {
 		void* backup;
 
 		if (function == reinterpret_cast<void*>(INVALID_FUNCTION_PTR)) {
+			xenomods::g_Logger->LogError("[hook-ng] Failed to hook something!");
 			return nullptr;
 		}
 
@@ -28,7 +29,7 @@ namespace skylaunch::hook::detail {
 		if(Result res; R_SUCCEEDED(res = nn::ro::LookupSymbol(&addr, symbolName.data()))) {
 			return addr;
 		} else {
-			xenomods::g_Logger->LogError("[hook-ng] Failed to resolve symbol \"{}\"! (Horizon ec {})", symbolName, res);
+			xenomods::g_Logger->LogDebug("[hook-ng] Failed to resolve symbol \"{}\"! (Horizon ec {})", symbolName, res);
 			return INVALID_FUNCTION_PTR;
 		}
 	}
