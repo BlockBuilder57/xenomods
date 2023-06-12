@@ -13,6 +13,8 @@
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 #include "xenomods/engine/game/Debug.hpp"
+#include "xenomods/engine/game/MenuGameData.hpp"
+#include "xenomods/engine/game/Scripts.hpp"
 #include "xenomods/engine/game/SeqUtil.hpp"
 #include "xenomods/engine/gf/BdatData.hpp"
 #include "xenomods/engine/gf/Bgm.hpp"
@@ -104,6 +106,16 @@ namespace xenomods {
 
 	int DebugStuff::tempInt = 0;
 	int DebugStuff::bgmTrackIndex = 0;
+
+	unsigned short DebugStuff::GetMapId() {
+#if XENOMODS_OLD_ENGINE
+		return gf::GfMapManager::getMapID();
+#elif XENOMODS_CODENAME(bfsw)
+		if(DocumentPtr != nullptr)
+			return game::MenuGameDataMap::getPlayerStayingMapId(*DocumentPtr);
+#endif
+		return 0;
+	}
 
 	void DebugStuff::DoMapJump(int mapjumpId) {
 		if (mapjumpId == 0)

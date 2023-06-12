@@ -13,6 +13,7 @@ namespace game {
 	class ScriptCfs {
 	   public:
 		void returnTitle();
+		static unsigned short getMapId();
 	};
 
 	class ScriptUnit {

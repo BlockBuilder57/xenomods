@@ -13,6 +13,8 @@ namespace xenomods {
 		static int tempInt;
 		static int bgmTrackIndex;
 
+		static unsigned short GetMapId();
+
 		static void DoMapJump(int mapjumpId);
 		static void PlaySE(unsigned int soundEffect);
 		static void ReturnTitle(unsigned int slot = -1);

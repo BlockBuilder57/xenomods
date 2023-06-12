@@ -21,6 +21,14 @@ namespace gf {
 		static bool isControlFree();
 	};
 
+	struct GfMapManager {
+	   public:
+		static unsigned short getMapID();
+		static unsigned short getMapJumpID();
+		static char* getMapName();
+		static char* getAssetName();
+	};
+
 	struct GfFieldManager {
 	   public:
 		static void clear(); // RESETS PLAYTIME!!
