@@ -99,7 +99,7 @@ target_include_directories(xenomods PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(xenomods PUBLIC ${PROJECT_BINARY_DIR}/)
 
 # not entirely sure what this is about, but
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_ENABLE_FLOAT16=0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_FLOAT_CHARCONV=1 -DTOML_ENABLE_FLOAT16=0")
 
 target_link_libraries(xenomods PUBLIC
 		tomlplusplus::tomlplusplus
