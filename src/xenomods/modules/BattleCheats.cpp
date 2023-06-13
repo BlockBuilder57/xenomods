@@ -27,7 +27,7 @@ namespace {
 		static void Hook(btl::BattleCharacter* this_pointer, btl::BattleCharacter::NOTIFY_DAMAGE_DATA& data, btl::BattleCharacter::NOTIFY_DAMAGE_RET& ret, const mm::Vec3& pos) {
 			if (data.attacker != nullptr) {
 				//xenomods::g_Logger->LogInfo("damage: {}, from us? {}", data.damage, data.attacker->IsBlade(false) || data.attacker->IsDriver(false));
-				xenomods::g_Logger->LogInfo("damage: {}, driver type: {}", data.damage, static_cast<int>(data.attacker->GetDriverType()));
+				//xenomods::g_Logger->LogInfo("damage: {}, driver type: {}", data.damage, static_cast<int>(data.attacker->GetDriverType()));
 
 				if (IsPlayerTakesBool && (data.attacker->IsBlade(false) || data.attacker->IsDriver(false)))
 					data.damage *= xenomods::GetState().config.damagePlayerMult;
