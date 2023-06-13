@@ -111,13 +111,21 @@ Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/common/SYS
 | Skip sky dome rendering         | Skips rendering the "sky dome," the plain sky gradient in the background.             | false   |
 
 #### Player Movement
+
+###### Warps...
+| Option               | Description                                                            | Default |
+|----------------------|------------------------------------------------------------------------|---------|
+| Load Warps from file | Loads warps from a file and selects the last open warp.                | -       |
+| Save Warps to file   | Saves all current warps to a file, saving which warp was last open.    | -       |
+| Current warp index   | Chooses which warp from the current set to use.                        | N/A     |
+| New Warp             | Creates a new warp at the party lead's location.                       | -       |
+| Overwrite Warp       | Overwrites the currently selected warp with the party lead's location. | -       |
+| Go To Warp           | Teleports the party lead to the currently selected warp.               | -       |
+
 | Option                    | Description                                                                                      | Default |
 |---------------------------|--------------------------------------------------------------------------------------------------|---------|
 | Disable fall damage       | Toggles taking fall damage. Incredibly useful so you don't fall to your death with the moonjump. | true    |
 | Movement speed multiplier | Multiplies the player's movement speed by the given amount.                                      | 1.0     |
-| Save Warp                 | Saves the location of the party lead.                                                            | -       |
-| Load Warp                 | Loads the saved location of the party lead.                                                      | -       |
-| Warp pos X/Y/Z            | Controls the position of the saved warp.                                                         | -       |
 
 #### BDAT Randomizer
 | Option        | Description                                                                                          | Default  |

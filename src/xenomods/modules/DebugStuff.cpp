@@ -226,7 +226,7 @@ namespace xenomods {
 
 		MMAssert::HookAt("_ZN2mm9MMStdBase8mmAssertEPKcS2_j");
 
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		BGMDebugging::HookAt("_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE");
 
 		JumpToClosedLandmarks_World::HookAt(&gf::GfMenuObjWorldMap::isEnterMap);

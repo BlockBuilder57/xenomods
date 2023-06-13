@@ -4,9 +4,10 @@
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
-#include <xenomods/menu/Menu.hpp>
+#include <xenomods/NnFile.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
+#include <xenomods/menu/Menu.hpp>
 
 #include "DebugStuff.hpp"
 #include "xenomods/engine/fw/Document.hpp"
@@ -121,7 +122,9 @@ namespace xenomods {
 	bool PlayerMovement::moonJump = false;
 	bool PlayerMovement::disableFallDamage = true;
 	float PlayerMovement::movementSpeedMult = 1.f;
-	PlayerMovement::WarpData PlayerMovement::Warp = {};
+
+	std::vector<PlayerMovement::WarpData> PlayerMovement::Warps = {};
+	int PlayerMovement::WarpIndex = -1;
 
 	glm::vec3 PlayerMovement::GetPartyPosition() {
 #if XENOMODS_OLD_ENGINE
@@ -269,28 +272,190 @@ namespace xenomods {
 #endif
 	}
 
-	void PlayerMovement::SaveWarp() {
-		Warp.position = GetPartyPosition();
-		Warp.rotation = GetPartyRotation();
-		Warp.velocity = GetPartyVelocity();
-		Warp.initialized = true;
-		g_Logger->ToastInfo("warp", "Saved warp at {:3}", Warp.position);
-		g_Logger->ToastInfo("warp2", "(rot {} vel {})", Warp.rotation, Warp.velocity);
-	}
+	void PlayerMovement::LoadWarpsFromFile() {
+		auto path = fmt::format("sd:/config/xenomods/{}/warps.toml", XENOMODS_CODENAME_STR);
+		toml::parse_result res = toml::parse_file(path);
 
-	void PlayerMovement::LoadWarp() {
-		if(Warp.initialized) {
-			SetPartyPosition(Warp.position);
-			if (Warp.rotation != glm::identity<glm::quat>())
-				SetPartyRotation(Warp.rotation); // can cause fun errors
-			SetPartyVelocity(Warp.velocity);
-			g_Logger->ToastInfo("warp", "Warped party to {:3}", Warp.position);
-			g_Logger->ToastInfo("warp2", "(rot {} vel {})", Warp.rotation, Warp.velocity);
+		if(!res) {
+			auto error = std::move(res).error();
+			g_Logger->LogDebug("Warp file error: ({})", error.description());
+			return;
+		}
+
+		auto table = std::move(res).table();
+
+		if(table["warps"].type() != toml::node_type::array)
+			return;
+
+		auto arr = table.get_as<toml::array>("warps");
+
+		if(arr->size() > 0) {
+			Warps.clear();
+
+			arr->for_each([&](auto& el) {
+				WarpData warp {};
+
+				toml::table& thisone = *el.as_table();
+
+				if(thisone["name"].type() == toml::node_type::string)
+					warp.name = thisone["name"].value_or("no name");
+
+				if(thisone["mapId"].type() == toml::node_type::integer) {
+					warp.mapId = thisone["mapId"].value_or(0);
+					warp.mapName = DebugStuff::GetMapName(warp.mapId);
+				}
+
+				if(thisone["position"].type() == toml::node_type::array) {
+					warp.position.x = thisone["position"][0].value_or(0.f);
+					warp.position.y = thisone["position"][1].value_or(0.f);
+					warp.position.z = thisone["position"][2].value_or(0.f);
+				}
+
+				if(thisone["rotation"].type() == toml::node_type::array) {
+					int size = thisone["rotation"].as_array()->size();
+
+					if(size == 3) {
+						glm::vec3 temp;
+
+						temp.x = thisone["rotation"][0].value_or(0.f);
+						temp.y = thisone["rotation"][1].value_or(0.f);
+						temp.z = thisone["rotation"][2].value_or(0.f);
+
+						warp.rotation = glm::quat(glm::radians(temp));
+					} else if(size == 4) {
+						warp.rotation.x = thisone["rotation"][0].value_or(1.f);
+						warp.rotation.y = thisone["rotation"][1].value_or(0.f);
+						warp.rotation.z = thisone["rotation"][2].value_or(0.f);
+						warp.rotation.w = thisone["rotation"][2].value_or(0.f);
+					}
+				}
+
+				if(thisone["velocity"].type() == toml::node_type::array) {
+					warp.velocity.x = thisone["velocity"][0].value_or(0.f);
+					warp.velocity.y = thisone["velocity"][1].value_or(0.f);
+					warp.velocity.z = thisone["velocity"][2].value_or(0.f);
+				}
+
+				Warps.push_back(warp);
+			});
+
+			// remember the last warp index
+			WarpIndex = table["lastWarpIndex"].value_or(0);
+			WarpIndex = std::clamp(WarpIndex, 0, (int)Warps.size() - 1);
+
+			g_Logger->ToastInfo("warp", "Loaded {} warp(s)", Warps.size());
 		}
 	}
 
-	void OnMenuWarpUpdate() {
-		PlayerMovement::Warp.initialized = true;
+	void PlayerMovement::SaveWarpsToFile() {
+		auto path = fmt::format("sd:/config/xenomods/{}/warps.toml", XENOMODS_CODENAME_STR);
+
+		toml::array allWarps;
+
+		for(auto& warp : Warps) {
+			toml::table thisone;
+
+			thisone.emplace("name", warp.name);
+			thisone.emplace("mapId", warp.mapId);
+			// save the name of the map to the file so it's clearer what map each warp is for
+			thisone.emplace("mapNameReadOnly", warp.mapName);
+
+			thisone.emplace("position", toml::array{warp.position.x, warp.position.y, warp.position.z});
+
+			glm::vec3 rot = glm::degrees(glm::eulerAngles(warp.rotation));
+			thisone.emplace("rotation", toml::array{rot.x, rot.y, rot.z});
+
+			thisone.emplace("velocity", toml::array{warp.velocity.x, warp.velocity.y, warp.velocity.z});
+
+			allWarps.emplace_back(thisone);
+		}
+
+		toml::table finalTable;
+		finalTable.emplace("warps", allWarps);
+
+		finalTable.emplace("lastWarpIndex", WarpIndex);
+
+		std::stringstream ss;
+		ss << finalTable;
+		std::string out = ss.str();
+
+		if (!NnFile::Preallocate(path, out.size())) {
+			g_Logger->LogError("Couldn't create/preallocate warps file \"{}\"", path);
+			return;
+		}
+
+		NnFile file(path, nn::fs::OpenMode_Write);
+
+		file.Write(out.c_str(), out.size());
+		file.Flush();
+		file.Close();
+	}
+
+	void PlayerMovement::NewWarp() {
+		Warps.push_back({ .name = "New Warp " + std::to_string(Warps.size()),
+						  .mapId = DebugStuff::GetMapId(),
+						  .mapName = DebugStuff::GetMapName() });
+
+		WarpIndex = Warps.size() - 1;
+		OverwriteWarp();
+	}
+	void PlayerMovement::OverwriteWarp() {
+		if (WarpIndex < 0 || WarpIndex >= Warps.size())
+			return;
+
+		auto warp = &Warps[WarpIndex];
+
+		warp->mapId = DebugStuff::GetMapId();
+		warp->mapName = DebugStuff::GetMapName(warp->mapId);
+
+		warp->position = GetPartyPosition();
+		warp->rotation = GetPartyRotation();
+		warp->velocity = GetPartyVelocity();
+		g_Logger->ToastInfo("warp", "Set {} at {:3}", warp->name, warp->position);
+		g_Logger->ToastInfo("warp2", "(rot {} vel {})", warp->rotation, warp->velocity);
+	}
+	void PlayerMovement::GoToWarp() {
+		if (WarpIndex < 0 || WarpIndex >= Warps.size())
+			return;
+
+		auto warp = &Warps[WarpIndex];
+
+		if (warp->mapId != 0 && warp->mapId != DebugStuff::GetMapId()) {
+			g_Logger->ToastWarning("warp", "Current map ({}) does not match the warp's map ({})", DebugStuff::GetMapName(), DebugStuff::GetMapName(warp->mapId));
+			return;
+		}
+
+		const glm::quat zero = glm::quat(0,0,0,0);
+		glm::quat normalized = glm::normalize(warp->rotation);
+
+		SetPartyPosition(warp->position);
+		if (normalized != zero)
+			SetPartyRotation(normalized); // can cause fun errors
+		SetPartyVelocity(warp->velocity);
+
+		g_Logger->ToastInfo("warp", "Warped party to {}", warp->name);
+	}
+
+	void MenuChangeWarpIndex() {
+		if (xenomods::PlayerMovement::WarpIndex < 0)
+			xenomods::PlayerMovement::WarpIndex = xenomods::PlayerMovement::Warps.size() - 1;
+		else if (xenomods::PlayerMovement::WarpIndex >= xenomods::PlayerMovement::Warps.size())
+			xenomods::PlayerMovement::WarpIndex = 0;
+	}
+
+	std::string MenuGetCurrentWarpInfo() {
+		if (xenomods::PlayerMovement::WarpIndex < 0 || xenomods::PlayerMovement::WarpIndex >= xenomods::PlayerMovement::Warps.size())
+			return "No warp";
+
+		auto warp = xenomods::PlayerMovement::Warps[xenomods::PlayerMovement::WarpIndex];
+		return fmt::format("{} in {}", warp.name, warp.mapName);
+	}
+	std::string MenuGetCurrentWarpInfo2() {
+		if (xenomods::PlayerMovement::WarpIndex < 0 || xenomods::PlayerMovement::WarpIndex >= xenomods::PlayerMovement::Warps.size())
+			return "...";
+
+		auto warp = xenomods::PlayerMovement::Warps[xenomods::PlayerMovement::WarpIndex];
+		return fmt::format("Position: {}", warp.position);
 	}
 
 	void PlayerMovement::Initialize() {
@@ -316,11 +481,16 @@ namespace xenomods {
 			auto section = modules->RegisterSection(STRINGIFY(PlayerMovement), "Player Movement");
 			section->RegisterOption<bool>(disableFallDamage, "Disable fall damage");
 			section->RegisterOption<float>(movementSpeedMult, "Movement speed multiplier");
-			section->RegisterOption<void>("Save Warp", &PlayerMovement::SaveWarp);
-			section->RegisterOption<void>("Load Warp", &PlayerMovement::LoadWarp);
-			section->RegisterOption<float>(Warp.position.x, "Warp pos X", &OnMenuWarpUpdate);
-			section->RegisterOption<float>(Warp.position.y, "Warp pos Y", &OnMenuWarpUpdate);
-			section->RegisterOption<float>(Warp.position.z, "Warp pos Z", &OnMenuWarpUpdate);
+
+			auto warps = section->RegisterSection(std::string(STRINGIFY(PlayerMovement)) + "_warps", "Warps...");
+			warps->RegisterOption<void>("Load Warps from file", &PlayerMovement::LoadWarpsFromFile);
+			warps->RegisterOption<void>("Save Warps to file", &PlayerMovement::SaveWarpsToFile);
+			warps->RegisterOption<int>(WarpIndex, "Current warp index", &MenuChangeWarpIndex);
+			warps->RegisterOption<void>("New Warp", &PlayerMovement::NewWarp);
+			warps->RegisterOption<void>("Overwrite Warp", &PlayerMovement::OverwriteWarp);
+			warps->RegisterOption<void>("Go To Warp", &PlayerMovement::GoToWarp);
+			warps->RegisterTextual("Current Warp: ", {}, &MenuGetCurrentWarpInfo);
+			warps->RegisterTextual("", {}, &MenuGetCurrentWarpInfo2);
 		}
 #endif
 	}
