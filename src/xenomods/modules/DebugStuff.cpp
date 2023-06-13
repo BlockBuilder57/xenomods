@@ -95,7 +95,6 @@ namespace {
 		}
 	};
 #endif
-
 }
 
 namespace xenomods {
@@ -115,6 +114,32 @@ namespace xenomods {
 			return game::MenuGameDataMap::getPlayerStayingMapId(*DocumentPtr);
 #endif
 		return 0;
+	}
+
+	std::string DebugStuff::GetMapName(int id) {
+		std::string value = "No Map";
+
+		if(id > 0) {
+#if XENOMODS_OLD_ENGINE
+			value = gf::GfDataMap::getName(id);
+#elif XENOMODS_CODENAME(bfsw)
+			game::MenuGameDataMap dataMap(*DocumentPtr);
+			dataMap.create(id, game::MenuGameDataMap::MapType::OneFloor);
+
+			game::MsText text = dataMap.getMapNameText();
+
+			if(text.pBdat != nullptr)
+				value = Bdat::getMSText(text.pBdat, text.index);
+			else
+				value = "";
+#endif
+		}
+
+		// display "ID n" if the name is blank
+		if (value == "")
+			value = "ID " + std::to_string(id);
+
+		return value;
 	}
 
 	void DebugStuff::DoMapJump(int mapjumpId) {

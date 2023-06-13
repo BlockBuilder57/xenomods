@@ -6,6 +6,16 @@
 
 namespace gf {
 
+	class GfBdatMsg {
+	   public:
+		static char* getNameMapInfo(unsigned int);
+	};
+
+	class GfDataMap {
+	   public:
+		static char* getName(unsigned int);
+	};
+
 	class GfDataEvent {
 	   public:
 		static char* getEventName(unsigned int eventId);
