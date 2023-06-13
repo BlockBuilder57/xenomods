@@ -204,7 +204,7 @@ namespace xenomods {
 #endif
 
 void fmt_assert_failed(const char* file, int line, const char* message) {
-		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught @ %s:%d : %s", file, line, message);
+		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught : %s", message);
 	}
 
 	void update(fw::UpdateInfo* updateInfo) {
