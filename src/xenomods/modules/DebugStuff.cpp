@@ -167,7 +167,7 @@ namespace xenomods {
 #if XENOMODS_OLD_ENGINE
 		gf::GfPlayFactory::createSkipTravel(mapjumpId);
 		gf::GfMenuObjUtil::playSE(gf::GfMenuObjUtil::SEIndex::mapjump);
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		game::MapJumpSetupInfo info;
 
 		if(DocumentPtr == nullptr) {
@@ -188,7 +188,7 @@ namespace xenomods {
 	}
 
 	void DebugStuff::PlaySE(unsigned int soundEffect) {
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		gf::GfMenuObjUtil::playSE(soundEffect);
 #endif
 	}
@@ -198,9 +198,9 @@ namespace xenomods {
 	}
 
 	void DebugStuff::ReturnTitle(unsigned int slot) {
-#if !XENOMODS_CODENAME(bfsw)
+#if XENOMODS_OLD_ENGINE
 		tl::TitleMain::returnTitle((gf::SAVESLOT)slot);
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't return to title cause no doc ptr!");
 			return;
@@ -218,13 +218,21 @@ namespace xenomods {
 #if XENOMODS_OLD_ENGINE
 		fw::PadManager::enableDebugDraw(enableDebugRendering);
 #endif
+#if XENOMODS_CODENAME(bf3)
+		unsigned int* globalDebugFlags = reinterpret_cast<unsigned int*>(skylaunch::utils::g_MainTextAddr + 0x1c49c60);
+
+		// sets the system info print to display
+		*globalDebugFlags ^= (-enableDebugRendering ^ *globalDebugFlags) & (1 << 6);
+#endif
 	}
 
 	void DebugStuff::Initialize() {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up debug stuff...");
 
+#if !XENOMODS_CODENAME(bf3)
 		MMAssert::HookAt("_ZN2mm9MMStdBase8mmAssertEPKcS2_j");
+#endif
 
 #if XENOMODS_OLD_ENGINE
 		BGMDebugging::HookAt("_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE");
@@ -255,14 +263,14 @@ namespace xenomods {
 			section->RegisterOption<void>("Return to Title", &MenuReturnTitle);
 #endif
 		}
+
+		UpdateDebugRendering();
 	}
 
 	void DebugStuff::Update(fw::UpdateInfo* updateInfo) {
 		bgmTrackIndex = 0;
 	}
 
-#if !XENOMODS_CODENAME(bf3)
 	XENOMODS_REGISTER_MODULE(DebugStuff);
-#endif
 
 } // namespace xenomods

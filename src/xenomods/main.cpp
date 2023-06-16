@@ -238,17 +238,6 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 			g_Logger->LogDebug("strict combo up!");*/
 
 		/*
-		 * Enforce some things on first update
-		 */
-		static bool hasUpdated;
-		if(!hasUpdated) {
-#if XENOMODS_OLD_ENGINE
-			fw::PadManager::enableDebugDraw(true);
-#endif
-			hasUpdated = true;
-		}
-
-		/*
 		 * Check buttons
 		 */
 
