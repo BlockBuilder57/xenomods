@@ -2,7 +2,14 @@
 
 #include <type_traits>
 
+#include <skylaunch/hookng/Hooks.hpp>
+#include <xenomods/DebugWrappers.hpp>
+#include <xenomods/HidInput.hpp>
+#include <xenomods/Logger.hpp>
+#include <xenomods/NnFile.hpp>
 #include <xenomods/State.hpp>
+#include <xenomods/Utils.hpp>
+#include <xenomods/menu/Menu.hpp>
 
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 
@@ -32,6 +39,20 @@ namespace xenomods {
 
 	namespace detail {
 		void RegisterModule(UpdatableModule* module);
+
+		static bool IsModuleRegistered(const char* moduleName)
+		{
+			std::string strModuleName = std::string(moduleName);
+			// dumb hack (as if this whole function isn't)
+			if (strModuleName.starts_with("xenomods::"))
+				strModuleName = strModuleName.substr(10);
+
+			std::string symbol = "_ZN8xenomods15ModuleRegistrarINS_";
+			symbol += std::to_string(strModuleName.size());
+			symbol += strModuleName;
+			symbol += "EEC1EPS1_";
+			return skylaunch::hook::detail::ResolveSymbolBase(symbol) != skylaunch::hook::INVALID_FUNCTION_PTR;
+		}
 	}
 
 	template<class TUpdatable>

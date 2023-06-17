@@ -1,12 +1,5 @@
 #include "BdatRandomizer.hpp"
 
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/HidInput.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/menu/Menu.hpp>
-#include <xenomods/Utils.hpp>
-#include <skylaunch/hookng/Hooks.hpp>
-
 #include "xenomods/engine/bdat/Bdat.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/stuff/utils/util.hpp"
@@ -56,7 +49,8 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up Bdat randomizer...");
 
-		BdatOverride::RegisterCallback(&MsOverride());
+		if (detail::IsModuleRegistered(STRINGIFY(BdatOverride)))
+			BdatOverride::RegisterCallback(&MsOverride());
 
 #if !XENOMODS_CODENAME(bf3)
 		auto modules = g_Menu->FindSection("modules");

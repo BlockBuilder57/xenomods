@@ -1,14 +1,5 @@
 #include "PlayerMovement.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/HidInput.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/NnFile.hpp>
-#include <xenomods/State.hpp>
-#include <xenomods/Utils.hpp>
-#include <xenomods/menu/Menu.hpp>
-
 #include "DebugStuff.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
@@ -302,7 +293,10 @@ namespace xenomods {
 
 				if(thisone["mapId"].type() == toml::node_type::integer) {
 					warp.mapId = thisone["mapId"].value_or(0);
-					warp.mapName = DebugStuff::GetMapName(warp.mapId);
+					if (detail::IsModuleRegistered(STRINGIFY(DebugStuff)))
+						warp.mapName = DebugStuff::GetMapName(warp.mapId);
+					else
+						warp.mapName = "bepis";
 				}
 
 				if(thisone["position"].type() == toml::node_type::array) {
@@ -392,9 +386,17 @@ namespace xenomods {
 	}
 
 	void PlayerMovement::NewWarp() {
+		unsigned short mapId = 0;
+		std::string mapName = "bepis";
+
+		if (detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
+			mapId = DebugStuff::GetMapId();
+			mapName = DebugStuff::GetMapName();
+		}
+
 		Warps.push_back({ .name = "New Warp " + std::to_string(Warps.size()),
-						  .mapId = DebugStuff::GetMapId(),
-						  .mapName = DebugStuff::GetMapName() });
+						  .mapId = mapId,
+						  .mapName = mapName });
 
 		WarpIndex = Warps.size() - 1;
 		OverwriteWarp();
@@ -405,8 +407,14 @@ namespace xenomods {
 
 		auto warp = &Warps[WarpIndex];
 
-		warp->mapId = DebugStuff::GetMapId();
-		warp->mapName = DebugStuff::GetMapName(warp->mapId);
+		if (xenomods::detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
+			warp->mapId = DebugStuff::GetMapId();
+			warp->mapName = DebugStuff::GetMapName(warp->mapId);
+		}
+		else {
+			warp->mapId = 0;
+			warp->mapName = "bepis";
+		}
 
 		warp->position = GetPartyPosition();
 		warp->rotation = GetPartyRotation();
@@ -420,9 +428,13 @@ namespace xenomods {
 
 		auto warp = &Warps[WarpIndex];
 
-		if (warp->mapId != 0 && warp->mapId != DebugStuff::GetMapId()) {
-			g_Logger->ToastWarning("warp", "Current map ({}) does not match the warp's map ({})", DebugStuff::GetMapName(), DebugStuff::GetMapName(warp->mapId));
-			return;
+		// lock out warps that have map ids set
+		// if DebugStuff isn't present just let them do whatever
+		if (xenomods::detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
+			if (warp->mapId > 0 && warp->mapId != DebugStuff::GetMapId()) {
+				g_Logger->ToastWarning("warp", "Current map ({}) does not match the warp's map ({})", DebugStuff::GetMapName(), DebugStuff::GetMapName(warp->mapId));
+				return;
+			}
 		}
 
 		const glm::quat zero = glm::quat(0,0,0,0);

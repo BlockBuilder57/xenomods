@@ -1,8 +1,5 @@
 #include "AppletRedirect.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/Logger.hpp>
-
 #include "nn/account.h"
 #include "nn/fs.h"
 #include "xenomods/NnFile.hpp"

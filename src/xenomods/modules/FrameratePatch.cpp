@@ -2,12 +2,6 @@
 
 #include "FrameratePatch.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/HidInput.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/Utils.hpp>
-
 #include "xenomods/engine/ml/DevGraph.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
 

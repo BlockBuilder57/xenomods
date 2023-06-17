@@ -4,13 +4,6 @@
 
 #include "BattleCheats.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/NnFile.hpp>
-#include <xenomods/Utils.hpp>
-#include <xenomods/menu/Menu.hpp>
-
 #include "xenomods/engine/btl/Character.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/game/Actor.hpp"

@@ -1,13 +1,5 @@
 #include "DebugStuff.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/HidInput.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/State.hpp>
-#include <xenomods/Utils.hpp>
-#include <xenomods/menu/Menu.hpp>
-
 #include "xenomods/engine/bdat/Bdat.hpp"
 #include "xenomods/engine/fw/Debug.hpp"
 #include "xenomods/engine/fw/Framework.hpp"

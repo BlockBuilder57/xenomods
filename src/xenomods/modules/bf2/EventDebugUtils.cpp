@@ -5,13 +5,6 @@
 #include "EventDebugUtils.hpp"
 #include "../DebugStuff.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/HidInput.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/State.hpp>
-#include <xenomods/Utils.hpp>
-
 #include "xenomods/engine/event/Manager.hpp"
 #include "xenomods/engine/gf/BdatData.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
@@ -24,7 +17,7 @@ namespace {
 		static void Hook(event::Manager* this_pointer) {
 			xenomods::EventDebugUtils::ShouldUpdate = !this_pointer->isPlayCancel();
 
-			if(!this_pointer->isPlayCancel() && xenomods::DebugStuff::enableDebugRendering) {
+			if(xenomods::detail::IsModuleRegistered(STRINGIFY(xenomods::DebugStuff)) && !this_pointer->isPlayCancel() && xenomods::DebugStuff::enableDebugRendering) {
 				if((xenomods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
 					this_pointer->drawInfo();
 				}
@@ -50,7 +43,8 @@ namespace {
 
 		static void Hook(TManager* this_pointer, event::MSG_TYPE msg) {
 			HookType::Orig(this_pointer, msg);
-			if(msg == 0xe && xenomods::DebugStuff::enableDebugRendering && (xenomods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
+			if(msg == 0xe && xenomods::detail::IsModuleRegistered(STRINGIFY(xenomods::DebugStuff)) &&
+			   xenomods::DebugStuff::enableDebugRendering && (xenomods::EventDebugUtils::ActiveBits >> registeredIndex) & 1) {
 				this_pointer->setDisp(true);
 				this_pointer->render();
 			}

@@ -6,12 +6,6 @@
 #include "DebugStuff.hpp"
 #include "PlayerMovement.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/HidInput.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/menu/Menu.hpp>
-
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"
 #include "xenomods/engine/apps/FrameworkLauncher.hpp"
@@ -259,7 +253,8 @@ namespace xenomods {
 	}
 
 	void TeleportPlayerToCamera() {
-		PlayerMovement::SetPartyPosition(CameraTools::Meta.pos);
+		if (xenomods::detail::IsModuleRegistered(STRINGIFY(PlayerMovement)))
+			PlayerMovement::SetPartyPosition(CameraTools::Meta.pos);
 	}
 
 	void CameraTools::Initialize() {
@@ -339,18 +334,6 @@ namespace xenomods {
 			}
 
 			DoFreeCameraMovement(updateInfo->updateDelta);
-
-#if 0
-			if (xenomods::DebugStuff::enableDebugRendering && GetPlayer(2)->InputHeld(Keybind::FREECAM_HANDLE)) {
-				const int height = xenomods::debug::drawFontGetHeight();
-				int yPos = (720 / 2) - ((height * 5) / 2);
-				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "- Freecam -");
-				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Pos: {:1}", Meta.pos);
-				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Rot: {:1}", glm::degrees(glm::eulerAngles(Meta.rot)));
-				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "Speed: {}m/s", Freecam.camSpeed);
-				xenomods::debug::drawFontFmtShadow(0, yPos += height, mm::Col4::white, "FOV: {:.1f}", Freecam.fov);
-			}
-#endif
 		}
 	}
 

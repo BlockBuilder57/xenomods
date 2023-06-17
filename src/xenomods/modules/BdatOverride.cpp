@@ -4,12 +4,6 @@
 
 #include "BdatOverride.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/HidInput.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/Utils.hpp>
-
 #include "xenomods/engine/bdat/Bdat.hpp"
 
 namespace {

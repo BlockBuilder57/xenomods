@@ -1,13 +1,5 @@
 #include "RenderingControls.hpp"
 
-#include <skylaunch/hookng/Hooks.hpp>
-#include <xenomods/DebugWrappers.hpp>
-#include <xenomods/HidInput.hpp>
-#include <xenomods/Logger.hpp>
-#include <xenomods/State.hpp>
-#include <xenomods/Version.hpp>
-#include <xenomods/menu/Menu.hpp>
-
 #include "DebugStuff.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
