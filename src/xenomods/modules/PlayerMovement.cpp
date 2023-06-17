@@ -508,7 +508,7 @@ namespace xenomods {
 	}
 
 	void PlayerMovement::Update(fw::UpdateInfo* updateInfo) {
-		moonJump = GetPlayer(1)->InputHeld(Keybind::MOONJUMP);
+		moonJump = HidInput::GetPlayer(1)->InputHeld(Keybind::MOONJUMP);
 	}
 
 #if !XENOMODS_CODENAME(bf3)

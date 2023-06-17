@@ -3,6 +3,7 @@ add_executable(xenomods
 		xenomods/main.cpp
 
 		# UTILITY
+		xenomods/FunctionalHooks.cpp
 		xenomods/NnFile.cpp
 
 		xenomods/modules/UpdatableModule.cpp

@@ -4,6 +4,8 @@
 
 #include <nn/oe.h>
 
+#include "FunctionalHooks.hpp"
+
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
 
@@ -50,8 +52,12 @@ namespace xenomods {
 		}
 	}
 
-	HidInput* GetPlayer(int player) {
+	HidInput* HidInput::GetPlayer(int player) {
 		return &controllers[std::clamp(player, 1, CONTROLLER_COUNT) - 1];
+	}
+
+	HidInput* HidInput::GetDebugInput() {
+		return ClampNumberOfControllers::HasApplied() ? GetPlayer(ClampNumberOfControllers::Orig()) : GetPlayer(1);
 	}
 
 } // namespace xenomods

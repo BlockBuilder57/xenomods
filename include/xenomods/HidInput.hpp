@@ -28,6 +28,14 @@ namespace xenomods {
 
 		void Poll();
 
+		static HidInput* GetPlayer(int player);
+
+		/*
+		 * Gets the controller used for the debug input (like the Menu)
+		 * Uses the last numbered controller if it is connected, otherwise P1.
+		 */
+		static HidInput* GetDebugInput();
+
 		/**
 		 * \defgroup input Input functions
 		 * Standard style input functions. Can take any kind of integer to check.
@@ -68,7 +76,7 @@ namespace xenomods {
 		/** @} */
 	};
 
-	HidInput* GetPlayer(int player);
+
 
 	enum class Keybind : std::uint64_t {
 		// in-game controls

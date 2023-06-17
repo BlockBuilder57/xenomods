@@ -166,10 +166,10 @@ namespace xenomods {
 
 		//xenomods::debug::drawFontFmtShadow(0, 720-16, mm::Col4::white, "Manager bits: {:0b}", ActiveBits);
 
-		if(GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_PREV)) {
+		if(HidInput::GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_PREV)) {
 			CurrentIndex--;
 			changed = true;
-		} else if(GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_NEXT)) {
+		} else if(HidInput::GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_NEXT)) {
 			CurrentIndex++;
 			changed = true;
 		}
@@ -183,7 +183,7 @@ namespace xenomods {
 			g_Logger->LogInfo("Selected {} (currently {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");
 		}
 
-		if(GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_TOGGLE)) {
+		if(HidInput::GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_TOGGLE)) {
 			if(CurrentIndex >= 0 && CurrentIndex < RegistrationIndex) {
 				ActiveBits ^= 1 << CurrentIndex;
 				g_Logger->LogInfo("Toggled debug for {} (now {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");
