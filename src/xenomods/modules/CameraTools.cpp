@@ -12,7 +12,7 @@
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/game/MenuModelView.hpp"
-#include "xenomods/engine/game/ObjUtil.hpp"
+#include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/engine/game/Scripts.hpp"
 #include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/engine/ml/Scene.hpp"

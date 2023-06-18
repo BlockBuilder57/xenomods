@@ -74,4 +74,9 @@ namespace xenomods {
 	 * NOTE: Only done on a successful config reload.
 	 */
 	void ConfigUpdateForAllRegisteredModules();
+
+	/**
+	 * Notifies all modules about a map change.
+	 */
+	void MapChangeForAllRegisteredModules(unsigned short mapId);
 } // namespace xenomods

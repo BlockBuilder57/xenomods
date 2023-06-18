@@ -4,7 +4,7 @@
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 #include "xenomods/engine/game/CharacterController.hpp"
-#include "xenomods/engine/game/ObjUtil.hpp"
+#include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/engine/gf/PlayerController.hpp"
 #include "xenomods/engine/mm/mtl/RTTI.hpp"

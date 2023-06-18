@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "IGfEvent.hpp"
 #include "Object.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 
@@ -27,6 +28,8 @@ namespace gf {
 		static unsigned short getMapJumpID();
 		static char* getMapName();
 		static char* getAssetName();
+
+		static void gevMapjump(GEV gev, const MapjumpCallbackInfo& mapjumpInfo);
 	};
 
 	struct GfFieldManager {

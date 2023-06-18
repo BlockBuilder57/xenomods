@@ -1,7 +1,6 @@
 // Created by block on 6/17/23.
 
 #include "FunctionalHooks.hpp"
-#include "main.hpp"
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
@@ -12,9 +11,13 @@
 #include <xenomods/Version.hpp>
 #include <xenomods/menu/Menu.hpp>
 
+#include "main.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
+#include "xenomods/engine/game/Sequence.hpp"
+#include "xenomods/engine/gf/BdatData.hpp"
+#include "xenomods/engine/gf/Manager.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
@@ -184,6 +187,29 @@ namespace {
 		}
 	};
 
+#if XENOMODS_OLD_ENGINE
+	struct OnMapChange : skylaunch::hook::Trampoline<OnMapChange> {
+		static void Hook(uint* GfReqParam) {
+			Orig(GfReqParam);
+
+			unsigned int mapId = gf::GfDataMap::getMapID(*GfReqParam);
+
+			xenomods::MapChangeForAllRegisteredModules(mapId);
+		}
+	};
+#elif XENOMODS_CODENAME(bfsw)
+	struct OnMapChange : skylaunch::hook::Trampoline<OnMapChange> {
+		static void Hook(game::SeqMapJump* this_pointer, game::MapJumpSetupInfo* setupInfo) {
+			Orig(this_pointer, setupInfo);
+
+			std::string thingy = fmt::format("ma{:02}{:02}", setupInfo->chapter, setupInfo->location);
+			unsigned int mapId = game::DataUtil::searchBdatFldMaplistRowID(*xenomods::DocumentPtr, thingy.c_str());
+
+			xenomods::MapChangeForAllRegisteredModules(mapId);
+		}
+	};
+#endif
+
 }; // namespace
 
 namespace xenomods {
@@ -248,6 +274,14 @@ namespace xenomods {
 #else
 		DisableControllerUpdatingForMenu::HookFromBase(0x710124fa34);
 #endif
+
+		// Map change events
+#if XENOMODS_OLD_ENGINE
+		OnMapChange::HookAt("_ZN2gf12GfReqCommand11execMapjumpEPKNS_10GfReqParamE");
+#elif XENOMODS_CODENAME(bfsw)
+		OnMapChange::HookAt("_ZN4game10SeqMapJumpC1ERKNS_16MapJumpSetupInfoE");
+#endif
+
 	}
 
 } // namespace xenomods

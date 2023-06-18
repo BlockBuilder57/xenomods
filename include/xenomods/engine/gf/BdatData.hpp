@@ -14,6 +14,7 @@ namespace gf {
 	class GfDataMap {
 	   public:
 		static char* getName(unsigned int);
+		static unsigned int getMapID(unsigned int);
 	};
 
 	class GfDataEvent {

@@ -7,7 +7,7 @@
 #include "xenomods/engine/game/Debug.hpp"
 #include "xenomods/engine/game/MenuGameData.hpp"
 #include "xenomods/engine/game/Scripts.hpp"
-#include "xenomods/engine/game/SeqUtil.hpp"
+#include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/engine/gf/BdatData.hpp"
 #include "xenomods/engine/gf/Bgm.hpp"
 #include "xenomods/engine/gf/Manager.hpp"

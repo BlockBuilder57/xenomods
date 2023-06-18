@@ -75,4 +75,10 @@ namespace xenomods {
 				registeredModules[i].modulePtr->OnConfigUpdate();
 	}
 
+	void MapChangeForAllRegisteredModules(unsigned short mapId) {
+		for(int i = 0; i < moduleIndex; ++i)
+			if(registeredModules[i].modulePtr->HasInitialized)
+				registeredModules[i].modulePtr->OnMapChange(mapId);
+	}
+
 } // namespace xenomods
