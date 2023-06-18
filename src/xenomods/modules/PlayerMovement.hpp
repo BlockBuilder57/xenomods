@@ -21,12 +21,12 @@ namespace xenomods {
 		static std::vector<WarpData> Warps;
 		static int WarpIndex;
 
-		static glm::vec3 GetPartyPosition();
+		static glm::vec3* GetPartyPosition();
 		static void SetPartyPosition(glm::vec3 pos);
-		static glm::quat GetPartyRotation();
+		static glm::quat* GetPartyRotation();
 		static void SetPartyRotation(glm::quat rot);
 
-		static glm::vec3 GetPartyVelocity();
+		static glm::vec3* GetPartyVelocity();
 		static void SetPartyVelocity(glm::vec3 vel);
 
 		static void NewWarp();
@@ -37,11 +37,11 @@ namespace xenomods {
 		static void SaveWarpsToFile();
 
 		void Initialize() override;
-
 		bool NeedsUpdate() const override {
 			return true;
 		}
 		void Update(fw::UpdateInfo* updateInfo) override;
+		void OnMapChange(unsigned short mapId) override;
 	};
 
 } // namespace xenomods

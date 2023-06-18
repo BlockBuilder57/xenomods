@@ -117,11 +117,11 @@ namespace xenomods {
 	std::vector<PlayerMovement::WarpData> PlayerMovement::Warps = {};
 	int PlayerMovement::WarpIndex = -1;
 
-	glm::vec3 PlayerMovement::GetPartyPosition() {
+	glm::vec3* PlayerMovement::GetPartyPosition() {
 #if XENOMODS_OLD_ENGINE
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if(trans != nullptr)
-			return *trans->getPosition();
+			return reinterpret_cast<glm::vec3*>(trans->getPosition());
 #else
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't get party position cause no doc ptr!");
@@ -132,11 +132,11 @@ namespace xenomods {
 		if (leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
 			if (control != nullptr) {
-				return control->position;
+				return reinterpret_cast<glm::vec3*>(&control->position);
 			}
 		}
 #endif
-		return {};
+		return nullptr;
 	}
 	void PlayerMovement::SetPartyPosition(glm::vec3 pos) {
 #if XENOMODS_OLD_ENGINE
@@ -160,11 +160,11 @@ namespace xenomods {
 		}
 #endif
 	}
-	glm::quat PlayerMovement::GetPartyRotation() {
+	glm::quat* PlayerMovement::GetPartyRotation() {
 #if XENOMODS_OLD_ENGINE
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if(trans != nullptr)
-			return *trans->getRotation();
+			return reinterpret_cast<glm::quat*>(trans->getRotation());
 #else
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't get party position cause no doc ptr!");
@@ -175,11 +175,11 @@ namespace xenomods {
 		if (leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
 			if (control != nullptr) {
-				return control->rotation;
+				return reinterpret_cast<glm::quat*>(&control->rotation);
 			}
 		}
 #endif
-		return {};
+		return nullptr;
 	}
 	void PlayerMovement::SetPartyRotation(glm::quat rot) {
 #if XENOMODS_OLD_ENGINE
@@ -202,7 +202,7 @@ namespace xenomods {
 #endif
 	}
 
-	glm::vec3 PlayerMovement::GetPartyVelocity() {
+	glm::vec3* PlayerMovement::GetPartyVelocity() {
 #if XENOMODS_OLD_ENGINE
 		// TODO
 		/*gf::GF_OBJ_HANDLE handle = gf::GfGameParty::getLeader();
@@ -237,11 +237,11 @@ namespace xenomods {
 		if (leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
 			if (control != nullptr) {
-				return control->velocity;
+				return reinterpret_cast<glm::vec3*>(&control->velocity);
 			}
 		}
 #endif
-		return {};
+		return nullptr;
 	}
 	void PlayerMovement::SetPartyVelocity(glm::vec3 vel) {
 #if XENOMODS_OLD_ENGINE
@@ -416,9 +416,13 @@ namespace xenomods {
 			warp->mapName = "bepis";
 		}
 
-		warp->position = GetPartyPosition();
-		warp->rotation = GetPartyRotation();
-		warp->velocity = GetPartyVelocity();
+		if (GetPartyPosition() != nullptr)
+			warp->position = *GetPartyPosition();
+		if (GetPartyRotation() != nullptr)
+			warp->rotation = *GetPartyRotation();
+		if (GetPartyVelocity() != nullptr)
+			warp->velocity = *GetPartyVelocity();
+
 		g_Logger->ToastInfo("warp", "Set {} at {:3}", warp->name, warp->position);
 		g_Logger->ToastInfo("warp2", "(rot {} vel {})", warp->rotation, warp->velocity);
 	}
@@ -470,6 +474,34 @@ namespace xenomods {
 		return fmt::format("Position: {}", warp.position);
 	}
 
+	std::string cacheMapName = "No Map";
+
+	std::string MenuCurrentMapInfo() {
+		return cacheMapName;
+	}
+
+	std::string MenuCurrentPlayerPosition() {
+		auto pos = xenomods::PlayerMovement::GetPartyPosition();
+		if (pos != nullptr)
+			return fmt::format("{:2}", *pos);
+		else
+			return "-";
+	}
+	std::string MenuCurrentPlayerRotation() {
+		auto rot = xenomods::PlayerMovement::GetPartyRotation();
+		if (rot != nullptr)
+			return fmt::format("{:1}", glm::degrees(glm::eulerAngles(*rot)));
+		else
+			return "-";
+	}
+	std::string MenuCurrentPlayerVelocity() {
+		auto vel = xenomods::PlayerMovement::GetPartyVelocity();
+		if (vel != nullptr)
+			return fmt::format("{:2}", *vel);
+		else
+			return "-";
+	}
+
 	void PlayerMovement::Initialize() {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up player movement hooks...");
@@ -504,11 +536,27 @@ namespace xenomods {
 			warps->RegisterTextual("Current Warp: ", {}, &MenuGetCurrentWarpInfo);
 			warps->RegisterTextual("", {}, &MenuGetCurrentWarpInfo2);
 		}
+
+		auto state = g_Menu->FindSection("state");
+		if (state != nullptr) {
+			state->RegisterTextual("Current map: ", {}, &MenuCurrentMapInfo);
+			state->RegisterTextual("Current pos: ", {}, &MenuCurrentPlayerPosition);
+			state->RegisterTextual("Current rot: ", {}, &MenuCurrentPlayerRotation);
+			state->RegisterTextual("Current vel: ", {}, &MenuCurrentPlayerVelocity);
+		}
 #endif
 	}
 
 	void PlayerMovement::Update(fw::UpdateInfo* updateInfo) {
 		moonJump = HidInput::GetPlayer(1)->InputHeld(Keybind::MOONJUMP);
+	}
+
+	void PlayerMovement::OnMapChange(unsigned short mapId) {
+		if (detail::IsModuleRegistered(STRINGIFY(DebugStuff)))
+			cacheMapName = DebugStuff::GetMapName(mapId);
+
+		if (!cacheMapName.starts_with("ID"))
+			cacheMapName += " (ID " + std::to_string(mapId) + ")";
 	}
 
 #if !XENOMODS_CODENAME(bf3)
