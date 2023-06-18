@@ -7,9 +7,34 @@
 #include "xenomods/engine/fw/Document.hpp"
 
 #include "Bdat.hpp"
+#include "DataPC.hpp"
 
 #if XENOMODS_CODENAME(bfsw)
 namespace game {
+
+	class MenuGameDataPc {
+	   public:
+		MenuGameDataPc(const fw::Document& doc);
+		void create(unsigned int pcid);
+		bool refresh();
+		void createFromPcId(PcID pcid);
+		void createFromDataPc(DataPc* dataPc);
+
+		const char* getName() const;
+		MsText getNameMsText() const;
+
+		int getLevel() const;
+		int getHp() const;
+		int getMaxHp() const;
+		int getSp() const;
+		int getNextSp() const;
+		int getExp() const;
+		int getNextExp() const;
+		int getShortageExp() const;
+		int getNextExpRate() const;
+
+		const char* getActiveSkillLineName();
+	};
 
 	class MenuGameDataMap {
 	   public:

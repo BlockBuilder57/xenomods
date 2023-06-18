@@ -7,6 +7,7 @@
 #include <xenomods/Utils.hpp>
 
 #include "CharacterController.hpp"
+#include "DataPC.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 #include "xenomods/engine/mm/mtl/FixedVector.hpp"
@@ -29,6 +30,8 @@ namespace game {
 		static bool isDisableMenu(const fw::Document& doc);
 		static bool isOpenableCurrentAreaMap(const fw::Document& doc);
 		static void makeParty(const fw::Document& doc, const mm::mtl::FixedVector<unsigned short, 9ul>&);
+		static DataParty* getDataParty(const fw::Document& doc);
+		static DataPc* getDataPc(const fw::Document& doc, unsigned short pcid);
 	};
 
 	class ObjUtil {
