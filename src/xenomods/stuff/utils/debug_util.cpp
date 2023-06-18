@@ -113,8 +113,12 @@ namespace dbgutil {
 #endif
 	}
 
-	void dumpMemory(void* address, size_t len) {
-		auto path = fmt::format("sd:/config/xenomods/memdump/{:08x}.dump", nn::os::GetSystemTick() & 0xFFFFFFFF);
+	void dumpMemory(void* address, size_t len, const char* name /*= nullptr*/) {
+		std::string path = "sd:/config/xenomods/memdump/";
+		if (name == nullptr)
+			path += fmt::format("{:08x}.dump", nn::os::GetSystemTick() & 0xFFFFFFFF);
+		else
+			path += std::string_view(name);
 
 		if(!xenomods::NnFile::Preallocate(path, len)) {
 			xenomods::g_Logger->LogError("Couldn't create/preallocate dump file \"{}\"", path);
@@ -129,6 +133,17 @@ namespace dbgutil {
 
 		file.Write(address, len);
 		file.Flush();
+	}
+
+	void loadMemory(void* address, std::string path) {
+		xenomods::NnFile file(path, nn::fs::OpenMode_Read);
+
+		if(!file) {
+			xenomods::g_Logger->LogError("Couldn't open dump file \"{}\"", path);
+			return;
+		}
+
+		file.Read(address, file.Size());
 	}
 
 } // namespace dbgutil

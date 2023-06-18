@@ -34,7 +34,9 @@ namespace dbgutil {
 
 	void logMemory(void* address, size_t len);
 
-	void dumpMemory(void* address, size_t len);
+	void dumpMemory(void* address, size_t len, const char* name = nullptr);
+
+	void loadMemory(void* address, std::string path);
 
 } // namespace dbgutil
 
