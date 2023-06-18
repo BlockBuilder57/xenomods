@@ -35,38 +35,32 @@ namespace xenomods {
 
 		virtual void OnConfigUpdate() {
 		}
+
+		virtual void OnMapChange(unsigned short mapId) {
+		}
 	};
 
 	namespace detail {
-		void RegisterModule(UpdatableModule* module);
+		void RegisterModule(const char* name, UpdatableModule* module);
 
-		static bool IsModuleRegistered(const char* moduleName)
-		{
-			std::string strModuleName = std::string(moduleName);
-			// dumb hack (as if this whole function isn't)
-			if (strModuleName.starts_with("xenomods::"))
-				strModuleName = strModuleName.substr(10);
-
-			std::string symbol = "_ZN8xenomods15ModuleRegistrarINS_";
-			symbol += std::to_string(strModuleName.size());
-			symbol += strModuleName;
-			symbol += "EEC1EPS1_";
-			return skylaunch::hook::detail::ResolveSymbolBase(symbol) != skylaunch::hook::INVALID_FUNCTION_PTR;
-		}
+		bool IsModuleRegistered(const std::string& moduleName);
 	}
 
 	template<class TUpdatable>
 	struct ModuleRegistrar {
 		static_assert(std::is_base_of_v<UpdatableModule, TUpdatable>, "what are you doing");
 
-		explicit ModuleRegistrar(TUpdatable* updatable) {
-			detail::RegisterModule(updatable);
+		explicit ModuleRegistrar(const char* name, TUpdatable* updatable) {
+			if(std::string_view(name).starts_with("xenomods::"))
+				detail::RegisterModule(name + 10, updatable);
+			else
+				detail::RegisterModule(name, updatable);
 		}
 	};
 
 #define XENOMODS_REGISTER_MODULE(T) \
 	static T module__##T;          \
-	::xenomods::ModuleRegistrar<T> register__##T(&module__##T);
+	::xenomods::ModuleRegistrar<T> register__##T(#T, &module__##T);
 
 	void InitializeAllRegisteredModules();
 

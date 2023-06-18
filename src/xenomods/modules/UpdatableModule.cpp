@@ -8,7 +8,14 @@ namespace xenomods {
 
 	//std::vector<UpdatableModule*> registeredModules;
 
-	std::array<UpdatableModule*, MAX_MODULES> registeredModules;
+	// TODO: figure out how to use construct on first use idiom to just use a map
+	// this is just so this code doesnt need to be completely changed yet
+	struct RegisteredModule {
+		std::string_view name;
+		UpdatableModule* modulePtr{};
+	};
+
+	std::array<RegisteredModule, MAX_MODULES> registeredModules;
 	int moduleIndex = 0;
 
 	namespace detail {
@@ -24,35 +31,48 @@ namespace xenomods {
 			//	delete registeredModules;
 		}
 
-		void RegisterModule(UpdatableModule* module) {
+		void RegisterModule(const char* name, UpdatableModule* module) {
 			if(module == nullptr)
 				return;
 
 			//if(registeredModules == nullptr)
 			//	ModuleInit();
 
-			registeredModules[moduleIndex++] = module;
+			registeredModules[moduleIndex++] = {
+				name,
+				module
+			};
 		}
+
+		bool IsModuleRegistered(const std::string& moduleName) {
+			std::string_view view = moduleName;
+			if (view.starts_with("xenomods::"))
+				view.remove_prefix(10);
+
+			for(int i = 0; i < moduleIndex; ++i)
+				if(registeredModules[i].name == view)
+					return true;
+			return false;
+		}
+
 
 	} // namespace detail
 
 	void InitializeAllRegisteredModules() {
 		for(int i = 0; i < moduleIndex; ++i)
-			registeredModules[i]->Initialize();
+			registeredModules[i].modulePtr->Initialize();
 	}
 
 	void UpdateAllRegisteredModules(fw::UpdateInfo* updateInfo) {
 		for(int i = 0; i < moduleIndex; ++i)
-			if(registeredModules[i]->NeedsUpdate())
-				registeredModules[i]->Update(updateInfo);
-			else
-				continue;
+			if(registeredModules[i].modulePtr->NeedsUpdate())
+				registeredModules[i].modulePtr->Update(updateInfo);
 	}
 
 	void ConfigUpdateForAllRegisteredModules() {
 		for(int i = 0; i < moduleIndex; ++i)
-			if(registeredModules[i]->HasInitialized)
-				registeredModules[i]->OnConfigUpdate();
+			if(registeredModules[i].modulePtr->HasInitialized)
+				registeredModules[i].modulePtr->OnConfigUpdate();
 	}
 
 } // namespace xenomods
