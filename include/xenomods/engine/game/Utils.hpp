@@ -9,6 +9,7 @@
 #include "CharacterController.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
+#include "xenomods/engine/mm/mtl/FixedVector.hpp"
 
 #if XENOMODS_NEW_ENGINE
 namespace game {
@@ -25,6 +26,9 @@ namespace game {
 	class DataUtil {
 	   public:
 		static unsigned int searchBdatFldMaplistRowID(const fw::Document& doc, const char* id_name);
+		static bool isDisableMenu(const fw::Document& doc);
+		static bool isOpenableCurrentAreaMap(const fw::Document& doc);
+		static void makeParty(const fw::Document& doc, const mm::mtl::FixedVector<unsigned short, 9ul>&);
 	};
 
 	class ObjUtil {

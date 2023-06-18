@@ -86,6 +86,12 @@ namespace {
 			return xenomods::DebugStuff::enableDebugUnlockAll;
 		}
 	};
+
+	struct AlwaysAbleToOpenMenu : skylaunch::hook::Trampoline<AlwaysAbleToOpenMenu> {
+		static bool Hook(fw::Document* doc) {
+			return !xenomods::DebugStuff::enableDebugUnlockAll && Orig(doc);
+		}
+	};
 #endif
 }
 
@@ -233,6 +239,7 @@ namespace xenomods {
 		JumpToClosedLandmarks_Map::HookAt(&gf::GfMenuObjWorldMap::chkMapCond);
 #elif XENOMODS_CODENAME(bfsw)
 		EnableDebugUnlockAll::HookAt(&game::IsMenuDebugUnlockAll);
+		AlwaysAbleToOpenMenu::HookAt(&game::DataUtil::isDisableMenu);
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
