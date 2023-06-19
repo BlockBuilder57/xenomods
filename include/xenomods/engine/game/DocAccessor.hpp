@@ -4,6 +4,7 @@
 
 #include <xenomods/Utils.hpp>
 
+#include "Sequence.hpp"
 #include "CharacterController.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 
@@ -11,9 +12,11 @@
 namespace game {
 
 	class DocAccessor {
+	   public:
 		void* getDataManager();
 		void* getPartyManager();
-	}
+		SeqManager* getSeqManager() const;
+	};
 
 }
 #endif

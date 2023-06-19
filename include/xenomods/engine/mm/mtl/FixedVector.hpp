@@ -11,12 +11,8 @@ namespace mm {
 		template<typename T, std::size_t N>
 		class [[gnu::packed]] FixedVector {
 		   public:
-			T items[N];
-			std::uint32_t m_nLen;
-
-			FixedVector() {
-				memset(&items[0], 0, sizeof(T) * N);
-			}
+			T items[N] {};
+			std::uint64_t m_nLen {};
 
 			void set(std::vector<T> vec) {
 				std::size_t min = std::min(vec.size(), N);

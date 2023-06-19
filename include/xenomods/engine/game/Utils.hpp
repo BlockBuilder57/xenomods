@@ -40,16 +40,22 @@ namespace game {
 		static CharacterController* getCharacterController(const fw::Document& doc, unsigned int handle);
 	};
 
-	namespace SeqUtil {
+	class ScriptUtil {
+	   public:
+		static fw::Document* s_document;
+	};
+
+	class SeqUtil {
+	   public:
 		struct WarpPcPartyParams {
 
 		};
 
-		void makeMapJumpSetupInfoFromLandmark(MapJumpSetupInfo& info, const fw::Document& doc, ushort landmarkId);
-		void requestMapJump(const fw::Document& doc, const MapJumpSetupInfo& info);
-		void returnTitle(const fw::Document& doc);
-		void warpPcParty(const WarpPcPartyParams& params);
-	}
+		static void makeMapJumpSetupInfoFromLandmark(MapJumpSetupInfo& info, const fw::Document& doc, ushort landmarkId);
+		static void requestMapJump(const fw::Document& doc, const MapJumpSetupInfo& info);
+		static void returnTitle(const fw::Document& doc);
+		static void warpPcParty(const WarpPcPartyParams& params);
+	};
 
 }
 #endif

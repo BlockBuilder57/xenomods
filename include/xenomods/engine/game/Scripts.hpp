@@ -14,6 +14,12 @@ namespace game {
 	   public:
 		void returnTitle();
 		static unsigned short getMapId();
+		static unsigned int makeParty(const mm::mtl::FixedVector<unsigned short, 9ul>&);
+	};
+
+	class ScriptUI {
+	   public:
+		static void* openPartyChange();
 	};
 
 	class ScriptUnit {

@@ -9,7 +9,7 @@
 namespace xenomods {
 
 	struct PartyEditor : public UpdatableModule {
-		static game::PcID CurPcID;
+		static game::PcID PartySetup[7];
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {

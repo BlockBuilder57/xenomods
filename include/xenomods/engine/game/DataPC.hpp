@@ -11,7 +11,7 @@
 #if XENOMODS_CODENAME(bfsw)
 namespace game {
 
-	enum class PcID {
+	enum class PcID : std::uint16_t {
 		None,
 		Shulk,
 		Reyn,
@@ -27,7 +27,20 @@ namespace game {
 		DunbanPrelude,
 		DunbanCopy,
 		Kino,
-		Nene
+		Nene,
+		Ponspector_Wunwun,
+		Ponspector_Tutu,
+		Ponspector_Drydry,
+		Ponspector_Fofora,
+		Ponspector_Faifa,
+		Ponspector_Hekasa,
+		Ponspector_Setset,
+		Ponspector_Teitei,
+		Ponspector_Nonona,
+		Ponspector_Dekadeka,
+		Ponspector_Evelen,
+		Ponspector_Tentoo,
+		Count
 	};
 
 	enum class BdatId {
@@ -67,20 +80,24 @@ namespace game {
 		static void setupPc(game::DataCharaStatus& status, const fw::Document& doc, PcID pcid, unsigned short param_4);
 	};
 
+	// size 13440
 	class DataPc {
 	   public:
 		PcID pcid;
 		DataCharaStatus status;
 		// a lot more
+		INSERT_PADDING_BYTES(13124);
 	};
 
 	class DataParty {
 	   public:
+		PcID members[8];
+		unsigned long unk1;
+		unsigned long count;
 		DataPc* getMember(PcID pcid);
 	};
 
 }
-#endif
 
 template<>
 struct fmt::formatter<game::PcID> : fmt::formatter<std::string_view> {
@@ -107,6 +124,18 @@ struct fmt::formatter<game::PcID> : fmt::formatter<std::string_view> {
 			case DunbanCopy: name = "Dunban Copy?"; break;
 			case Kino: name = "Kino"; break;
 			case Nene: name = "Nene"; break;
+			case Ponspector_Wunwun: name = "Wunwun (Ponspector)"; break;
+			case Ponspector_Tutu: name = "Tutu (Ponspector)"; break;
+			case Ponspector_Drydry: name = "Drydry (Ponspector)"; break;
+			case Ponspector_Fofora: name = "Fofora (Ponspector)"; break;
+			case Ponspector_Faifa: name = "Faifa (Ponspector)"; break;
+			case Ponspector_Hekasa: name = "Hekasa (Ponspector)"; break;
+			case Ponspector_Setset: name = "Setset (Ponspector)"; break;
+			case Ponspector_Teitei: name = "Teitei (Ponspector)"; break;
+			case Ponspector_Nonona: name = "Nonona (Ponspector)"; break;
+			case Ponspector_Dekadeka: name = "Dekadeka (Ponspector)"; break;
+			case Ponspector_Evelen: name = "Evelen (Ponspector)"; break;
+			case Ponspector_Tentoo: name = "Tentoo (Ponspector)"; break;
 			default: name = "Unknown - " + std::to_string(reinterpret_cast<std::underlying_type_t<game::PcID>&>(pcid)); break;
 		}
 		// clang-format on
@@ -114,3 +143,4 @@ struct fmt::formatter<game::PcID> : fmt::formatter<std::string_view> {
 		return formatter<std::string_view>::format(name, ctx);
 	}
 };
+#endif

@@ -138,6 +138,13 @@ Landmark ids can be found [here](https://xenoblade.github.io/xb2/bdat/common/SYS
 | Player damage multiplier | Config option. Multiplies the damage done by player characters. | 1.0     |
 | Enemy damage multiplier  | Config option. Multiplies the damage done by enemies.           | 1.0     |
 
+#### Party Editor (DE)
+| Option      | Description                                            | Default |
+|-------------|--------------------------------------------------------|---------|
+| PC 1-7      | Sets which player character occupies which party slot. | -       |
+| Apply Party | Applies the party choices set above.                   | -       |
+| Get Party   | Gets the current party and fills the list above.       | -       |
+
 
 ### State
 
