@@ -14,6 +14,7 @@
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/gf/PlayFactory.hpp"
 #include "xenomods/engine/gf/Weather.hpp"
+#include "xenomods/engine/gmk/Landmark.hpp"
 #include "xenomods/engine/ml/DebugDrawing.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/engine/ml/Scene.hpp"
@@ -65,15 +66,35 @@ namespace {
 	};
 
 #if XENOMODS_OLD_ENGINE
-	struct JumpToClosedLandmarks_World : skylaunch::hook::Trampoline<JumpToClosedLandmarks_World> {
+	struct JumpToClosedLandmarks_CanEnterMap : skylaunch::hook::Trampoline<JumpToClosedLandmarks_CanEnterMap> {
 		static bool Hook(unsigned int mapjump) {
 			return xenomods::DebugStuff::accessClosedLandmarks || Orig(mapjump);
 		}
 	};
 
-	struct JumpToClosedLandmarks_Map : skylaunch::hook::Trampoline<JumpToClosedLandmarks_Map> {
+	struct JumpToClosedLandmarks_CheckCondition : skylaunch::hook::Trampoline<JumpToClosedLandmarks_CheckCondition> {
 		static bool Hook(unsigned int mapjump, mm::Pnt<short>* pos) {
 			bool result = Orig(mapjump, pos);
+			return xenomods::DebugStuff::accessClosedLandmarks || result;
+		}
+	};
+
+	struct JumpToClosedLandmarks_WorldMap : skylaunch::hook::Trampoline<JumpToClosedLandmarks_WorldMap> {
+		static bool Hook(const gf::MenuZoneMapInfo& info) {
+			bool result = Orig(info);
+			return xenomods::DebugStuff::accessClosedLandmarks || result;
+		}
+	};
+	struct JumpToClosedLandmarks_ZoneMap : skylaunch::hook::Trampoline<JumpToClosedLandmarks_ZoneMap> {
+		static bool Hook(const gf::MenuZoneMapInfo& info) {
+			bool result = Orig(info);
+			return xenomods::DebugStuff::accessClosedLandmarks || result;
+		}
+	};
+
+	struct JumpToClosedLandmarks_IsFound : skylaunch::hook::Trampoline<JumpToClosedLandmarks_IsFound> {
+		static bool Hook(gmk::GmkLandmark* this_pointer) {
+			bool result = Orig(this_pointer);
 			return xenomods::DebugStuff::accessClosedLandmarks || result;
 		}
 	};
@@ -235,8 +256,11 @@ namespace xenomods {
 #if XENOMODS_OLD_ENGINE
 		BGMDebugging::HookAt("_ZN2gf8BgmTrack6updateERKN2fw10UpdateInfoE");
 
-		JumpToClosedLandmarks_World::HookAt(&gf::GfMenuObjWorldMap::isEnterMap);
-		JumpToClosedLandmarks_Map::HookAt(&gf::GfMenuObjWorldMap::chkMapCond);
+		JumpToClosedLandmarks_CanEnterMap::HookAt(&gf::GfMenuObjWorldMap::isEnterMap);
+		JumpToClosedLandmarks_CheckCondition::HookAt(&gf::GfMenuObjWorldMap::chkMapCond);
+		JumpToClosedLandmarks_WorldMap::HookAt(&gf::GfMenuObjWorldMap::isEnableJump);
+		JumpToClosedLandmarks_ZoneMap::HookAt(&gf::GfMenuObjZoneMap::isEnableJump);
+		JumpToClosedLandmarks_IsFound::HookAt("_ZNK3gmk11GmkLandmark7isFoundEv");
 #elif XENOMODS_CODENAME(bfsw)
 		EnableDebugUnlockAll::HookAt(&game::IsMenuDebugUnlockAll);
 		AlwaysAbleToOpenMenu::HookAt(&game::DataUtil::isDisableMenu);

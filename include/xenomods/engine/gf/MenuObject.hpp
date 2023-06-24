@@ -63,11 +63,16 @@ namespace gf {
 		static bool chkMapCond(unsigned int mapjump, mm::Pnt<short>* pos);
 
 		static bool isDispMap(unsigned int mapjump);
-		static bool isEnableJump(const MenuZoneMapInfo& nuts);
+		static bool isEnableJump(const MenuZoneMapInfo& info);
 		static bool isEnterMap(unsigned int mapjump);
 
 		// DOES NOT EXIST IN 1.0.0
 		static bool isOpenLandmark(unsigned int mapjump);
+	};
+
+	class GfMenuObjZoneMap {
+	   public:
+		static bool isEnableJump(const MenuZoneMapInfo& info);
 	};
 
 } // namespace gf
