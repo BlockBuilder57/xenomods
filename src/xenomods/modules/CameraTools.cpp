@@ -151,6 +151,9 @@ namespace xenomods {
 		// for future reference:
 		//auto seconds = nn::os::GetSystemTick()/19200000.;
 
+		// don't need to check if p1, we already did that
+		HidInput* debugInput = HidInput::GetDebugInput();
+
 		auto fc = &CameraTools::Freecam;
 		auto meta = &CameraTools::Meta;
 
@@ -163,8 +166,8 @@ namespace xenomods {
 		// decompose existing matrix
 		glm::decompose(static_cast<glm::mat4&>(fc->matrix), scale, rot, pos, skew, perspective);
 
-		glm::vec2 lStick = HidInput::GetPlayer(2)->stateCur.LAxis;
-		glm::vec2 rStick = HidInput::GetPlayer(2)->stateCur.RAxis;
+		glm::vec2 lStick = debugInput->stateCur.LAxis;
+		glm::vec2 rStick = debugInput->stateCur.RAxis;
 
 		// deadzone
 		if(glm::length(lStick) < 0.15f)
@@ -180,7 +183,7 @@ namespace xenomods {
 		if(fc->fov != 0.0f && std::abs(fc->fov) < 20.f)
 			fovMult *= std::lerp(0.01f, 1.0f, std::abs(fc->fov) / 20.f);
 
-		if(HidInput::GetPlayer(2)->InputHeld(Keybind::CAMERA_COMBO)) {
+		if(debugInput->InputHeld(Keybind::CAMERA_COMBO)) {
 			// holding down the button, so modify fov
 			// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
 			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
@@ -201,7 +204,7 @@ namespace xenomods {
 		if(fc->fov != 0.0f && std::abs(fc->fov) < 40.f)
 			lookMult *= fc->fov / 40.f;
 
-		if(HidInput::GetPlayer(2)->InputHeld(Keybind::CAMERA_COMBO))
+		if(debugInput->InputHeld(Keybind::CAMERA_COMBO))
 			look = { 0, 0, -rStick.x * rollMult }; // only roll
 		else
 			look = { rStick.y * lookMult, -rStick.x * lookMult, 0 }; // pitch and yaw
@@ -296,17 +299,23 @@ namespace xenomods {
 	}
 
 	void CameraTools::Update(fw::UpdateInfo* updateInfo) {
-		if(HidInput::GetPlayer(2)->InputDownStrict(Keybind::FREECAM_TOGGLE)) {
+		HidInput* debugInput = HidInput::GetDebugInput();
+
+		// if there's only one controller, let them freecam only when the menu is open
+		if (debugInput == HidInput::GetPlayer(1) && !g_Menu->IsOpen())
+			return;
+
+		if(debugInput->InputDownStrict(Keybind::FREECAM_TOGGLE)) {
 			Freecam.isOn = !Freecam.isOn;
 			g_Logger->ToastInfo(STRINGIFY(Freecam.isOn), "Freecam: {}", Freecam.isOn);
 		}
 
 		if(Freecam.isOn) {
 			bool speedChanged = false;
-			if(HidInput::GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_UP)) {
+			if(debugInput->InputDownStrict(Keybind::FREECAM_SPEED_UP)) {
 				Freecam.camSpeed *= 2.f;
 				speedChanged = true;
-			} else if(HidInput::GetPlayer(2)->InputDownStrict(Keybind::FREECAM_SPEED_DOWN)) {
+			} else if(debugInput->InputDownStrict(Keybind::FREECAM_SPEED_DOWN)) {
 				Freecam.camSpeed /= 2.f;
 				speedChanged = true;
 			}
@@ -314,9 +323,9 @@ namespace xenomods {
 			if(speedChanged)
 				g_Logger->ToastInfo("freecamSpeed", "Freecam speed: {}m/s", Freecam.camSpeed);
 
-			if(HidInput::GetPlayer(2)->InputDownStrict(Keybind::FREECAM_FOVRESET))
+			if(debugInput->InputDownStrict(Keybind::FREECAM_FOVRESET))
 				Freecam.fov = 80;
-			if(HidInput::GetPlayer(2)->InputDownStrict(Keybind::FREECAM_ROTRESET)) {
+			if(debugInput->InputDownStrict(Keybind::FREECAM_ROTRESET)) {
 				glm::vec3 pos {};
 				glm::quat rot {};
 				glm::vec3 scale {};
@@ -334,6 +343,9 @@ namespace xenomods {
 			}
 
 			DoFreeCameraMovement(updateInfo->updateDelta);
+
+			if (debugInput->InputDownStrict(Keybind::FREECAM_TELEPORT))
+				TeleportPlayerToCamera();
 		}
 	}
 

@@ -14,7 +14,7 @@ Xenomods mostly utilizes a menu to interact with the game, as most buttons are a
 
 #### Camera controls:
 
-Camera controls only exist on P2, so both analog sticks are always free.
+The camera can be controlled by P1 while the Menu is open, but ideally should be used by P2 so both analog sticks are always free.
 
 | Action                    | Control               | Description                                                                                                                                    |
 |---------------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|

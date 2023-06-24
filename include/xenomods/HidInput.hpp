@@ -107,6 +107,7 @@ namespace xenomods {
 		FREECAM_ROTRESET = CAMERA_COMBO | nn::hid::KEY_RSTICK,
 		FREECAM_SPEED_UP = CAMERA_COMBO | nn::hid::KEY_PLUS,
 		FREECAM_SPEED_DOWN = CAMERA_COMBO | nn::hid::KEY_MINUS,
+		FREECAM_TELEPORT = CAMERA_COMBO | nn::hid::KEY_B,
 	};
 
 }; // namespace xenomods
