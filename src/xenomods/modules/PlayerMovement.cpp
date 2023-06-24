@@ -122,7 +122,7 @@ namespace xenomods {
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if(trans != nullptr)
 			return reinterpret_cast<glm::vec3*>(trans->getPosition());
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't get party position cause no doc ptr!");
 			return {};
@@ -143,7 +143,7 @@ namespace xenomods {
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if (trans != nullptr)
 			trans->setPosition(pos);
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't set party position cause no doc ptr!");
 			return;
@@ -165,7 +165,7 @@ namespace xenomods {
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if(trans != nullptr)
 			return reinterpret_cast<glm::quat*>(trans->getRotation());
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't get party position cause no doc ptr!");
 			return {};
@@ -186,7 +186,7 @@ namespace xenomods {
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
 		if (trans != nullptr)
 			trans->setRotation(rot);
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't set party position cause no doc ptr!");
 			return;
@@ -227,7 +227,7 @@ namespace xenomods {
 					g_Logger->LogInfo("uh oh, no RTTI");
 			}
 		}*/
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't get party position cause no doc ptr!");
 			return {};
@@ -246,7 +246,7 @@ namespace xenomods {
 	void PlayerMovement::SetPartyVelocity(glm::vec3 vel) {
 #if XENOMODS_OLD_ENGINE
 		// TODO
-#else
+#elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
 			g_Logger->LogError("can't set party position cause no doc ptr!");
 			return;

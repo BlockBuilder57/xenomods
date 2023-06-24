@@ -12,7 +12,7 @@
 #include "xenomods/engine/mm/MathTypes.hpp"
 #include "xenomods/engine/mm/mtl/FixedVector.hpp"
 
-#if XENOMODS_NEW_ENGINE
+#if XENOMODS_CODENAME(bfsw)
 namespace game {
 
 	struct MapJumpSetupInfo {
