@@ -5,13 +5,47 @@
 #include "xenomods/engine/game/DocAccessor.hpp"
 #include "xenomods/engine/game/Scripts.hpp"
 #include "xenomods/engine/game/Utils.hpp"
+#include "xenomods/engine/gf/Command.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 
-#if XENOMODS_CODENAME(bfsw) && _DEBUG
 namespace xenomods {
 
-	game::PcID PartyEditor::PartySetup[7] = {};
+#if XENOMODS_OLD_ENGINE
+	gf::RQ_SETUP_PARTY PartyEditor::PartySetup = {};
+	int PartyEditor::DriverIdx = 0;
 
+	OptionBase* optDriver = {};
+	OptionBase* optCurBlade = {};
+	OptionBase* optBlade1 = {};
+	OptionBase* optBlade2 = {};
+	OptionBase* optBlade3 = {};
+#elif XENOMODS_CODENAME(bfsw)
+	game::PcID PartyEditor::PartySetup[7] = {};
+#endif
+
+#if XENOMODS_OLD_ENGINE
+	void MenuGetParty() {
+		gf::GfGameParty::getCurrentPartyInfo(PartyEditor::PartySetup);
+		//dbgutil::dumpMemory(&PartyEditor::PartySetup, sizeof(gf::RQ_SETUP_PARTY), XENOMODS_CODENAME_STR "_party.dump");
+		PartyEditor::DriverIdx = 0;
+	}
+
+	void MenuApplyParty() {
+		gf::GfReqCommand::reqChangeParty(PartyEditor::PartySetup);
+	}
+
+	void MenuChangeDriverIndex() {
+		PartyEditor::DriverIdx = std::clamp(PartyEditor::DriverIdx, 0, 9);
+
+		gf::RQ_SETUP_PARTY_basegame* base = &PartyEditor::PartySetup.base[PartyEditor::DriverIdx];
+
+		optDriver->SetValuePtr(&base->driver);
+		optCurBlade->SetValuePtr(&base->curBlade);
+		optBlade1->SetValuePtr(&base->blades[0]);
+		optBlade2->SetValuePtr(&base->blades[1]);
+		optBlade3->SetValuePtr(&base->blades[2]);
+	}
+#elif XENOMODS_CODENAME(bfsw)
 	void MenuGetParty() {
 		game::DataParty* party = game::DataUtil::getDataParty(*DocumentPtr);
 		if (party == nullptr)
@@ -73,6 +107,7 @@ namespace xenomods {
 			dbgutil::dumpMemory(&member->status, sizeof(game::DataCharaStatus), filename.c_str());
 		}
 	}*/
+#endif
 
 	void PartyEditor::Initialize() {
 		UpdatableModule::Initialize();
@@ -81,6 +116,17 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if(modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(PartyEditor), "Party Editor");
+#if XENOMODS_OLD_ENGINE
+			section->RegisterOption<int>(DriverIdx, "Driver Index", &MenuChangeDriverIndex);
+			gf::RQ_SETUP_PARTY_basegame* base = &PartyEditor::PartySetup.base[0];
+			optDriver = section->RegisterOption<std::int32_t>(base->driver, "Driver");
+			optCurBlade = section->RegisterOption<std::int32_t>(base->curBlade, "Cur Blade");
+			optBlade1 = section->RegisterOption<std::int16_t>(base->blades[0], "Blade 1");
+			optBlade2 = section->RegisterOption<std::int16_t>(base->blades[1], "Blade 2");
+			optBlade3 = section->RegisterOption<std::int16_t>(base->blades[2], "Blade 3");
+			section->RegisterOption<void>("Apply Party", &MenuApplyParty);
+			section->RegisterOption<void>("Get Party", &MenuGetParty);
+#elif XENOMODS_CODENAME(bfsw)
 			//section->RegisterOption<void>("Dump all chara statuses", &MenuDumpAllCharaStatuses);
 			//section->RegisterOption<void>("Load chara status", &MenuLoadCharaStatus);
 			section->RegisterOption<game::PcID>(PartySetup[0], "PC 1");
@@ -92,10 +138,12 @@ namespace xenomods {
 			section->RegisterOption<game::PcID>(PartySetup[6], "PC 7");
 			section->RegisterOption<void>("Apply Party", &MenuApplyParty);
 			section->RegisterOption<void>("Get Party", &MenuGetParty);
+#endif
 		}
 	}
 
+#if !XENOMODS_CODENAME(bf3)
 	XENOMODS_REGISTER_MODULE(PartyEditor);
+#endif
 
 } // namespace xenomods
-#endif

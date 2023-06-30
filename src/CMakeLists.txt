@@ -26,9 +26,9 @@ add_executable(xenomods
 		xenomods/modules/BdatRandomizer.cpp
 		xenomods/modules/FrameratePatch.cpp
         xenomods/modules/BattleCheats.cpp
+		xenomods/modules/PartyEditor.cpp
 		xenomods/modules/bf2/EventDebugUtils.cpp
 		xenomods/modules/bfsw/AppletRedirect.cpp
-		xenomods/modules/bfsw/PartyEditor.cpp
 
         xenomods/stuff/utils/debug_util.cpp
 		xenomods/stuff/utils/util.cpp

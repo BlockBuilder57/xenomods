@@ -52,6 +52,10 @@ namespace xenomods {
 			return selected;
 		}
 
+		void SetValuePtr(void* v) {
+			value = v;
+		}
+
 	   protected:
 		bool selected { false };
 		std::string name {};
@@ -114,7 +118,7 @@ namespace xenomods {
 
 			T& val = ValueAs<T>();
 
-			tens = std::log10(std::abs(val));
+			tens = std::log10(val);
 			by2 = input->InputHeld(Keybind::MENU_NUM_MULT2);
 			by10s = input->InputHeld(Keybind::MENU_NUM_TENS);
 

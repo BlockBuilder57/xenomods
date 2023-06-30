@@ -4,6 +4,7 @@
 
 #include "Object.hpp"
 
+#if XENOMODS_OLD_ENGINE
 namespace gf {
 
 	struct RQ_SETUP_PARTY_DRIVER {
@@ -11,9 +12,29 @@ namespace gf {
 		std::uint32_t leader;
 	};
 
+	struct RQ_SETUP_PARTY_basegame {
+		std::int32_t driver;
+		std::int32_t curBlade;
+		std::int16_t blades[6];
+	};
+
+	struct RQ_SETUP_PARTY_torna {
+		std::int16_t lead;
+		std::int16_t rear1;
+		std::int16_t rear2;
+	};
+
+	struct RQ_SETUP_PARTY {
+		RQ_SETUP_PARTY_basegame base[10];
+		RQ_SETUP_PARTY_torna ira[10];
+		std::uint32_t unk1;
+		std::uint32_t unk2;
+		std::uint32_t unk3;
+		std::uint32_t unk4;
+	};
+
 	class GfDataParty {
 	   public:
-
 	};
 
 	class GfGameParty {
@@ -26,10 +47,12 @@ namespace gf {
 		static void reviveMembere();
 
 		static void getCurrentPartyInfo(gf::RQ_SETUP_PARTY_DRIVER&);
+		static void getCurrentPartyInfo(gf::RQ_SETUP_PARTY&);
 
 		static gf::GF_OBJ_HANDLE getLeader();
-		static gf::GF_OBJ_HANDLE getHandleMover(unsigned int );
+		static gf::GF_OBJ_HANDLE getHandleMover(unsigned int);
 		static GfComTransform* getLeaderTransform();
 	};
 
-}
+} // namespace gf
+#endif

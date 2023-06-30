@@ -62,8 +62,8 @@ namespace xenomods {
 		Section* RegisterSection(const std::string& key, const std::string& display);
 
 		template<class T, class... Args>
-		void RegisterOption(Args&&... args) {
-			options.push_back(new Option<T>(static_cast<Args&&>(args)...));
+		OptionBase* RegisterOption(Args&&... args) {
+			return options.emplace_back(new Option<T>(static_cast<Args&&>(args)...));
 		}
 
 		void RegisterOption(OptionBase* opt) {
