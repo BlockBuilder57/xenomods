@@ -46,6 +46,8 @@ namespace gf {
 		};
 
 		void playSE(unsigned int index);
+
+		static bool isValidExpansion(unsigned int index);
 	} // namespace GfMenuObjUtil
 
 	class GfMenuObjTitle {

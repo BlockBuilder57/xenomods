@@ -14,6 +14,8 @@ namespace tl {
 		void* getSaveBuffer();
 		static void returnTitle(gf::SAVESLOT slot);
 		void playTitleEvent(uint event_id);
+
+		bool isValidAocVersion() const;
 	};
 
 } // namespace tl

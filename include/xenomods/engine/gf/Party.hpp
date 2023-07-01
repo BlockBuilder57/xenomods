@@ -28,7 +28,7 @@ namespace gf {
 		RQ_SETUP_PARTY_basegame base[10];
 		RQ_SETUP_PARTY_torna ira[10];
 		std::uint32_t unk1;
-		std::uint32_t unk2;
+		std::uint32_t basePartyLead;
 		std::uint32_t unk3;
 		std::uint32_t unk4;
 	};

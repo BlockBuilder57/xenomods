@@ -20,6 +20,8 @@ namespace gf {
 
 		static bool isClearGame();
 		static bool isControlFree();
+
+		static bool isGameTypeIra();
 	};
 
 	struct GfMapManager {

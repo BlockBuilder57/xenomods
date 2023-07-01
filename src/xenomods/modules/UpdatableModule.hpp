@@ -9,6 +9,7 @@
 #include <xenomods/NnFile.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
+#include <xenomods/Version.hpp>
 #include <xenomods/menu/Menu.hpp>
 
 #include "xenomods/engine/fw/UpdateInfo.hpp"

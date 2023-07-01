@@ -5,7 +5,10 @@
 #include "xenomods/engine/game/DocAccessor.hpp"
 #include "xenomods/engine/game/Scripts.hpp"
 #include "xenomods/engine/game/Utils.hpp"
+#include "xenomods/engine/gf/AddOnContent.hpp"
 #include "xenomods/engine/gf/Command.hpp"
+#include "xenomods/engine/gf/Manager.hpp"
+#include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 
 namespace xenomods {
@@ -13,12 +16,17 @@ namespace xenomods {
 #if XENOMODS_OLD_ENGINE
 	gf::RQ_SETUP_PARTY PartyEditor::PartySetup = {};
 	int PartyEditor::DriverIdx = 0;
+	int PartyEditor::TeamIdx = 0;
 
 	OptionBase* optDriver = {};
 	OptionBase* optCurBlade = {};
 	OptionBase* optBlade1 = {};
 	OptionBase* optBlade2 = {};
 	OptionBase* optBlade3 = {};
+
+	OptionBase* optTornaLead = {};
+	OptionBase* optTornaRear1 = {};
+	OptionBase* optTornaRear2 = {};
 #elif XENOMODS_CODENAME(bfsw)
 	game::PcID PartyEditor::PartySetup[7] = {};
 #endif
@@ -45,10 +53,20 @@ namespace xenomods {
 		optBlade2->SetValuePtr(&base->blades[1]);
 		optBlade3->SetValuePtr(&base->blades[2]);
 	}
+
+	void MenuChangeTeamIndex() {
+		PartyEditor::TeamIdx = std::clamp(PartyEditor::TeamIdx, 0, 2);
+
+		gf::RQ_SETUP_PARTY_torna* ira = &PartyEditor::PartySetup.ira[PartyEditor::TeamIdx];
+
+		optTornaLead->SetValuePtr(&ira->lead);
+		optTornaRear1->SetValuePtr(&ira->rear1);
+		optTornaRear2->SetValuePtr(&ira->rear2);
+	}
 #elif XENOMODS_CODENAME(bfsw)
 	void MenuGetParty() {
 		game::DataParty* party = game::DataUtil::getDataParty(*DocumentPtr);
-		if (party == nullptr)
+		if(party == nullptr)
 			return;
 
 		// clears and sets to party
@@ -58,17 +76,17 @@ namespace xenomods {
 
 	void MenuApplyParty() {
 		game::DataParty* party = game::DataUtil::getDataParty(*DocumentPtr);
-		if (party == nullptr)
+		if(party == nullptr)
 			return;
 
 		std::vector<game::PcID> holder {};
 		for(int i = 0; i < 7; ++i) {
 			auto pcid = PartyEditor::PartySetup[i];
-			if (pcid > game::PcID::None && pcid < game::PcID::Count)
+			if(pcid > game::PcID::None && pcid < game::PcID::Count)
 				holder.push_back(pcid);
 		}
 
-		if (holder.size() <= 0) {
+		if(holder.size() <= 0) {
 			g_Logger->ToastError(STRINGIFY(PartyEditor), "Party size is 0! Please choose some party members.");
 			return;
 		}
@@ -115,17 +133,46 @@ namespace xenomods {
 
 		auto modules = g_Menu->FindSection("modules");
 		if(modules != nullptr) {
-			auto section = modules->RegisterSection(STRINGIFY(PartyEditor), "Party Editor");
+			auto baseSection = modules->RegisterSection(STRINGIFY(PartyEditor), "Party Editor");
+
+			// this is done to properly support only showing the right controls
+			// for Torna, as DLC or as standalone
+			// (ie on <2.0.0 we don't make a base game section)
+			auto section = baseSection;
 #if XENOMODS_OLD_ENGINE
-			section->RegisterOption<int>(DriverIdx, "Driver Index", &MenuChangeDriverIndex);
-			gf::RQ_SETUP_PARTY_basegame* base = &PartyEditor::PartySetup.base[0];
-			optDriver = section->RegisterOption<std::int32_t>(base->driver, "Driver");
-			optCurBlade = section->RegisterOption<std::int32_t>(base->curBlade, "Cur Blade");
-			optBlade1 = section->RegisterOption<std::int16_t>(base->blades[0], "Blade 1");
-			optBlade2 = section->RegisterOption<std::int16_t>(base->blades[1], "Blade 2");
-			optBlade3 = section->RegisterOption<std::int16_t>(base->blades[2], "Blade 3");
-			section->RegisterOption<void>("Apply Party", &MenuApplyParty);
-			section->RegisterOption<void>("Get Party", &MenuGetParty);
+			bool skipTorna = false;
+
+			if(version::RuntimeGame() == version::GameType::BF2) {
+				if(version::RuntimeVersion() >= version::SemVer::v2_0_0 && gf::GfDataAoc::getContentVersion(gf::AOC_TYPE::Torna) > -1)
+					section = baseSection->RegisterSection(std::string(STRINGIFY(PartyEditor)) + "_base", "Base game");
+				else
+					skipTorna = true;
+
+				section->RegisterOption<int>(DriverIdx, "Driver Index", &MenuChangeDriverIndex);
+				gf::RQ_SETUP_PARTY_basegame* base = &PartyEditor::PartySetup.base[0];
+				optDriver = section->RegisterOption<std::int32_t>(base->driver, "Driver");
+				optCurBlade = section->RegisterOption<std::int32_t>(base->curBlade, "Cur Blade");
+				optBlade1 = section->RegisterOption<std::int16_t>(base->blades[0], "Blade 1");
+				optBlade2 = section->RegisterOption<std::int16_t>(base->blades[1], "Blade 2");
+				optBlade3 = section->RegisterOption<std::int16_t>(base->blades[2], "Blade 3");
+				section->RegisterOption<void>("Apply Party", &MenuApplyParty);
+				section->RegisterOption<void>("Get Party", &MenuGetParty);
+			}
+
+			if (!skipTorna)
+			{
+				if(version::RuntimeGame() != version::GameType::IRA)
+					section = baseSection->RegisterSection(std::string(STRINGIFY(PartyEditor)) + "_ira", "Torna");
+
+				section->RegisterOption<int>(TeamIdx, "Team Index", &MenuChangeTeamIndex);
+				gf::RQ_SETUP_PARTY_torna* ira = &PartyEditor::PartySetup.ira[0];
+				optTornaLead = section->RegisterOption<std::int16_t>(ira->lead, "Vanguard");
+				optTornaRear1 = section->RegisterOption<std::int16_t>(ira->rear1, "Rearguard 1");
+				optTornaRear2 = section->RegisterOption<std::int16_t>(ira->rear2, "Rearguard 2");
+				section->RegisterOption<void>("Apply Party", &MenuApplyParty);
+				section->RegisterOption<void>("Get Party", &MenuGetParty);
+			}
+
 #elif XENOMODS_CODENAME(bfsw)
 			//section->RegisterOption<void>("Dump all chara statuses", &MenuDumpAllCharaStatuses);
 			//section->RegisterOption<void>("Load chara status", &MenuLoadCharaStatus);

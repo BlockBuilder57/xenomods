@@ -12,6 +12,7 @@ namespace xenomods {
 #if XENOMODS_OLD_ENGINE
 		static gf::RQ_SETUP_PARTY PartySetup;
 		static int DriverIdx;
+		static int TeamIdx;
 #elif XENOMODS_CODENAME(bfsw)
 		static game::PcID PartySetup[7];
 #endif
