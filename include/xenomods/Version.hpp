@@ -25,9 +25,23 @@ namespace xenomods::version {
 		std::uint8_t minor {};
 		std::uint8_t patch {};
 
+		static const SemVer v2_0_0;
+
 		inline bool IsValid() {
 			return major != 0 && minor != 0 && patch != 0;
 		}
+
+		inline bool operator==(const SemVer& other) const {
+			return this->major == other.major && this->minor == other.minor && this->patch == other.patch;
+		}
+		inline bool operator!=(const SemVer& other) const { return !(*this == other); }
+
+		inline bool operator<(const SemVer& other) const {
+			return this->major <= other.major && this->minor <= other.minor && this->patch < other.patch;
+		}
+		inline bool operator>(const SemVer& other) const { return other < *this; }
+		inline bool operator<=(const SemVer& other) const { return !(other > *this); }
+		inline bool operator>=(const SemVer& other) const { return !(other < *this); }
 	};
 
 	const char* BuildGitVersion();

@@ -69,4 +69,6 @@ namespace xenomods::version {
 		return {0,0,0};
 	}
 
+	const SemVer SemVer::v2_0_0 = {2,0,0};
+
 } // namespace xenomods::version
