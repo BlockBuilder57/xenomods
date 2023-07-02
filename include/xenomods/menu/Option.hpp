@@ -118,30 +118,27 @@ namespace xenomods {
 
 			T& val = ValueAs<T>();
 
-			tens = std::log10(val);
 			by2 = input->InputHeld(Keybind::MENU_NUM_MULT2);
-			by10s = input->InputHeld(Keybind::MENU_NUM_TENS);
 
-			// don't let the log return 0
-			if(tens <= 0)
-				tens = 1;
+			if (input->InputDown(Keybind::MENU_NUM_NEXT_TENS)) {
+				tens++;
+
+				if (tens > std::numeric_limits<T>::digits10)
+					tens = 0;
+			}
 
 			if(input->InputDown(Keybind::MENU_NUM_INC)) {
 				if(by2)
 					val *= 2;
-				else if(by10s && tens != 0)
-					val += std::pow(10, tens);
 				else
-					val++;
+					val += std::pow(10, tens);
 
 				changed = true;
 			} else if(input->InputDown(Keybind::MENU_NUM_DEC)) {
 				if(by2)
 					val /= 2;
-				else if(by10s && tens != 0)
-					val -= std::pow(10, tens);
 				else
-					val--;
+					val -= std::pow(10, tens);
 
 				changed = true;
 			} else if(input->InputDown(Keybind::MENU_NUM_NEGATE)) {
@@ -159,11 +156,9 @@ namespace xenomods {
 			std::string extra;
 
 			if(selected) {
-				if(!by2 && !by10s) {
-					extra = "\x81\x7D""1"; // +- 1
-				} else if(by2) {
+				if(by2) {
 					extra = "\x81\x7E/\x81\x80" "2"; // x/div 2
-				} else if(by10s) {
+				} else {
 					// 0x7D is }, so it gets mad when trying to emit it on its own
 					extra = fmt::format("{}{}", "\x81\x7D", std::pow(10, tens)); // +- 10^tens
 				}
@@ -173,9 +168,8 @@ namespace xenomods {
 		}
 
 	   private:
-		int tens;
-		bool by2;
-		bool by10s;
+		int tens {};
+		bool by2 {};
 	};
 
 	template<class T>

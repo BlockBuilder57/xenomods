@@ -96,7 +96,7 @@ namespace xenomods {
 		MENU_NUM_INC = nn::hid::KEY_DUP,
 		MENU_NUM_DEC = nn::hid::KEY_DDOWN,
 		MENU_NUM_MULT2 = nn::hid::KEY_B,
-		MENU_NUM_TENS = nn::hid::KEY_A,
+		MENU_NUM_NEXT_TENS = nn::hid::KEY_A,
 		MENU_NUM_NEGATE = nn::hid::KEY_Y,
 		MENU_NUM_SET0 = nn::hid::KEY_X,
 

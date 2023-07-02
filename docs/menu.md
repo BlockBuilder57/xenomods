@@ -6,29 +6,6 @@ The Menu can be controlled by P1, but will swap to P2 if the controller is conne
 
 ---
 
-#### Basic controls:
-| Action      | Control    | Description                                                              |
-|-------------|------------|--------------------------------------------------------------------------|
-| Toggle Menu | L+R+ZL+ZR  | Opens the Menu. Will take the place of logger messages.                  |
-| Up          | Dpad Up    | Navigates to the previous choice.                                        |
-| Down        | Dpad Down  | Navigates to the next choice.                                            |
-| Select      | Dpad Right | Selects the currently hovered choice. Will automatically call functions. |
-| Back        | Dpad Left  | Returns to the parent section/deselects the current option.              |
-
-#### Option controls:
-
-These are the controls for Options (numbers, booleans, enums).
-
-| Action         | Control   | Description                                                                                                                                 |
-|----------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| Increment      | Dpad Up   | Increments the number or toggles the boolean.                                                                                               |
-| Decrement      | Dpad Down | Decrements the number or toggles the boolean.                                                                                               |
-| Multiply by 2  | B         | Hold while changing a number to instead multiply or divide the number by 2.                                                                 |
-| Change by Tens | A         | Hold while changing a number to increment/decrement by the integer log of the number.<br>(12 would increment by 10, 123 would be 100, etc.) |
-| Negate         | Y         | Press to negate the current number.                                                                                                         |
-| Set to 0       | X         | Sets the current number to 0.                                                                                                               |
-
-
 ### Modules
 
 Modules control a majority of the functionality of Xenomods. A number of options do not work in every game (especially in 3), so be sure to check to see if the option you are looking appears in the Menu.
