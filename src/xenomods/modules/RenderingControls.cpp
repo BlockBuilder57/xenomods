@@ -160,16 +160,16 @@ namespace xenomods {
 #if XENOMODS_OLD_ENGINE
 			section->RegisterOption<bool>(straightenFont, "Straighten font");
 #endif
-			section->RegisterOption<bool>(skipUIRendering, "Skip UI rendering");
 #if !XENOMODS_CODENAME(bf3)
-			section->RegisterOption<bool>(skipParticleRendering, "Skip particle+overlay rendering");
-			section->RegisterOption<bool>(skipCloudRendering, "Skip cloud (sea) rendering");
-			section->RegisterOption<bool>(skipSkyDomeRendering, "Skip sky dome rendering");
 			section->RegisterOption<float>(shadowStrength, "Shadow strength", &MenuSetShadowStrength);
 #endif
 
-#if !XENOMODS_CODENAME(bf3)
 			auto toggles = section->RegisterSection(toggleKey, "Toggles...");
+			toggles->RegisterOption<bool>(skipUIRendering, "Skip UI rendering");
+#if !XENOMODS_CODENAME(bf3)
+			toggles->RegisterOption<bool>(skipParticleRendering, "Skip particle+overlay rendering");
+			toggles->RegisterOption<bool>(skipCloudRendering, "Skip cloud (sea) rendering");
+			toggles->RegisterOption<bool>(skipSkyDomeRendering, "Skip sky dome rendering");
 			toggles->RegisterOption<void>("Toggle map", &MenuToggleMap);
 			toggles->RegisterOption<void>("Toggle fog", &MenuToggleFog);
 			toggles->RegisterOption<void>("Toggle bloom", &MenuToggleBloom);

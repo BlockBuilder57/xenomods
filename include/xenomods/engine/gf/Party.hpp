@@ -14,7 +14,7 @@ namespace gf {
 
 	struct RQ_SETUP_PARTY_basegame {
 		std::int32_t driver;
-		std::int32_t curBlade;
+		std::int32_t activeBladeIdx;
 		std::int16_t blades[6];
 	};
 

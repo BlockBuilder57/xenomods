@@ -146,15 +146,6 @@ namespace xenomods {
 		ReadFileHook::HookFromBase(0x71012562a4);
 		ReadFileSliceHook::HookFromBase(0x7101254ab0);
 #endif
-
-		auto modules = g_Menu->FindSection("modules");
-		if (modules != nullptr) {
-			auto section = modules->RegisterSection(STRINGIFY(FileDetours), "File Detours");
-			section->RegisterOption<bool>(GetState().config.dumpFileReads, "Dump file reads");
-			section->RegisterOption<bool>(GetState().config.enableFileOverrides, "Enable file overrides");
-			section->RegisterTextual("Note: these only apply for file that use compressed blocks.");
-			section->RegisterTextual("Normal file overriding can be done through LayeredFS.");
-		}
 	}
 
 	XENOMODS_REGISTER_MODULE(FileDetours);

@@ -12,7 +12,7 @@ namespace xenomods {
 	struct PartyEditor : public UpdatableModule {
 #if XENOMODS_OLD_ENGINE
 		static gf::RQ_SETUP_PARTY PartySetup;
-		static int DriverIdx;
+		static int PartyIdx;
 		static int TeamIdx;
 #elif XENOMODS_CODENAME(bfsw)
 		static game::PcID PartySetup[7];

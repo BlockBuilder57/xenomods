@@ -18,15 +18,15 @@ add_executable(xenomods
 		xenomods/menu/Option.cpp
 
 		xenomods/modules/DebugStuff.cpp
+		xenomods/modules/CameraTools.cpp
+		xenomods/modules/RenderingControls.cpp
+		xenomods/modules/BattleCheats.cpp
+		xenomods/modules/PartyEditor.cpp
+		xenomods/modules/PlayerMovement.cpp
+		xenomods/modules/FrameratePatch.cpp
 		xenomods/modules/FileDetours.cpp
 		xenomods/modules/BdatOverride.cpp
-		xenomods/modules/CameraTools.cpp
-        xenomods/modules/RenderingControls.cpp
-		xenomods/modules/PlayerMovement.cpp
 		xenomods/modules/BdatRandomizer.cpp
-		xenomods/modules/FrameratePatch.cpp
-        xenomods/modules/BattleCheats.cpp
-		xenomods/modules/PartyEditor.cpp
 		xenomods/modules/bf2/EventDebugUtils.cpp
 		xenomods/modules/bfsw/AppletRedirect.cpp
 
