@@ -54,18 +54,18 @@ namespace game {
 		int hp;
 		int unk1;
 		float always100;
-		unsigned int unk2;
-		unsigned int unk3;
-		unsigned int bonusExp;
-		unsigned int unk4;
-		unsigned int unk5;
+		unsigned int exp;
+		unsigned int lastExp; // ???
+		unsigned int expBonus;
+		unsigned int ap;
+		unsigned int affinityCoins;
 		float unk6;
 		std::uint8_t tp_atk;
 		std::uint8_t tp_arts;
 		std::uint8_t tp_atkdmg;
 		std::uint8_t tp_artsdmg;
 		INSERT_PADDING_BYTES(0x10);
-		int baseHp;
+		unsigned int baseHp; // this being an int is intentional
 		unsigned short baseStrength;
 		unsigned short baseAgility;
 		unsigned short baseEther;
@@ -121,7 +121,7 @@ struct fmt::formatter<game::PcID> : fmt::formatter<std::string_view> {
 			case Mumkhar: name = "Mumkhar"; break;
 			case Alvis: name = "Alvis"; break;
 			case DunbanPrelude: name = "Dunban (Prelude)"; break;
-			case DunbanCopy: name = "Dunban Copy?"; break;
+			case DunbanCopy: name = "Dunban Copy"; break;
 			case Kino: name = "Kino"; break;
 			case Nene: name = "Nene"; break;
 			case Ponspector_Wunwun: name = "Wunwun (Ponspector)"; break;

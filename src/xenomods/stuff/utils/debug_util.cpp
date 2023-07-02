@@ -122,6 +122,7 @@ namespace dbgutil {
 
 		if(!xenomods::NnFile::Preallocate(path, len)) {
 			xenomods::g_Logger->LogError("Couldn't create/preallocate dump file \"{}\"", path);
+			return;
 		}
 
 		xenomods::NnFile file(path, nn::fs::OpenMode_Write);

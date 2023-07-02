@@ -26,12 +26,23 @@ namespace game {
 
 	class DataUtil {
 	   public:
+		struct AddExpApSpInfo {
+			PcID pcid;
+			int exp;
+			int ap;
+			int sp;
+			bool unk1;
+			bool showOnUI;
+			bool unk3;
+		};
+
 		static unsigned int searchBdatFldMaplistRowID(const fw::Document& doc, const char* id_name);
 		static bool isDisableMenu(const fw::Document& doc);
 		static bool isOpenableCurrentAreaMap(const fw::Document& doc);
 		static void makeParty(const fw::Document& doc, const mm::mtl::FixedVector<unsigned short, 9ul>&);
 		static DataParty* getDataParty(const fw::Document& doc);
 		static DataPc* getDataPc(const fw::Document& doc, unsigned short pcid);
+		static void addExpApSp(const fw::Document& doc, const AddExpApSpInfo& addInfo, bool clampThing);
 	};
 
 	class ObjUtil {

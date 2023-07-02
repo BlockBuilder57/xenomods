@@ -29,6 +29,18 @@ namespace xenomods {
 	OptionBase* optTornaRear2 = {};
 #elif XENOMODS_CODENAME(bfsw)
 	game::PcID PartyEditor::PartySetup[7] = {};
+	game::PcID PartyEditor::CurrentStatus = game::PcID::None;
+	game::DataUtil::AddExpApSpInfo PartyEditor::AddInfo = {};
+
+	game::DataCharaStatus tempStatus;
+
+	OptionBase* optStatusLevel = {};
+	OptionBase* optStatusExp = {};
+	OptionBase* optStatusAffCoins = {};
+	OptionBase* optStatusStatHp = {};
+	OptionBase* optStatusStatStrength = {};
+	OptionBase* optStatusStatAgility = {};
+	OptionBase* optStatusStatEther = {};
 #endif
 
 #if XENOMODS_OLD_ENGINE
@@ -112,9 +124,35 @@ namespace xenomods {
 		game::ScriptUI::openPartyChange();
 	}
 
+	void MenuChangePcID() {
+		PartyEditor::CurrentStatus = (game::PcID)std::clamp((int)PartyEditor::CurrentStatus, 0, (int)game::PcID::Count);
+
+		game::DataPc* member = game::DataUtil::getDataPc(*xenomods::DocumentPtr, static_cast<unsigned short>(PartyEditor::CurrentStatus));
+
+		if (member == nullptr)
+		{
+			optStatusLevel->SetValuePtr(&tempStatus.level);
+			optStatusExp->SetValuePtr(&tempStatus.exp);
+			optStatusAffCoins->SetValuePtr(&tempStatus.affinityCoins);
+			optStatusStatHp->SetValuePtr(&tempStatus.baseHp);
+			optStatusStatStrength->SetValuePtr(&tempStatus.baseStrength);
+			optStatusStatAgility->SetValuePtr(&tempStatus.baseAgility);
+			optStatusStatEther->SetValuePtr(&tempStatus.baseEther);
+			return;
+		}
+
+		optStatusLevel->SetValuePtr(&member->status.level);
+		optStatusExp->SetValuePtr(&member->status.exp);
+		optStatusAffCoins->SetValuePtr(&member->status.affinityCoins);
+		optStatusStatHp->SetValuePtr(&member->status.baseHp);
+		optStatusStatStrength->SetValuePtr(&member->status.baseStrength);
+		optStatusStatAgility->SetValuePtr(&member->status.baseAgility);
+		optStatusStatEther->SetValuePtr(&member->status.baseEther);
+	}
+
 	/*void MenuLoadCharaStatus() {
-		game::DataPc* member = game::DataUtil::getDataPc(*xenomods::DocumentPtr, static_cast<unsigned short>(game::PcID::Shulk));
-		dbgutil::loadMemory(&member->status, "sd:/config/xenomods/memdump/DataCharaStatus - Dummy.dump");
+		game::DataPc* member = game::DataUtil::getDataPc(*xenomods::DocumentPtr, static_cast<unsigned short>(PartyEditor::CurrentStatus));
+		dbgutil::loadMemory(&member->status, fmt::format("sd:/config/xenomods/memdump/DataCharaStatus - {}.dump", PartyEditor::CurrentStatus));
 	}
 
 	void MenuDumpAllCharaStatuses() {
@@ -125,6 +163,13 @@ namespace xenomods {
 			dbgutil::dumpMemory(&member->status, sizeof(game::DataCharaStatus), filename.c_str());
 		}
 	}*/
+
+	void MenuAddExperience() {
+		if (PartyEditor::AddInfo.pcid > game::PcID::None && PartyEditor::AddInfo.pcid < game::PcID::Count)
+			game::DataUtil::addExpApSp(*xenomods::DocumentPtr, PartyEditor::AddInfo, false);
+		else
+			xenomods::g_Logger->ToastWarning("addexp", "Invalid PC selected");
+	}
 #endif
 
 	void PartyEditor::Initialize() {
@@ -172,19 +217,43 @@ namespace xenomods {
 				section->RegisterOption<void>("Apply Party", &MenuApplyParty);
 				section->RegisterOption<void>("Get Party", &MenuGetParty);
 			}
-
 #elif XENOMODS_CODENAME(bfsw)
-			//section->RegisterOption<void>("Dump all chara statuses", &MenuDumpAllCharaStatuses);
-			//section->RegisterOption<void>("Load chara status", &MenuLoadCharaStatus);
-			section->RegisterOption<game::PcID>(PartySetup[0], "PC 1");
-			section->RegisterOption<game::PcID>(PartySetup[1], "PC 2");
-			section->RegisterOption<game::PcID>(PartySetup[2], "PC 3");
-			section->RegisterOption<game::PcID>(PartySetup[3], "PC 4");
-			section->RegisterOption<game::PcID>(PartySetup[4], "PC 5");
-			section->RegisterOption<game::PcID>(PartySetup[5], "PC 6");
-			section->RegisterOption<game::PcID>(PartySetup[6], "PC 7");
-			section->RegisterOption<void>("Apply Party", &MenuApplyParty);
-			section->RegisterOption<void>("Get Party", &MenuGetParty);
+			{
+				auto order = baseSection->RegisterSection(std::string(STRINGIFY(PartyEditor)) + "_order", "Party Order...");
+				order->RegisterOption<game::PcID>(PartySetup[0], "PC 1");
+				order->RegisterOption<game::PcID>(PartySetup[1], "PC 2");
+				order->RegisterOption<game::PcID>(PartySetup[2], "PC 3");
+				order->RegisterOption<game::PcID>(PartySetup[3], "PC 4");
+				order->RegisterOption<game::PcID>(PartySetup[4], "PC 5");
+				order->RegisterOption<game::PcID>(PartySetup[5], "PC 6");
+				order->RegisterOption<game::PcID>(PartySetup[6], "PC 7");
+				order->RegisterOption<void>("Apply Party", &MenuApplyParty);
+				order->RegisterOption<void>("Get Party", &MenuGetParty);
+			}
+
+			{
+				auto status = baseSection->RegisterSection(std::string(STRINGIFY(PartyEditor)) + "_status", "PC Status...");
+				//status->RegisterOption<void>("Dump all chara statuses", &MenuDumpAllCharaStatuses);
+				//status->RegisterOption<void>("Load current chara status", &MenuLoadCharaStatus);
+				status->RegisterOption<game::PcID>(CurrentStatus, "Party Member", &MenuChangePcID);
+				optStatusLevel = status->RegisterOption<int>(tempStatus.level, "Level");
+				optStatusExp = status->RegisterOption<unsigned int>(tempStatus.exp, "Experience");
+				optStatusAffCoins = status->RegisterOption<unsigned int>(tempStatus.affinityCoins, "Affinity Coins");
+				optStatusStatHp = status->RegisterOption<unsigned int>(tempStatus.baseHp, "Base HP");
+				optStatusStatStrength = status->RegisterOption<unsigned short>(tempStatus.baseStrength, "Base Strength");
+				optStatusStatAgility = status->RegisterOption<unsigned short>(tempStatus.baseAgility, "Base Agility");
+				optStatusStatEther = status->RegisterOption<unsigned short>(tempStatus.baseEther, "Base Ether");
+			}
+
+			{
+				auto exp = baseSection->RegisterSection(std::string(STRINGIFY(PartyEditor)) + "_exp", "Experience...");
+				exp->RegisterOption<game::PcID>(AddInfo.pcid, "PC");
+				exp->RegisterOption<int>(AddInfo.exp, "EXP");
+				exp->RegisterOption<int>(AddInfo.ap, "AP");
+				exp->RegisterOption<int>(AddInfo.sp, "SP");
+				exp->RegisterOption<bool>(AddInfo.showOnUI, "Show UI alerts");
+				exp->RegisterOption<void>("Add Experience", &MenuAddExperience);
+			}
 #endif
 		}
 	}

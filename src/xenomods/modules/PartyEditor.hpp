@@ -4,6 +4,7 @@
 
 #include "UpdatableModule.hpp"
 #include "xenomods/engine/game/DataPC.hpp"
+#include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/engine/gf/Party.hpp"
 
 namespace xenomods {
@@ -15,6 +16,8 @@ namespace xenomods {
 		static int TeamIdx;
 #elif XENOMODS_CODENAME(bfsw)
 		static game::PcID PartySetup[7];
+		static game::PcID CurrentStatus;
+		static game::DataUtil::AddExpApSpInfo AddInfo;
 #endif
 
 		void Initialize() override;
