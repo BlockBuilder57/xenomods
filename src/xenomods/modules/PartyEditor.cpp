@@ -14,19 +14,17 @@
 namespace xenomods {
 
 #if XENOMODS_OLD_ENGINE
-	gf::RQ_SETUP_PARTY PartyEditor::PartySetup = {};
-	int PartyEditor::PartyIdx = 0;
-	int PartyEditor::TeamIdx = 0;
+	gf::RQ_SETUP_PARTY PartyEditor::PartySetup {};
+	int PartyEditor::PartyIdx {};
+	int PartyEditor::TeamIdx {};
 
-	OptionBase* optDriver = {};
-	OptionBase* optCurBlade = {};
-	OptionBase* optBlade1 = {};
-	OptionBase* optBlade2 = {};
-	OptionBase* optBlade3 = {};
+	OptionBase* optDriver {};
+	OptionBase* optCurBlade {};
+	OptionBase* optBlades[3] {};
 
-	OptionBase* optTornaLead = {};
-	OptionBase* optTornaRear1 = {};
-	OptionBase* optTornaRear2 = {};
+	OptionBase* optTornaLead {};
+	OptionBase* optTornaRear1 {};
+	OptionBase* optTornaRear2 {};
 #elif XENOMODS_CODENAME(bfsw)
 	game::PcID PartyEditor::PartySetup[7] = {};
 	game::PcID PartyEditor::CurrentStatus = game::PcID::None;
@@ -46,7 +44,7 @@ namespace xenomods {
 #if XENOMODS_OLD_ENGINE
 	void MenuGetParty() {
 		gf::GfGameParty::getCurrentPartyInfo(PartyEditor::PartySetup);
-		//dbgutil::dumpMemory(&PartyEditor::PartySetup, sizeof(gf::RQ_SETUP_PARTY), XENOMODS_CODENAME_STR "_party.dump");
+		dbgutil::dumpMemory(&PartyEditor::PartySetup, sizeof(gf::RQ_SETUP_PARTY), XENOMODS_CODENAME_STR "_party.dump");
 		PartyEditor::PartyIdx = 0;
 	}
 
@@ -61,9 +59,8 @@ namespace xenomods {
 
 		optDriver->SetValuePtr(&base->driver);
 		optCurBlade->SetValuePtr(&base->activeBladeIdx);
-		optBlade1->SetValuePtr(&base->blades[0]);
-		optBlade2->SetValuePtr(&base->blades[1]);
-		optBlade3->SetValuePtr(&base->blades[2]);
+		for (int i = 0; i < 3; i++)
+			optBlades[i]->SetValuePtr(&base->blades[i]);
 	}
 
 	void MenuChangeTeamIndex() {
@@ -197,9 +194,8 @@ namespace xenomods {
 				gf::RQ_SETUP_PARTY_basegame* base = &PartyEditor::PartySetup.base[0];
 				optDriver = section->RegisterOption<std::int32_t>(base->driver, "Driver");
 				optCurBlade = section->RegisterOption<std::int32_t>(base->activeBladeIdx, "Active Blade Index");
-				optBlade1 = section->RegisterOption<std::int16_t>(base->blades[0], "Blade 0");
-				optBlade2 = section->RegisterOption<std::int16_t>(base->blades[1], "Blade 1");
-				optBlade3 = section->RegisterOption<std::int16_t>(base->blades[2], "Blade 2");
+				for (int i = 0; i < 3; i++)
+					optBlades[i] = section->RegisterOption<std::int16_t>(base->blades[i], "Blade " + std::to_string(i));
 				section->RegisterOption<void>("Apply Party", &MenuApplyParty);
 				section->RegisterOption<void>("Get Party", &MenuGetParty);
 			}

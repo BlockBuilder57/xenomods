@@ -27,8 +27,8 @@ namespace gf {
 	struct RQ_SETUP_PARTY {
 		RQ_SETUP_PARTY_basegame base[10];
 		RQ_SETUP_PARTY_torna ira[10];
-		std::uint32_t unk1;
-		std::uint32_t basePartyLead;
+		std::uint32_t partyType; // unknown, usually 3 or 4
+		std::uint32_t partyLead;
 		std::uint32_t unk3;
 		std::uint32_t unk4;
 	};
