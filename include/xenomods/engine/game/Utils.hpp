@@ -36,13 +36,16 @@ namespace game {
 			bool applyBonusExp; // ?
 		};
 
-		static unsigned int searchBdatFldMaplistRowID(const fw::Document& doc, const char* id_name);
+		static void addExpApSp(const fw::Document& doc, const AddExpApSpInfo& addInfo, bool clampThing);
+		static int addItem(const fw::Document& doc, unsigned short id, unsigned short count, bool param_4, unsigned char showNotif, bool isTemp);
+		static DataParty* getDataParty(const fw::Document& doc);
+		static DataPc* getDataPc(const fw::Document& doc, unsigned short pcid);
+		static void getItemHelp(const fw::Document& doc, unsigned short id, mm::mtl::FixStr<256>& str, unsigned char colorThing);
+		static void getItemName(const fw::Document& doc, unsigned short id, mm::mtl::FixStr<256>& str);
 		static bool isDisableMenu(const fw::Document& doc);
 		static bool isOpenableCurrentAreaMap(const fw::Document& doc);
 		static void makeParty(const fw::Document& doc, const mm::mtl::FixedVector<unsigned short, 9ul>&);
-		static DataParty* getDataParty(const fw::Document& doc);
-		static DataPc* getDataPc(const fw::Document& doc, unsigned short pcid);
-		static void addExpApSp(const fw::Document& doc, const AddExpApSpInfo& addInfo, bool clampThing);
+		static unsigned int searchBdatFldMaplistRowID(const fw::Document& doc, const char* id_name);
 	};
 
 	class ObjUtil {
