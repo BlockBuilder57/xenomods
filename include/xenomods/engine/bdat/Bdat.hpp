@@ -47,8 +47,9 @@ namespace Bdat {
 
 	ValueType getVarType(unsigned char* pBdat, unsigned char* pVarName);
 
-	void* getVal(unsigned char* pBdat, unsigned char* pVarName, int);
-	long getValCheck(unsigned char* pBdat, const char* memberName, int param_3, int type);
+	void* getVal(unsigned char* pBdat, unsigned char* pVarName, int idx);
+	void* getVal(unsigned char* pBdat, const char* pVarName, int idx);
+	long getValCheck(unsigned char* pBdat, const char* memberName, int idx, int type);
 
 	char* getSheetName(unsigned char* pBdat);
 	char* getMemberName(unsigned char* somethin, int index);

@@ -29,6 +29,7 @@ namespace xenomods {
 		struct Access {
 			SheetData sheet;
 			unsigned long data {};
+			bool ignoreEmptyData {};
 		};
 
 		[[nodiscard]] virtual bool IsApplicable(SheetData& sheetName) const = 0;
