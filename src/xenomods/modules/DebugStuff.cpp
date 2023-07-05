@@ -33,6 +33,7 @@ namespace {
 		}
 	};
 
+#if XENOMODS_OLD_ENGINE
 	struct BGMDebugging : skylaunch::hook::Trampoline<BGMDebugging> {
 		static void Hook(gf::BgmTrack* this_pointer, fw::UpdateInfo* updateInfo) {
 			Orig(this_pointer, updateInfo);
@@ -65,7 +66,6 @@ namespace {
 		}
 	};
 
-#if XENOMODS_OLD_ENGINE
 	struct JumpToClosedLandmarks_CanEnterMap : skylaunch::hook::Trampoline<JumpToClosedLandmarks_CanEnterMap> {
 		static bool Hook(unsigned int mapjump) {
 			return xenomods::DebugStuff::accessClosedLandmarks || Orig(mapjump);

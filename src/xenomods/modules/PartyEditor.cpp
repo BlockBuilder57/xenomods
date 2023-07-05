@@ -33,7 +33,8 @@ namespace xenomods {
 	game::DataCharaStatus tempStatus;
 
 	OptionBase* optStatusLevel = {};
-	OptionBase* optStatusExp = {};
+	OptionBase* optStatusExpLevel = {};
+	OptionBase* optStatusExpTotal = {};
 	OptionBase* optStatusAffCoins = {};
 	OptionBase* optStatusStatHp = {};
 	OptionBase* optStatusStatStrength = {};
@@ -129,7 +130,8 @@ namespace xenomods {
 		if (member == nullptr)
 		{
 			optStatusLevel->SetValuePtr(&tempStatus.level);
-			optStatusExp->SetValuePtr(&tempStatus.exp);
+			optStatusExpLevel->SetValuePtr(&tempStatus.expLevel);
+			optStatusExpTotal->SetValuePtr(&tempStatus.expTotal);
 			optStatusAffCoins->SetValuePtr(&tempStatus.affinityCoins);
 			optStatusStatHp->SetValuePtr(&tempStatus.baseHp);
 			optStatusStatStrength->SetValuePtr(&tempStatus.baseStrength);
@@ -139,7 +141,8 @@ namespace xenomods {
 		}
 
 		optStatusLevel->SetValuePtr(&member->status.level);
-		optStatusExp->SetValuePtr(&member->status.exp);
+		optStatusExpLevel->SetValuePtr(&member->status.expLevel);
+		optStatusExpTotal->SetValuePtr(&member->status.expTotal);
 		optStatusAffCoins->SetValuePtr(&member->status.affinityCoins);
 		optStatusStatHp->SetValuePtr(&member->status.baseHp);
 		optStatusStatStrength->SetValuePtr(&member->status.baseStrength);
@@ -233,7 +236,8 @@ namespace xenomods {
 				//status->RegisterOption<void>("Load current chara status", &MenuLoadCharaStatus);
 				status->RegisterOption<game::PcID>(CurrentStatus, "Party Member", &MenuChangePcID);
 				optStatusLevel = status->RegisterOption<int>(tempStatus.level, "Level");
-				optStatusExp = status->RegisterOption<unsigned int>(tempStatus.exp, "Experience");
+				optStatusExpLevel = status->RegisterOption<unsigned int>(tempStatus.expLevel, "EXP (cur level)");
+				optStatusExpTotal = status->RegisterOption<unsigned int>(tempStatus.expTotal, "EXP (total)");
 				optStatusAffCoins = status->RegisterOption<unsigned int>(tempStatus.affinityCoins, "Affinity Coins");
 				optStatusStatHp = status->RegisterOption<unsigned int>(tempStatus.baseHp, "Base HP");
 				optStatusStatStrength = status->RegisterOption<unsigned short>(tempStatus.baseStrength, "Base Strength");

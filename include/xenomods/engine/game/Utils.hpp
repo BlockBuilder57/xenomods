@@ -33,7 +33,7 @@ namespace game {
 			int sp;
 			bool unk1;
 			bool showOnUI;
-			bool unk3;
+			bool applyBonusExp; // ?
 		};
 
 		static unsigned int searchBdatFldMaplistRowID(const fw::Document& doc, const char* id_name);

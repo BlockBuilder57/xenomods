@@ -54,8 +54,8 @@ namespace game {
 		int hp;
 		int unk1;
 		float always100;
-		unsigned int exp;
-		unsigned int lastExp; // ???
+		unsigned int expLevel;
+		unsigned int expTotal;
 		unsigned int expBonus;
 		unsigned int ap;
 		unsigned int affinityCoins;
