@@ -24,6 +24,74 @@ namespace game {
 		INSERT_PADDING_BYTES(0x20);
 	};
 
+	class DataItem {
+	   public:
+		struct DataCommon {
+			ushort unk1;
+			ushort unk2;
+			ushort itemId;
+			ushort itemType;
+			ushort stackCount;
+			int addTime;
+			bool isInInventory;
+			bool isFavorite;
+		};
+
+		// Gems and mob crystals
+		struct DataCrystal : public DataCommon {
+			ushort slotSize;
+			byte rankType;
+			byte atrType;
+			byte gemIds;
+			INSERT_PADDING_BYTES(1);
+			byte skillCount;
+			INSERT_PADDING_BYTES(1);
+			ushort unk3;
+			byte arrSkills;
+			byte skillRate;
+			INSERT_PADDING_BYTES(4);
+			byte alsoCountUnk;
+			INSERT_PADDING_BYTES(3);
+		};
+
+		struct DataSlot {
+			uint itemId;
+			ushort skillId;
+			bool isEquipped;
+		};
+
+		// Weapons and armor
+		struct DataEquip : public DataCommon {
+			INSERT_PADDING_BYTES(1);
+			byte slotCount;
+			INSERT_PADDING_BYTES(2);
+			DataSlot slots[3];
+		};
+
+		DataEquip Weapons[500];
+		DataEquip HeadArmor[500];
+		DataEquip BodyArmor[500];
+		DataEquip ArmArmor[500];
+		DataEquip LeggArmor[500];
+		DataEquip FootArmor[500];
+		DataCrystal Crystals[550];
+		DataCrystal Gems[550];
+		DataCommon Collectables[500];
+		DataCommon Materials[500];
+		DataCommon KeyItems[500];
+		DataCommon ArtBooks[500];
+		INSERT_PADDING_BYTES(263279-228000);
+		DataEquip TempWeapons[32];
+		DataEquip TempHeadArmor[32];
+		DataEquip TempBodyArmor[32];
+		DataEquip TempArmArmor[32];
+		DataEquip TempLeggArmor[32];
+		DataEquip TempFootArmor[32];
+		DataCrystal TempGems[35];
+
+		DataCommon* getItem(unsigned int);
+	};
+
 	class DataUtil {
 	   public:
 		struct AddExpApSpInfo {
@@ -40,8 +108,10 @@ namespace game {
 		static int addItem(const fw::Document& doc, unsigned short id, unsigned short count, bool param_4, unsigned char showNotif, bool isTemp);
 		static DataParty* getDataParty(const fw::Document& doc);
 		static DataPc* getDataPc(const fw::Document& doc, unsigned short pcid);
+		static DataItem* getDataItem(const fw::Document& doc);
 		static void getItemHelp(const fw::Document& doc, unsigned short id, mm::mtl::FixStr<256>& str, unsigned char colorThing);
 		static void getItemName(const fw::Document& doc, unsigned short id, mm::mtl::FixStr<256>& str);
+		static DataItem::DataCommon* findStackItem(const fw::Document& doc, unsigned short id);
 		static bool isDisableMenu(const fw::Document& doc);
 		static bool isOpenableCurrentAreaMap(const fw::Document& doc);
 		static void makeParty(const fw::Document& doc, const mm::mtl::FixedVector<unsigned short, 9ul>&);
