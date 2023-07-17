@@ -79,7 +79,9 @@ namespace xenomods {
 		}
 
 		for(auto& tex : textuals) {
-			xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, tex.Color().a > 0 ? tex.Color() : Menu::COLOR_TEXTUAL, " {} ", tex.String());
+			auto str = tex.String();
+			if (!str.empty())
+				xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, tex.Color().a > 0 ? tex.Color() : Menu::COLOR_TEXTUAL, " {} ", str);
 		}
 	}
 
