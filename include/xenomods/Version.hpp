@@ -46,6 +46,10 @@ namespace xenomods::version {
 
 	const char* BuildGitVersion();
 	const char* BuildTimestamp();
+
+	// returns a string like "xenomods 1234567~ (debug) [???]"
+	const char* BuildXenomodsVersion();
+
 	const GameType BuildGame =
 #if XENOMODS_CODENAME(bf2)
 	GameType::BF2;
@@ -140,6 +144,6 @@ template<>
 struct fmt::formatter<xenomods::version::SemVer> : fmt::formatter<std::string> {
 	template<typename FormatContext>
 	inline auto format(const xenomods::version::SemVer& semver, FormatContext& ctx) {
-		return fmt::format_to(ctx.out(), FMT_STRING("{}.{}.{}"), semver.major, semver.minor, semver.patch);
+		return fmt::format_to(ctx.out(), "{}.{}.{}", semver.major, semver.minor, semver.patch);
 	}
 };

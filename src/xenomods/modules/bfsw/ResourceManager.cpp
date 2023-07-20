@@ -3,6 +3,7 @@
 #include "ResourceManager.hpp"
 
 #include "xenomods/engine/game/Utils.hpp"
+#include "xenomods/stuff/utils/debug_util.hpp"
 
 #if XENOMODS_CODENAME(bfsw)
 namespace xenomods {
@@ -12,13 +13,27 @@ namespace xenomods {
 
 	mm::mtl::FixStr<256> itemName {};
 	mm::mtl::FixStr<256> itemHelp {};
+	std::string itemInventory = "";
 
-	void MenuRefreshItemStrings() {
+	void MenuChangeItemId() {
 		if (xenomods::DocumentPtr == nullptr)
 			return;
 
 		game::DataUtil::getItemName(*xenomods::DocumentPtr, ResourceManager::ItemId, itemName);
 		game::DataUtil::getItemHelp(*xenomods::DocumentPtr, ResourceManager::ItemId, itemHelp, 0);
+
+		game::DataItem* dataItem = game::DataUtil::getDataItem(*xenomods::DocumentPtr);
+		if (dataItem == nullptr)
+			return;
+
+		game::DataItem::DataCommon* item = dataItem->getItem(ResourceManager::ItemId);
+		if (item == nullptr)
+			return;
+
+		if (item->isInInventory)
+			itemInventory = fmt::format("Num in inventory: {}", item->stackCount);
+		else
+			itemInventory = "Not in inventory";
 	}
 
 	void MenuChangeItemCount() {
@@ -30,6 +45,9 @@ namespace xenomods {
 	};
 	std::string MenuItemInfo2() {
 		return std::string(itemHelp.buffer, itemHelp.m_nLen);
+	};
+	std::string MenuItemInfo3() {
+		return itemInventory;
 	};
 
 	void MenuGiveItem() {
@@ -45,12 +63,13 @@ namespace xenomods {
 
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
-			auto section = modules->RegisterSection(STRINGIFY(ResourceManager), "Resource Manager");
-			section->RegisterOption<unsigned short>(ItemId, "ID", &MenuRefreshItemStrings);
+			/*auto section = modules->RegisterSection(STRINGIFY(ResourceManager), "Resource Manager");
+			section->RegisterOption<unsigned short>(ItemId, "ID", &MenuChangeItemId);
 			section->RegisterOption<unsigned short>(ItemCount, "Count", &MenuChangeItemCount);
 			section->RegisterOption<void>("Give Item", &MenuGiveItem);
 			section->RegisterTextual("Item: ", {}, &MenuItemInfo1);
 			section->RegisterTextual("", {}, &MenuItemInfo2);
+			section->RegisterTextual("", {}, &MenuItemInfo3);*/
 		}
 	}
 

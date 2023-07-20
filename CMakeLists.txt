@@ -20,7 +20,9 @@ if(" ${XENOMODS_CODENAME}" STREQUAL " ")
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/cmake)
 include(MakeNso)
+include(FpicExternal)
 
 # Generate switch.specs for this build
 set(SKYLAUNCH_LINKERSCRIPTS_DIR "${PROJECT_SOURCE_DIR}/linkerscripts")
@@ -42,6 +44,13 @@ set_source_files_properties(${PROJECT_BINARY_DIR}/${VERSION_FILENAME} PROPERTIES
 add_subdirectory(vendor/glm)
 add_subdirectory(vendor/fmt)
 add_subdirectory(vendor/tomlpp)
+
+set(IMGUI_XENO_EXTERNAL_TOOLCHAIN TRUE)
+add_subdirectory(vendor/imgui-xeno)
+
+#include_directories("vendor/imgui-xeno/include")
+#include_directories("vendor/imgui-xeno/src")
+#include_directories("vendor/imgui-xeno/extern/imgui")
 
 add_subdirectory(src)
 

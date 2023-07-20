@@ -1,6 +1,8 @@
 #pragma once
 
 #include <type_traits>
+#include <imgui.h>
+#include <imgui_xeno.h>
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>

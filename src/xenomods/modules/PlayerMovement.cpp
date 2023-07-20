@@ -520,7 +520,7 @@ namespace xenomods {
 #endif
 
 #if !XENOMODS_CODENAME(bf3) // need to find these for 3
-		auto modules = g_Menu->FindSection("modules");
+		/*auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(PlayerMovement), "Player Movement");
 			section->RegisterOption<bool>(disableFallDamage, "Disable fall damage");
@@ -543,7 +543,7 @@ namespace xenomods {
 			state->RegisterTextual("Current pos: ", {}, &MenuCurrentPlayerPosition);
 			state->RegisterTextual("Current rot: ", {}, &MenuCurrentPlayerRotation);
 			state->RegisterTextual("Current vel: ", {}, &MenuCurrentPlayerVelocity);
-		}
+		}*/
 #endif
 	}
 

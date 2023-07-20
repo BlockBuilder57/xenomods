@@ -15,13 +15,12 @@ add_executable(xenomods
 
 		xenomods/menu/Menu.cpp
 		xenomods/menu/Section.cpp
-		xenomods/menu/Option.cpp
 
-		xenomods/modules/DebugStuff.cpp
+        xenomods/modules/DebugStuff.cpp
 		xenomods/modules/CameraTools.cpp
 		xenomods/modules/RenderingControls.cpp
 		xenomods/modules/BattleCheats.cpp
-		xenomods/modules/PartyEditor.cpp
+		#xenomods/modules/PartyEditor.cpp
 		xenomods/modules/PlayerMovement.cpp
 		xenomods/modules/FrameratePatch.cpp
 		xenomods/modules/FileDetours.cpp
@@ -98,16 +97,29 @@ set_target_properties(xenomods PROPERTIES
 		LINK_FLAGS "-fPIC -specs=${PROJECT_BINARY_DIR}/switch.specs -Wl,-Map,xenomods.map -Wl,--version-script=${PROJECT_SOURCE_DIR}/linkerscripts/exported.txt -nodefaultlibs -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -L ${DEVKITPRO}/portlibs/switch/lib -L ${DEVKITPRO}/libnx/lib"
 )
 
+xenomods_external_fpic(imgui_xeno)
+xenomods_external_fpic(fmt)
+
 target_include_directories(xenomods PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(xenomods PUBLIC ${PROJECT_BINARY_DIR}/)
+
+target_include_directories(xenomods PRIVATE
+		${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/include
+		${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/extern/imgui
+		# :v
+		#${PROJECT_SOURCE_DIR}/include/skylaunch
+		#${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/src_framework
+		#${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/src
+		)
 
 # not entirely sure what this is about, but
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_FLOAT_CHARCONV=1 -DTOML_ENABLE_FLOAT16=0")
 
 target_link_libraries(xenomods PUBLIC
 		tomlplusplus::tomlplusplus
-		fmt::fmt-header-only
+		fmt::fmt
 		glm::glm
+		imgui_xeno
 		)
 
 target_compile_definitions(xenomods PUBLIC

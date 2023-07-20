@@ -76,9 +76,9 @@ namespace xenomods {
 
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
-			auto section = modules->RegisterSection(STRINGIFY(BattleCheats), "Battle Cheats");
+			/*auto section = modules->RegisterSection(STRINGIFY(BattleCheats), "Battle Cheats");
 			section->RegisterOption<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
-			section->RegisterOption<float>(GetState().config.damageEnemyMult, "Enemy damage multiplier");
+			section->RegisterOption<float>(GetState().config.damageEnemyMult, "Enemy damage multiplier");*/
 		}
 	}
 

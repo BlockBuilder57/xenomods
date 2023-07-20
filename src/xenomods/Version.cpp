@@ -14,6 +14,13 @@ namespace xenomods::version {
 		return __DATE__ " " __TIME__;
 	}
 
+	char XenomodsVersionBuf[128];
+	const char* BuildXenomodsVersion() {
+		if (XenomodsVersionBuf[0] == 0)
+			sprintf(&XenomodsVersionBuf[0], "xenomods %s%s [%s]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
+		return &XenomodsVersionBuf[0];
+	}
+
 	unsigned long RuntimeProgramID() {
 		static unsigned long progid = 0;
 

@@ -245,6 +245,32 @@ namespace xenomods {
 #endif
 	}
 
+	void MenuSection() {
+		if(ImGui::MenuItem("Enable debug rendering", "", &DebugStuff::enableDebugRendering))
+			DebugStuff::UpdateDebugRendering();
+
+#if XENOMODS_CODENAME(bfsw)
+		ImGui::MenuItem("Debug unlock all", "", &DebugStuff::enableDebugUnlockAll);
+#endif
+#if !XENOMODS_CODENAME(bf3)
+	#if XENOMODS_OLD_ENGINE
+		ImGui::MenuItem("Access closed landmarks", "", &DebugStuff::accessClosedLandmarks);
+	#endif
+		ImGui::PushItemWidth(150.f);
+		ImGui::InputInt("Temp Int", &DebugStuff::tempInt);
+		ImGui::PopItemWidth();
+		if (ImGui::Button("Jump to Landmark"))
+			DebugStuff::DoMapJump(DebugStuff::tempInt);
+	#if XENOMODS_OLD_ENGINE
+		ImGui::SameLine();
+		if (ImGui::Button("Play common sound effect"))
+			DebugStuff::PlaySE(DebugStuff::tempInt);
+	#endif
+		if (ImGui::Button("Return to Title"))
+			DebugStuff::ReturnTitle();
+#endif
+	}
+
 	void DebugStuff::Initialize() {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up debug stuff...");
@@ -269,22 +295,7 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(DebugStuff), "Debug Stuff");
-
-			section->RegisterOption<bool>(enableDebugRendering, "Enable debug rendering", &DebugStuff::UpdateDebugRendering);
-#if XENOMODS_CODENAME(bfsw)
-			section->RegisterOption<bool>(enableDebugUnlockAll, "Debug unlock all");
-#endif
-#if !XENOMODS_CODENAME(bf3)
-	#if XENOMODS_OLD_ENGINE
-			section->RegisterOption<bool>(accessClosedLandmarks, "Access closed landmarks");
-	#endif
-			section->RegisterOption<int>(tempInt, "Temp Int");
-			section->RegisterOption<void>("Jump to Landmark", &MenuDoMapJump);
-	#if XENOMODS_OLD_ENGINE
-			section->RegisterOption<void>("Play common sound effect", &MenuPlaySE);
-	#endif
-			section->RegisterOption<void>("Return to Title", &MenuReturnTitle);
-#endif
+			section->RegisterCallback(&MenuSection);
 		}
 
 		UpdateDebugRendering();

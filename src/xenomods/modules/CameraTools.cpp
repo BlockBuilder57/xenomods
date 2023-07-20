@@ -283,7 +283,7 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(CameraTools), "Camera Tools");
-			section->RegisterOption<bool>(Freecam.isOn, "Freecam");
+			/*section->RegisterOption<bool>(Freecam.isOn, "Freecam");
 			section->RegisterOption<float>(Freecam.camSpeed, "Freecam speed (m/s)");
 			section->RegisterOption<float>(Meta.pos.x, "Camera pos X", &OnMenuMetaChange);
 			section->RegisterOption<float>(Meta.pos.y, "Camera pos Y", &OnMenuMetaChange);
@@ -294,7 +294,7 @@ namespace xenomods {
 			section->RegisterOption<float>(Meta.fov, "Camera FOV", &OnMenuMetaChange);
 #if !XENOMODS_CODENAME(bf3)
 			section->RegisterOption<void>("Teleport party lead to camera", &TeleportPlayerToCamera);
-#endif
+#endif*/
 		}
 	}
 

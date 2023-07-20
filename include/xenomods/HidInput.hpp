@@ -30,6 +30,7 @@ namespace xenomods {
 
 		static HidInput* GetPlayer(int player);
 
+		static int GetDebugInputNum();
 		/*
 		 * Gets the controller used for the debug input (like the Menu)
 		 * Uses the last numbered controller if it is connected, otherwise P1.

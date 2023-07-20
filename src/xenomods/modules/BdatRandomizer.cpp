@@ -52,7 +52,7 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if(modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(BdatRandomizer), "BDAT Randomizer");
-			section->RegisterOption<BdatMSScrambleType>(msScrambleType, "Scramble type");
+			//section->RegisterOption<BdatMSScrambleType>(msScrambleType, "Scramble type");
 		}
 #endif
 	}

@@ -155,7 +155,7 @@ namespace xenomods {
 
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
-			auto section = modules->RegisterSection(STRINGIFY(RenderingControls), "Rendering Controls");
+			/*auto section = modules->RegisterSection(STRINGIFY(RenderingControls), "Rendering Controls");
 
 #if XENOMODS_OLD_ENGINE
 			section->RegisterOption<bool>(straightenFont, "Straighten font");
@@ -179,7 +179,7 @@ namespace xenomods {
 			toggles->RegisterOption<void>("Toggle color filter", &MenuToggleColorFilter);
 			//toggles->RegisterOption<void>("Toggle AA", &MenuToggleAntiAliasing);
 			//toggles->RegisterOption<void>("Toggle SSAO", &MenuToggleScreenspaceAmbientOcclusion);
-#endif
+#endif*/
 		}
 	}
 
@@ -189,7 +189,7 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 		static bool hasRun;
 		if (!hasRun) {
-			auto section = g_Menu->FindSection(STRINGIFY(RenderingControls));
+			/*auto section = g_Menu->FindSection(STRINGIFY(RenderingControls));
 			auto acc = ml::ScnRenderDrSysParmAcc();
 			if (section != nullptr && acc.PixlPostParm != nullptr) {
 				auto gbuffer = section->RegisterSection(std::string(STRINGIFY(RenderingControls)) + "gbuffer", "GBuffer debug...");
@@ -211,7 +211,7 @@ namespace xenomods {
 				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[7][0], "Specular? add");
 				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[7][1], "Specular? mult");
 				gbuffer->RegisterOption<void>("Reset parameters", &MenuSetGBufferDebugReset);
-			}
+			}*/
 			hasRun = true;
 		}
 

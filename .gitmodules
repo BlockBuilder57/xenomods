@@ -9,3 +9,6 @@
 	path = vendor/tomlpp
 	url = https://github.com/marzer/tomlplusplus.git
 	shallow = true
+[submodule "vendor/imgui-xeno"]
+	path = vendor/imgui-xeno
+	url = https://github.com/BlockBuilder57/imgui-xeno

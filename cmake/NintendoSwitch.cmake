@@ -12,7 +12,7 @@ set(CMAKE_EXECUTABLE_SUFFIX_CXX "${CMAKE_EXECUTABLE_SUFFIX}")
 
 # allow CMake projects to detect NX compilation
 set(NX TRUE)
-
+set(SWITCH TRUE)
 
 macro(msys_to_cmake MsysPath ResultingPath)
 	if("$ENV{MSYSTEM}" STREQUAL "MSYS")

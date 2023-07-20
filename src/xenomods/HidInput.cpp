@@ -56,8 +56,11 @@ namespace xenomods {
 		return &controllers[std::clamp(player, 1, CONTROLLER_COUNT) - 1];
 	}
 
+	int HidInput::GetDebugInputNum() {
+		return ClampNumberOfControllers::HasApplied() ? ClampNumberOfControllers::Orig() : 1;
+	}
 	HidInput* HidInput::GetDebugInput() {
-		return ClampNumberOfControllers::HasApplied() ? GetPlayer(ClampNumberOfControllers::Orig()) : GetPlayer(1);
+		return GetPlayer(GetDebugInputNum());
 	}
 
 } // namespace xenomods
