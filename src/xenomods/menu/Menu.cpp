@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 #include <imgui_xeno.h>
+#include <imgui_internal.h>
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
@@ -79,7 +80,9 @@ namespace xenomods {
 					continue;
 
 				if(ImGui::BeginMenu(sec->GetName().c_str())) {
+					ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
 					sec->Render();
+					ImGui::PopItemFlag();
 					ImGui::EndMenu();
 				}
 			}

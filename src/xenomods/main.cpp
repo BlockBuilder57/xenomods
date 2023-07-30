@@ -65,14 +65,12 @@ namespace xenomods {
 		// Update modules
 		xenomods::UpdateAllRegisteredModules(updateInfo);
 
-		// render the menu if open, otherwise draw logger messages
+		// render the menu if open
 		if(g_Menu->IsOpen())
 			g_Menu->Update(menuInput);
-		else
-			g_Logger->DrawMessages(updateInfo);
 
-		// always draw toasts
-		g_Logger->DrawToasts(updateInfo);
+		// draw logger messages and toasts
+		g_Logger->Draw(updateInfo);
 	}
 
 	void main() {

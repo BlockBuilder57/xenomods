@@ -1,9 +1,11 @@
 #include "xenomods/Logger.hpp"
 
 #include <nn/diag.h>
+#include <imgui.h>
 
 #include "skylaunch/logger/Logger.hpp"
 #include "xenomods/DebugWrappers.hpp"
+#include "xenomods/menu/Menu.hpp"
 
 namespace xenomods {
 
@@ -77,6 +79,11 @@ namespace xenomods {
 	}
 
 	void Logger::DrawMessages(fw::UpdateInfo* updateInfo) {
+		auto barHeight = 0;
+
+		if (g_Menu->IsOpen())
+			barHeight += ImGui::GetFrameHeight();
+
 		for(std::size_t i = 0; i < lines.size(); ++i) {
 			auto& msg = lines[i];
 
@@ -84,7 +91,7 @@ namespace xenomods {
 
 			// check lifetime greater than 0, but also decrement it for next time
 			if(msg.lifetime > 0)
-				DrawInternal(msg, 5, 5 + (i * 16));
+				DrawInternal(msg, 5, barHeight + 5 + (i * 16));
 			else if(!lines.empty())
 				// erase the current index but decrement i so we try again with the next one
 				lines.erase(lines.begin() + i--);
@@ -93,6 +100,11 @@ namespace xenomods {
 
 	void Logger::DrawToasts(fw::UpdateInfo* updateInfo) {
 		auto validToasts = 0;
+		auto barHeight = 0;
+
+		if (g_Menu->IsOpen())
+			barHeight += ImGui::GetFrameHeight();
+
 		for(std::size_t i = 0; i < toastLines.size(); ++i) {
 			auto& msg = toastLines[i];
 
@@ -102,7 +114,7 @@ namespace xenomods {
 			if(msg.lifetime > 0) {
 				// we're right-aligned, we need the width
 				int width = xenomods::debug::drawFontFmtGetWidth("{}", msg.text);
-				DrawInternal(msg, 1280 - width - 5, 5 + (validToasts * 16), false);
+				DrawInternal(msg, 1280 - width - 5, barHeight + 5 + (validToasts * 16), false);
 				validToasts++;
 			} else if(!lines.empty())
 				// erase the current index but decrement i so we try again with the next one

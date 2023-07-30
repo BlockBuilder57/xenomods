@@ -17,15 +17,15 @@ namespace xenomods {
 	}
 
 	void Section::Render() {
-		for(auto func : callbacks) {
-			func();
-		}
-
 		for(auto sub : subsections) {
 			if(ImGui::BeginMenu(sub->GetName().c_str())) {
 				sub->Render();
 				ImGui::EndMenu();
 			}
+		}
+
+		for(auto func : callbacks) {
+			func();
 		}
 	}
 
