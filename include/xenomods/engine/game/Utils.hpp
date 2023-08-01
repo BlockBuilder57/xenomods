@@ -141,5 +141,10 @@ namespace game {
 		static void warpPcParty(const WarpPcPartyParams& params);
 	};
 
+	class CameraUtil {
+	   public:
+		static bool calcScreenPos(mm::Vec3& point, const fw::Document& doc, const mm::Vec3& pos);
+	};
+
 }
 #endif

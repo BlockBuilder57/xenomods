@@ -7,6 +7,7 @@
 #include <skylaunch/hookng/Hooks.hpp>
 
 #include "xenomods/engine/fw/Debug.hpp"
+#include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/engine/gf/Util.hpp"
 #include "xenomods/engine/ml/DebugDrawing.hpp"
 
@@ -104,8 +105,15 @@ namespace xenomods::debug {
 	inline void drawFontFmt3D(const mm::Vec3 pos, const mm::Col4& color, const FormatString& format, Args&&... args) {
 		std::string formatted = fmt::vformat(format, fmt::make_format_args(args...));
 		glm::vec3 screenPoint {};
+#if XENOMODS_OLD_ENGINE
 		gf::util::getScreenPos(reinterpret_cast<mm::Vec3&>(screenPoint), pos);
 		if (screenPoint.z > 0)
+#elif XENOMODS_CODENAME(bfsw)
+		if (xenomods::DocumentPtr == nullptr)
+			return;
+
+		if (game::CameraUtil::calcScreenPos(reinterpret_cast<mm::Vec3&>(screenPoint), *xenomods::DocumentPtr, pos))
+#endif
 			drawFont(screenPoint.x, screenPoint.y, color, "%s", formatted.c_str());
 	}
 
@@ -113,7 +121,15 @@ namespace xenomods::debug {
 	inline void drawFontFmtShadow3D(const mm::Vec3 pos, const mm::Col4& color, const FormatString& format, Args&&... args) {
 		std::string formatted = fmt::vformat(format, fmt::make_format_args(args...));
 		glm::vec3 screenPoint {};
+#if XENOMODS_OLD_ENGINE
 		gf::util::getScreenPos(reinterpret_cast<mm::Vec3&>(screenPoint), pos);
+		if (screenPoint.z > 0)
+#elif XENOMODS_CODENAME(bfsw)
+		if (xenomods::DocumentPtr == nullptr)
+			return;
+
+		if (game::CameraUtil::calcScreenPos(reinterpret_cast<mm::Vec3&>(screenPoint), *xenomods::DocumentPtr, pos))
+#endif
 		if (screenPoint.z > 0)
 			drawFontShadow(screenPoint.x, screenPoint.y, color, "%s", formatted.c_str());
 	}

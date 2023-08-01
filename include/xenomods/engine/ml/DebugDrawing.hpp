@@ -31,6 +31,8 @@ namespace ml {
 
 		static CacheDraw* getCacheDraw();
 
+		bool getScreenPos(mm::Vec3& point, const mm::Vec3& pos);
+
 		static void flushPrio(int param_1, const mm::Mat44& param_2, const mm::Mat44& param_3);
 
 	};
