@@ -236,28 +236,51 @@ namespace xenomods {
 		CameraTools::UpdateMeta();
 	}
 
-	void OnMenuMetaChange() {
-		glm::quat newRot = glm::quat(glm::radians(CameraTools::Meta.euler));
-		float angle = glm::angle(newRot);
-		glm::vec3 axis = glm::axis(newRot);
-
-		glm::mat4 newmat = glm::mat4(1.f);
-		newmat = glm::translate(newmat, CameraTools::Meta.pos);
-		newmat = glm::rotate(newmat, angle, axis);
-
-		CameraTools::Freecam.matrix = newmat;
-
-		// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
-		CameraTools::Freecam.fov = std::clamp(CameraTools::Meta.fov, -179.f, 179.f);
-		if (CameraTools::Freecam.fov == 0)
-			CameraTools::Freecam.fov = 0.001f;
-
-		CameraTools::Freecam.isOn = true;
-	}
-
 	void TeleportPlayerToCamera() {
 		if (xenomods::detail::IsModuleRegistered(STRINGIFY(PlayerMovement)))
 			PlayerMovement::SetPartyPosition(CameraTools::Meta.pos);
+	}
+
+	void CameraTools::MenuSection() {
+		ImGui::Checkbox("Freecam", &Freecam.isOn);
+
+		ImGui::PushItemWidth(250.f);
+		ImGui::InputFloat("Freecam speed", &Freecam.camSpeed, 1, 4, "%.3f m/s");
+
+		bool shouldUpdate = false;
+		ImGui::InputFloat3("Camera pos", reinterpret_cast<float*>(&Meta.pos));
+		shouldUpdate = shouldUpdate || ImGui::IsItemDeactivatedAfterEdit();
+		ImGui::InputFloat3("Camera rot", reinterpret_cast<float*>(&Meta.euler));
+		shouldUpdate = shouldUpdate || ImGui::IsItemDeactivatedAfterEdit();
+		ImGui::InputFloat("Camera FOV", &Meta.fov);
+		shouldUpdate = shouldUpdate || ImGui::IsItemDeactivatedAfterEdit();
+
+		ImGui::PopItemWidth();
+
+		if (shouldUpdate)
+		{
+			glm::quat newRot = glm::quat(glm::radians(CameraTools::Meta.euler));
+			float angle = glm::angle(newRot);
+			glm::vec3 axis = glm::axis(newRot);
+
+			glm::mat4 newmat = glm::mat4(1.f);
+			newmat = glm::translate(newmat, CameraTools::Meta.pos);
+			newmat = glm::rotate(newmat, angle, axis);
+
+			CameraTools::Freecam.matrix = newmat;
+
+			// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
+			CameraTools::Freecam.fov = std::clamp(CameraTools::Meta.fov, -179.f, 179.f);
+			if (CameraTools::Freecam.fov == 0)
+				CameraTools::Freecam.fov = 0.001f;
+
+			CameraTools::Freecam.isOn = true;
+		}
+
+#if !XENOMODS_CODENAME(bf3)
+		if (ImGui::Button("Teleport party lead to camera"))
+			TeleportPlayerToCamera();
+#endif
 	}
 
 	void CameraTools::Initialize() {
@@ -283,6 +306,7 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(CameraTools), "Camera Tools");
+			section->RegisterRenderCallback(&MenuSection);
 			/*section->RegisterOption<bool>(Freecam.isOn, "Freecam");
 			section->RegisterOption<float>(Freecam.camSpeed, "Freecam speed (m/s)");
 			section->RegisterOption<float>(Meta.pos.x, "Camera pos X", &OnMenuMetaChange);

@@ -202,18 +202,10 @@ namespace xenomods {
 #endif
 	}
 
-	void MenuDoMapJump() {
-		DebugStuff::DoMapJump(DebugStuff::tempInt);
-	}
-
 	void DebugStuff::PlaySE(unsigned int soundEffect) {
 #if XENOMODS_OLD_ENGINE
 		gf::GfMenuObjUtil::playSE(soundEffect);
 #endif
-	}
-
-	void MenuPlaySE() {
-		DebugStuff::PlaySE(DebugStuff::tempInt);
 	}
 
 	void DebugStuff::ReturnTitle(unsigned int slot) {
@@ -229,10 +221,6 @@ namespace xenomods {
 #endif
 	}
 
-	void MenuReturnTitle() {
-		DebugStuff::ReturnTitle(-1);
-	}
-
 	void DebugStuff::UpdateDebugRendering() {
 #if XENOMODS_OLD_ENGINE
 		fw::PadManager::enableDebugDraw(enableDebugRendering);
@@ -245,16 +233,16 @@ namespace xenomods {
 #endif
 	}
 
-	void MenuSection() {
-		if(ImGui::MenuItem("Enable debug rendering", "", &DebugStuff::enableDebugRendering))
+	void DebugStuff::MenuSection() {
+		if(ImGui::Checkbox("Enable debug rendering", &DebugStuff::enableDebugRendering))
 			DebugStuff::UpdateDebugRendering();
 
 #if XENOMODS_CODENAME(bfsw)
-		ImGui::MenuItem("Debug unlock all", "", &DebugStuff::enableDebugUnlockAll);
+		ImGui::Checkbox("Debug unlock all", &DebugStuff::enableDebugUnlockAll);
 #endif
 #if !XENOMODS_CODENAME(bf3)
 	#if XENOMODS_OLD_ENGINE
-		ImGui::MenuItem("Access closed landmarks", "", &DebugStuff::accessClosedLandmarks);
+		ImGui::Checkbox("Access closed landmarks", &DebugStuff::accessClosedLandmarks);
 	#endif
 		ImGui::PushItemWidth(150.f);
 		ImGui::InputInt("Temp Int", &DebugStuff::tempInt);
@@ -295,7 +283,7 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(DebugStuff), "Debug Stuff");
-			section->RegisterCallback(&MenuSection);
+			section->RegisterRenderCallback(&MenuSection);
 		}
 
 		UpdateDebugRendering();

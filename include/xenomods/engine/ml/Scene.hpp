@@ -194,6 +194,14 @@ namespace ml {
 		void setGBuffDebugParam(GBuffDebugType, float, float);
 	};
 
+	class DebDraw;
+	class WinView;
+
+	class ScnUtil {
+	   public:
+		static void setPerspective(const Scn* scene, ml::DebDraw* debDraw, const ml::WinView* winView);
+	};
+
 } // namespace ml
 
 template<>

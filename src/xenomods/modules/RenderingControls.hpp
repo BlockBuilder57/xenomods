@@ -24,6 +24,10 @@ namespace xenomods {
 		};
 		static ForcedRenderParameters ForcedParameters;
 
+		static void MenuSection();
+		static void MenuToggles();
+		static void MenuGBuffer();
+
 		void Initialize() override;
 		void Update(fw::UpdateInfo* updateInfo) override;
 		bool NeedsUpdate() const override {

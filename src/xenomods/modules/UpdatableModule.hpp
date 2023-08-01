@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <imgui.h>
 #include <imgui_xeno.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>

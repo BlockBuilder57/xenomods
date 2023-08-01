@@ -35,6 +35,14 @@ namespace ml {
 
 		static void flushPrio(int param_1, const mm::Mat44& param_2, const mm::Mat44& param_3);
 
+		void setZComp(bool);
+		void setZWrite(bool);
+
+		void setCol(const mm::Col4& color);
+		void setMatrix(const mm::Mat44& matrix);
+
+		void renderGrid(float count, float spacing);
+
 	};
 
 	class FontLayer {

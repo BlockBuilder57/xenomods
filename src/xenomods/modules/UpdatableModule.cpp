@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include <misc/cpp/imgui_stdlib.cpp>
+
 namespace xenomods {
 
 	constexpr auto MAX_MODULES = 16;

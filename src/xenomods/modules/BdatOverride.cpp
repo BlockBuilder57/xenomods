@@ -103,7 +103,7 @@ namespace {
 
 			auto sheetName = Bdat::getSheetName(pBdat);
 			auto memberName = reinterpret_cast<char*>(pBdat + *reinterpret_cast<short*>(pVarName + 4));
-			xenomods::g_Logger->LogInfo("[Check] {}/{}:{}", sheetName, memberName, idx);
+			//xenomods::g_Logger->LogInfo("[Check] {}/{}:{}", sheetName, memberName, idx);
 
 			//xenomods::BdatOverride::HotPath[sheetName]++;
 

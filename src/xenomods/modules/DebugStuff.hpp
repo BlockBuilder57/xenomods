@@ -23,6 +23,8 @@ namespace xenomods {
 
 		static void UpdateDebugRendering();
 
+		static void MenuSection();
+
 		void Initialize() override;
 		bool NeedsUpdate() const override {
 			return true;

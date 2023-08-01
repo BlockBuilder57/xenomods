@@ -58,10 +58,10 @@ namespace xenomods {
 		auto modules = RegisterSection("modules", "Modules");
 
 		auto state = RegisterSection("state", "State");
-		state->RegisterCallback(&Section_State);
+		state->RegisterRenderCallback(&Section_State);
 
 		auto about = RegisterSection("about", "About");
-		about->RegisterCallback(&Section_About);
+		about->RegisterRenderCallback(&Section_About);
 	}
 
 	void Menu::Update(HidInput* input) {
@@ -93,6 +93,10 @@ namespace xenomods {
 		}
 		if(show_demo) {
 			ImGui::ShowDemoWindow();
+		}
+
+		for(auto func : g_Menu->callbacks) {
+			func();
 		}
 	}
 
@@ -130,6 +134,11 @@ namespace xenomods {
 		auto sec = new Section(key, display);
 		sections.push_back(sec);
 		return sec;
+	}
+
+	void Menu::RegisterRenderCallback(void (*func)()) {
+		if (func != nullptr)
+			callbacks.push_back(func);
 	}
 
 	// The menu instance.

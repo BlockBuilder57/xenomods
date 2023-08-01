@@ -12,6 +12,8 @@ namespace xenomods {
 		static unsigned short ItemId;
 		static unsigned short ItemCount;
 
+		static void MenuSection();
+
 		void Initialize() override;
 		bool NeedsUpdate() const override {
 			return false;

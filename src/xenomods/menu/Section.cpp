@@ -36,7 +36,7 @@ namespace xenomods {
 		return sec;
 	}
 
-	void Section::RegisterCallback(void (*func)()) {
+	void Section::RegisterRenderCallback(void (*func)()) {
 		if (func != nullptr)
 			callbacks.push_back(func);
 	}

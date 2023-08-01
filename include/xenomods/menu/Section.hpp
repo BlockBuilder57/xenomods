@@ -41,7 +41,7 @@ namespace xenomods {
 		void Render();
 
 		Section* RegisterSection(const std::string& key, const std::string& display);
-		void RegisterCallback(void(*func)());
+		void RegisterRenderCallback(void(*func)());
 	};
 
 } // namespace xenomods

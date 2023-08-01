@@ -13,48 +13,52 @@ namespace xenomods {
 
 	mm::mtl::FixStr<256> itemName {};
 	mm::mtl::FixStr<256> itemHelp {};
-	std::string itemInventory = "";
+	mm::mtl::FixStr<256> itemInventory {};
 
-	void MenuChangeItemId() {
+	void ResourceManager::MenuSection() {
+		// everything here needs the document
 		if (xenomods::DocumentPtr == nullptr)
 			return;
 
-		game::DataUtil::getItemName(*xenomods::DocumentPtr, ResourceManager::ItemId, itemName);
-		game::DataUtil::getItemHelp(*xenomods::DocumentPtr, ResourceManager::ItemId, itemHelp, 0);
+		const unsigned short u16_one = 1;
+		const unsigned short u16_hundred = 100;
 
-		game::DataItem* dataItem = game::DataUtil::getDataItem(*xenomods::DocumentPtr);
-		if (dataItem == nullptr)
-			return;
+		ImGui::PushItemWidth(100.f);
 
-		game::DataItem::DataCommon* item = dataItem->getItem(ResourceManager::ItemId);
-		if (item == nullptr)
-			return;
+		ImGui::InputScalar("ID", ImGuiDataType_U16, &ItemId, &u16_one, &u16_hundred, "%u");
+		if (ImGui::IsItemDeactivatedAfterEdit())
+		{
+			game::DataUtil::getItemName(*xenomods::DocumentPtr, ResourceManager::ItemId, itemName);
+			game::DataUtil::getItemHelp(*xenomods::DocumentPtr, ResourceManager::ItemId, itemHelp, 0);
 
-		if (item->isInInventory)
-			itemInventory = fmt::format("Num in inventory: {}", item->stackCount);
-		else
-			itemInventory = "Not in inventory";
-	}
+			game::DataItem* dataItem = game::DataUtil::getDataItem(*xenomods::DocumentPtr);
+			if (dataItem != nullptr)
+			{
+				game::DataItem::DataCommon* item = dataItem->getItem(ResourceManager::ItemId);
+				if (item != nullptr)
+				{
+					if (item->isInInventory)
+						itemInventory.set(fmt::format("Num in inventory: {}", item->stackCount));
+					else
+						itemInventory.set("Not in inventory");
+				}
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::InputScalar("Count", ImGuiDataType_U16, &ItemCount, &u16_one, nullptr, "%u"))
+			ItemCount = std::clamp((int)ItemCount, 1, 99);
 
-	void MenuChangeItemCount() {
-		ResourceManager::ItemCount = std::clamp((int)ResourceManager::ItemCount, 1, 99);
-	}
+		ImGui::PopItemWidth();
 
-	std::string MenuItemInfo1() {
-		return std::string(itemName.buffer, itemName.m_nLen);
-	};
-	std::string MenuItemInfo2() {
-		return std::string(itemHelp.buffer, itemHelp.m_nLen);
-	};
-	std::string MenuItemInfo3() {
-		return itemInventory;
-	};
+		if (itemName.buffer[0] != '\0')
+			ImGui::Text("%s", itemName.buffer);
+		if (itemHelp.buffer[0] != '\0')
+			ImGui::Text("%s", itemHelp.buffer);
+		if (itemInventory.buffer[0] != '\0')
+			ImGui::Text("%s", itemInventory.buffer);
 
-	void MenuGiveItem() {
-		if (xenomods::DocumentPtr == nullptr)
-			return;
-
-		game::DataUtil::addItem(*xenomods::DocumentPtr, ResourceManager::ItemId, 1, true, true, false);
+		if (ImGui::Button("Give Item"))
+			game::DataUtil::addItem(*xenomods::DocumentPtr, ItemId, ItemCount, true, true, false);
 	}
 
 	void ResourceManager::Initialize() {
@@ -63,13 +67,8 @@ namespace xenomods {
 
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
-			/*auto section = modules->RegisterSection(STRINGIFY(ResourceManager), "Resource Manager");
-			section->RegisterOption<unsigned short>(ItemId, "ID", &MenuChangeItemId);
-			section->RegisterOption<unsigned short>(ItemCount, "Count", &MenuChangeItemCount);
-			section->RegisterOption<void>("Give Item", &MenuGiveItem);
-			section->RegisterTextual("Item: ", {}, &MenuItemInfo1);
-			section->RegisterTextual("", {}, &MenuItemInfo2);
-			section->RegisterTextual("", {}, &MenuItemInfo3);*/
+			auto section = modules->RegisterSection(STRINGIFY(ResourceManager), "Resource Manager");
+			section->RegisterRenderCallback(&MenuSection);
 		}
 	}
 
