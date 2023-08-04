@@ -65,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          submodules: true
+          submodules: recursive
 
       # This cursed incantation is because the container is Debian Buster,
       # and buster-backports does not have a CMake version new enough
