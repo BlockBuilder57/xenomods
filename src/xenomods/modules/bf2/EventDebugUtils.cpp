@@ -150,14 +150,14 @@ namespace {
 namespace xenomods {
 
 	int EventDebugUtils::RegistrationIndex = 0;
-	unsigned long EventDebugUtils::ActiveBits = 0;
+	std::uint32_t EventDebugUtils::ActiveBits = 0;
 	std::vector<std::string> EventDebugUtils::FuncNames {};
 
 	bool EventDebugUtils::ShouldUpdate = false;
 
 	void EventDebugUtils::MenuSection() {
 		for (int i = 0; i < RegistrationIndex; i++) {
-			ImGui::CheckboxFlags(FuncNames[i].c_str(), reinterpret_cast<ImU64*>(&ActiveBits), 1 << i);
+			ImGui::CheckboxFlags(FuncNames[i].c_str(), &ActiveBits, 1 << i);
 		}
 	}
 

@@ -15,7 +15,9 @@ namespace xenomods {
 
 		static unsigned short GetMapId();
 		static std::string GetMapName(int id);
-		static std::string GetMapName() { return GetMapName(GetMapId()); }
+		static std::string GetMapName() {
+			return GetMapName(GetMapId());
+		}
 
 		static void DoMapJump(int mapjumpId);
 		static void PlaySE(unsigned int soundEffect);

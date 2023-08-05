@@ -42,7 +42,7 @@ namespace {
 				return;
 
 			const int height = xenomods::debug::drawFontGetHeight();
-			if (this_pointer->getTrackName() != nullptr) {
+			if(this_pointer->getTrackName() != nullptr) {
 				std::string trackName = this_pointer->getTrackName();
 
 				if(trackName == "EventBGM")
@@ -57,7 +57,7 @@ namespace {
 					}
 
 					xenomods::debug::drawFontFmtShadow(0, 720 - (xenomods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white,
-												 "{}: {} {:.1f}/{:.1f}{}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop() ? " (∞)" : "");
+													   "{}: {} {:.1f}/{:.1f}{}", trackName, bgmFileName.buffer, this_pointer->getPlayTime(), this_pointer->getTotalTime(), this_pointer->isLoop() ? " (∞)" : "");
 				} else {
 					// uncomment if you want every BgmTrack instance to show
 					//xenomods::debug::drawFontFmtShadow(0, 720 - (xenomods::DebugStuff::bgmTrackIndex++ * height) - height, mm::Col4::white, "{}: not playing", trackName);
@@ -114,7 +114,7 @@ namespace {
 		}
 	};
 #endif
-}
+} // namespace
 
 namespace xenomods {
 
@@ -155,29 +155,29 @@ namespace xenomods {
 		}
 
 		// display "ID n" if the name is blank
-		if (value == "")
+		if(value == "")
 			value = "ID " + std::to_string(id);
 
 		return value;
 	}
 
 	void DebugStuff::DoMapJump(int mapjumpId) {
-		if (mapjumpId == 0)
+		if(mapjumpId == 0)
 			return;
 
 #if !XENOMODS_CODENAME(bf3)
 		int end = 1;
 		unsigned char* pBdat =
-#if XENOMODS_OLD_ENGINE
+	#if XENOMODS_OLD_ENGINE
 		Bdat::getFP("SYS_MapJumpList");
-#elif XENOMODS_CODENAME(bfsw)
+	#elif XENOMODS_CODENAME(bfsw)
 		Bdat::getFP("landmarklist");
-#endif
-		if (pBdat != nullptr)
+	#endif
+		if(pBdat != nullptr)
 			end = Bdat::getIdEnd(pBdat);
 
 		// can input negative numbers to wrap to the end
-		if (mapjumpId < 0)
+		if(mapjumpId < 0)
 			mapjumpId = end - (std::abs(mapjumpId) - 1);
 
 		mapjumpId = std::clamp<unsigned>(mapjumpId, 1, end);
@@ -247,14 +247,14 @@ namespace xenomods {
 		ImGui::PushItemWidth(150.f);
 		ImGui::InputInt("Temp Int", &DebugStuff::tempInt);
 		ImGui::PopItemWidth();
-		if (ImGui::Button("Jump to Landmark"))
+		if(ImGui::Button("Jump to Landmark"))
 			DebugStuff::DoMapJump(DebugStuff::tempInt);
 	#if XENOMODS_OLD_ENGINE
 		ImGui::SameLine();
-		if (ImGui::Button("Play common sound effect"))
+		if(ImGui::Button("Play common sound effect"))
 			DebugStuff::PlaySE(DebugStuff::tempInt);
 	#endif
-		if (ImGui::Button("Return to Title"))
+		if(ImGui::Button("Return to Title"))
 			DebugStuff::ReturnTitle();
 #endif
 	}
@@ -281,7 +281,7 @@ namespace xenomods {
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
-		if (modules != nullptr) {
+		if(modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(DebugStuff), "Debug Stuff");
 			section->RegisterRenderCallback(&MenuSection);
 		}

@@ -28,46 +28,46 @@ namespace {
 #else
 		static void Hook(fw::CameraLayer* this_pointer, const fw::UpdateInfo& updateInfo) {
 #endif
-			if (reinterpret_cast<void*>(this_pointer->listCamera.head) != &this_pointer->listCamera) {
+			if(reinterpret_cast<void*>(this_pointer->listCamera.head) != &this_pointer->listCamera) {
 				size_t ptrOffset = 0x10; //offsetof(fw::Camera, next);
 				auto realHead = reinterpret_cast<fw::Camera*>(reinterpret_cast<u8*>(this_pointer->listCamera.head) - ptrOffset);
 				//xenomods::g_Logger->LogDebug("list @ {} - head == {}, count {}", reinterpret_cast<void*>(&this_pointer->listCamera), reinterpret_cast<void*>(this_pointer->listCamera.head), this_pointer->listCamera.count);
 
-				if (realHead == nullptr)
+				if(realHead == nullptr)
 					return;
 
-				while (true) {
+				while(true) {
 					//xenomods::g_Logger->LogDebug("so no head? {} -> {}", reinterpret_cast<void*>(realHead), reinterpret_cast<void*>(realHead->next));
 					//xenomods::g_Logger->LogDebug("say,  head? {} -> {}", reinterpret_cast<void*>(realHead), reinterpret_cast<void*>(realHead->prev));
 					//dbgutil::logMemory(realHead, sizeof(fw::Camera));
 
 					//if (realHead->getRTTI()->isKindOf(&fw::Camera::m_rtti)) {
-						if (xenomods::CameraTools::Freecam.isOn) {
-							realHead->matrix = glm::inverse(static_cast<const glm::mat4&>(xenomods::CameraTools::Freecam.matrix));;
-							realHead->fov = xenomods::CameraTools::Freecam.fov;
+					if(xenomods::CameraTools::Freecam.isOn) {
+						realHead->matrix = glm::inverse(static_cast<const glm::mat4&>(xenomods::CameraTools::Freecam.matrix));
+						realHead->fov = xenomods::CameraTools::Freecam.fov;
 
-							//fw::debug::drawCompareZ(false);
-							//fw::debug::drawCamera(glm::inverse(static_cast<const glm::mat4&>(realHead->matrix)), mm::Col4::cyan);
-							//fw::debug::drawCompareZ(true);
+						//fw::debug::drawCompareZ(false);
+						//fw::debug::drawCamera(glm::inverse(static_cast<const glm::mat4&>(realHead->matrix)), mm::Col4::cyan);
+						//fw::debug::drawCompareZ(true);
 
-							//std::string namey = std::string(realHead->getName());
-							//xenomods::g_Logger->ToastInfo("ball" + namey, "{} prio {} fov {:.2f}", namey, realHead->CAMERA_PRIO, realHead->fov);
+						//std::string namey = std::string(realHead->getName());
+						//xenomods::g_Logger->ToastInfo("ball" + namey, "{} prio {} fov {:.2f}", namey, realHead->CAMERA_PRIO, realHead->fov);
 
-							//xenomods::debug::drawFontFmtShadow3D(xenomods::CameraTools::Meta.pos, mm::Col4::white, "Camera: {} prio {}", namey, realHead->CAMERA_PRIO);
-						}
+						//xenomods::debug::drawFontFmtShadow3D(xenomods::CameraTools::Meta.pos, mm::Col4::white, "Camera: {} prio {}", namey, realHead->CAMERA_PRIO);
+					}
 					//}
 
-					if (realHead->prev == realHead->next)
+					if(realHead->prev == realHead->next)
 						break;
 
-					if (realHead->next == nullptr || reinterpret_cast<void*>(realHead->next) == &this_pointer->listCamera)
+					if(realHead->next == nullptr || reinterpret_cast<void*>(realHead->next) == &this_pointer->listCamera)
 						break;
 
 					realHead = reinterpret_cast<fw::Camera*>(reinterpret_cast<u8*>(realHead->next) - ptrOffset);
 				}
 			}
 
-			if (xenomods::CameraTools::Freecam.isOn) {
+			if(xenomods::CameraTools::Freecam.isOn) {
 				this_pointer->willLerp = true;
 				this_pointer->lerpProgress = 999.f;
 				this_pointer->matTarget = xenomods::CameraTools::Freecam.matrix;
@@ -80,34 +80,33 @@ namespace {
 			Orig(this_pointer, updateInfo);
 #endif
 
-			if (xenomods::CameraTools::Freecam.isOn && this_pointer->objCam != nullptr) {
+			if(xenomods::CameraTools::Freecam.isOn && this_pointer->objCam != nullptr) {
 				this_pointer->objCam->AttrTransformPtr->fov = xenomods::CameraTools::Freecam.fov;
 #if !XENOMODS_CODENAME(bf3)
 				this_pointer->objCam->updateFovNearFar();
 #endif
 			}
-		}
+		} // namespace
 	};
 
 	struct CopyCurrentCameraState : skylaunch::hook::Trampoline<CopyCurrentCameraState> {
-			static void Hook(ml::ScnObjCam* this_pointer) {
-				Orig(this_pointer);
+		static void Hook(ml::ScnObjCam* this_pointer) {
+			Orig(this_pointer);
 
 #if !XENOMODS_CODENAME(bf3)
-				if(this_pointer->ScnPtr != nullptr && this_pointer->AttrTransformPtr != nullptr && this_pointer == this_pointer->ScnPtr->getCam(-1)) {
+			if(this_pointer->ScnPtr != nullptr && this_pointer->AttrTransformPtr != nullptr && this_pointer == this_pointer->ScnPtr->getCam(-1)) {
 #else
-				if(this_pointer->AttrTransformPtr != nullptr) {
+			if(this_pointer->AttrTransformPtr != nullptr) {
 #endif
-					if(!xenomods::CameraTools::Freecam.isOn) {
-						// read state from current camera
-						xenomods::CameraTools::Freecam.matrix = this_pointer->AttrTransformPtr->viewMatInverse;
-						xenomods::CameraTools::Freecam.fov = this_pointer->AttrTransformPtr->fov;
-						xenomods::CameraTools::UpdateMeta();
-					}
+				if(!xenomods::CameraTools::Freecam.isOn) {
+					// read state from current camera
+					xenomods::CameraTools::Freecam.matrix = this_pointer->AttrTransformPtr->viewMatInverse;
+					xenomods::CameraTools::Freecam.fov = this_pointer->AttrTransformPtr->fov;
+					xenomods::CameraTools::UpdateMeta();
 				}
 			}
+		}
 	};
-
 }; // namespace
 
 namespace xenomods {
@@ -187,12 +186,12 @@ namespace xenomods {
 			// holding down the button, so modify fov
 			// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
 			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
-			if (fc->fov == 0)
+			if(fc->fov == 0)
 				fc->fov = 0.001f;
 		} else {
 			move = { lStick.x, 0, -lStick.y };
 			move = rot * move * deltaTime; // rotate movement to local space
-			move *= fc->camSpeed;			   // multiply by cam speed
+			move *= fc->camSpeed;		   // multiply by cam speed
 		}
 
 		// rotation
@@ -237,7 +236,7 @@ namespace xenomods {
 	}
 
 	void TeleportPlayerToCamera() {
-		if (xenomods::detail::IsModuleRegistered(STRINGIFY(PlayerMovement)))
+		if(xenomods::detail::IsModuleRegistered(STRINGIFY(PlayerMovement)))
 			PlayerMovement::SetPartyPosition(CameraTools::Meta.pos);
 	}
 
@@ -250,17 +249,16 @@ namespace xenomods {
 		bool shouldUpdate = false;
 
 		// icky short-circuit prevention...
-		if (ImGui::DragFloat3("Camera pos", reinterpret_cast<float*>(&Meta.pos)))
+		if(ImGui::DragFloat3("Camera pos", reinterpret_cast<float*>(&Meta.pos)))
 			shouldUpdate = true;
-		if (ImGui::DragFloat3("Camera rot", reinterpret_cast<float*>(&Meta.euler)))
+		if(ImGui::DragFloat3("Camera rot", reinterpret_cast<float*>(&Meta.euler)))
 			shouldUpdate = true;
-		if (ImGui::DragFloat("Camera FOV", &Freecam.fov, 1, -179, 179))
+		if(ImGui::DragFloat("Camera FOV", &Freecam.fov, 1, -179, 179))
 			shouldUpdate = true;
 
 		ImGui::PopItemWidth();
 
-		if (shouldUpdate)
-		{
+		if(shouldUpdate) {
 			glm::quat newRot = glm::quat(glm::radians(CameraTools::Meta.euler));
 			float angle = glm::angle(newRot);
 			glm::vec3 axis = glm::axis(newRot);
@@ -273,14 +271,14 @@ namespace xenomods {
 
 			// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
 			CameraTools::Freecam.fov = std::clamp(CameraTools::Freecam.fov, -179.f, 179.f);
-			if (CameraTools::Freecam.fov == 0)
+			if(CameraTools::Freecam.fov == 0)
 				CameraTools::Freecam.fov = 0.001f;
 
 			CameraTools::Freecam.isOn = true;
 		}
 
 #if !XENOMODS_CODENAME(bf3)
-		if (ImGui::Button("Teleport party lead to camera"))
+		if(ImGui::Button("Teleport party lead to camera"))
 			TeleportPlayerToCamera();
 #endif
 	}
@@ -306,7 +304,7 @@ namespace xenomods {
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
-		if (modules != nullptr) {
+		if(modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(CameraTools), "Camera Tools");
 			section->RegisterRenderCallback(&MenuSection);
 			/*section->RegisterOption<bool>(Freecam.isOn, "Freecam");
@@ -328,7 +326,7 @@ namespace xenomods {
 		HidInput* debugInput = HidInput::GetDebugInput();
 
 		// if there's only one controller, let them freecam only when the menu is open
-		if (debugInput == HidInput::GetPlayer(1) && !g_Menu->IsOpen())
+		if(debugInput == HidInput::GetPlayer(1) && !g_Menu->IsOpen())
 			return;
 
 		if(debugInput->InputDownStrict(Keybind::FREECAM_TOGGLE)) {
@@ -370,7 +368,7 @@ namespace xenomods {
 
 			DoFreeCameraMovement(updateInfo->updateDelta);
 
-			if (debugInput->InputDownStrict(Keybind::FREECAM_TELEPORT))
+			if(debugInput->InputDownStrict(Keybind::FREECAM_TELEPORT))
 				TeleportPlayerToCamera();
 		}
 	}

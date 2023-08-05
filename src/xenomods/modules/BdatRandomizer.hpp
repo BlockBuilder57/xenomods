@@ -24,7 +24,7 @@ namespace xenomods {
 
 } // namespace xenomods
 
-template <>
+template<>
 constexpr magic_enum::customize::customize_t magic_enum::customize::enum_name<xenomods::BdatRandomizer::BdatMSScrambleType>(xenomods::BdatRandomizer::BdatMSScrambleType value) noexcept {
 	// clang-format off
 	switch (value) {
@@ -44,7 +44,7 @@ struct fmt::formatter<xenomods::BdatRandomizer::BdatMSScrambleType> : fmt::forma
 	inline auto format(xenomods::BdatRandomizer::BdatMSScrambleType type, FormatContext& ctx) {
 		using enum xenomods::BdatRandomizer::BdatMSScrambleType;
 
-		if (type < Off || type > ShowSheetName)
+		if(type < Off || type > ShowSheetName)
 			return "Unknown - " + std::to_string(xenomods::underlying_value(type));
 
 		return magic_enum::enum_name(type);

@@ -2,8 +2,8 @@
 
 #include "FrameratePatch.hpp"
 
-#include "xenomods/engine/ml/DevGraph.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
+#include "xenomods/engine/ml/DevGraph.hpp"
 
 namespace {
 
@@ -26,7 +26,7 @@ namespace {
 		}
 	};
 
-}
+} // namespace
 
 namespace xenomods {
 
@@ -34,7 +34,7 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up framerate patch...");
 
-		if (GetState().config.enable60FPS) {
+		if(GetState().config.enable60FPS) {
 #if XENOMODS_CODENAME(bf3)
 			LayerManagerCtorHook::HookFromBase(0x710100f260);
 			VSyncHook::HookFromBase(0x7101249648);

@@ -14,7 +14,7 @@ namespace xenomods {
 	// this is just so this code doesnt need to be completely changed yet
 	struct RegisteredModule {
 		std::string_view name;
-		UpdatableModule* modulePtr{};
+		UpdatableModule* modulePtr {};
 	};
 
 	std::array<RegisteredModule, MAX_MODULES> registeredModules;
@@ -48,7 +48,7 @@ namespace xenomods {
 
 		bool IsModuleRegistered(const std::string& moduleName) {
 			std::string_view view = moduleName;
-			if (view.starts_with("xenomods::"))
+			if(view.starts_with("xenomods::"))
 				view.remove_prefix(10);
 
 			for(int i = 0; i < moduleIndex; ++i)
@@ -56,7 +56,6 @@ namespace xenomods {
 					return true;
 			return false;
 		}
-
 
 	} // namespace detail
 

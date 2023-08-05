@@ -51,25 +51,25 @@ namespace xenomods {
 	void PartyEditor::MenuBaseParty() {
 		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 5.f);
 
-		if (ImGui::Button("Apply Party"))
+		if(ImGui::Button("Apply Party"))
 			MenuApplyParty();
 		ImGui::SameLine();
-		if (ImGui::Button("Get Party"))
+		if(ImGui::Button("Get Party"))
 			MenuGetParty();
 
-		if (ImGui::InputInt("Index", &PartyIdx))
+		if(ImGui::InputInt("Index", &PartyIdx))
 			PartyIdx = std::clamp(PartyIdx, 0, 9);
 
 		gf::RQ_SETUP_PARTY_basegame* base = &PartySetup.base[PartyIdx];
 
-		if (ImGui::InputInt("Driver", &base->driver))
+		if(ImGui::InputInt("Driver", &base->driver))
 			base->driver = std::clamp(base->driver, -1, 25);
 
 		int bladeCount = 3;
-		if (base->driver == 1)
+		if(base->driver == 1)
 			bladeCount = 6; // all have 6, but only Rex uses them all
 
-		if (ImGui::InputInt("Active Blade Index", &base->activeBladeIdx))
+		if(ImGui::InputInt("Active Blade Index", &base->activeBladeIdx))
 			base->activeBladeIdx = std::clamp(base->activeBladeIdx, 0, bladeCount - 1);
 
 		ImGui::Separator();
@@ -77,11 +77,11 @@ namespace xenomods {
 		for(int i = 0; i < bladeCount; i++) {
 			const std::uint16_t u16one = 1;
 			std::string name = "Blade " + std::to_string(i);
-			if (ImGui::InputScalar(name.data(), ImGuiDataType_U16, &base->blades[i], &u16one))
-				if (base->blades[i] > 0 && base->blades[i] <= 1000)
+			if(ImGui::InputScalar(name.data(), ImGuiDataType_U16, &base->blades[i], &u16one))
+				if(base->blades[i] > 0 && base->blades[i] <= 1000)
 					base->blades[i] = 1001; // set to Pyra if "out of bounds"
 			ImGui::SameLine();
-			if (ImGui::Button("None"))
+			if(ImGui::Button("None"))
 				base->blades[i] = 0;
 		}
 
@@ -91,13 +91,13 @@ namespace xenomods {
 	void PartyEditor::MenuIraParty() {
 		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 5.f);
 
-		if (ImGui::Button("Apply Teams"))
+		if(ImGui::Button("Apply Teams"))
 			MenuApplyParty();
 		ImGui::SameLine();
-		if (ImGui::Button("Get Teams"))
+		if(ImGui::Button("Get Teams"))
 			MenuGetParty();
 
-		if (ImGui::InputInt("Index", &TeamIdx))
+		if(ImGui::InputInt("Index", &TeamIdx))
 			TeamIdx = std::clamp(TeamIdx, 0, 2);
 
 		gf::RQ_SETUP_PARTY_torna* ira = &PartySetup.ira[TeamIdx];
@@ -105,11 +105,11 @@ namespace xenomods {
 
 		ImGui::Separator();
 
-		if (ImGui::InputScalar("Vanguard", ImGuiDataType_U16, &ira->lead, &u16one))
+		if(ImGui::InputScalar("Vanguard", ImGuiDataType_U16, &ira->lead, &u16one))
 			ira->lead = std::clamp<std::uint16_t>(ira->lead, 0, 25);
-		if (ImGui::InputScalar("Rear Guard 1", ImGuiDataType_U16, &ira->rear1, &u16one))
+		if(ImGui::InputScalar("Rear Guard 1", ImGuiDataType_U16, &ira->rear1, &u16one))
 			ira->rear1 = std::clamp<std::uint16_t>(ira->rear1, 0, 25);
-		if (ImGui::InputScalar("Rear Guard 2", ImGuiDataType_U16, &ira->rear2, &u16one))
+		if(ImGui::InputScalar("Rear Guard 2", ImGuiDataType_U16, &ira->rear2, &u16one))
 			ira->rear2 = std::clamp<std::uint16_t>(ira->rear2, 0, 25);
 
 		ImGui::PopItemWidth();
@@ -130,7 +130,6 @@ namespace xenomods {
 	}*/
 
 	void PartyEditor::MenuSection() {
-
 	}
 
 	void PartyEditor::MenuOrder() {
@@ -269,8 +268,6 @@ namespace xenomods {
 					section = baseSection->RegisterSection(std::string(STRINGIFY(PartyEditor)) + "_ira", "Teams...");
 
 				section->RegisterRenderCallback(&MenuIraParty);
-
-
 			}
 #elif XENOMODS_CODENAME(bfsw)
 			auto order = baseSection->RegisterSection(std::string(STRINGIFY(PartyEditor)) + "_order", "Party Order");
