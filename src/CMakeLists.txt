@@ -120,6 +120,7 @@ target_link_libraries(xenomods PUBLIC
 		fmt::fmt
 		glm::glm
 		imgui_xeno
+		magic_enum
 		)
 
 target_compile_definitions(xenomods PUBLIC

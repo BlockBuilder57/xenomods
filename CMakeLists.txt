@@ -44,13 +44,10 @@ set_source_files_properties(${PROJECT_BINARY_DIR}/${VERSION_FILENAME} PROPERTIES
 add_subdirectory(vendor/glm)
 add_subdirectory(vendor/fmt)
 add_subdirectory(vendor/tomlpp)
+add_subdirectory(vendor/magic_enum)
 
 set(IMGUI_XENO_EXTERNAL_TOOLCHAIN TRUE)
 add_subdirectory(vendor/imgui-xeno)
-
-#include_directories("vendor/imgui-xeno/include")
-#include_directories("vendor/imgui-xeno/src")
-#include_directories("vendor/imgui-xeno/extern/imgui")
 
 add_subdirectory(src)
 

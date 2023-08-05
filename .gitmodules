@@ -12,3 +12,6 @@
 [submodule "vendor/imgui-xeno"]
 	path = vendor/imgui-xeno
 	url = https://github.com/BlockBuilder57/imgui-xeno
+[submodule "vendor/magic_enum"]
+	path = vendor/magic_enum
+	url = https://github.com/Neargye/magic_enum
