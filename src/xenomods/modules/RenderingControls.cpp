@@ -134,6 +134,7 @@ namespace xenomods {
 	}
 
 	void RenderingControls::MenuGBuffer() {
+#if !XENOMODS_CODENAME(bf3)
 		auto acc = ml::ScnRenderDrSysParmAcc();
 
 		ImGui::Checkbox("GBuffer debug", &acc.PixlPostParm->GBufferDebug);
@@ -148,6 +149,7 @@ namespace xenomods {
 
 		if (ImGui::Button("Reset parameters"))
 			acc.setGBuffDebugDefault();
+#endif
 	}
 
 	void RenderingControls::Initialize() {
@@ -178,8 +180,10 @@ namespace xenomods {
 			auto toggles = section->RegisterSection(toggleKey, "Toggles...");
 			toggles->RegisterRenderCallback(&MenuToggles);
 
+#if !XENOMODS_CODENAME(bf3)
 			auto gbuffer = section->RegisterSection(std::string(STRINGIFY(RenderingControls)) + "gbuffer", "GBuffer debug...");
 			gbuffer->RegisterRenderCallback(&MenuGBuffer);
+#endif
 		}
 	}
 

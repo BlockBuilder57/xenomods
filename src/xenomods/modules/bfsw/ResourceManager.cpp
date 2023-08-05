@@ -51,11 +51,11 @@ namespace xenomods {
 		ImGui::PopItemWidth();
 
 		if (itemName.buffer[0] != '\0')
-			ImGui::Text("%s", itemName.buffer);
+			ImGui::TextUnformatted(itemName.buffer);
 		if (itemHelp.buffer[0] != '\0')
-			ImGui::Text("%s", itemHelp.buffer);
+			ImGui::TextUnformatted(itemHelp.buffer);
 		if (itemInventory.buffer[0] != '\0')
-			ImGui::Text("%s", itemInventory.buffer);
+			ImGui::TextUnformatted(itemInventory.buffer);
 
 		if (ImGui::Button("Give Item"))
 			game::DataUtil::addItem(*xenomods::DocumentPtr, ItemId, ItemCount, true, true, false);

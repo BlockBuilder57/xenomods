@@ -611,6 +611,8 @@ namespace xenomods {
 				if(warp.mapId > 0 && warp.mapId != DebugStuff::GetMapId())
 					continue;
 
+				// axis/arrow rendering is messed up in DE for some reason, it's all relative to the camera center...
+	#if XENOMODS_OLD_ENGINE
 				float angle = glm::angle(warp.rotation);
 				glm::vec3 axis = glm::axis(warp.rotation);
 
@@ -618,8 +620,6 @@ namespace xenomods {
 				newmat = glm::translate(newmat, warp.position);
 				newmat = glm::rotate(newmat, angle, axis);
 
-				// axis/arrow rendering is messed up in DE for some reason, all relative to the camera...
-	#if XENOMODS_OLD_ENGINE
 				fw::debug::drawCompareZ(false);
 				fw::debug::drawAxis(newmat, 2.f);
 				fw::debug::drawArrow(warp.position, warp.position + (warp.velocity * 0.5f), mm::Col4::yellow);

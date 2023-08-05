@@ -248,12 +248,14 @@ namespace xenomods {
 		ImGui::InputFloat("Freecam speed", &Freecam.camSpeed, 1, 4, "%.3f m/s");
 
 		bool shouldUpdate = false;
-		ImGui::InputFloat3("Camera pos", reinterpret_cast<float*>(&Meta.pos));
-		shouldUpdate = shouldUpdate || ImGui::IsItemDeactivatedAfterEdit();
-		ImGui::InputFloat3("Camera rot", reinterpret_cast<float*>(&Meta.euler));
-		shouldUpdate = shouldUpdate || ImGui::IsItemDeactivatedAfterEdit();
-		ImGui::InputFloat("Camera FOV", &Meta.fov);
-		shouldUpdate = shouldUpdate || ImGui::IsItemDeactivatedAfterEdit();
+
+		// icky short-circuit prevention...
+		if (ImGui::DragFloat3("Camera pos", reinterpret_cast<float*>(&Meta.pos)))
+			shouldUpdate = true;
+		if (ImGui::DragFloat3("Camera rot", reinterpret_cast<float*>(&Meta.euler)))
+			shouldUpdate = true;
+		if (ImGui::DragFloat("Camera FOV", &Freecam.fov, 1, -179, 179))
+			shouldUpdate = true;
 
 		ImGui::PopItemWidth();
 
@@ -270,7 +272,7 @@ namespace xenomods {
 			CameraTools::Freecam.matrix = newmat;
 
 			// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
-			CameraTools::Freecam.fov = std::clamp(CameraTools::Meta.fov, -179.f, 179.f);
+			CameraTools::Freecam.fov = std::clamp(CameraTools::Freecam.fov, -179.f, 179.f);
 			if (CameraTools::Freecam.fov == 0)
 				CameraTools::Freecam.fov = 0.001f;
 
