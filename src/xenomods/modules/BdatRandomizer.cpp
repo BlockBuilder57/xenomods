@@ -43,7 +43,9 @@ namespace xenomods {
 	BdatRandomizer::BdatMSScrambleType BdatRandomizer::msScrambleType = BdatRandomizer::BdatMSScrambleType::Off;
 
 	void BdatRandomizer::MenuSection() {
+		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 9.f);
 		imguiext::EnumComboBox("Scramble Type", &msScrambleType);
+		ImGui::PopItemWidth();
 	}
 
 	void BdatRandomizer::Initialize() {

@@ -62,8 +62,10 @@ namespace xenomods {
 
 	void BattleCheats::MenuSection() {
 		auto config = &GetState().config;
-		ImGui::InputFloat("Player damage multiplier", &config->damagePlayerMult, 1.f);
-		ImGui::InputFloat("Enemy damage multiplier", &config->damageEnemyMult, 1.f);
+		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 5.f);
+		ImGui::InputFloat("Player damage multiplier", &config->damagePlayerMult, 1.f, 10.f, "%.1f");
+		ImGui::InputFloat("Enemy damage multiplier", &config->damageEnemyMult, 1.f, 10.f, "%.1f");
+		ImGui::PopItemWidth();
 	}
 
 	void BattleCheats::Initialize() {
