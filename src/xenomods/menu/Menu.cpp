@@ -86,7 +86,9 @@ namespace xenomods {
 					ImGui::EndMenu();
 				}
 			}
+#if _DEBUG
 			ImGui::MenuItem("Imgui demo", "", &show_demo);
+#endif
 
 			ImGui::TextDisabled("%s", version::BuildXenomodsVersion());
 			ImGui::EndMainMenuBar();

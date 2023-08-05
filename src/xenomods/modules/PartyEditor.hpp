@@ -14,11 +14,21 @@ namespace xenomods {
 		static gf::RQ_SETUP_PARTY PartySetup;
 		static int PartyIdx;
 		static int TeamIdx;
+
+		static void MenuBaseParty();
+		static void MenuIraParty();
 #elif XENOMODS_CODENAME(bfsw)
 		static game::PcID PartySetup[7];
-		static game::PcID CurrentStatus;
+		static game::PcID StatusCurrentPcID;
+		static game::DataPc* StatusCurrentDataPc;
 		static game::DataUtil::AddExpApSpInfo AddInfo;
+
+		static void MenuOrder();
+		static void MenuStatus();
+		static void MenuAddExperience();
 #endif
+
+		static void MenuSection();
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {

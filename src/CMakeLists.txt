@@ -20,7 +20,7 @@ add_executable(xenomods
 		xenomods/modules/CameraTools.cpp
 		xenomods/modules/RenderingControls.cpp
 		xenomods/modules/BattleCheats.cpp
-		#xenomods/modules/PartyEditor.cpp
+		xenomods/modules/PartyEditor.cpp
 		xenomods/modules/PlayerMovement.cpp
 		xenomods/modules/FrameratePatch.cpp
 		xenomods/modules/FileDetours.cpp
