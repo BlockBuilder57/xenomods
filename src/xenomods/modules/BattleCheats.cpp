@@ -60,6 +60,12 @@ namespace {
 
 namespace xenomods {
 
+	void BattleCheats::MenuSection() {
+		auto config = &GetState().config;
+		ImGui::InputFloat("Player damage multiplier", &config->damagePlayerMult, 1.f);
+		ImGui::InputFloat("Enemy damage multiplier", &config->damageEnemyMult, 1.f);
+	}
+
 	void BattleCheats::Initialize() {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up battle cheats...");
@@ -72,13 +78,10 @@ namespace xenomods {
 		ModifyDamage::HookAt(&game::BattleDamageCalcurator::calcCounterSpike); // last call in calcDamage
 #endif
 
-
-
 		auto modules = g_Menu->FindSection("modules");
 		if (modules != nullptr) {
-			/*auto section = modules->RegisterSection(STRINGIFY(BattleCheats), "Battle Cheats");
-			section->RegisterOption<float>(GetState().config.damagePlayerMult, "Player damage multiplier");
-			section->RegisterOption<float>(GetState().config.damageEnemyMult, "Enemy damage multiplier");*/
+			auto section = modules->RegisterSection(STRINGIFY(BattleCheats), "Battle Cheats");
+			section->RegisterRenderCallback(&MenuSection);
 		}
 	}
 

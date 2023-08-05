@@ -7,6 +7,8 @@
 namespace xenomods {
 
 	struct BattleCheats : public xenomods::UpdatableModule {
+		static void MenuSection();
+
 		void Initialize() override;
 	};
 
