@@ -162,9 +162,9 @@ namespace {
 	struct DisableControllerSingleMode : skylaunch::hook::Trampoline<DisableControllerSingleMode> {
 		static void Hook(nn::hid::ControllerSupportResultInfo* resultInfo, nn::hid::ControllerSupportArg* supportArg) {
 			nn::hid::NpadFullKeyState p1State {};
-			nn::hid::GetNpadState(&p1State, nn::hid::CONTROLLER_PLAYER_1);
+			nn::hid::GetNpadState(&p1State, 0);
 
-			if(p1State.Flags & nn::hid::NpadFlags::NPAD_CONNECTED) {
+			if(p1State.mAttributes.isBitSet(nn::hid::NpadAttribute::IsConnected)) {
 				// We have a player 1 at this point, so disable single-controller only mode
 				// That way if another controller is connected while the game is running, we can allow it to be P2
 				// Monolib actually passes the (according to switchbrew) default arguments to this,
