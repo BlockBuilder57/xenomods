@@ -13,7 +13,7 @@
 #include <xenomods/Version.hpp>
 #include <xenomods/menu/Menu.hpp>
 
-//#include "helpers/InputHelper.h"
+#include "helpers/InputHelper.h"
 
 namespace xenomods {
 
@@ -65,7 +65,8 @@ namespace xenomods {
 	}
 
 	void Menu::Update(HidInput* input) {
-		//InputHelper::setPort(input->padId);
+		InputHelper::setPort(input->padId);
+		InputHelper::toggleInput = g_Menu->IsOpen();
 	}
 
 	void Menu::Render() {
