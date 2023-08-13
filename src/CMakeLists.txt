@@ -100,6 +100,10 @@ set_target_properties(xenomods PROPERTIES
 xenomods_external_fpic(imgui_xeno)
 xenomods_external_fpic(fmt)
 
+set_target_properties(imgui_xeno PROPERTIES
+		COMPILE_FLAGS "-DIMGUI_XENO_LOAD_DEFAULT_FONT=false"
+		)
+
 target_include_directories(xenomods PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(xenomods PUBLIC ${PROJECT_BINARY_DIR}/)
 
@@ -112,7 +116,7 @@ target_include_directories(xenomods PRIVATE
 		#${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/src
 		)
 
-# not entirely sure what this is about, but
+# disables architecture unsupported float conversions
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_FLOAT_CHARCONV=1 -DTOML_ENABLE_FLOAT16=0")
 
 target_link_libraries(xenomods PUBLIC
@@ -124,9 +128,9 @@ target_link_libraries(xenomods PUBLIC
 		)
 
 target_compile_definitions(xenomods PUBLIC
-	__XENOMODS_CODENAME_${XENOMODS_CODENAME}
-	_XENOMODS_CODENAME_STR="${XENOMODS_CODENAME}"
-)
+		__XENOMODS_CODENAME_${XENOMODS_CODENAME}
+		_XENOMODS_CODENAME_STR="${XENOMODS_CODENAME}"
+		)
 
 # NPDM/NSO output.
 add_npdm(xenomods ${PROJECT_SOURCE_DIR}/npdm/${XENOMODS_CODENAME}.json main-unpatched)
