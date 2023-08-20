@@ -24,7 +24,24 @@ namespace xenomods {
 		nn::hid::NpadBaseState padState {};
 		auto styleSet = nn::hid::GetNpadStyleSet(padId);
 
-		//g_Logger->LogInfo("Player {} has styleset {:#05b}", padId+1, styleSet.flags);
+		// handheld mode screws a few things up, let's handle it properly
+		if (this == &controllers[0]) {
+			if (nn::oe::GetOperationMode() == nn::oe::OperationMode::Handheld) {
+				// only check this in handheld mode
+				nn::hid::GetNpadState(&reinterpret_cast<nn::hid::NpadHandheldState&>(padState), 0x20);
+				int newPadId = padState.mAttributes.isBitSet(nn::hid::NpadAttribute::IsConnected) ? 0x20 : 0;
+				if (padId != newPadId) {
+					padId = newPadId;
+					styleSet = nn::hid::GetNpadStyleSet(padId);
+				}
+			}
+			else if (padId == 0x20) {
+				// reset if stuck in handheld
+				padId = 0;
+			}
+		}
+
+		//g_Logger->LogInfo("Player {} has styleset {:#05b}", padId+1, styleSet.field);
 
 		if (styleSet.isBitSet(nn::hid::NpadStyleTag::NpadStyleFullKey))
 			nn::hid::GetNpadState(&reinterpret_cast<nn::hid::NpadFullKeyState&>(padState), padId);
