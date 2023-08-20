@@ -100,8 +100,8 @@ set_target_properties(xenomods PROPERTIES
 xenomods_external_fpic(imgui_xeno)
 xenomods_external_fpic(fmt)
 
-set_target_properties(imgui_xeno PROPERTIES
-		COMPILE_FLAGS "-DIMGUI_XENO_LOAD_DEFAULT_FONT=false"
+target_compile_options(imgui_xeno PUBLIC
+		-DIMGUI_XENO_LOAD_DEFAULT_FONT=false
 		)
 
 target_include_directories(xenomods PUBLIC ${PROJECT_SOURCE_DIR}/include)
