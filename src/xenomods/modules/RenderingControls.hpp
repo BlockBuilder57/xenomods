@@ -9,6 +9,7 @@ namespace xenomods {
 		static bool straightenFont;
 		static bool skipUIRendering;
 		static bool skipParticleRendering;
+		static bool skipOverlayRendering;
 		static bool skipCloudRendering;
 		static bool skipSkyDomeRendering;
 		static float shadowStrength;

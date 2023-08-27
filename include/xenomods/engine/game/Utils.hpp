@@ -6,7 +6,7 @@
 
 #include <xenomods/Utils.hpp>
 
-#include "CharacterController.hpp"
+#include "Controllers.hpp"
 #include "DataPC.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
@@ -122,6 +122,7 @@ namespace game {
 	   public:
 		static unsigned int getPartyHandle(const fw::Document& doc, unsigned short index);
 		static CharacterController* getCharacterController(const fw::Document& doc, unsigned int handle);
+		static void setPartyGauge(const fw::Document& doc, int level); // max 300
 	};
 
 	class ScriptUtil {

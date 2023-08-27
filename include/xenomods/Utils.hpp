@@ -13,6 +13,7 @@ using undefined4 = uint32_t;
 using undefined8 = uint64_t;
 
 using byte = uint8_t;
+using ushort = uint16_t;
 using uint = uint32_t;
 using ulong = uint64_t;
 

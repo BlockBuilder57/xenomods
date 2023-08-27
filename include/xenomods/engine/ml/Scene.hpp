@@ -192,6 +192,9 @@ namespace ml {
 		void setGBuffDebug(bool);
 		void setGBuffDebugDefault();
 		void setGBuffDebugParam(GBuffDebugType, float, float);
+
+		void isSeamMapOpenMode() const;
+		void setSeamMapOpenMode(bool);
 	};
 
 	class DebDraw;

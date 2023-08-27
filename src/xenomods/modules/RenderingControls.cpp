@@ -1,10 +1,14 @@
 #include "RenderingControls.hpp"
 
 #include "DebugStuff.hpp"
+#include "xenomods/engine/effect/SystemManager.hpp"
+#include "xenomods/engine/fw/Managers.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
+#include "xenomods/engine/ptlib/Emitter.hpp"
 #include "xenomods/engine/ui/UIObjectAcc.hpp"
+#include "xenomods/engine/xefb/Effect.hpp"
 
 namespace {
 
@@ -45,9 +49,31 @@ namespace {
 	};
 #elif XENOMODS_CODENAME(bfsw)
 	struct SkipParticleRendering : skylaunch::hook::Trampoline<SkipParticleRendering> {
-		static void Hook(void* this_pointer) {
-			if(!xenomods::RenderingControls::skipParticleRendering)
-				Orig(this_pointer);
+		static void Hook(xefb::CEParticlelist* this_pointer, xefb::CERes* res) {
+			bool skip = false;
+
+			using enum xefb::eXefbDrayType;
+			switch (this_pointer->Emitter->drawType) {
+				case PostLine:
+				case PostGauss:
+				case PostRadial:
+				case PostMono:
+				case PostDist: {
+					if(xenomods::RenderingControls::skipOverlayRendering)
+						skip = true;
+
+					break;
+				}
+				default: {
+					if(xenomods::RenderingControls::skipParticleRendering)
+						skip = true;
+
+					break;
+				}
+			}
+
+			if (!skip)
+				Orig(this_pointer, res);
 		}
 	};
 #endif
@@ -73,6 +99,7 @@ namespace xenomods {
 	bool RenderingControls::straightenFont = false;
 	bool RenderingControls::skipUIRendering = false;
 	bool RenderingControls::skipParticleRendering = false;
+	bool RenderingControls::skipOverlayRendering = false;
 	bool RenderingControls::skipCloudRendering = false;
 	bool RenderingControls::skipSkyDomeRendering = false;
 	float RenderingControls::shadowStrength = 1.0;
@@ -97,39 +124,31 @@ namespace xenomods {
 	void RenderingControls::MenuToggles() {
 		ImGui::Checkbox("Skip UI rendering", &skipUIRendering);
 #if !XENOMODS_CODENAME(bf3)
+#if XENOMODS_OLD_ENGINE
 		ImGui::Checkbox("Skip particle+overlay rendering", &skipParticleRendering);
+#else
+		ImGui::Checkbox("Skip particle rendering", &skipParticleRendering);
+		ImGui::Checkbox("Skip overlay rendering", &skipOverlayRendering);
+#endif
 		ImGui::Checkbox("Skip cloud (sea) rendering", &skipCloudRendering);
 		ImGui::Checkbox("Skip sky dome rendering", &skipSkyDomeRendering);
 
 		auto acc = ml::ScnRenderDrSysParmAcc();
+		static bool hideFog = false, hideBloom = false, hideTonemap = false;
 
-		if (ImGui::Button("Toggle map"))
-		{
-			// done this way because 2/Torna do not have is/setDispMap
-			acc.drMan->hideMap = !acc.drMan->hideMap;
-			g_Logger->ToastInfo(toggleKey, "Toggled map: {}", !acc.drMan->hideMap);
-		}
-		if (ImGui::Button("Toggle fog"))
-		{
-			static bool fogSkip;
-			fogSkip = !fogSkip;
-			acc.setFogSkip(fogSkip);
-			g_Logger->ToastInfo(toggleKey, "Toggled fog: {}", !fogSkip);
-		}
-		if (ImGui::Button("Toggle bloom"))
-		{
-			acc.setBloom(!acc.isBloomOn());
-			g_Logger->ToastInfo(toggleKey, "Toggled bloom: {}", acc.isBloomOn());
-		}
-		if (ImGui::Button("Toggle tonemapping"))
-		{
-			acc.setToneMap(!acc.isToneMap());
-			g_Logger->ToastInfo(toggleKey, "Toggled tone mapping: {}", acc.isToneMap());
-		}
+		ImGui::Checkbox("Hide map", &acc.drMan->hideMap);
+		if (ImGui::Checkbox("Disable fog", &hideFog))
+			acc.setFogSkip(hideFog);
+		if (ImGui::Checkbox("Disable bloom", &hideBloom))
+			acc.setBloom(!hideBloom);
+		if (ImGui::Checkbox("Disable tonemapping", &hideTonemap))
+			acc.setToneMap(!hideTonemap);
 
 		ImGui::Checkbox("Force disable depth of field", &ForcedParameters.DisableDOF);
 		ImGui::Checkbox("Force disable motion blur", &ForcedParameters.DisableMotionBlur);
 		ImGui::Checkbox("Force disable color filters", &ForcedParameters.DisableColorFilter);
+		ImGui::Checkbox("Enable AA", &acc.PixlPostParm->enableAA);
+		ImGui::Checkbox("Enable TMAA", &acc.PixlPostParm->enableTMAA);
 #endif
 	}
 
@@ -169,7 +188,7 @@ namespace xenomods {
 		StraightensYourXenoblade::HookAt("_ZN5layer12LayerObjFont17updateShaderParmsEPKNS_15LayerRenderViewERKNS_14LayerResMatrixERKNS_13LayerResColorE");
 		SkipParticleRendering::HookAt("_ZN5ptlib15ParticleManager4drawEPKNS_16DrDrawWorkInfoEFEib");
 #elif XENOMODS_CODENAME(bfsw)
-		SkipParticleRendering::HookAt("_ZN4xefb9CEEmitter4drawEv");
+		SkipParticleRendering::HookAt("_ZN4xefb14CEParticlelist4drawEPNS_5CEResE");
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
