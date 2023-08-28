@@ -74,7 +74,7 @@ namespace xenomods {
 	}
 
 	void main() {
-		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "Running %s", version::BuildXenomodsVersion());
+		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "Running %s", version::XenomodsFullVersion());
 		g_Menu->Initialize();
 		InitializeAllRegisteredModules();
 

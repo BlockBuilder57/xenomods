@@ -47,8 +47,10 @@ namespace xenomods::version {
 	const char* BuildGitVersion();
 	const char* BuildTimestamp();
 
-	// returns a string like "xenomods 1234567~ (debug) [???]"
-	const char* BuildXenomodsVersion();
+	// returns a string like "Xenomods 1234567~"
+	const char* XenomodsVersion();
+	// returns a string like "Xenomods 1234567~ (debug) [???]"
+	const char* XenomodsFullVersion();
 
 	const GameType BuildGame =
 #if XENOMODS_CODENAME(bf2)

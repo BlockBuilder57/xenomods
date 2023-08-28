@@ -115,8 +115,7 @@ namespace {
 			modVersion.uiObject->name.set("TXT_mod_version");
 
 			// make the version string...
-			auto modVersionStr = fmt::format("xenomods {}", xenomods::version::BuildGitVersion());
-			auto modVersionUIStr = ui::UIStr(modVersionStr.c_str(), true);
+			auto modVersionUIStr = ui::UIStr(xenomods::version::XenomodsVersion(), true);
 			modVersion.setText(modVersionUIStr);
 
 			// now we can use the offset for ourselves

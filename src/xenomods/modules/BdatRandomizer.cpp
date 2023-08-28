@@ -1,6 +1,6 @@
 #include "BdatRandomizer.hpp"
-#include "helpers/ImGuiExtensions.hpp"
 
+#include "xenomods/ImGuiExtensions.hpp"
 #include "xenomods/engine/bdat/Bdat.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/stuff/utils/util.hpp"

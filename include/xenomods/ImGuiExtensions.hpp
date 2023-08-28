@@ -7,6 +7,8 @@
 #include <magic_enum.hpp>
 #include <string_view>
 
+#include <xenomods/menu/Themes.hpp>
+
 namespace xenomods::imguiext {
 
 	template<typename T>
@@ -35,5 +37,7 @@ namespace xenomods::imguiext {
 
 		return result;
 	}
+
+	bool ShowStyleSelector(const char* label);
 
 } // namespace xenomods::imgui

@@ -2,7 +2,7 @@
 
 #include "PartyEditor.hpp"
 
-#include "helpers/ImGuiExtensions.hpp"
+#include "xenomods/ImGuiExtensions.hpp"
 #include "xenomods/engine/game/DocAccessor.hpp"
 #include "xenomods/engine/game/Scripts.hpp"
 #include "xenomods/engine/game/Utils.hpp"

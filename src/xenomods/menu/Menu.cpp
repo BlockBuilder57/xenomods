@@ -1,17 +1,19 @@
 // Created by block on 5/28/23.
 
 #include <imgui.h>
-#include <imgui_xeno.h>
 #include <imgui_internal.h>
+#include <imgui_xeno.h>
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
+#include <xenomods/ImGuiExtensions.hpp>
 #include <xenomods/Logger.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
 #include <xenomods/Version.hpp>
 #include <xenomods/menu/Menu.hpp>
+#include <xenomods/menu/Themes.hpp>
 
 #include "helpers/InputHelper.h"
 
@@ -24,11 +26,32 @@ namespace xenomods {
 		}
 	};
 
-	void ImGuiInitCallback() {}
+	void ImGuiInitCallback() {
+		// Select the theme for the current game by default
+		switch (version::RuntimeGame()) {
+			case version::GameType::BFSW:
+				ImGuiStyleColorsXB1();
+				break;
+			case version::GameType::BF2:
+			case version::GameType::IRA:
+				ImGuiStyleColorsXB2();
+				break;
+			case version::GameType::BF3:
+				ImGuiStyleColorsXB3();
+				break;
+			default:
+				// leave with defaults
+				break;
+		}
+	}
 
 	void Section_State() {
 		if (ImGui::Button("Reload config/BDAT overrides"))
 			XenomodsState::ReloadConfig();
+
+		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 8.f);
+		imguiext::ShowStyleSelector("Menu Theme");
+		ImGui::PopItemWidth();
 	}
 
 	std::string about_build {};
@@ -41,14 +64,21 @@ namespace xenomods {
 			about_runtime = fmt::format("Currently running {} ({:c}) version {}", version::RuntimeGame(), version::RuntimeGame(), version::RuntimeVersion());
 		if (about_executable.empty()) {
 			if(std::string_view(version::RuntimeBuildRevision()).starts_with("Rev"))
-				about_executable = fmt::format("Executable {}", version::RuntimeBuildRevision());
+				about_executable = fmt::format("Game executable {}", version::RuntimeBuildRevision());
 			else
-				about_executable = fmt::format("Executable version {}", version::RuntimeBuildRevision());
+				about_executable = fmt::format("Game executable version {}", version::RuntimeBuildRevision());
 		}
 
+		ImGui::TextUnformatted(version::XenomodsFullVersion());
 		ImGui::TextUnformatted(about_build.c_str());
 		ImGui::TextUnformatted(about_runtime.c_str());
 		ImGui::TextUnformatted(about_executable.c_str());
+
+		static bool showImGuiAbout = false;
+		if (ImGui::SmallButton("About Dear ImGui"))
+			showImGuiAbout = true;
+		if (showImGuiAbout)
+			ImGui::ShowAboutWindow(&showImGuiAbout);
 	}
 
 	void Menu::Initialize() {
@@ -88,10 +118,10 @@ namespace xenomods {
 				}
 			}
 #if _DEBUG
-			ImGui::MenuItem("Imgui demo", "", &show_demo);
+			ImGui::MenuItem("ImGui Demo", "", &show_demo);
 #endif
 
-			ImGui::TextDisabled("%s", version::BuildXenomodsVersion());
+			ImGui::TextDisabled("%s", version::XenomodsVersion());
 			ImGui::EndMainMenuBar();
 		}
 		if(show_demo) {

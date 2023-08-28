@@ -15,10 +15,17 @@ namespace xenomods::version {
 	}
 
 	char XenomodsVersionBuf[128];
-	const char* BuildXenomodsVersion() {
+	char XenomodsFullVersionBuf[128];
+
+	const char* XenomodsVersion() {
 		if (XenomodsVersionBuf[0] == 0)
-			sprintf(&XenomodsVersionBuf[0], "xenomods %s%s [%s]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
+			sprintf(&XenomodsVersionBuf[0], "Xenomods %s", version::BuildGitVersion());
 		return &XenomodsVersionBuf[0];
+	}
+	const char* XenomodsFullVersion() {
+		if (XenomodsFullVersionBuf[0] == 0)
+			sprintf(&XenomodsFullVersionBuf[0], "Xenomods %s%s [%s]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
+		return &XenomodsFullVersionBuf[0];
 	}
 
 	unsigned long RuntimeProgramID() {

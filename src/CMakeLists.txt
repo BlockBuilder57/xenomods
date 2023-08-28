@@ -5,6 +5,7 @@ add_executable(xenomods
 		# UTILITY
 		xenomods/FunctionalHooks.cpp
 		xenomods/NnFile.cpp
+		xenomods/ImGuiExtensions.cpp
 
 		xenomods/modules/UpdatableModule.cpp
 
