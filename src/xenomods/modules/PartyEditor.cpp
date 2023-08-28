@@ -202,6 +202,7 @@ namespace xenomods {
 			return;
 		}
 
+		ImGui::InputInt("HP", &StatusCurrentDataPc->status.hp);
 		ImGui::InputInt("Level", &StatusCurrentDataPc->status.level);
 		ImGui::DragScalar("EXP (cur level)", ImGuiDataType_U32, &StatusCurrentDataPc->status.expLevel, 1.f);
 		ImGui::DragScalar("EXP (total)", ImGuiDataType_U32, &StatusCurrentDataPc->status.expTotal, 1.f);

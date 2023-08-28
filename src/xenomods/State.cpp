@@ -18,14 +18,16 @@ namespace xenomods {
 		enableFileOverrides = CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT;
 		bdatSkipOverrides = CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT;
 
-		mountTornaContent = CONFIG_MOUNT_TORNA_CONTENT_DEFAULT;
+		damagePlayerMult = CONFIG_DAMAGE_PLAYER_MULT_DEFAULT;
+		damageEnemyMult = CONFIG_DAMAGE_ENEMY_MULT_DEFAULT;
+
+		disableBattleBGMChanges = CONFIG_DISABLE_BATTLE_BGM_CHANGES;
 
 		enable60FPS = CONFIG_ENABLE_60FPS_DEFAULT;
 
-		loadFcLatest = CONFIG_LOAD_FC_LATEST_DEFAULT;
+		mountTornaContent = CONFIG_MOUNT_TORNA_CONTENT_DEFAULT;
 
-		damagePlayerMult = CONFIG_DAMAGE_PLAYER_MULT_DEFAULT;
-		damageEnemyMult = CONFIG_DAMAGE_ENEMY_MULT_DEFAULT;
+		loadFcLatest = CONFIG_LOAD_FC_LATEST_DEFAULT;
 	}
 
 	void Config::LoadFromFile() {
@@ -58,30 +60,6 @@ namespace xenomods {
 		if(respectDefaults || table[STRINGIFY(loggingLevel)].type() != toml::node_type::none)
 			loggingLevel = static_cast<Logger::Severity>(table[STRINGIFY(loggingLevel)].value_or(CONFIG_LOGGING_LEVEL_DEFAULT));
 
-		if(table[STRINGIFY(titleEvents)].is_array()) {
-			const toml::array* arr = table[STRINGIFY(titleEvents)].as_array();
-			bool load_failed = false;
-			titleEvents.clear();
-
-			if(arr != nullptr) {
-				arr->for_each([&](auto& el) {
-					if constexpr(toml::is_integer<decltype(el)>)
-						titleEvents.push_back(static_cast<std::uint16_t>(el.get()));
-					else {
-						load_failed = true;
-						return false;
-					}
-				});
-			} else
-				load_failed = true;
-
-			if(load_failed && respectDefaults)
-				titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
-		}
-
-		if(respectDefaults || table[STRINGIFY(eventDebugBits)].type() != toml::node_type::none)
-			eventDebugBits = table[STRINGIFY(eventDebugBits)].value_or(CONFIG_EVENT_DEBUG_BITS_DEFAULT);
-
 		if(respectDefaults || table[STRINGIFY(dumpFileReads)].type() != toml::node_type::none)
 			dumpFileReads = table[STRINGIFY(dumpFileReads)].value_or(CONFIG_DUMP_FILE_READS_DEFAULT);
 		if(respectDefaults || table[STRINGIFY(enableFileOverrides)].type() != toml::node_type::none)
@@ -107,19 +85,48 @@ namespace xenomods {
 				bdatSkipOverrides = CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT;
 		}
 
-		if(respectDefaults || table[STRINGIFY(mountTornaContent)].type() != toml::node_type::none)
-			mountTornaContent = table[STRINGIFY(mountTornaContent)].value_or(CONFIG_MOUNT_TORNA_CONTENT_DEFAULT);
-
-		if(respectDefaults || table[STRINGIFY(enable60FPS)].type() != toml::node_type::none)
-			enable60FPS = table[STRINGIFY(enable60FPS)].value_or(CONFIG_ENABLE_60FPS_DEFAULT);
-
-		if(respectDefaults || table[STRINGIFY(loadFcLatest)].type() != toml::node_type::none)
-			loadFcLatest = table[STRINGIFY(loadFcLatest)].value_or(CONFIG_LOAD_FC_LATEST_DEFAULT);
-
 		if(respectDefaults || table[STRINGIFY(damagePlayerMult)].type() != toml::node_type::none)
 			damagePlayerMult = table[STRINGIFY(damagePlayerMult)].value_or(CONFIG_DAMAGE_PLAYER_MULT_DEFAULT);
 		if(respectDefaults || table[STRINGIFY(damageEnemyMult)].type() != toml::node_type::none)
 			damageEnemyMult = table[STRINGIFY(damageEnemyMult)].value_or(CONFIG_DAMAGE_ENEMY_MULT_DEFAULT);
+
+		if(respectDefaults || table[STRINGIFY(enable60FPS)].type() != toml::node_type::none)
+			enable60FPS = table[STRINGIFY(enable60FPS)].value_or(CONFIG_ENABLE_60FPS_DEFAULT);
+
+		if(respectDefaults || table[STRINGIFY(disableBattleBGMChanges)].type() != toml::node_type::none)
+			disableBattleBGMChanges = table[STRINGIFY(disableBattleBGMChanges)].value_or(CONFIG_DISABLE_BATTLE_BGM_CHANGES);
+
+		// 2/Torna exclusive
+		if(table[STRINGIFY(titleEvents)].is_array()) {
+			const toml::array* arr = table[STRINGIFY(titleEvents)].as_array();
+			bool load_failed = false;
+			titleEvents.clear();
+
+			if(arr != nullptr) {
+				arr->for_each([&](auto& el) {
+					if constexpr(toml::is_integer<decltype(el)>)
+						titleEvents.push_back(static_cast<std::uint16_t>(el.get()));
+					else {
+						load_failed = true;
+						return false;
+					}
+				});
+			} else
+				load_failed = true;
+
+			if(load_failed && respectDefaults)
+				titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
+		}
+
+		if(respectDefaults || table[STRINGIFY(eventDebugBits)].type() != toml::node_type::none)
+			eventDebugBits = table[STRINGIFY(eventDebugBits)].value_or(CONFIG_EVENT_DEBUG_BITS_DEFAULT);
+
+		if(respectDefaults || table[STRINGIFY(mountTornaContent)].type() != toml::node_type::none)
+			mountTornaContent = table[STRINGIFY(mountTornaContent)].value_or(CONFIG_MOUNT_TORNA_CONTENT_DEFAULT);
+
+		// DE exclusive
+		if(respectDefaults || table[STRINGIFY(loadFcLatest)].type() != toml::node_type::none)
+			loadFcLatest = table[STRINGIFY(loadFcLatest)].value_or(CONFIG_LOAD_FC_LATEST_DEFAULT);
 
 		if(respectDefaults && table[XENOMODS_CODENAME_STR].is_table()) {
 			//g_Logger->LogDebug("Found {} as a category, loading...", XENOMODS_CODENAME_STR);

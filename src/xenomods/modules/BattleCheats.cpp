@@ -7,7 +7,9 @@
 #include "xenomods/engine/btl/Character.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/game/Actor.hpp"
+#include "xenomods/engine/game/BGM.hpp"
 #include "xenomods/engine/game/Battle.hpp"
+#include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 
 namespace {
@@ -54,11 +56,32 @@ namespace {
 			Orig(this_pointer, damageInfo);
 		}
 	};
+
+	struct DisableVisionBGM : skylaunch::hook::Trampoline<DisableVisionBGM> {
+		static std::uint16_t Hook(game::BGM* this_pointer, game::GameController& controller) {
+			if (xenomods::BattleCheats::disableVisionBGM)
+				controller.someFlags &= ~(1 << 3); // and with all but the vision bit
+
+			return Orig(this_pointer, controller);
+		}
+	};
+
+	struct DisableTensionBGM : skylaunch::hook::Trampoline<DisableTensionBGM> {
+		static bool Hook(game::BGM* this_pointer, game::GameController& controller) {
+			if (xenomods::BattleCheats::disableTensionBGM)
+				return false;
+
+			return Orig(this_pointer, controller);
+		}
+	};
 #endif
 
 } // namespace
 
 namespace xenomods {
+
+	bool BattleCheats::disableVisionBGM = false;
+	bool BattleCheats::disableTensionBGM = false;
 
 	void BattleCheats::MenuSection() {
 		auto config = &GetState().config;
@@ -66,11 +89,31 @@ namespace xenomods {
 		ImGui::InputFloat("Player damage multiplier", &config->damagePlayerMult, 1.f, 10.f, "%.1f");
 		ImGui::InputFloat("Enemy damage multiplier", &config->damageEnemyMult, 1.f, 10.f, "%.1f");
 		ImGui::PopItemWidth();
+
+#if XENOMODS_CODENAME(bfsw)
+		ImGui::Checkbox("Disable vision BGM change", &disableVisionBGM);
+		ImGui::Checkbox("Disable low tension/death BGM change", &disableTensionBGM);
+#endif
+
+		static float partyGauge = 3.f;
+		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 5.f);
+		ImGui::SliderFloat("Sections", &partyGauge, 0.f, 3.f);
+		ImGui::SameLine();
+		if (ImGui::Button("Set Party Gauge")) {
+#if XENOMODS_OLD_ENGINE
+			gf::GfGameParty::setPartyGauge(partyGauge * 100);
+#elif XENOMODS_CODENAME(bfsw)
+			if (xenomods::DocumentPtr != nullptr)
+				game::ObjUtil::setPartyGauge(*xenomods::DocumentPtr, partyGauge * 100);
+#endif
+		}
+		ImGui::PopItemWidth();
 	}
 
 	void BattleCheats::Initialize() {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up battle cheats...");
+		OnConfigUpdate();
 
 #if XENOMODS_OLD_ENGINE
 		IsPlayerTakesBool = skylaunch::hook::detail::ResolveSymbolBase("_ZNK3btl15BattleCharacter8IsDriverEv") == skylaunch::hook::INVALID_FUNCTION_PTR;
@@ -78,6 +121,9 @@ namespace xenomods {
 		ModifyDamage::HookAt(&btl::BattleCharacter::NotifyDamage);
 #elif XENOMODS_CODENAME(bfsw)
 		ModifyDamage::HookAt(&game::BattleDamageCalcurator::calcCounterSpike); // last call in calcDamage
+
+		DisableVisionBGM::HookAt("_ZNK4game3BGM14getBattleBGMIDERKNS_14GameControllerE");
+		DisableTensionBGM::HookAt("_ZNK4game3BGM15testTensionZeroERKNS_14GameControllerE");
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
@@ -85,6 +131,11 @@ namespace xenomods {
 			auto section = modules->RegisterSection(STRINGIFY(BattleCheats), "Battle Cheats");
 			section->RegisterRenderCallback(&MenuSection);
 		}
+	}
+
+	void BattleCheats::OnConfigUpdate() {
+		disableVisionBGM = GetState().config.disableBattleBGMChanges;
+		disableTensionBGM = GetState().config.disableBattleBGMChanges;
 	}
 
 #if !XENOMODS_CODENAME(bf3)
