@@ -4,9 +4,12 @@
 
 #include <xenomods/Utils.hpp>
 
+#include "xenomods/engine/mm/FixStr.hpp"
+
 namespace ml {
 
 	class Scn;
+	class IDrDrawWorkInfo;
 
 	class DrMan {
 	   public:
@@ -50,6 +53,44 @@ namespace ml {
 		float GBufferDebugParams[8][2];
 		INSERT_PADDING_BYTES(0x128);
 		bool GBufferDebug;
+	};
+
+	class DrResMdoTexList {
+	   public:
+		void texStmUpdate();
+	};
+
+	class DrCalcStmListObj {
+	   public:
+		INSERT_PADDING_BYTES(0x10);
+		DrCalcStmListObj* nextListObj;
+		INSERT_PADDING_BYTES(188);
+		mm::mtl::FixStr<256> path;
+
+		void chacheTexClear();
+		void chacheDefClear();
+
+		void update();
+
+		void texstm_checkTexStm();
+		void texstm_stmchk_topheader();
+		void texstm_stmchk_topWait();
+		void texstm_defMidTexUpdate();
+		void texstm_defRead();
+		void texstm_defupdate();
+	};
+
+	class DrCalcTexStreamMan {
+	   public:
+		INSERT_PADDING_BYTES(40);
+		DrCalcStmListObj* rootObjectIDK;
+		INSERT_PADDING_BYTES(40);
+
+		// one for each buffer, oddly
+		DrCalcStmListObj* updateList[512][2];
+		int updateListCount[2];
+
+		void update();
 	};
 
 }

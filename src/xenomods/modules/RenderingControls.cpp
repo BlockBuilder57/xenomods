@@ -40,6 +40,13 @@ namespace {
 		}
 	};
 
+	struct FreezeTextureStreaming : skylaunch::hook::Trampoline<FreezeTextureStreaming> {
+		static void Hook(ml::DrResMdoTexList* this_pointer) {
+			if (!xenomods::RenderingControls::freezeTextureStreaming)
+				Orig(this_pointer);
+		}
+	};
+
 #if XENOMODS_OLD_ENGINE
 	struct SkipParticleRendering : skylaunch::hook::Trampoline<SkipParticleRendering> {
 		static void Hook(void* this_pointer, void* DrDrawWorkInfoEF, int param_2, bool param_3) {
@@ -53,7 +60,7 @@ namespace {
 			bool skip = false;
 
 			using enum xefb::eXefbDrayType;
-			switch (this_pointer->Emitter->drawType) {
+			switch(this_pointer->Emitter->drawType) {
 				case PostLine:
 				case PostGauss:
 				case PostRadial:
@@ -72,7 +79,7 @@ namespace {
 				}
 			}
 
-			if (!skip)
+			if(!skip)
 				Orig(this_pointer, res);
 		}
 	};
@@ -82,7 +89,7 @@ namespace {
 	struct StraightensYourXenoblade : skylaunch::hook::Trampoline<StraightensYourXenoblade> {
 		static void Hook(layer::LayerObjFont* this_pointer, void* LayerRenderView, void* LayerResMatrix, void* LayerResColor) {
 			float temp = this_pointer->slopeRot;
-			if (xenomods::RenderingControls::straightenFont)
+			if(xenomods::RenderingControls::straightenFont)
 				this_pointer->slopeRot = 0; // hook to the system tick for fun times
 			Orig(this_pointer, LayerRenderView, LayerResMatrix, LayerResColor);
 			this_pointer->slopeRot = temp;
@@ -90,7 +97,7 @@ namespace {
 	};
 #endif
 
-}
+} // namespace
 
 namespace xenomods {
 
@@ -102,7 +109,10 @@ namespace xenomods {
 	bool RenderingControls::skipOverlayRendering = false;
 	bool RenderingControls::skipCloudRendering = false;
 	bool RenderingControls::skipSkyDomeRendering = false;
+
 	float RenderingControls::shadowStrength = 1.0;
+
+	bool RenderingControls::freezeTextureStreaming = false;
 
 	const std::string toggleKey = std::string(STRINGIFY(RenderingControls)) + "_Toggles";
 
@@ -112,24 +122,38 @@ namespace xenomods {
 #endif
 #if !XENOMODS_CODENAME(bf3)
 		ImGui::PushItemWidth(150.f);
-		if (ImGui::SliderFloat("Shadow strength", &shadowStrength, -1, 1))
-		{
+		if(ImGui::SliderFloat("Shadow strength", &shadowStrength, -1, 1)) {
 			auto acc = ml::ScnRenderDrSysParmAcc();
 			acc.setShadowStr(shadowStrength);
 		}
 		ImGui::PopItemWidth();
+
+		ImGui::Separator();
+
+		if(ImGui::Button("Clear Texture Cache")) {
+			auto ptr = *reinterpret_cast<ml::DrCalcTexStreamMan**>(skylaunch::hook::detail::ResolveSymbolBase("_ZZN2mm3mtl12PtrSingletonIN2ml18DrCalcTexStreamManEE3sysEvE10s_instance"));
+
+			if (ptr != nullptr) {
+				for (ml::DrCalcStmListObj* listObj = ptr->rootObjectIDK; listObj != nullptr; listObj = listObj->nextListObj) {
+					g_Logger->LogDebug("Clearing texture cache for {}", listObj->path.buffer);
+					listObj->chacheTexClear();
+				}
+			}
+		}
+
+		ImGui::Checkbox("Freeze texture streaming", &freezeTextureStreaming);
 #endif
 	}
 
 	void RenderingControls::MenuToggles() {
 		ImGui::Checkbox("Skip UI rendering", &skipUIRendering);
 #if !XENOMODS_CODENAME(bf3)
-#if XENOMODS_OLD_ENGINE
+	#if XENOMODS_OLD_ENGINE
 		ImGui::Checkbox("Skip particle+overlay rendering", &skipParticleRendering);
-#else
+	#else
 		ImGui::Checkbox("Skip particle rendering", &skipParticleRendering);
 		ImGui::Checkbox("Skip overlay rendering", &skipOverlayRendering);
-#endif
+	#endif
 		ImGui::Checkbox("Skip cloud (sea) rendering", &skipCloudRendering);
 		ImGui::Checkbox("Skip sky dome rendering", &skipSkyDomeRendering);
 
@@ -137,11 +161,11 @@ namespace xenomods {
 		static bool hideFog = false, hideBloom = false, hideTonemap = false;
 
 		ImGui::Checkbox("Hide map", &acc.drMan->hideMap);
-		if (ImGui::Checkbox("Disable fog", &hideFog))
+		if(ImGui::Checkbox("Disable fog", &hideFog))
 			acc.setFogSkip(hideFog);
-		if (ImGui::Checkbox("Disable bloom", &hideBloom))
+		if(ImGui::Checkbox("Disable bloom", &hideBloom))
 			acc.setBloom(!hideBloom);
-		if (ImGui::Checkbox("Disable tonemapping", &hideTonemap))
+		if(ImGui::Checkbox("Disable tonemapping", &hideTonemap))
 			acc.setToneMap(!hideTonemap);
 
 		ImGui::Checkbox("Force disable depth of field", &ForcedParameters.DisableDOF);
@@ -166,7 +190,7 @@ namespace xenomods {
 		ImGui::SliderFloat2("Emission 2",        acc.PixlPostParm->GBufferDebugParams[6], 0, 1);
 		ImGui::SliderFloat2("Specular",          acc.PixlPostParm->GBufferDebugParams[7], 0, 1);
 
-		if (ImGui::Button("Reset parameters"))
+		if(ImGui::Button("Reset parameters"))
 			acc.setGBuffDebugDefault();
 #endif
 	}
@@ -179,6 +203,8 @@ namespace xenomods {
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 		SkipCloudRendering::HookAt("_ZN5cloud8CloudMan5applyEPKN2ml15IDrDrawWorkInfoEPNS1_13DrMdoZSortManE");
 		SkipSkyDomeRendering::HookAt("_ZN2ml9DrPixlMan13renderSkyDomeEv");
+
+		FreezeTextureStreaming::HookAt(&ml::DrResMdoTexList::texStmUpdate);
 #else
 		SkipLayerRendering::HookFromBase(0x710100f790);
 		SkipLayer2Rendering::HookFromBase(0x710100f808);
@@ -192,7 +218,7 @@ namespace xenomods {
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
-		if (modules != nullptr) {
+		if(modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(RenderingControls), "Rendering Controls");
 			section->RegisterRenderCallback(&MenuSection);
 
@@ -210,18 +236,18 @@ namespace xenomods {
 		UpdatableModule::Update(updateInfo);
 
 #if !XENOMODS_CODENAME(bf3)
-		if (ForcedParameters.Any()) {
+		if(ForcedParameters.Any()) {
 			auto acc = ml::ScnRenderDrSysParmAcc();
 
-			if (ForcedParameters.DisableDOF) {
+			if(ForcedParameters.DisableDOF) {
 				acc.setDOFOverride(true);
 				acc.setDOF(false);
 			}
-			if (ForcedParameters.DisableMotionBlur) {
+			if(ForcedParameters.DisableMotionBlur) {
 				acc.setMotBlurOverride(true);
 				acc.setMotBlur(false);
 			}
-			if (ForcedParameters.DisableColorFilter) {
+			if(ForcedParameters.DisableColorFilter) {
 				acc.setColorFilterOverride(true);
 				acc.setColorFilterNum(0);
 				acc.setColorFilterFarNum(0);

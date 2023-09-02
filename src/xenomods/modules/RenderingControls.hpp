@@ -12,7 +12,10 @@ namespace xenomods {
 		static bool skipOverlayRendering;
 		static bool skipCloudRendering;
 		static bool skipSkyDomeRendering;
+
 		static float shadowStrength;
+
+		static bool freezeTextureStreaming;
 
 		struct ForcedRenderParameters {
 			bool DisableDOF;
