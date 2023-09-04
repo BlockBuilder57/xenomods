@@ -26,6 +26,7 @@ namespace xenomods::version {
 		std::uint8_t patch {};
 
 		static const SemVer v2_0_0;
+		static const SemVer v2_1_0;
 
 		inline bool IsValid() {
 			return major != 0 && minor != 0 && patch != 0;
@@ -75,7 +76,15 @@ namespace xenomods::version {
 #if !XENOMODS_CODENAME(bf3)
 	inline const char* RuntimeBuildRevision() { return ml::ProcDesktop::getBuildRevision()->buffer; }
 #else
-	inline const char* RuntimeBuildRevision() { return reinterpret_cast<mm::mtl::FixStr<128>*>(skylaunch::utils::g_MainTextAddr + 0x1b6f500)->buffer; }
+	inline const char* RuntimeBuildRevision() {
+		// ml::_dsk::s_revision
+		if (RuntimeVersion() == SemVer::v2_0_0)
+			return reinterpret_cast<mm::mtl::FixStr<128>*>(skylaunch::utils::g_MainTextAddr + 0x1b6f500)->buffer;
+		else if (RuntimeVersion() == SemVer::v2_1_0)
+			return reinterpret_cast<mm::mtl::FixStr<128>*>(skylaunch::utils::g_MainTextAddr + 0x1b70500)->buffer;
+
+		return nullptr;
+	}
 #endif
 
 } // namespace xenomods::version

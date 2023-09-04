@@ -6,6 +6,7 @@
 
 #include <skylaunch/hookng/Hooks.hpp>
 
+#include "Version.hpp"
 #include "xenomods/engine/fw/Debug.hpp"
 #include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/engine/gf/Util.hpp"
@@ -19,8 +20,14 @@ namespace xenomods::debug {
 		drawFontCurBackColor = color;
 
 #if XENOMODS_CODENAME(bf3)
-		auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243890))(-1); // ml::DebDraw::get
-		((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x12450d8))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontBack
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
+			auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243890))(-1); // ml::DebDraw::get
+			((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x12450d8))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontBack
+		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
+			auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243bc0))(-1); // ml::DebDraw::get
+			((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x1245408))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontBack
+		}
 #else
 		auto cacheDraw = ml::DebDraw::getCacheDraw();
 		cacheDraw->fontBack(color);
@@ -58,9 +65,16 @@ namespace xenomods::debug {
 		// a bit of a travesty here...
 		static char buf[512];
 		snprintf(&buf[0], 512, fmt, std::forward<Args>(args)...);
-		auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243890))(-1); // ml::DebDraw::get
-		((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x1244f5c))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontColor
-		((void(*)(ml::CacheDraw*, short, short, const char*))(skylaunch::utils::g_MainTextAddr + 0x12456c8))(debDraw->pCacheDraw, x, y, buf); // ml::CacheDraw::font
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
+			auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243890))(-1); // ml::DebDraw::get
+			((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x1244f5c))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontColor
+			((void(*)(ml::CacheDraw*, short, short, const char*))(skylaunch::utils::g_MainTextAddr + 0x12456c8))(debDraw->pCacheDraw, x, y, buf); // ml::CacheDraw::font
+		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
+			auto debDraw = ((ml::DebDraw*(*)(int))(skylaunch::utils::g_MainTextAddr + 0x1243bc0))(-1); // ml::DebDraw::get
+			((void(*)(ml::CacheDraw*, const mm::Col4&))(skylaunch::utils::g_MainTextAddr + 0x124528c))(debDraw->pCacheDraw, color); // ml::CacheDraw::fontColor
+			((void(*)(ml::CacheDraw*, short, short, const char*))(skylaunch::utils::g_MainTextAddr + 0x124f5c8))(debDraw->pCacheDraw, x, y, buf); // ml::CacheDraw::font
+		}
 #else
 		fw::debug::drawFont(x, y, color, fmt, std::forward<Args>(args)...);
 #endif

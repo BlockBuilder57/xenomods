@@ -36,8 +36,16 @@ namespace xenomods {
 
 		if(GetState().config.enable60FPS) {
 #if XENOMODS_CODENAME(bf3)
-			LayerManagerCtorHook::HookFromBase(0x710100f260);
-			VSyncHook::HookFromBase(0x7101249648);
+			// layer::LayerManager::LayerManager
+			// ml::DevGraph::setVSync
+			if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
+				LayerManagerCtorHook::HookFromBase(0x710100f260);
+				VSyncHook::HookFromBase(0x7101249648);
+			}
+			else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
+				LayerManagerCtorHook::HookFromBase(0x710100f590);
+				VSyncHook::HookFromBase(0x7101249978);
+			}
 #else
 			LayerManagerCtorHook::HookAt("_ZN5layer12LayerManagerC1EPN2ml3ScnEN3mtl12ALLOC_HANDLEEj"); // can't hook ctors yet?
 			VSyncHook::HookAt(&ml::DevGraph::setVSync);

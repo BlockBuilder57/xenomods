@@ -294,13 +294,19 @@ namespace xenomods {
 #elif XENOMODS_CODENAME(bfsw)
 		PilotCameraLayers::HookAt(&fw::CameraLayer::update);
 #elif XENOMODS_CODENAME(bf3)
-		PilotCameraLayers::HookFromBase(0x7100013708);
+		// fw::CameraLayer::update
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0)
+			PilotCameraLayers::HookFromBase(0x7100013708);
 #endif
 
 #if !XENOMODS_CODENAME(bf3)
 		CopyCurrentCameraState::HookAt(&ml::ScnObjCam::updateFovNearFar);
 #else
-		CopyCurrentCameraState::HookFromBase(0x71012702ec);
+		// ml::ScnObjCam::updateFovNearFar
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0)
+			CopyCurrentCameraState::HookFromBase(0x71012702ec);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0)
+			CopyCurrentCameraState::HookFromBase(0x710127061c);
 #endif
 
 		auto modules = g_Menu->FindSection("modules");

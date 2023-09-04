@@ -206,8 +206,15 @@ namespace xenomods {
 
 		FreezeTextureStreaming::HookAt(&ml::DrResMdoTexList::texStmUpdate);
 #else
-		SkipLayerRendering::HookFromBase(0x710100f790);
-		SkipLayer2Rendering::HookFromBase(0x710100f808);
+		// layer::LayerManager::finalRender and its cousin
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
+			SkipLayerRendering::HookFromBase(0x710100f790);
+			SkipLayer2Rendering::HookFromBase(0x710100f808);
+		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
+			SkipLayerRendering::HookFromBase(0x710100fac0);
+			SkipLayer2Rendering::HookFromBase(0x710100fb38);
+		}
 #endif
 
 #if XENOMODS_OLD_ENGINE
