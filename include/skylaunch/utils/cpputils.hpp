@@ -57,4 +57,12 @@ namespace skylaunch::utils {
 			return std::memcmp(this, &o, sizeof(*this)) > 0;
 		}
 	};
+
+	inline uintptr_t AddrFromBase(uintptr_t ptr) {
+		if (ptr > 0x7100000000)
+			ptr -= 0x7100000000;
+
+		return g_MainTextAddr + ptr;
+	};
+
 }; // namespace skylaunch::utils

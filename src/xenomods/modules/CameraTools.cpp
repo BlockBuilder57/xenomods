@@ -297,6 +297,8 @@ namespace xenomods {
 		// fw::CameraLayer::update
 		if (version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0)
 			PilotCameraLayers::HookFromBase(0x7100013708);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
+			PilotCameraLayers::HookFromBase(0x7100013718);
 #endif
 
 #if !XENOMODS_CODENAME(bf3)
@@ -307,6 +309,8 @@ namespace xenomods {
 			CopyCurrentCameraState::HookFromBase(0x71012702ec);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_0)
 			CopyCurrentCameraState::HookFromBase(0x710127061c);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
+			CopyCurrentCameraState::HookFromBase(0x710127065c);
 #endif
 
 		auto modules = g_Menu->FindSection("modules");

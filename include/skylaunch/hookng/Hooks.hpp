@@ -64,10 +64,7 @@ namespace skylaunch::hook {
 		}
 
 		static inline void HookFromBase(uintptr_t address) {
-			if (address > 0x7100000000)
-				address -= 0x7100000000;
-
-			(void)detail::HookFunction(reinterpret_cast<ReplaceHookType<>>(skylaunch::utils::g_MainTextAddr + address), &Impl::Hook);
+			(void)detail::HookFunction(reinterpret_cast<ReplaceHookType<>>(skylaunch::utils::AddrFromBase(address)), &Impl::Hook);
 		}
 	};
 
@@ -111,10 +108,7 @@ namespace skylaunch::hook {
 		}
 
 		static inline void HookFromBase(uintptr_t address) {
-			if (address > 0x7100000000)
-				address -= 0x7100000000;
-
-			Backup() = detail::HookFunction(reinterpret_cast<TrampolineHookType<>>(skylaunch::utils::g_MainTextAddr + address), &Impl::Hook);
+			Backup() = detail::HookFunction(reinterpret_cast<TrampolineHookType<>>(skylaunch::utils::AddrFromBase(address)), &Impl::Hook);
 		}
 
 		static auto& Backup() {

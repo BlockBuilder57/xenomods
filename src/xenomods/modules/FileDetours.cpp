@@ -152,6 +152,10 @@ namespace xenomods {
 			ReadFileHook::HookFromBase(0x71012565d4);
 			ReadFileSliceHook::HookFromBase(0x7101254de0);
 		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1) {
+			ReadFileHook::HookFromBase(0x7101256614);
+			ReadFileSliceHook::HookFromBase(0x7101254e20);
+		}
 #endif
 	}
 

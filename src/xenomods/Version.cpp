@@ -85,5 +85,6 @@ namespace xenomods::version {
 
 	const SemVer SemVer::v2_0_0 = {2,0,0};
 	const SemVer SemVer::v2_1_0 = {2,1,0};
+	const SemVer SemVer::v2_1_1 = {2,1,1};
 
 } // namespace xenomods::version

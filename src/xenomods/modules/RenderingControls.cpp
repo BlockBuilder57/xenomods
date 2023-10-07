@@ -215,6 +215,10 @@ namespace xenomods {
 			SkipLayerRendering::HookFromBase(0x710100fac0);
 			SkipLayer2Rendering::HookFromBase(0x710100fb38);
 		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1) {
+			SkipLayerRendering::HookFromBase(0x710100fb00);
+			SkipLayer2Rendering::HookFromBase(0x710100fb78);
+		}
 #endif
 
 #if XENOMODS_OLD_ENGINE

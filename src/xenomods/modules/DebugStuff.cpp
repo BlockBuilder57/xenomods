@@ -226,14 +226,15 @@ namespace xenomods {
 		fw::PadManager::enableDebugDraw(enableDebugRendering);
 #endif
 #if XENOMODS_CODENAME(bf3)
-		unsigned int* globalDebugFlags = nullptr;
+		unsigned int* s_flg = nullptr; //ml::_dsk::s_flg
+
 		if (version::RuntimeVersion() == version::SemVer::v2_0_0)
-			globalDebugFlags = reinterpret_cast<unsigned int*>(skylaunch::utils::g_MainTextAddr + 0x1c49c60);
-		else if (version::RuntimeVersion() == version::SemVer::v2_1_0)
-			globalDebugFlags = reinterpret_cast<unsigned int*>(skylaunch::utils::g_MainTextAddr + 0x1c4ac60);
+			s_flg = reinterpret_cast<unsigned int*>(skylaunch::utils::AddrFromBase(0x7101c49c60));
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_1_1)
+			s_flg = reinterpret_cast<unsigned int*>(skylaunch::utils::AddrFromBase(0x7101c4ac60));
 
 		// sets the system info print to display
-		*globalDebugFlags ^= (-enableDebugRendering ^ *globalDebugFlags) & (1 << 6);
+		*s_flg ^= (-enableDebugRendering ^ *s_flg) & (1 << 6);
 #endif
 	}
 
