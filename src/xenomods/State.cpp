@@ -9,6 +9,7 @@ namespace xenomods {
 	void Config::Reset() {
 		port = CONFIG_PORT_DEFAULT;
 		loggingLevel = static_cast<Logger::Severity>(CONFIG_LOGGING_LEVEL_DEFAULT);
+		menuTheme = static_cast<Menu::Theme>(CONFIG_MENU_THEME_DEFAULT);
 
 		titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 
@@ -46,6 +47,8 @@ namespace xenomods {
 
 		// update the logger's level
 		g_Logger->SetLoggingLevel(loggingLevel);
+		// update menu theme
+		g_Menu->SetTheme(menuTheme);
 
 		// update modules
 		ConfigUpdateForAllRegisteredModules();
@@ -59,6 +62,8 @@ namespace xenomods {
 
 		if(respectDefaults || table[STRINGIFY(loggingLevel)].type() != toml::node_type::none)
 			loggingLevel = static_cast<Logger::Severity>(table[STRINGIFY(loggingLevel)].value_or(CONFIG_LOGGING_LEVEL_DEFAULT));
+		if(respectDefaults || table[STRINGIFY(menuTheme)].type() != toml::node_type::none)
+			menuTheme = static_cast<Menu::Theme>(table[STRINGIFY(menuTheme)].value_or(CONFIG_MENU_THEME_DEFAULT));
 
 		if(respectDefaults || table[STRINGIFY(dumpFileReads)].type() != toml::node_type::none)
 			dumpFileReads = table[STRINGIFY(dumpFileReads)].value_or(CONFIG_DUMP_FILE_READS_DEFAULT);

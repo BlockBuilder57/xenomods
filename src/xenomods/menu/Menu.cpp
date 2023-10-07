@@ -27,22 +27,7 @@ namespace xenomods {
 	};
 
 	void ImGuiInitCallback() {
-		// Select the theme for the current game by default
-		switch (version::RuntimeGame()) {
-			case version::GameType::BFSW:
-				ImGuiStyleColorsXB1();
-				break;
-			case version::GameType::BF2:
-			case version::GameType::IRA:
-				ImGuiStyleColorsXB2();
-				break;
-			case version::GameType::BF3:
-				ImGuiStyleColorsXB3();
-				break;
-			default:
-				// leave with defaults
-				break;
-		}
+		g_Menu->SetTheme(GetState().config.menuTheme);
 	}
 
 	void Section_State() {
@@ -50,7 +35,8 @@ namespace xenomods {
 			XenomodsState::ReloadConfig();
 
 		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 8.f);
-		imguiext::ShowStyleSelector("Menu Theme");
+		if (imguiext::EnumComboBox("Menu Theme", &GetState().config.menuTheme)) {}
+			g_Menu->SetTheme(GetState().config.menuTheme);
 		ImGui::PopItemWidth();
 	}
 
@@ -131,6 +117,37 @@ namespace xenomods {
 		for(auto func : g_Menu->callbacks) {
 			func();
 		}
+	}
+
+	Menu::Theme Menu::SetTheme(Theme theme) {
+		if (ImGui::GetCurrentContext() == nullptr)
+			return Theme::Auto;
+
+		Theme curTheme = theme;
+
+		if (curTheme == Theme::Auto) {
+			switch (version::RuntimeGame()) {
+				case version::GameType::BFSW:
+					curTheme = Theme::Titans;
+				case version::GameType::BF2:
+				case version::GameType::IRA:
+					curTheme = Theme::Alrest;
+				case version::GameType::BF3:
+					curTheme = Theme::Aionios;
+			}
+		}
+
+		switch (curTheme) {
+			case Theme::Titans: ImGuiStyleColorsXB1(); break;
+			case Theme::Alrest: ImGuiStyleColorsXB2(); break;
+			case Theme::Aionios: ImGuiStyleColorsXB3(); break;
+			case Theme::ImGuiDark: ImGui::StyleColorsDark(); break;
+			case Theme::ImGuiLight: ImGui::StyleColorsLight(); break;
+			case Theme::ImGuiClassic: ImGui::StyleColorsClassic(); break;
+			default: ImGui::StyleColorsDark(); return Theme::ImGuiDark;
+		}
+
+		return curTheme;
 	}
 
 	Section* FindSectionRecurse(Section* section, const std::string& key) {

@@ -13,6 +13,8 @@ Below is an example, with defaults. Note that all are optional, excluding them w
 port = 6969
 # Logging level of the console. (Debug = 0, Info, Warning, Error, Fatal = 4)
 loggingLevel = 1
+# Theme for the Menu. (Auto = 0, Titans, Alrest, Aionios, Dear ImGui Dark, Dear ImGui Light, Dear ImGui Classic = 6)
+menuTheme = 0
 
 # Dumps files to /config/xenomods/{game}/dump/
 dumpFileReads = false

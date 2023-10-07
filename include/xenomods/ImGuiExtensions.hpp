@@ -38,6 +38,4 @@ namespace xenomods::imguiext {
 		return result;
 	}
 
-	bool ShowStyleSelector(const char* label);
-
 } // namespace xenomods::imgui

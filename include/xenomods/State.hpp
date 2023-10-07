@@ -7,6 +7,7 @@
 
 #include "xenomods/Logger.hpp"
 #include "xenomods/Utils.hpp"
+#include "xenomods/menu/Menu.hpp"
 
 namespace xenomods {
 
@@ -14,6 +15,7 @@ namespace xenomods {
 		// very yucky, but this way it's in one spot
 #define CONFIG_PORT_DEFAULT 6969
 #define CONFIG_LOGGING_LEVEL_DEFAULT underlying_value(Logger::Severity::Info)
+#define CONFIG_MENU_THEME_DEFAULT underlying_value(Menu::Theme::Auto)
 #define CONFIG_DUMP_FILE_READS_DEFAULT false
 #define CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT true
 #define CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT \
@@ -42,6 +44,7 @@ namespace xenomods {
 
 		uint16_t port {};
 		Logger::Severity loggingLevel {};
+		Menu::Theme menuTheme {};
 
 		bool dumpFileReads {};
 		bool enableFileOverrides {};
