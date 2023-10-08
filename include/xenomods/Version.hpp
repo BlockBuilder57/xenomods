@@ -4,10 +4,12 @@
 
 #include <string_view>
 
-#include "Utils.hpp"
 #include "fmt/core.h"
 #include "gitversion.h"
 #include "skylaunch/utils/cpputils.hpp"
+#include <xenomods/Utils.hpp>
+#include <xenomods/Logger.hpp>
+
 #include "xenomods/engine/ml/ProcDesktop.hpp"
 
 namespace xenomods::version {
@@ -25,25 +27,77 @@ namespace xenomods::version {
 		std::uint8_t minor {};
 		std::uint8_t patch {};
 
+		static const SemVer v1_0_0;
+		static const SemVer v1_0_1;
+		static const SemVer v1_0_2;
+		static const SemVer v1_1_0;
+		static const SemVer v1_1_1;
+		static const SemVer v1_1_2;
+		static const SemVer v1_2_0;
+		static const SemVer v1_2_1;
+		static const SemVer v1_3_0;
+		static const SemVer v1_3_1;
+		static const SemVer v1_4_0;
+		static const SemVer v1_4_1;
+		static const SemVer v1_5_0;
+		static const SemVer v1_5_1;
+		static const SemVer v1_5_2;
 		static const SemVer v2_0_0;
+		static const SemVer v2_0_1;
+		static const SemVer v2_0_2;
 		static const SemVer v2_1_0;
 		static const SemVer v2_1_1;
 
-		inline bool IsValid() {
+		inline bool IsValid() const {
 			return major != 0 && minor != 0 && patch != 0;
 		}
-
-		inline bool operator==(const SemVer& other) const {
-			return this->major == other.major && this->minor == other.minor && this->patch == other.patch;
+		[[nodiscard]] inline unsigned int AsInteger() const {
+			return (major << (sizeof(major) + sizeof(minor))) | (minor << (sizeof(minor))) | patch;
 		}
+
+		inline bool operator==(const SemVer& other) const { return this->AsInteger() == other.AsInteger(); }
 		inline bool operator!=(const SemVer& other) const { return !(*this == other); }
 
-		inline bool operator<(const SemVer& other) const {
-			return this->major <= other.major && this->minor <= other.minor && this->patch < other.patch;
-		}
+		inline bool operator<(const SemVer& other) const { return this->AsInteger() < other.AsInteger(); }
 		inline bool operator>(const SemVer& other) const { return other < *this; }
 		inline bool operator<=(const SemVer& other) const { return !(other > *this); }
-		inline bool operator>=(const SemVer& other) const { return !(other < *this); }
+		inline bool operator>=(const SemVer& other) const { return !(*this < other); }
+
+/*#define TEST_SEMVER(x) g_Logger->LogInfo(#x " : {}", (x));
+
+		static void Test() {
+			TEST_SEMVER(v1_0_0 == v2_0_0);
+			TEST_SEMVER(v1_1_0 == v2_0_0);
+			TEST_SEMVER(v2_0_0 == v2_0_0);
+			TEST_SEMVER(v2_1_0 == v2_0_0);
+
+			TEST_SEMVER(v1_0_0 != v2_0_0);
+			TEST_SEMVER(v1_1_0 != v2_0_0);
+			TEST_SEMVER(v2_0_0 != v2_0_0);
+			TEST_SEMVER(v2_1_0 != v2_0_0);
+
+			TEST_SEMVER(v1_0_0 < v2_0_0);
+			TEST_SEMVER(v1_1_0 < v2_0_0);
+			TEST_SEMVER(v2_0_0 < v2_0_0);
+			TEST_SEMVER(v2_1_0 < v2_0_0);
+
+			TEST_SEMVER(v1_0_0 > v2_0_0);
+			TEST_SEMVER(v1_1_0 > v2_0_0);
+			TEST_SEMVER(v2_0_0 > v2_0_0);
+			TEST_SEMVER(v2_1_0 > v2_0_0);
+
+			TEST_SEMVER(v1_0_0 <= v2_0_0);
+			TEST_SEMVER(v1_1_0 <= v2_0_0);
+			TEST_SEMVER(v2_0_0 <= v2_0_0);
+			TEST_SEMVER(v2_1_0 <= v2_0_0);
+
+			TEST_SEMVER(v1_0_0 >= v2_0_0);
+			TEST_SEMVER(v1_1_0 >= v2_0_0);
+			TEST_SEMVER(v2_0_0 >= v2_0_0);
+			TEST_SEMVER(v2_1_0 >= v2_0_0);
+		}
+
+#undef TEST_SEMVER*/
 	};
 
 	const char* BuildGitVersion();
