@@ -126,15 +126,13 @@ namespace xenomods {
 		Theme curTheme = theme;
 
 		if (curTheme == Theme::Auto) {
-			switch (version::RuntimeGame()) {
-				case version::GameType::BFSW:
-					curTheme = Theme::Titans;
-				case version::GameType::BF2:
-				case version::GameType::IRA:
-					curTheme = Theme::Alrest;
-				case version::GameType::BF3:
-					curTheme = Theme::Aionios;
-			}
+#if XENOMODS_CODENAME(bfsw)
+			curTheme = Theme::Titans;
+#elif XENOMODS_OLD_ENGINE
+			curTheme = Theme::Alrest;
+#elif XENOMODS_CODENAME(bf3)
+			curTheme = Theme::Aionios;
+#endif
 		}
 
 		switch (curTheme) {
