@@ -9,7 +9,9 @@ namespace xenomods {
 	void Config::Reset() {
 		port = CONFIG_PORT_DEFAULT;
 		loggingLevel = static_cast<Logger::Severity>(CONFIG_LOGGING_LEVEL_DEFAULT);
+
 		menuTheme = static_cast<Menu::Theme>(CONFIG_MENU_THEME_DEFAULT);
+		menuFonts = CONFIG_MENU_FONTS_DEFAULT;
 
 		titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
 
@@ -47,7 +49,7 @@ namespace xenomods {
 
 		// update the logger's level
 		g_Logger->SetLoggingLevel(loggingLevel);
-		// update menu theme
+		// update menu
 		g_Menu->SetTheme(menuTheme);
 
 		// update modules
@@ -62,8 +64,37 @@ namespace xenomods {
 
 		if(respectDefaults || table[STRINGIFY(loggingLevel)].type() != toml::node_type::none)
 			loggingLevel = static_cast<Logger::Severity>(table[STRINGIFY(loggingLevel)].value_or(CONFIG_LOGGING_LEVEL_DEFAULT));
+
 		if(respectDefaults || table[STRINGIFY(menuTheme)].type() != toml::node_type::none)
 			menuTheme = static_cast<Menu::Theme>(table[STRINGIFY(menuTheme)].value_or(CONFIG_MENU_THEME_DEFAULT));
+		if(table[STRINGIFY(menuFonts)].is_array()) {
+			const toml::array* arr = table[STRINGIFY(menuFonts)].as_array();
+			bool load_failed = false;
+			menuFonts.clear();
+
+			if(arr != nullptr) {
+				arr->for_each([&](auto& el) {
+					if constexpr(toml::is_array<decltype(el)>) {
+						const toml::array* fontDef = el.as_array();
+
+						if (fontDef != nullptr) {
+							std::string path = fontDef->get(0)->value_or("");
+							float fontSize = fontDef->get(1)->value_or(0.0f);
+
+							menuFonts[path] = fontSize;
+						}
+					}
+					else {
+						load_failed = true;
+						return false;
+					}
+				});
+			} else
+				load_failed = true;
+
+			if(load_failed && respectDefaults)
+				menuFonts = CONFIG_MENU_FONTS_DEFAULT;
+		}
 
 		if(respectDefaults || table[STRINGIFY(dumpFileReads)].type() != toml::node_type::none)
 			dumpFileReads = table[STRINGIFY(dumpFileReads)].value_or(CONFIG_DUMP_FILE_READS_DEFAULT);

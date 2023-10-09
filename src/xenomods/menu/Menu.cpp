@@ -9,6 +9,7 @@
 #include <xenomods/HidInput.hpp>
 #include <xenomods/ImGuiExtensions.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/NnFile.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
 #include <xenomods/Version.hpp>
@@ -22,22 +23,95 @@ namespace xenomods {
 	struct NvnBootstrapHook : skylaunch::hook::Trampoline<NvnBootstrapHook> {
 		static void* Hook(const char* name) {
 			return imgui_xeno_bootstrap_hook(name, reinterpret_cast<OrigNvnBootstrap>(Backup()));
-			//return Orig(name);
 		}
 	};
 
-	void ImGuiInitCallback() {
+	void ImGuiPreInitCallback() {
+		ImGuiIO& io = ImGui::GetIO();
+
+		// add as much as we reasonably can from the loaded fonts
+		static const ImWchar ranges[] = {
+			0x0020, 0x00FF, // Basic Latin + Latin Supplement
+			0x0102, 0x0103, // Vietnamese
+			0x0110, 0x0111, // Vietnamese
+			0x0128, 0x0129, // Vietnamese
+			0x0168, 0x0169, // Vietnamese
+			0x01A0, 0x01A1, // Vietnamese
+			0x01AF, 0x01B0, // Vietnamese
+			0x0370, 0x03FF, // Greek and Coptic
+			0x0400, 0x052F, // Cyrillic + Cyrillic Supplement
+			0x0E00, 0x0E7F, // Thai
+			0x1EA0, 0x1EF9, // Vietnamese
+			0x2000, 0x206F, // General Punctuation
+			0x2DE0, 0x2DFF, // Cyrillic Extended-A
+			0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
+			0x3131, 0x3163, // Korean alphabets
+			0x31F0, 0x31FF, // Katakana Phonetic Extensions
+			0x4e00, 0x9FAF, // CJK Ideograms
+			0xA640, 0xA69F, // Cyrillic Extended-B
+			0xAC00, 0xD7A3, // Korean characters
+			0xFF00, 0xFFEF, // Half-width characters
+			0xFFFD, 0xFFFD, // Invalid
+			0,
+		};
+
+		for(std::pair<std::string, float> thingy : GetState().config.menuFonts) {
+			std::string path = thingy.first;
+
+			if (!path.starts_with("sd:"))
+				path = "sd:/config/xenomods/fonts/" + path;
+
+			// check that the file exists first
+			xenomods::NnFile file(path, nn::fs::OpenMode_Read);
+
+			if(file) {
+				file.Close();
+				//g_Logger->LogDebug("{} at {}px", path, thingy.second);
+				io.Fonts->AddFontFromFileTTF(path.c_str(), thingy.second, nullptr, &ranges[0]);
+			}
+		}
+		io.Fonts->AddFontDefault();
+
 		g_Menu->SetTheme(GetState().config.menuTheme);
+
+		// I am fine hardcoding these for now. In the future, if we make support
+		// for full file-based theming, make sure we can do colors and style.
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		style.WindowPadding = ImVec2(6,6);
+		style.FramePadding = ImVec2(2,1);
+		style.ItemSpacing = ImVec2(8,3);
+		style.ItemInnerSpacing = ImVec2(3,4);
+
+		style.ScrollbarSize = 16;
+		style.ScrollbarRounding = 0;
 	}
 
 	void Section_State() {
-		if (ImGui::Button("Reload config/BDAT overrides"))
+		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 10.f);
+
+		if(imguiext::EnumComboBox("Menu Theme", &GetState().config.menuTheme))
+			g_Menu->SetTheme(GetState().config.menuTheme);
+
+		// copied from the demo
+		ImGuiIO& io = ImGui::GetIO();
+		ImFont* font_current = ImGui::GetFont();
+		if(ImGui::BeginCombo("Menu Font", font_current->GetDebugName())) {
+			for(ImFont* font : io.Fonts->Fonts) {
+				ImGui::PushID((void*)font);
+				if(ImGui::Selectable(font->GetDebugName(), font == font_current))
+					io.FontDefault = font;
+				ImGui::PopID();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::PopItemWidth();
+
+		if(ImGui::Button("Reload config/BDAT overrides"))
 			XenomodsState::ReloadConfig();
 
-		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 8.f);
-		if (imguiext::EnumComboBox("Menu Theme", &GetState().config.menuTheme)) {}
-			g_Menu->SetTheme(GetState().config.menuTheme);
-		ImGui::PopItemWidth();
+		ImGui::Separator();
 	}
 
 	std::string about_build {};
@@ -69,7 +143,7 @@ namespace xenomods {
 
 	void Menu::Initialize() {
 		NvnBootstrapHook::HookAt("nvnBootstrapLoader");
-		imgui_xeno_init(&ImGuiInitCallback, &Render);
+		imgui_xeno_init(&ImGuiPreInitCallback, nullptr, nullptr, &Render);
 
 		auto modules = RegisterSection("modules", "Modules");
 

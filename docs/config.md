@@ -13,8 +13,13 @@ Below is an example, with defaults. Note that all are optional, excluding them w
 port = 6969
 # Logging level of the console. (Debug = 0, Info, Warning, Error, Fatal = 4)
 loggingLevel = 1
+
 # Theme for the Menu. (Auto = 0, Titans, Alrest, Aionios, Dear ImGui Dark, Dear ImGui Light, Dear ImGui Classic = 6)
 menuTheme = 0
+# Extra fonts for the menu. This should be an array of arrays that has a file path and size (in pixels). The first in the array will be automatically used.
+# A full path can be specified, otherwise it will be relative to sd:/config/xenomods/fonts/.
+# Example: [["comic.ttf", 20.0], ["sd:/directory/consolas.ttf", 16.0]]
+menuFonts = []
 
 # Dumps files to /config/xenomods/{game}/dump/
 dumpFileReads = false
