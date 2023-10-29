@@ -176,7 +176,7 @@ namespace xenomods {
 			rStick = glm::zero<glm::vec2>();
 
 		// movement
-		glm::vec3 move {};
+		glm::vec3 move { 0, 0, 0 };
 		float fovMult = 30.f * deltaTime;
 
 		// slow the zoom at lower fovs
@@ -189,11 +189,14 @@ namespace xenomods {
 			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
 			if(fc->fov == 0)
 				fc->fov = 0.001f;
+
+			move = { 0, rStick.y, 0 };
 		} else {
 			move = { lStick.x, 0, -lStick.y };
-			move = rot * move * deltaTime; // rotate movement to local space
-			move *= fc->camSpeed;		   // multiply by cam speed
 		}
+
+		move = rot * move * deltaTime; // rotate movement to local space
+		move *= fc->camSpeed;		   // multiply by cam speed
 
 		// rotation
 		glm::vec3 look {};
