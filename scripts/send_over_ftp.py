@@ -31,7 +31,7 @@ def EnsureDirectory(root, path):
     print(f"Ensuring {os.path.join(root, path)} exists...")
 
     if path not in ListDirs(root):
-        ftpSite.mkd(f'{root}/{path}')
+        ftpConnection.mkd(f'{root}/{path}')
 
 
 def SendFile(filename, out):
