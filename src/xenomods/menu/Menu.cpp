@@ -39,16 +39,11 @@ namespace xenomods {
 			0x01A0, 0x01A1, // Vietnamese
 			0x01AF, 0x01B0, // Vietnamese
 			0x0370, 0x03FF, // Greek and Coptic
-			0x0400, 0x052F, // Cyrillic + Cyrillic Supplement
-			0x0E00, 0x0E7F, // Thai
-			0x1EA0, 0x1EF9, // Vietnamese
 			0x2000, 0x206F, // General Punctuation
-			0x2DE0, 0x2DFF, // Cyrillic Extended-A
 			0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
 			0x3131, 0x3163, // Korean alphabets
 			0x31F0, 0x31FF, // Katakana Phonetic Extensions
 			0x4e00, 0x9FAF, // CJK Ideograms
-			0xA640, 0xA69F, // Cyrillic Extended-B
 			0xAC00, 0xD7A3, // Korean characters
 			0xFF00, 0xFFEF, // Half-width characters
 			0xFFFD, 0xFFFD, // Invalid
@@ -142,8 +137,10 @@ namespace xenomods {
 	}
 
 	void Menu::Initialize() {
+		// imgui-xeno initialization
 		NvnBootstrapHook::HookAt("nvnBootstrapLoader");
-		imgui_xeno_init(&ImGuiPreInitCallback, nullptr, nullptr, &Render);
+		imgui_xeno_add_on_pre_init(&ImGuiPreInitCallback);
+		imgui_xeno_init(nullptr, &Render);
 
 		auto modules = RegisterSection("modules", "Modules");
 

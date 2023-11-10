@@ -20,6 +20,7 @@
 #include "xenomods/engine/ml/Scene.hpp"
 #include "xenomods/engine/ml/WinView.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
+#include "xenomods/engine/mm/StdBase.hpp"
 #include "xenomods/engine/tl/title.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/stuff/utils/util.hpp"
@@ -269,7 +270,7 @@ namespace xenomods {
 		g_Logger->LogDebug("Setting up debug stuff...");
 
 #if !XENOMODS_CODENAME(bf3)
-		MMAssert::HookAt("_ZN2mm9MMStdBase8mmAssertEPKcS2_j");
+		MMAssert::HookAt(&mm::MMStdBase::mmAssert);
 #endif
 
 #if XENOMODS_OLD_ENGINE

@@ -5,6 +5,7 @@
 #include <xenomods/Utils.hpp>
 
 #include "xenomods/engine/mm/FixStr.hpp"
+#include "xenomods/engine/mm/mtl/PtrSingleton.hpp"
 
 namespace ml {
 
@@ -80,7 +81,7 @@ namespace ml {
 		void texstm_defupdate();
 	};
 
-	class DrCalcTexStreamMan {
+	class DrCalcTexStreamMan : public mm::mtl::PtrSingleton<DrCalcTexStreamMan> {
 	   public:
 		INSERT_PADDING_BYTES(40);
 		DrCalcStmListObj* rootObjectIDK;

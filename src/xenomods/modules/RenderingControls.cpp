@@ -6,6 +6,7 @@
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
+#include "xenomods/engine/mm/mtl/PtrSingleton.hpp"
 #include "xenomods/engine/ptlib/Emitter.hpp"
 #include "xenomods/engine/ui/UIObjectAcc.hpp"
 #include "xenomods/engine/xefb/Effect.hpp"
@@ -131,9 +132,9 @@ namespace xenomods {
 		ImGui::Separator();
 
 		if(ImGui::Button("Clear Texture Cache")) {
-			auto ptr = *reinterpret_cast<ml::DrCalcTexStreamMan**>(skylaunch::hook::detail::ResolveSymbolBase("_ZZN2mm3mtl12PtrSingletonIN2ml18DrCalcTexStreamManEE3sysEvE10s_instance"));
+			auto ptr = *skylaunch::hook::detail::ResolveSymbol<ml::DrCalcTexStreamMan**>("_ZZN2mm3mtl12PtrSingletonIN2ml18DrCalcTexStreamManEE3sysEvE10s_instance");
 
-			if (ptr != nullptr) {
+			if (reinterpret_cast<uintptr_t>(ptr) != skylaunch::hook::INVALID_FUNCTION_PTR) {
 				for (ml::DrCalcStmListObj* listObj = ptr->rootObjectIDK; listObj != nullptr; listObj = listObj->nextListObj) {
 					g_Logger->LogDebug("Clearing texture cache for {}", listObj->path.buffer);
 					listObj->chacheTexClear();

@@ -204,8 +204,8 @@ namespace xenomods {
 
 		ImGui::InputInt("HP", &StatusCurrentDataPc->status.hp);
 		ImGui::InputInt("Level", &StatusCurrentDataPc->status.level);
-		ImGui::DragScalar("EXP (cur level)", ImGuiDataType_U32, &StatusCurrentDataPc->status.expLevel, 1.f);
-		ImGui::DragScalar("EXP (total)", ImGuiDataType_U32, &StatusCurrentDataPc->status.expTotal, 1.f);
+		//ImGui::DragScalar("EXP (cur level)", ImGuiDataType_U32, &StatusCurrentDataPc->status.expLevel, 1.f);
+		ImGui::DragScalar("Total EXP", ImGuiDataType_U32, &StatusCurrentDataPc->status.expTotal, 1.f);
 		ImGui::DragScalar("Bonus EXP", ImGuiDataType_U32, &StatusCurrentDataPc->status.expBonus, 1.f);
 		ImGui::DragScalar("Affinity Coins", ImGuiDataType_U32, &StatusCurrentDataPc->status.affinityCoins, 1.f);
 
@@ -256,7 +256,9 @@ namespace xenomods {
 			bool skipTorna = false;
 
 			if(version::RuntimeGame() == version::GameType::BF2) {
-				if(version::RuntimeVersion() >= version::SemVer::v2_0_0 && gf::GfDataAoc::getContentVersion(gf::AOC_TYPE::Torna) > -1)
+				auto ptr = *skylaunch::hook::detail::ResolveSymbol<gf::GfGameAoc**>("_ZZN2mm3mtl12PtrSingletonIN2gf9GfGameAocEE3sysEvE10s_instance");
+
+				if(version::RuntimeVersion() >= version::SemVer::v2_0_0 && (ptr != nullptr && ptr->isExistGameAoc(static_cast<gf::GAMEAOC>(gf::GAMEAOC::Ira | gf::GAMEAOC::Ver1_1))))
 					section = baseSection->RegisterSection(std::string(STRINGIFY(PartyEditor)) + "_base", "Party...");
 				else
 					skipTorna = true;

@@ -9,7 +9,7 @@
 namespace gf {
 
 	enum class AOC_TYPE {
-		Torna,
+		Ira,
 		NewQuests,
 		NewRareBlade,
 		NewChallengeMode,
@@ -27,13 +27,24 @@ namespace gf {
 		Major3 = 0x0300,
 		Major4 = 0x0400,
 
-		Ira = 0x30000,
+		Ver1_1 = 0x0101,
+
+		Ira =              0x000000,
+		NewQuests =        0x010000,
+		NewRareBlade =     0x020000,
+		NewChallengeMode = 0x030000,
+		HelpfulItems =     0x040000,
 	};
 
 	class GfDataAoc {
 	   public:
 		static int getContentVersion(gf::AOC_TYPE type);
 		static void debugSetContentVersion(gf::AOC_TYPE type, int ver);
+	};
+
+	class GfGameAoc {
+	   public:
+		bool isExistGameAoc(GAMEAOC aoc) const;
 	};
 }
 
