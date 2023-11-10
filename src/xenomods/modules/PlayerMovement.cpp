@@ -111,7 +111,7 @@ namespace {
 namespace xenomods {
 
 	bool PlayerMovement::moonJump = false;
-	bool PlayerMovement::disableFallDamage = true;
+	bool PlayerMovement::disableFallDamage = false;
 	float PlayerMovement::movementSpeedMult = 1.f;
 
 	std::vector<PlayerMovement::WarpData> PlayerMovement::Warps = {};
@@ -391,7 +391,7 @@ namespace xenomods {
 		}
 
 		WarpData warp = {
-			.name = "New Warp " + std::to_string(Warps.size()),
+			.name = mapName + " Warp " + std::to_string(Warps.size()),
 			.mapName = mapName,
 			.mapId = mapId,
 		};
@@ -496,19 +496,21 @@ namespace xenomods {
 		ImGui::Text("Current vel: %s", MenuCurrentPlayerVelocity().c_str());
 	}
 
-	void DrawWarp(PlayerMovement::WarpData* warp) {
-		ImGui::InputTextWithHint("", "Warp Name", &warp->name);
+	void MenuDrawWarp(PlayerMovement::WarpData* warp) {
 		ImGui::Text("Map: %s", warp->mapName.c_str());
 		ImGui::DragFloat3("Position", reinterpret_cast<float*>(&warp->position));
 		if(ImGui::DragFloat3("Rotation", reinterpret_cast<float*>(&warp->rotationEuler)))
 			warp->rotation = glm::quat(glm::radians(warp->rotationEuler));
 		ImGui::DragFloat3("Velocity", reinterpret_cast<float*>(&warp->velocity));
 
-		if(ImGui::Button("Overwrite Warp"))
-			PlayerMovement::SetWarp(warp);
-
 		if(ImGui::Button("Go To Warp"))
 			PlayerMovement::GoToWarp(warp);
+		ImGui::SameLine();
+		if(ImGui::Button("Overwrite Warp"))
+			PlayerMovement::SetWarp(warp);
+		ImGui::SameLine();
+		if(ImGui::Button("Delete Warp"))
+			PlayerMovement::DeleteWarp(warp);
 	}
 
 	void PlayerMovement::MenuWarps() {
@@ -549,7 +551,7 @@ namespace xenomods {
 				}
 
 				if(ImGui::BeginTabItem(warp->name.c_str(), &open, ImGuiTabItemFlags_None)) {
-					DrawWarp(warp);
+					MenuDrawWarp(warp);
 					ImGui::EndTabItem();
 				}
 

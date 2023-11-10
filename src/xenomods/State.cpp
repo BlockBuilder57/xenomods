@@ -38,7 +38,10 @@ namespace xenomods {
 
 		if(!res) {
 			auto error = std::move(res).error();
-			g_Logger->LogWarning("Couldn't load config! ({}) Falling back to defaults.", error.description());
+			if (error.description() == "File could not be opened for reading")
+				g_Logger->LogWarning("Config file was not found. Falling back to defaults.");
+			else
+				g_Logger->LogWarning("Couldn't load config! ({}) Falling back to defaults.", error.description());
 			return Reset();
 		}
 
