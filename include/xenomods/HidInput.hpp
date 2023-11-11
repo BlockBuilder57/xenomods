@@ -19,9 +19,9 @@ namespace xenomods {
 		State stateCur {};
 		State statePrev {};
 
-		nn::hid::NpadId padId {};
+		int padId {};
 
-		constexpr HidInput(nn::hid::NpadId id)
+		constexpr HidInput(int id)
 			: padId(id) {
 
 		}
@@ -30,6 +30,7 @@ namespace xenomods {
 
 		static HidInput* GetPlayer(int player);
 
+		static int GetDebugInputNum();
 		/*
 		 * Gets the controller used for the debug input (like the Menu)
 		 * Uses the last numbered controller if it is connected, otherwise P1.
@@ -76,38 +77,41 @@ namespace xenomods {
 		/** @} */
 	};
 
-
+	using enum nn::hid::NpadButton;
+#define NPADBIT(n) (1UL << ((std::uint64_t)n))
 
 	enum class Keybind : std::uint64_t {
 		// in-game controls
-		MOONJUMP = nn::hid::KEY_R | nn::hid::KEY_B,
+		MOONJUMP = NPADBIT(R) | NPADBIT(B),
 
-		EVENT_DEBUG_PREV = nn::hid::KEY_R | nn::hid::KEY_DLEFT,
-		EVENT_DEBUG_NEXT = nn::hid::KEY_R | nn::hid::KEY_DRIGHT,
-		EVENT_DEBUG_TOGGLE = nn::hid::KEY_R | nn::hid::KEY_DUP,
+		EVENT_DEBUG_PREV = NPADBIT(R) | NPADBIT(Left),
+		EVENT_DEBUG_NEXT = NPADBIT(R) | NPADBIT(Right),
+		EVENT_DEBUG_TOGGLE = NPADBIT(R) | NPADBIT(Up),
 
 		// menu controls + binds
-		MENU_TOGGLE = nn::hid::KEY_L | nn::hid::KEY_R | nn::hid::KEY_ZL | nn::hid::KEY_ZR,
-		MENU_UP = nn::hid::KEY_DUP,
-		MENU_DOWN = nn::hid::KEY_DDOWN,
-		MENU_SELECT = nn::hid::KEY_DRIGHT,
-		MENU_BACK = nn::hid::KEY_DLEFT,
+		MENU_TOGGLE = NPADBIT(L) | NPADBIT(R) | NPADBIT(ZL) | NPADBIT(ZR),
+		MENU_UP = NPADBIT(Up),
+		MENU_DOWN = NPADBIT(Down),
+		MENU_SELECT = NPADBIT(Right),
+		MENU_BACK = NPADBIT(Left),
 
-		MENU_NUM_INC = nn::hid::KEY_DUP,
-		MENU_NUM_DEC = nn::hid::KEY_DDOWN,
-		MENU_NUM_MULT2 = nn::hid::KEY_B,
-		MENU_NUM_NEXT_TENS = nn::hid::KEY_A,
-		MENU_NUM_NEGATE = nn::hid::KEY_Y,
-		MENU_NUM_SET0 = nn::hid::KEY_X,
+		MENU_NUM_INC = NPADBIT(Up),
+		MENU_NUM_DEC = NPADBIT(Down),
+		MENU_NUM_MULT2 = NPADBIT(B),
+		MENU_NUM_NEXT_TENS = NPADBIT(A),
+		MENU_NUM_NEGATE = NPADBIT(Y),
+		MENU_NUM_SET0 = NPADBIT(X),
 
-		CAMERA_COMBO = nn::hid::KEY_L | nn::hid::KEY_R,
-		FREECAM_TOGGLE = nn::hid::KEY_LSTICK | nn::hid::KEY_RSTICK,
+		CAMERA_COMBO = NPADBIT(L) | NPADBIT(R),
+		FREECAM_TOGGLE = NPADBIT(StickL) | NPADBIT(StickR),
 
-		FREECAM_FOVRESET = CAMERA_COMBO | nn::hid::KEY_LSTICK,
-		FREECAM_ROTRESET = CAMERA_COMBO | nn::hid::KEY_RSTICK,
-		FREECAM_SPEED_UP = CAMERA_COMBO | nn::hid::KEY_PLUS,
-		FREECAM_SPEED_DOWN = CAMERA_COMBO | nn::hid::KEY_MINUS,
-		FREECAM_TELEPORT = CAMERA_COMBO | nn::hid::KEY_B,
+		FREECAM_FOVRESET = CAMERA_COMBO | NPADBIT(StickL),
+		FREECAM_ROTRESET = CAMERA_COMBO | NPADBIT(StickR),
+		FREECAM_SPEED_UP = CAMERA_COMBO | NPADBIT(Plus),
+		FREECAM_SPEED_DOWN = CAMERA_COMBO | NPADBIT(Minus),
+		FREECAM_TELEPORT = CAMERA_COMBO | NPADBIT(B),
 	};
+
+#undef NPADBIT
 
 }; // namespace xenomods

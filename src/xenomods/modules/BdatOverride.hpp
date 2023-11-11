@@ -8,8 +8,8 @@
 
 #include <string>
 #include <string_view>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "UpdatableModule.hpp"
 
@@ -48,7 +48,6 @@ namespace xenomods {
 
 		static void RegisterCallback(xenomods::BdatOverrideBase* override);
 		static void LoadFromFile();
-
 	};
 
 } // namespace xenomods

@@ -5,6 +5,7 @@ add_executable(xenomods
 		# UTILITY
 		xenomods/FunctionalHooks.cpp
 		xenomods/NnFile.cpp
+		xenomods/ImGuiExtensions.cpp
 
 		xenomods/modules/UpdatableModule.cpp
 
@@ -15,9 +16,8 @@ add_executable(xenomods
 
 		xenomods/menu/Menu.cpp
 		xenomods/menu/Section.cpp
-		xenomods/menu/Option.cpp
 
-		xenomods/modules/DebugStuff.cpp
+        xenomods/modules/DebugStuff.cpp
 		xenomods/modules/CameraTools.cpp
 		xenomods/modules/RenderingControls.cpp
 		xenomods/modules/BattleCheats.cpp
@@ -98,22 +98,40 @@ set_target_properties(xenomods PROPERTIES
 		LINK_FLAGS "-fPIC -specs=${PROJECT_BINARY_DIR}/switch.specs -Wl,-Map,xenomods.map -Wl,--version-script=${PROJECT_SOURCE_DIR}/linkerscripts/exported.txt -nodefaultlibs -Wl,-init=__custom_init -Wl,-fini=__custom_fini -Wl,--export-dynamic -L ${DEVKITPRO}/portlibs/switch/lib -L ${DEVKITPRO}/libnx/lib"
 )
 
+xenomods_external_fpic(imgui_xeno)
+xenomods_external_fpic(fmt)
+
+target_compile_options(imgui_xeno PUBLIC
+		-DIMGUI_XENO_LOAD_DEFAULT_FONT=false
+		)
+
 target_include_directories(xenomods PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(xenomods PUBLIC ${PROJECT_BINARY_DIR}/)
 
-# not entirely sure what this is about, but
+target_include_directories(xenomods PRIVATE
+		${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/include
+		${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/extern/imgui
+		# :v
+		#${PROJECT_SOURCE_DIR}/include/skylaunch
+		#${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/src_framework
+		#${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/src
+		)
+
+# disables architecture unsupported float conversions
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_FLOAT_CHARCONV=1 -DTOML_ENABLE_FLOAT16=0")
 
 target_link_libraries(xenomods PUBLIC
 		tomlplusplus::tomlplusplus
-		fmt::fmt-header-only
+		fmt::fmt
 		glm::glm
+		imgui_xeno
+		magic_enum
 		)
 
 target_compile_definitions(xenomods PUBLIC
-	__XENOMODS_CODENAME_${XENOMODS_CODENAME}
-	_XENOMODS_CODENAME_STR="${XENOMODS_CODENAME}"
-)
+		__XENOMODS_CODENAME_${XENOMODS_CODENAME}
+		_XENOMODS_CODENAME_STR="${XENOMODS_CODENAME}"
+		)
 
 # NPDM/NSO output.
 add_npdm(xenomods ${PROJECT_SOURCE_DIR}/npdm/${XENOMODS_CODENAME}.json main-unpatched)

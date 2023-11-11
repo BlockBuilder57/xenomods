@@ -14,11 +14,12 @@ namespace xenomods {
 	struct EventDebugUtils : public xenomods::UpdatableModule {
 
 		static int RegistrationIndex;
-		static int CurrentIndex;
-		static unsigned long ActiveBits;
+		static std::uint32_t ActiveBits;
 		static std::vector<std::string> FuncNames;
 
 		static bool ShouldUpdate;
+
+		static void MenuSection();
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {

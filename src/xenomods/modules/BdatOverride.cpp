@@ -12,7 +12,7 @@ namespace {
 
 	struct GetValHook : skylaunch::hook::Trampoline<GetValHook> {
 		static unsigned long Hook(unsigned char* pBdat, unsigned char* pMember, int idx) {
-			if (xenomods::BdatOverride::Callbacks.empty())
+			if(xenomods::BdatOverride::Callbacks.empty())
 				return Orig(pBdat, pMember, idx);
 
 			auto sheetName = Bdat::getSheetName(pBdat);
@@ -22,8 +22,8 @@ namespace {
 			//xenomods::BdatOverride::HotPath[sheetName]++;
 
 			auto& skips = xenomods::GetState().config.bdatSkipOverrides;
-			for (auto& it : skips) {
-				if (it.starts_with(sheetName)) {
+			for(auto& it : skips) {
+				if(it.starts_with(sheetName)) {
 					//xenomods::g_Logger->LogInfo("[Bdat] Skipping {} ({})", sheetName, it);
 					return Orig(pBdat, pMember, idx);
 				}
@@ -31,10 +31,10 @@ namespace {
 
 			xenomods::BdatOverrideBase::Access access {
 				.sheet = {
-					.buffer = pBdat,
-					.name = sheetName,
-					.member = memberName,
-					.row = static_cast<unsigned short>(idx)
+				.buffer = pBdat,
+				.name = sheetName,
+				.member = memberName,
+				.row = static_cast<unsigned short>(idx)
 				},
 				.data = 0,
 				.ignoreEmptyData = false
@@ -42,7 +42,7 @@ namespace {
 
 			// run all applicable callbacks
 			for(xenomods::BdatOverrideBase* callback : xenomods::BdatOverride::Callbacks) {
-				if (callback->IsApplicable(access.sheet))
+				if(callback->IsApplicable(access.sheet))
 					(*callback)(access);
 			}
 
@@ -55,7 +55,7 @@ namespace {
 
 	struct GetValHook2 : skylaunch::hook::Trampoline<GetValHook2> {
 		static unsigned long Hook(unsigned char* pBdat, char* pMemberName, int idx) {
-			if (xenomods::BdatOverride::Callbacks.empty())
+			if(xenomods::BdatOverride::Callbacks.empty())
 				return Orig(pBdat, pMemberName, idx);
 
 			auto sheetName = Bdat::getSheetName(pBdat);
@@ -65,8 +65,8 @@ namespace {
 			//xenomods::BdatOverride::HotPath[sheetName]++;
 
 			auto& skips = xenomods::GetState().config.bdatSkipOverrides;
-			for (auto& it : skips) {
-				if (it.starts_with(sheetName)) {
+			for(auto& it : skips) {
+				if(it.starts_with(sheetName)) {
 					//xenomods::g_Logger->LogInfo("[Bdat] Skipping {} ({})", sheetName, it);
 					return Orig(pBdat, pMemberName, idx);
 				}
@@ -85,7 +85,7 @@ namespace {
 
 			// run all applicable callbacks
 			for(xenomods::BdatOverrideBase* callback : xenomods::BdatOverride::Callbacks) {
-				if (callback->IsApplicable(access.sheet))
+				if(callback->IsApplicable(access.sheet))
 					(*callback)(access);
 			}
 
@@ -98,18 +98,18 @@ namespace {
 
 	struct GetValCheckHook : skylaunch::hook::Trampoline<GetValCheckHook> {
 		static unsigned long Hook(unsigned char* pBdat, unsigned char* pVarName, int idx, int param_4) {
-			if (xenomods::BdatOverride::Callbacks.empty())
+			if(xenomods::BdatOverride::Callbacks.empty())
 				return Orig(pBdat, pVarName, idx, param_4);
 
 			auto sheetName = Bdat::getSheetName(pBdat);
 			auto memberName = reinterpret_cast<char*>(pBdat + *reinterpret_cast<short*>(pVarName + 4));
-			xenomods::g_Logger->LogInfo("[Check] {}/{}:{}", sheetName, memberName, idx);
+			//xenomods::g_Logger->LogInfo("[Check] {}/{}:{}", sheetName, memberName, idx);
 
 			//xenomods::BdatOverride::HotPath[sheetName]++;
 
 			auto& skips = xenomods::GetState().config.bdatSkipOverrides;
-			for (auto& it : skips) {
-				if (it.starts_with(sheetName)) {
+			for(auto& it : skips) {
+				if(it.starts_with(sheetName)) {
 					//xenomods::g_Logger->LogInfo("[Bdat] Skipping {} ({})", sheetName, it);
 					return Orig(pBdat, pVarName, idx, param_4);
 				}
@@ -128,7 +128,7 @@ namespace {
 
 			// run all applicable callbacks
 			for(xenomods::BdatOverrideBase* callback : xenomods::BdatOverride::Callbacks) {
-				if (callback->IsApplicable(access.sheet))
+				if(callback->IsApplicable(access.sheet))
 					(*callback)(access);
 			}
 
@@ -145,9 +145,9 @@ namespace {
 			auto sheetName = Bdat::getSheetName(pBdat);
 			unsigned short result = Orig(pBdat);
 
-			if (xenomods::BdatOverride::SheetMaxIDs.contains(sheetName)) {
+			if(xenomods::BdatOverride::SheetMaxIDs.contains(sheetName)) {
 				unsigned short maxId = xenomods::BdatOverride::SheetMaxIDs[sheetName] - sheet->idTop + 1;
-				if (maxId > result)
+				if(maxId > result)
 					result = maxId;
 			}
 
@@ -160,9 +160,9 @@ namespace {
 			auto sheetName = Bdat::getSheetName(pBdat);
 			unsigned short result = Orig(pBdat);
 
-			if (xenomods::BdatOverride::SheetMaxIDs.contains(sheetName)) {
+			if(xenomods::BdatOverride::SheetMaxIDs.contains(sheetName)) {
 				unsigned short maxId = xenomods::BdatOverride::SheetMaxIDs[sheetName];
-				if (maxId > result)
+				if(maxId > result)
 					result = maxId;
 			}
 
@@ -172,7 +172,7 @@ namespace {
 
 	struct TomlBdatOverride : xenomods::BdatOverrideBase {
 		[[nodiscard]] bool IsApplicable(SheetData& sheet) const override {
-			if (xenomods::BdatOverride::SheetMaxIDs.empty())
+			if(xenomods::BdatOverride::SheetMaxIDs.empty())
 				return false;
 
 			return xenomods::BdatOverride::SheetMaxIDs.contains(sheet.name);
@@ -184,7 +184,7 @@ namespace {
 			//xenomods::g_Logger->LogDebug("{}/{}:{}", access.sheet.name, access.sheet.member, access.sheet.row);
 
 			toml::table* rowTable = xenomods::BdatOverride::TOMLTable[access.sheet.name][unfortunateConversion].as_table();
-			if (rowTable == nullptr) {
+			if(rowTable == nullptr) {
 				//xenomods::g_Logger->LogDebug("no row table! {}/{}:{}", access.sheet.name, access.sheet.member, access.sheet.row);
 				return; // no table for the row
 			}
@@ -192,13 +192,13 @@ namespace {
 			// we can declare a fallback for unchanged values
 			//ushort rowPre = access.sheet.row;
 			auto fallbackRow = rowTable->get("_fb");
-			if (fallbackRow != nullptr) {
+			if(fallbackRow != nullptr) {
 				access.sheet.row = fallbackRow->value_or(access.sheet.row);
 				//xenomods::g_Logger->LogWarning("{}/{}:{} requested fallback to {}", access.sheet.name, access.sheet.member, rowPre, access.sheet.row);
 			}
 
 			auto memberNode = rowTable->get(access.sheet.member);
-			if (memberNode == nullptr) {
+			if(memberNode == nullptr) {
 				//xenomods::g_Logger->LogDebug("no value for {}/{}:{}", access.sheet.name, access.sheet.member, rowPre);
 				return; // no value for this member
 			}
@@ -264,8 +264,8 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up Bdat overrides...");
 
-		GetValHook::HookAt(static_cast<void*(*)(unsigned char*, unsigned char*, int)>(Bdat::getVal));
-		GetValHook2::HookAt(static_cast<void*(*)(unsigned char*, const char*, int)>(Bdat::getVal));
+		GetValHook::HookAt(static_cast<void* (*)(unsigned char*, unsigned char*, int)>(Bdat::getVal));
+		GetValHook2::HookAt(static_cast<void* (*)(unsigned char*, const char*, int)>(Bdat::getVal));
 		GetValCheckHook::HookAt(&Bdat::getValCheck);
 		IDCountOverride::HookAt(&Bdat::getIdCount);
 		IDEndOverride::HookAt(&Bdat::getIdEnd);
@@ -309,9 +309,9 @@ namespace xenomods {
 				unsigned short maxRow = 0;
 
 				sheetName.for_each([&](auto& rowKey, auto& rowEl) {
-					if (toml::is_table<decltype(rowEl)>) {
+					if(toml::is_table<decltype(rowEl)>) {
 						int attempt = std::atoi(rowKey.data());
-						if (attempt > 0 && maxRow < attempt)
+						if(attempt > 0 && maxRow < attempt)
 							maxRow = attempt;
 					}
 				});
@@ -321,7 +321,7 @@ namespace xenomods {
 			}
 		});
 
-		if (!TOMLTable.empty()) {
+		if(!TOMLTable.empty()) {
 			RegisterCallback(&TomlOverride());
 			g_Logger->ToastInfo("configbdat", "Loaded Bdat override!");
 		} else {

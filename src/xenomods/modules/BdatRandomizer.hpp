@@ -12,11 +12,12 @@ namespace xenomods {
 		enum class BdatMSScrambleType : std::uint8_t {
 			Off,
 			ScrambleIndex,
-			ShowSheetName,
-			Count
+			ShowSheetName
 		};
 
 		static BdatMSScrambleType msScrambleType;
+
+		static void MenuSection();
 
 		void Initialize() override;
 	};
@@ -24,22 +25,28 @@ namespace xenomods {
 } // namespace xenomods
 
 template<>
+constexpr magic_enum::customize::customize_t magic_enum::customize::enum_name<xenomods::BdatRandomizer::BdatMSScrambleType>(xenomods::BdatRandomizer::BdatMSScrambleType value) noexcept {
+	// clang-format off
+	switch (value) {
+		using enum xenomods::BdatRandomizer::BdatMSScrambleType;
+
+		case ScrambleIndex: return "Scramble Index";
+		case ShowSheetName: return "Show Sheet/Label Name";
+		case Off: return "Disabled";
+	}
+	// clang-format on
+	return default_tag;
+}
+
+template<>
 struct fmt::formatter<xenomods::BdatRandomizer::BdatMSScrambleType> : fmt::formatter<std::string_view> {
 	template<typename FormatContext>
 	inline auto format(xenomods::BdatRandomizer::BdatMSScrambleType type, FormatContext& ctx) {
-		std::string_view name;
+		using enum xenomods::BdatRandomizer::BdatMSScrambleType;
 
-		// clang-format off
-		switch(type) {
-			using enum xenomods::BdatRandomizer::BdatMSScrambleType;
+		if(type < Off || type > ShowSheetName)
+			return "Unknown - " + std::to_string(xenomods::underlying_value(type));
 
-			case ScrambleIndex: name = "Scramble Index"; break;
-			case ShowSheetName: name = "Show Sheet/Label Name"; break;
-			case Off: name = "Disabled"; break;
-			case Count: default: name = "Unknown - " + std::to_string(reinterpret_cast<std::underlying_type_t<xenomods::BdatRandomizer::BdatMSScrambleType>&>(type)); break;
-		}
-		// clang-format on
-
-		return formatter<std::string_view>::format(name, ctx);
+		return magic_enum::enum_name(type);
 	}
 };

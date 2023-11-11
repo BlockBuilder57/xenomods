@@ -10,6 +10,11 @@
 
 namespace gf {
 
+	struct GfManager {
+	   public:
+		static bool isGameTypeIra();
+	};
+
 	struct GfGameManager {
 	   public:
 		static GF_OBJ_HANDLE* getControlMover();

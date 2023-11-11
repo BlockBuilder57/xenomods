@@ -30,6 +30,8 @@ namespace xenomods {
 
 		static void UpdateMeta();
 
+		static void MenuSection();
+
 		void Initialize() override;
 		bool NeedsUpdate() const override {
 			return true;

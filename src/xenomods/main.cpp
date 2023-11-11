@@ -12,9 +12,13 @@
 #include "FunctionalHooks.hpp"
 #include "nn/diag.h"
 
+#include <imgui_xeno.h>
+#include <imgui.h>
+#include "modules/RenderingControls.hpp"
+
 namespace xenomods {
 
-void fmt_assert_failed(const char* file, int line, const char* message) {
+	void fmt_assert_failed(const char* file, int line, const char* message) {
 		NN_DIAG_LOG(nn::diag::LogSeverity::Fatal, "fmtlib assert caught : %s", message);
 	}
 
@@ -54,25 +58,23 @@ void fmt_assert_failed(const char* file, int line, const char* message) {
 
 		// use P2 if it's connected, otherwise we'll drop P1's input to let them use the menu
 		HidInput* menuInput = HidInput::GetDebugInput();
-		if (menuInput->InputDownStrict(MENU_TOGGLE)) {
+		if(menuInput->InputDownStrict(MENU_TOGGLE)) {
 			g_Menu->Toggle();
 		}
 
 		// Update modules
 		xenomods::UpdateAllRegisteredModules(updateInfo);
 
-		// render the menu if open, otherwise draw logger messages
-		if (g_Menu->IsOpen())
+		// render the menu if open
+		if(g_Menu->IsOpen())
 			g_Menu->Update(menuInput);
-		else
-			g_Logger->DrawMessages(updateInfo);
 
-		// always draw toasts
-		g_Logger->DrawToasts(updateInfo);
+		// draw logger messages and toasts
+		g_Logger->Draw(updateInfo);
 	}
 
 	void main() {
-		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "Running xenomods %s%s [%s]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
+		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "Running %s", version::XenomodsFullVersion());
 		g_Menu->Initialize();
 		InitializeAllRegisteredModules();
 

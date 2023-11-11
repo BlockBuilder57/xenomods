@@ -10,6 +10,12 @@
 #if XENOMODS_NEW_ENGINE
 namespace game {
 
+	class GameController {
+	   public:
+		INSERT_PADDING_BYTES(0x211)
+		std::uint8_t someFlags; // bit 3 controls the vision
+	};
+
 	class CharacterController {
 	   public:
 		enum class Flags : std::uint32_t {

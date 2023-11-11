@@ -2,7 +2,7 @@
 
 With optional TOML config files, Bdat values can be overridden with ease.
 
-The game-specific override file can be created/found at `sd:/config/xenomods/{game}/bdatOverride.toml`.
+The game-specific override file can be created/found at `sd:/config/xenomods/{game}/bdatOverride.toml`. This currently does not work for Xenoblade 3.
 
 ---
 

@@ -4,8 +4,8 @@
 
 #include <xenomods/Utils.hpp>
 
+#include "Controllers.hpp"
 #include "Sequence.hpp"
-#include "CharacterController.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 
 #if XENOMODS_CODENAME(bfsw)

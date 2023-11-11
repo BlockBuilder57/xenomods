@@ -79,9 +79,21 @@ namespace {
 			Orig(this_pointer, callback);
 
 			mm::Mat44 identity = {};
-			((void (*)(unsigned int))(skylaunch::utils::g_MainTextAddr + 0x1248774))(0);
-			((void (*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::g_MainTextAddr + 0x124bdec))(-1, identity, identity);
-			((void (*)())(skylaunch::utils::g_MainTextAddr + 0x1248798))();
+			if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_0_0) {
+				((void (*)(unsigned int))(skylaunch::utils::AddrFromBase(0x7101248774)))(0); // ml::DevGraph::cmdOpenDisplayList
+				((void (*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::AddrFromBase(0x710124bdec)))(-1, identity, identity); // ml::DebDraw::flushPrio
+				((void (*)())(skylaunch::utils::AddrFromBase(0x7101248798)))(); // ml::DevGraph::cmdCloseDisplayList
+			}
+			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_1_0) {
+				((void (*)(unsigned int))(skylaunch::utils::AddrFromBase(0x7101248aa4)))(0); // ml::DevGraph::cmdOpenDisplayList
+				((void (*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::AddrFromBase(0x710124c11c)))(-1, identity, identity); // ml::DebDraw::flushPrio
+				((void (*)())(skylaunch::utils::AddrFromBase(0x7101248ac8)))(); // ml::DevGraph::cmdCloseDisplayList
+			}
+			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_1_1) {
+				((void (*)(unsigned int))(skylaunch::utils::AddrFromBase(0x7101248ae4)))(0); // ml::DevGraph::cmdOpenDisplayList
+				((void (*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::AddrFromBase(0x710124c15c)))(-1, identity, identity); // ml::DebDraw::flushPrio
+				((void (*)())(skylaunch::utils::AddrFromBase(0x7101248b08)))(); // ml::DevGraph::cmdCloseDisplayList
+			}
 		}
 	};
 #endif
@@ -115,8 +127,7 @@ namespace {
 			modVersion.uiObject->name.set("TXT_mod_version");
 
 			// make the version string...
-			auto modVersionStr = fmt::format("xenomods {}", xenomods::version::BuildGitVersion());
-			auto modVersionUIStr = ui::UIStr(modVersionStr.c_str(), true);
+			auto modVersionUIStr = ui::UIStr(xenomods::version::XenomodsVersion(), true);
 			modVersion.setText(modVersionUIStr);
 
 			// now we can use the offset for ourselves
@@ -162,9 +173,9 @@ namespace {
 	struct DisableControllerSingleMode : skylaunch::hook::Trampoline<DisableControllerSingleMode> {
 		static void Hook(nn::hid::ControllerSupportResultInfo* resultInfo, nn::hid::ControllerSupportArg* supportArg) {
 			nn::hid::NpadFullKeyState p1State {};
-			nn::hid::GetNpadState(&p1State, nn::hid::CONTROLLER_PLAYER_1);
+			nn::hid::GetNpadState(&p1State, 0);
 
-			if(p1State.Flags & nn::hid::NpadFlags::NPAD_CONNECTED) {
+			if(p1State.mAttributes.isBitSet(nn::hid::NpadAttribute::IsConnected)) {
 				// We have a player 1 at this point, so disable single-controller only mode
 				// That way if another controller is connected while the game is running, we can allow it to be P2
 				// Monolib actually passes the (according to switchbrew) default arguments to this,
@@ -247,7 +258,13 @@ namespace xenomods {
 #if XENOMODS_CODENAME(bfsw)
 		EnableDebugDrawing::HookAt(&ml::Scn::callbackToListener);
 #elif XENOMODS_CODENAME(bf3)
-		EnableDebugDrawing::HookFromBase(0x126dd38);
+		// ml::Scn::callbackToListener
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0)
+			EnableDebugDrawing::HookFromBase(0x710126dd38);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0)
+			EnableDebugDrawing::HookFromBase(0x710126e068);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
+			EnableDebugDrawing::HookFromBase(0x710126e0a8);
 #endif
 
 		// hook our updater
@@ -256,7 +273,11 @@ namespace xenomods {
 #elif XENOMODS_CODENAME(bfsw)
 		FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #elif XENOMODS_CODENAME(bf3)
-		FrameworkUpdater_updateStdHook::HookFromBase(0x710006734c);
+		// fw::FrameworkUpdater::updateStd
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0)
+			FrameworkUpdater_updateStdHook::HookFromBase(0x710006734c);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
+			FrameworkUpdater_updateStdHook::HookFromBase(0x710006735c);
 #endif
 
 		// Multiple controller support
@@ -265,14 +286,26 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 		ClampNumberOfControllers::HookAt("_ZN2ml8DevPadNx23getLocalConnectPadCountEv");
 #else
-		ClampNumberOfControllers::HookFromBase(0x7101251bcc);
+		// ml::DevPadNx::getLocalConnectPadCount
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0)
+			ClampNumberOfControllers::HookFromBase(0x7101251bcc);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0)
+			ClampNumberOfControllers::HookFromBase(0x7101251efc);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
+			ClampNumberOfControllers::HookFromBase(0x7101251f3c);
 #endif
 
 		// Disable inputs from P1 when the Menu is open
 #if !XENOMODS_CODENAME(bf3)
 		DisableControllerUpdatingForMenu::HookAt("_ZN2ml8DevPadNx4Impl10updateNpadEv");
 #else
-		DisableControllerUpdatingForMenu::HookFromBase(0x710124fa34);
+		// ml::DevPadNx::Impl::updateNpad
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0)
+			DisableControllerUpdatingForMenu::HookFromBase(0x710124fa34);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0)
+			DisableControllerUpdatingForMenu::HookFromBase(0x710124fd64);
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
+			DisableControllerUpdatingForMenu::HookFromBase(0x710124fda4);
 #endif
 
 		// Map change events

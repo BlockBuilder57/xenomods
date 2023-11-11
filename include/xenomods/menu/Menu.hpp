@@ -2,42 +2,26 @@
 
 #pragma once
 
+#include <magic_enum.hpp>
+
 #include <xenomods/HidInput.hpp>
 
-#include "Option.hpp"
 #include "Section.hpp"
 
 namespace xenomods {
 
 	class Menu {
 	   private:
-		static mm::Col4 COLOR_BACKGROUND;
-		static mm::Col4 COLOR_TITLE;
-		static mm::Col4 COLOR_SECTION;
-		static mm::Col4 COLOR_OPTION;
-		static mm::Col4 COLOR_TEXTUAL;
-		static mm::Col4 COLOR_HIGHLIGHT;
-
 		bool isOpen { false };
-		bool drawBackground { true };
 
 		std::vector<Section*> sections {};
-		Section* curSection {};
-
-		int maxIndex {};
-		int curIndex {};
-		int savedSectionIndex {};
-		bool pressSelect {};
-		bool pressBack {};
-
-		void PollMaxIndex();
+		std::vector<void(*)()> callbacks {};
 
 	   public:
 		void Initialize();
 
 		void Update(HidInput* input);
-
-		void Render();
+		static void Render();
 
 		void Toggle() {
 			isOpen = !isOpen;
@@ -46,13 +30,39 @@ namespace xenomods {
 			return isOpen;
 		};
 
+		enum class Theme {
+			Auto = 0,
+			Titans,
+			Alrest,
+			Aionios,
+			ImGuiDark,
+			ImGuiLight,
+			ImGuiClassic,
+		};
+
+		Theme SetTheme(Theme theme);
+
 		Section* FindSection(const std::string& key);
 		Section* RegisterSection(const std::string& key, const std::string& display);
+		void RegisterRenderCallback(void(*func)());
 
 		friend class Section;
-		friend class OptionBase;
 	};
 
 	extern Menu* g_Menu;
 
 } // namespace xenomods
+
+template<>
+constexpr magic_enum::customize::customize_t magic_enum::customize::enum_name<xenomods::Menu::Theme>(xenomods::Menu::Theme value) noexcept {
+	// clang-format off
+	switch (value) {
+		using enum xenomods::Menu::Theme;
+
+		case ImGuiDark: return "Dear ImGui Dark";
+		case ImGuiLight: return "Dear ImGui Light";
+		case ImGuiClassic: return "Dear ImGui Classic";
+	}
+	// clang-format on
+	return default_tag;
+}

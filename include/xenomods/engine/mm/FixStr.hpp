@@ -33,6 +33,16 @@ namespace mm {
 				memcpy(&buffer[0], text, length);
 				m_nLen = length-1;
 			}
+
+			void set(std::string text) {
+				memset(&buffer[0], 0, size);
+
+				size_t length = size;
+				if (text.size() < length)
+					length = text.size();
+
+				text.copy(&buffer[0], length);
+			}
 		};
 
 	} // namespace mtl

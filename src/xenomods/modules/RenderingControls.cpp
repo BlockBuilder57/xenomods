@@ -1,10 +1,15 @@
 #include "RenderingControls.hpp"
 
 #include "DebugStuff.hpp"
+#include "xenomods/engine/effect/SystemManager.hpp"
+#include "xenomods/engine/fw/Managers.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
+#include "xenomods/engine/mm/mtl/PtrSingleton.hpp"
+#include "xenomods/engine/ptlib/Emitter.hpp"
 #include "xenomods/engine/ui/UIObjectAcc.hpp"
+#include "xenomods/engine/xefb/Effect.hpp"
 
 namespace {
 
@@ -36,6 +41,13 @@ namespace {
 		}
 	};
 
+	struct FreezeTextureStreaming : skylaunch::hook::Trampoline<FreezeTextureStreaming> {
+		static void Hook(ml::DrResMdoTexList* this_pointer) {
+			if (!xenomods::RenderingControls::freezeTextureStreaming)
+				Orig(this_pointer);
+		}
+	};
+
 #if XENOMODS_OLD_ENGINE
 	struct SkipParticleRendering : skylaunch::hook::Trampoline<SkipParticleRendering> {
 		static void Hook(void* this_pointer, void* DrDrawWorkInfoEF, int param_2, bool param_3) {
@@ -45,9 +57,31 @@ namespace {
 	};
 #elif XENOMODS_CODENAME(bfsw)
 	struct SkipParticleRendering : skylaunch::hook::Trampoline<SkipParticleRendering> {
-		static void Hook(void* this_pointer) {
-			if(!xenomods::RenderingControls::skipParticleRendering)
-				Orig(this_pointer);
+		static void Hook(xefb::CEParticlelist* this_pointer, xefb::CERes* res) {
+			bool skip = false;
+
+			using enum xefb::eXefbDrayType;
+			switch(this_pointer->Emitter->drawType) {
+				case PostLine:
+				case PostGauss:
+				case PostRadial:
+				case PostMono:
+				case PostDist: {
+					if(xenomods::RenderingControls::skipOverlayRendering)
+						skip = true;
+
+					break;
+				}
+				default: {
+					if(xenomods::RenderingControls::skipParticleRendering)
+						skip = true;
+
+					break;
+				}
+			}
+
+			if(!skip)
+				Orig(this_pointer, res);
 		}
 	};
 #endif
@@ -56,7 +90,7 @@ namespace {
 	struct StraightensYourXenoblade : skylaunch::hook::Trampoline<StraightensYourXenoblade> {
 		static void Hook(layer::LayerObjFont* this_pointer, void* LayerRenderView, void* LayerResMatrix, void* LayerResColor) {
 			float temp = this_pointer->slopeRot;
-			if (xenomods::RenderingControls::straightenFont)
+			if(xenomods::RenderingControls::straightenFont)
 				this_pointer->slopeRot = 0; // hook to the system tick for fun times
 			Orig(this_pointer, LayerRenderView, LayerResMatrix, LayerResColor);
 			this_pointer->slopeRot = temp;
@@ -64,7 +98,7 @@ namespace {
 	};
 #endif
 
-}
+} // namespace
 
 namespace xenomods {
 
@@ -73,64 +107,93 @@ namespace xenomods {
 	bool RenderingControls::straightenFont = false;
 	bool RenderingControls::skipUIRendering = false;
 	bool RenderingControls::skipParticleRendering = false;
+	bool RenderingControls::skipOverlayRendering = false;
 	bool RenderingControls::skipCloudRendering = false;
 	bool RenderingControls::skipSkyDomeRendering = false;
+
 	float RenderingControls::shadowStrength = 1.0;
+
+	bool RenderingControls::freezeTextureStreaming = false;
 
 	const std::string toggleKey = std::string(STRINGIFY(RenderingControls)) + "_Toggles";
 
-	void MenuToggleMap() {
+	void RenderingControls::MenuSection() {
+#if XENOMODS_OLD_ENGINE
+		ImGui::Checkbox("Straighten font", &straightenFont);
+#endif
+#if !XENOMODS_CODENAME(bf3)
+		ImGui::PushItemWidth(150.f);
+		if(ImGui::SliderFloat("Shadow strength", &shadowStrength, -1, 1)) {
+			auto acc = ml::ScnRenderDrSysParmAcc();
+			acc.setShadowStr(shadowStrength);
+		}
+		ImGui::PopItemWidth();
+
+		ImGui::Separator();
+
+		if(ImGui::Button("Clear Texture Cache")) {
+			auto ptr = *skylaunch::hook::detail::ResolveSymbol<ml::DrCalcTexStreamMan**>("_ZZN2mm3mtl12PtrSingletonIN2ml18DrCalcTexStreamManEE3sysEvE10s_instance");
+
+			if (reinterpret_cast<uintptr_t>(ptr) != skylaunch::hook::INVALID_FUNCTION_PTR) {
+				for (ml::DrCalcStmListObj* listObj = ptr->rootObjectIDK; listObj != nullptr; listObj = listObj->nextListObj) {
+					g_Logger->LogDebug("Clearing texture cache for {}", listObj->path.buffer);
+					listObj->chacheTexClear();
+				}
+			}
+		}
+
+		ImGui::Checkbox("Freeze texture streaming", &freezeTextureStreaming);
+#endif
+	}
+
+	void RenderingControls::MenuToggles() {
+		ImGui::Checkbox("Skip UI rendering", &skipUIRendering);
+#if !XENOMODS_CODENAME(bf3)
+	#if XENOMODS_OLD_ENGINE
+		ImGui::Checkbox("Skip particle+overlay rendering", &skipParticleRendering);
+	#else
+		ImGui::Checkbox("Skip particle rendering", &skipParticleRendering);
+		ImGui::Checkbox("Skip overlay rendering", &skipOverlayRendering);
+	#endif
+		ImGui::Checkbox("Skip cloud (sea) rendering", &skipCloudRendering);
+		ImGui::Checkbox("Skip sky dome rendering", &skipSkyDomeRendering);
+
 		auto acc = ml::ScnRenderDrSysParmAcc();
-		// done this way because 2/Torna do not have is/setDispMap
-		acc.drMan->hideMap = !acc.drMan->hideMap;
-		g_Logger->ToastInfo(toggleKey, "Toggled map: {}", !acc.drMan->hideMap);
+		static bool hideFog = false, hideBloom = false, hideTonemap = false;
+
+		ImGui::Checkbox("Hide map", &acc.drMan->hideMap);
+		if(ImGui::Checkbox("Disable fog", &hideFog))
+			acc.setFogSkip(hideFog);
+		if(ImGui::Checkbox("Disable bloom", &hideBloom))
+			acc.setBloom(!hideBloom);
+		if(ImGui::Checkbox("Disable tonemapping", &hideTonemap))
+			acc.setToneMap(!hideTonemap);
+
+		ImGui::Checkbox("Force disable depth of field", &ForcedParameters.DisableDOF);
+		ImGui::Checkbox("Force disable motion blur", &ForcedParameters.DisableMotionBlur);
+		ImGui::Checkbox("Force disable color filters", &ForcedParameters.DisableColorFilter);
+		ImGui::Checkbox("Enable AA", &acc.PixlPostParm->enableAA);
+		ImGui::Checkbox("Enable TMAA", &acc.PixlPostParm->enableTMAA);
+#endif
 	}
-	void MenuToggleFog() {
+
+	void RenderingControls::MenuGBuffer() {
+#if !XENOMODS_CODENAME(bf3)
 		auto acc = ml::ScnRenderDrSysParmAcc();
-		static bool fogSkip;
-		fogSkip = !fogSkip;
-		acc.setFogSkip(fogSkip);
-		g_Logger->ToastInfo(toggleKey, "Toggled fog: {}", !fogSkip);
-	}
-	void MenuToggleBloom() {
-		auto acc = ml::ScnRenderDrSysParmAcc();
-		acc.setBloom(!acc.isBloomOn());
-		g_Logger->ToastInfo(toggleKey, "Toggled bloom: {}", acc.isBloomOn());
-	}
-	void MenuToggleTonemapping() {
-		auto acc = ml::ScnRenderDrSysParmAcc();
-		acc.setToneMap(!acc.isToneMap());
-		g_Logger->ToastInfo(toggleKey, "Toggled tone mapping: {}", acc.isToneMap());
-	}
-	void MenuToggleAntiAliasing() {
-		auto acc = ml::ScnRenderDrSysParmAcc();
-		acc.setAA(!acc.isAA());
-		g_Logger->ToastInfo(toggleKey, "Toggled anti-aliasing: {}", acc.isAA());
-	}
-	void MenuToggleScreenspaceAmbientOcclusion() {
-		auto acc = ml::ScnRenderDrSysParmAcc();
-		acc.setSSAO(!acc.isSSAO());
-		g_Logger->ToastInfo(toggleKey, "Toggled screenspace ambient occlusion: {}", acc.isSSAO());
-	}
-	void MenuToggleDOF() {
-		RenderingControls::ForcedParameters.DisableDOF = !RenderingControls::ForcedParameters.DisableDOF;
-		g_Logger->ToastInfo(toggleKey, "Toggled depth of field: {}", !RenderingControls::ForcedParameters.DisableDOF);
-	}
-	void MenuToggleMotionBlur() {
-		RenderingControls::ForcedParameters.DisableMotionBlur = !RenderingControls::ForcedParameters.DisableMotionBlur;
-		g_Logger->ToastInfo(toggleKey, "Toggled motion blur: {}", !RenderingControls::ForcedParameters.DisableMotionBlur);
-	}
-	void MenuToggleColorFilter() {
-		RenderingControls::ForcedParameters.DisableColorFilter = !RenderingControls::ForcedParameters.DisableColorFilter;
-		g_Logger->ToastInfo(toggleKey, "Toggled color filter: {}", !RenderingControls::ForcedParameters.DisableColorFilter);
-	}
-	void MenuSetShadowStrength() {
-		auto acc = ml::ScnRenderDrSysParmAcc();
-		acc.setShadowStr(RenderingControls::shadowStrength);
-	}
-	void MenuSetGBufferDebugReset() {
-		auto acc = ml::ScnRenderDrSysParmAcc();
-		acc.setGBuffDebugDefault();
+
+		ImGui::Checkbox("GBuffer debug", &acc.PixlPostParm->GBufferDebug);
+		ImGui::SliderFloat2("Base Color",        acc.PixlPostParm->GBufferDebugParams[0], 0, 1);
+		ImGui::SliderFloat2("Metalness",         acc.PixlPostParm->GBufferDebugParams[1], 0, 1);
+		ImGui::SliderFloat2("Roughness",         acc.PixlPostParm->GBufferDebugParams[2], 0, 1);
+		ImGui::SliderFloat2("Emission",          acc.PixlPostParm->GBufferDebugParams[3], 0, 1);
+		ImGui::SliderFloat2("N/A",               acc.PixlPostParm->GBufferDebugParams[4], 0, 1);
+		ImGui::SliderFloat2("Ambient Occlusion", acc.PixlPostParm->GBufferDebugParams[5], 0, 1);
+		ImGui::SliderFloat2("Emission 2",        acc.PixlPostParm->GBufferDebugParams[6], 0, 1);
+		ImGui::SliderFloat2("Specular",          acc.PixlPostParm->GBufferDebugParams[7], 0, 1);
+
+		if(ImGui::Button("Reset parameters"))
+			acc.setGBuffDebugDefault();
+#endif
 	}
 
 	void RenderingControls::Initialize() {
@@ -141,44 +204,42 @@ namespace xenomods {
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 		SkipCloudRendering::HookAt("_ZN5cloud8CloudMan5applyEPKN2ml15IDrDrawWorkInfoEPNS1_13DrMdoZSortManE");
 		SkipSkyDomeRendering::HookAt("_ZN2ml9DrPixlMan13renderSkyDomeEv");
+
+		FreezeTextureStreaming::HookAt(&ml::DrResMdoTexList::texStmUpdate);
 #else
-		SkipLayerRendering::HookFromBase(0x710100f790);
-		SkipLayer2Rendering::HookFromBase(0x710100f808);
+		// layer::LayerManager::finalRender and its cousin
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
+			SkipLayerRendering::HookFromBase(0x710100f790);
+			SkipLayer2Rendering::HookFromBase(0x710100f808);
+		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
+			SkipLayerRendering::HookFromBase(0x710100fac0);
+			SkipLayer2Rendering::HookFromBase(0x710100fb38);
+		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1) {
+			SkipLayerRendering::HookFromBase(0x710100fb00);
+			SkipLayer2Rendering::HookFromBase(0x710100fb78);
+		}
 #endif
 
 #if XENOMODS_OLD_ENGINE
 		StraightensYourXenoblade::HookAt("_ZN5layer12LayerObjFont17updateShaderParmsEPKNS_15LayerRenderViewERKNS_14LayerResMatrixERKNS_13LayerResColorE");
 		SkipParticleRendering::HookAt("_ZN5ptlib15ParticleManager4drawEPKNS_16DrDrawWorkInfoEFEib");
 #elif XENOMODS_CODENAME(bfsw)
-		SkipParticleRendering::HookAt("_ZN4xefb9CEEmitter4drawEv");
+		SkipParticleRendering::HookAt("_ZN4xefb14CEParticlelist4drawEPNS_5CEResE");
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
-		if (modules != nullptr) {
+		if(modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(RenderingControls), "Rendering Controls");
-
-#if XENOMODS_OLD_ENGINE
-			section->RegisterOption<bool>(straightenFont, "Straighten font");
-#endif
-#if !XENOMODS_CODENAME(bf3)
-			section->RegisterOption<float>(shadowStrength, "Shadow strength", &MenuSetShadowStrength);
-#endif
+			section->RegisterRenderCallback(&MenuSection);
 
 			auto toggles = section->RegisterSection(toggleKey, "Toggles...");
-			toggles->RegisterOption<bool>(skipUIRendering, "Skip UI rendering");
+			toggles->RegisterRenderCallback(&MenuToggles);
+
 #if !XENOMODS_CODENAME(bf3)
-			toggles->RegisterOption<bool>(skipParticleRendering, "Skip particle+overlay rendering");
-			toggles->RegisterOption<bool>(skipCloudRendering, "Skip cloud (sea) rendering");
-			toggles->RegisterOption<bool>(skipSkyDomeRendering, "Skip sky dome rendering");
-			toggles->RegisterOption<void>("Toggle map", &MenuToggleMap);
-			toggles->RegisterOption<void>("Toggle fog", &MenuToggleFog);
-			toggles->RegisterOption<void>("Toggle bloom", &MenuToggleBloom);
-			toggles->RegisterOption<void>("Toggle tonemapping", &MenuToggleTonemapping);
-			toggles->RegisterOption<void>("Toggle depth of field", &MenuToggleDOF);
-			toggles->RegisterOption<void>("Toggle motion blur", &MenuToggleMotionBlur);
-			toggles->RegisterOption<void>("Toggle color filter", &MenuToggleColorFilter);
-			//toggles->RegisterOption<void>("Toggle AA", &MenuToggleAntiAliasing);
-			//toggles->RegisterOption<void>("Toggle SSAO", &MenuToggleScreenspaceAmbientOcclusion);
+			auto gbuffer = section->RegisterSection(std::string(STRINGIFY(RenderingControls)) + "gbuffer", "GBuffer debug...");
+			gbuffer->RegisterRenderCallback(&MenuGBuffer);
 #endif
 		}
 	}
@@ -187,46 +248,18 @@ namespace xenomods {
 		UpdatableModule::Update(updateInfo);
 
 #if !XENOMODS_CODENAME(bf3)
-		static bool hasRun;
-		if (!hasRun) {
-			auto section = g_Menu->FindSection(STRINGIFY(RenderingControls));
-			auto acc = ml::ScnRenderDrSysParmAcc();
-			if (section != nullptr && acc.PixlPostParm != nullptr) {
-				auto gbuffer = section->RegisterSection(std::string(STRINGIFY(RenderingControls)) + "gbuffer", "GBuffer debug...");
-				gbuffer->RegisterOption<bool>(acc.PixlPostParm->GBufferDebug, "GBuffer debug");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[0][0], "Base Color add");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[0][1], "Base Color mult");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[1][0], "Metalness add");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[1][1], "Metalness mult");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[2][0], "Roughness add");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[2][1], "Roughness mult");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[3][0], "Emission add");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[3][1], "Emission mult");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[4][0], "N/A add");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[4][1], "N/A mult");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[5][0], "Ambient Occlusion add");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[5][1], "Ambient Occlusion mult");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[6][0], "Emission 2? add");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[6][1], "Emission 2? mult");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[7][0], "Specular? add");
-				gbuffer->RegisterOption<float>(acc.PixlPostParm->GBufferDebugParams[7][1], "Specular? mult");
-				gbuffer->RegisterOption<void>("Reset parameters", &MenuSetGBufferDebugReset);
-			}
-			hasRun = true;
-		}
-
-		if (ForcedParameters.Any()) {
+		if(ForcedParameters.Any()) {
 			auto acc = ml::ScnRenderDrSysParmAcc();
 
-			if (ForcedParameters.DisableDOF) {
+			if(ForcedParameters.DisableDOF) {
 				acc.setDOFOverride(true);
 				acc.setDOF(false);
 			}
-			if (ForcedParameters.DisableMotionBlur) {
+			if(ForcedParameters.DisableMotionBlur) {
 				acc.setMotBlurOverride(true);
 				acc.setMotBlur(false);
 			}
-			if (ForcedParameters.DisableColorFilter) {
+			if(ForcedParameters.DisableColorFilter) {
 				acc.setColorFilterOverride(true);
 				acc.setColorFilterNum(0);
 				acc.setColorFilterFarNum(0);

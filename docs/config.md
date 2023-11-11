@@ -14,15 +14,16 @@ port = 6969
 # Logging level of the console. (Debug = 0, Info, Warning, Error, Fatal = 4)
 loggingLevel = 1
 
-# List of title screen overrides, by Bdat id
-# This list contains all chapters, game clears, and NG+ clears
-titleEvents = [10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609]
-# A bitflag for event debugging defaults. The list is in EventDebugUtils.cpp
-eventDebugBits = 0b1
+# Theme for the Menu. (Auto = 0, Titans, Alrest, Aionios, Dear ImGui Dark, Dear ImGui Light, Dear ImGui Classic = 6)
+menuTheme = 0
+# Extra fonts for the menu. This should be an array of arrays that has a file path and size (in pixels). The first in the array will be automatically used.
+# A full path can be specified, otherwise it will be relative to sd:/config/xenomods/fonts/.
+# Example: [["comic.ttf", 20.0], ["sd:/directory/consolas.ttf", 16.0]]
+menuFonts = []
 
-# Dumps files to /config/xenomods/{game}/dump/
+# Dumps files to sd:/config/xenomods/{game}/dump/
 dumpFileReads = false
-# Reads overrides from /config/xenomods/{game}/override/
+# Reads overrides from sd:/config/xenomods/{game}/override/
 enableFileOverrides = true
 # Skips overriding these specific Bdat sheets (due to heavy performance penalties)
 bdatSkipOverrides = ["CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr", "CHR_EnArrange"]
@@ -31,9 +32,19 @@ bdatSkipOverrides = ["CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL
 damagePlayerMult = 1.0
 damageEnemyMult = 1.0
 
-# Using a header can override configs for specific games
+# Disables music changes during battles, eg Visions, low tension,  (2/Torna/DE only)
+disableBattleBGMChanges = false
+
+# Using a header can set configs for specific games
+# Headers can also overwrite "globally" defined settings
 
 [bf2]
+# List of title screen overrides, by Bdat id
+# This list contains all chapters, game clears, and NG+ clears
+titleEvents = [10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609]
+# A bitflag for event debugging defaults. The list is in EventDebugUtils.cpp
+eventDebugBits = 0b1
+
 # Tries to load "ira-xm.ard" from the filesystem and mounts if present
 mountTornaContent = true
 

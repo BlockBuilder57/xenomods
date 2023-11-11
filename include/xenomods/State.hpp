@@ -7,6 +7,7 @@
 
 #include "xenomods/Logger.hpp"
 #include "xenomods/Utils.hpp"
+#include "xenomods/menu/Menu.hpp"
 
 namespace xenomods {
 
@@ -14,6 +15,16 @@ namespace xenomods {
 		// very yucky, but this way it's in one spot
 #define CONFIG_PORT_DEFAULT 6969
 #define CONFIG_LOGGING_LEVEL_DEFAULT underlying_value(Logger::Severity::Info)
+#define CONFIG_MENU_THEME_DEFAULT underlying_value(Menu::Theme::Auto)
+#define CONFIG_MENU_FONTS_DEFAULT {}
+#define CONFIG_DUMP_FILE_READS_DEFAULT false
+#define CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT true
+#define CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT \
+	{ "CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr" }
+#define CONFIG_DAMAGE_PLAYER_MULT_DEFAULT 1.0
+#define CONFIG_DAMAGE_ENEMY_MULT_DEFAULT 1.0
+#define CONFIG_ENABLE_60FPS_DEFAULT false
+#define CONFIG_DISABLE_BATTLE_BGM_CHANGES false
 #if XENOMODS_CODENAME(bf2)
 	#define CONFIG_TITLEEVENTS_DEFAULT \
 		{ 10001, 10504, 10505, 10506, 10507, 10508, 10509, 10510, 10511, 10512, 10513, 10605, 10607, 10608, 10609 } // all chapters, game clear, and NG+ clear
@@ -22,15 +33,8 @@ namespace xenomods {
 		{}
 #endif
 #define CONFIG_EVENT_DEBUG_BITS_DEFAULT 0b1
-#define CONFIG_DUMP_FILE_READS_DEFAULT false
-#define CONFIG_ENABLE_FILE_OVERRIDES_DEFAULT true
-#define CONFIG_BDAT_SKIP_OVERRIDES_DEFAULT \
-	{ "CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr" }
 #define CONFIG_MOUNT_TORNA_CONTENT_DEFAULT false
-#define CONFIG_ENABLE_60FPS_DEFAULT false
 #define CONFIG_LOAD_FC_LATEST_DEFAULT false
-#define CONFIG_DAMAGE_PLAYER_MULT_DEFAULT 1.0
-#define CONFIG_DAMAGE_ENEMY_MULT_DEFAULT 1.0
 
 		/**
 		 * Reset to default values.
@@ -42,22 +46,27 @@ namespace xenomods {
 		uint16_t port {};
 		Logger::Severity loggingLevel {};
 
-		std::vector<uint16_t> titleEvents {};
-
-		unsigned int eventDebugBits {};
+		Menu::Theme menuTheme {};
+		std::map<std::string, float> menuFonts {};
 
 		bool dumpFileReads {};
 		bool enableFileOverrides {};
 		std::vector<std::string> bdatSkipOverrides {};
 
-		bool mountTornaContent {};
+		float damagePlayerMult {};
+		float damageEnemyMult {};
 
 		bool enable60FPS {};
 
-		bool loadFcLatest {};
+		bool disableBattleBGMChanges {};
 
-		float damagePlayerMult {};
-		float damageEnemyMult {};
+		// 2/Torna exclusive
+		std::vector<uint16_t> titleEvents {};
+		unsigned int eventDebugBits {};
+		bool mountTornaContent {};
+
+		// DE exclusive
+		bool loadFcLatest {};
 
 	   private:
 		void InitializeFromTable(const toml::table& table, bool respectDefaults);

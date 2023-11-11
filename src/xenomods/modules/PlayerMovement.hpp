@@ -12,14 +12,14 @@ namespace xenomods {
 
 		struct WarpData {
 			std::string name {};
-			unsigned short mapId {};
 			std::string mapName {}; // not serialized
+			unsigned short mapId {};
 			glm::vec3 position {};
 			glm::quat rotation {};
+			glm::vec3 rotationEuler {}; // not serialized
 			glm::vec3 velocity {};
 		};
 		static std::vector<WarpData> Warps;
-		static int WarpIndex;
 
 		static glm::vec3* GetPartyPosition();
 		static void SetPartyPosition(glm::vec3 pos);
@@ -29,12 +29,22 @@ namespace xenomods {
 		static glm::vec3* GetPartyVelocity();
 		static void SetPartyVelocity(glm::vec3 vel);
 
-		static void NewWarp();
-		static void OverwriteWarp();
-		static void GoToWarp();
+		static WarpData* NewWarp();
+		static void SetWarp(WarpData* warp);
+		static void DeleteWarp(WarpData* warp);
+
+		static void GoToWarp(WarpData* warp);
 
 		static void LoadWarpsFromFile();
 		static void SaveWarpsToFile();
+
+		static void MenuSection();
+		static void MenuState();
+
+		static bool ShowWarpsWindow;
+		static bool ShowAllWarps;
+		static bool ShowWarpsOnMap;
+		static void MenuWarps();
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {

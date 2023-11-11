@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <magic_enum.hpp>
+
 #include <xenomods/Utils.hpp>
 
 #include "xenomods/engine/fw/Document.hpp"
@@ -40,7 +42,6 @@ namespace game {
 		Ponspector_Dekadeka,
 		Ponspector_Evelen,
 		Ponspector_Tentoo,
-		Count
 	};
 
 	enum class BdatId {
@@ -99,48 +100,55 @@ namespace game {
 
 }
 
+template <>
+constexpr magic_enum::customize::customize_t magic_enum::customize::enum_name<game::PcID>(game::PcID value) noexcept {
+	// clang-format off
+	switch (value) {
+		using enum game::PcID;
+
+		//case Shulk:               return "Shulk"; break;
+		//case Reyn:                return "Reyn"; break;
+		case FioraHoms:           return "Fiora (Homs)"; break;
+		//case Dunban:              return "Dunban"; break;
+		//case Sharla:              return "Sharla"; break;
+		//case Riki:                return "Riki"; break;
+		//case Melia:               return "Melia"; break;
+		case FioraMachina:        return "Fiora (Machina)"; break;
+		//case Dickson:             return "Dickson"; break;
+		//case Mumkhar:             return "Mumkhar"; break;
+		//case Alvis:               return "Alvis"; break;
+		case DunbanPrelude:       return "Dunban (Prelude)"; break;
+		case DunbanCopy:          return "Dunban (Copy)"; break;
+		//case Kino:                return "Kino"; break;
+		//case Nene:                return "Nene"; break;
+		case Ponspector_Wunwun:   return "Wunwun (Pon.)"; break;
+		case Ponspector_Tutu:     return "Tutu (Pon.)"; break;
+		case Ponspector_Drydry:   return "Drydry (Pon.)"; break;
+		case Ponspector_Fofora:   return "Fofora (Pon.)"; break;
+		case Ponspector_Faifa:    return "Faifa (Pon.)"; break;
+		case Ponspector_Hekasa:   return "Hekasa (Pon.)"; break;
+		case Ponspector_Setset:   return "Setset (Pon.)"; break;
+		case Ponspector_Teitei:   return "Teitei (Pon.)"; break;
+		case Ponspector_Nonona:   return "Nonona (Pon.)"; break;
+		case Ponspector_Dekadeka: return "Dekadeka (Pon.)"; break;
+		case Ponspector_Evelen:   return "Evelen (Pon.)"; break;
+		case Ponspector_Tentoo:   return "Tentoo (Pon.)"; break;
+	}
+	// clang-format on
+	return default_tag;
+}
+
 template<>
 struct fmt::formatter<game::PcID> : fmt::formatter<std::string_view> {
 	template<typename FormatContext>
 	inline auto format(game::PcID pcid, FormatContext& ctx) {
-		std::string_view name;
+		using enum game::PcID;
 
-		// clang-format off
-		switch(pcid) {
-			using enum game::PcID;
+		// just checks for invalids
+		if (pcid < None || pcid > Ponspector_Tentoo)
+			return "Unknown - " + std::to_string(xenomods::underlying_value(pcid));
 
-			case Shulk: name = "Shulk"; break;
-			case Reyn: name = "Reyn"; break;
-			case FioraHoms: name = "Fiora (Homs)"; break;
-			case Dunban: name = "Dunban"; break;
-			case Sharla: name = "Sharla"; break;
-			case Riki: name = "Riki"; break;
-			case Melia: name = "Melia"; break;
-			case FioraMachina: name = "Fiora (Machina)"; break;
-			case Dickson: name = "Dickson"; break;
-			case Mumkhar: name = "Mumkhar"; break;
-			case Alvis: name = "Alvis"; break;
-			case DunbanPrelude: name = "Dunban (Prelude)"; break;
-			case DunbanCopy: name = "Dunban Copy"; break;
-			case Kino: name = "Kino"; break;
-			case Nene: name = "Nene"; break;
-			case Ponspector_Wunwun: name = "Wunwun (Ponspector)"; break;
-			case Ponspector_Tutu: name = "Tutu (Ponspector)"; break;
-			case Ponspector_Drydry: name = "Drydry (Ponspector)"; break;
-			case Ponspector_Fofora: name = "Fofora (Ponspector)"; break;
-			case Ponspector_Faifa: name = "Faifa (Ponspector)"; break;
-			case Ponspector_Hekasa: name = "Hekasa (Ponspector)"; break;
-			case Ponspector_Setset: name = "Setset (Ponspector)"; break;
-			case Ponspector_Teitei: name = "Teitei (Ponspector)"; break;
-			case Ponspector_Nonona: name = "Nonona (Ponspector)"; break;
-			case Ponspector_Dekadeka: name = "Dekadeka (Ponspector)"; break;
-			case Ponspector_Evelen: name = "Evelen (Ponspector)"; break;
-			case Ponspector_Tentoo: name = "Tentoo (Ponspector)"; break;
-			default: name = "Unknown - " + std::to_string(reinterpret_cast<std::underlying_type_t<game::PcID>&>(pcid)); break;
-		}
-		// clang-format on
-
-		return formatter<std::string_view>::format(name, ctx);
+		return magic_enum::enum_name(pcid);
 	}
 };
 #endif

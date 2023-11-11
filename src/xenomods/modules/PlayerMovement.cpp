@@ -1,9 +1,10 @@
 #include "PlayerMovement.hpp"
-
 #include "DebugStuff.hpp"
+
+#include "xenomods/ImGuiExtensions.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
-#include "xenomods/engine/game/CharacterController.hpp"
+#include "xenomods/engine/game/Controllers.hpp"
 #include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/engine/gf/PlayerController.hpp"
@@ -111,11 +112,14 @@ namespace {
 namespace xenomods {
 
 	bool PlayerMovement::moonJump = false;
-	bool PlayerMovement::disableFallDamage = true;
+	bool PlayerMovement::disableFallDamage = false;
 	float PlayerMovement::movementSpeedMult = 1.f;
 
 	std::vector<PlayerMovement::WarpData> PlayerMovement::Warps = {};
-	int PlayerMovement::WarpIndex = -1;
+
+	bool PlayerMovement::ShowWarpsWindow = false;
+	bool PlayerMovement::ShowAllWarps = false;
+	bool PlayerMovement::ShowWarpsOnMap = false;
 
 	glm::vec3* PlayerMovement::GetPartyPosition() {
 #if XENOMODS_OLD_ENGINE
@@ -129,9 +133,9 @@ namespace xenomods {
 		}
 
 		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
-		if (leadHandle != 0) {
+		if(leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
-			if (control != nullptr) {
+			if(control != nullptr) {
 				return reinterpret_cast<glm::vec3*>(&control->position);
 			}
 		}
@@ -141,7 +145,7 @@ namespace xenomods {
 	void PlayerMovement::SetPartyPosition(glm::vec3 pos) {
 #if XENOMODS_OLD_ENGINE
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
-		if (trans != nullptr)
+		if(trans != nullptr)
 			trans->setPosition(pos);
 #elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
@@ -150,9 +154,9 @@ namespace xenomods {
 		}
 
 		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
-		if (leadHandle != 0) {
+		if(leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
-			if (control != nullptr) {
+			if(control != nullptr) {
 				control->syncFrame();
 				control->setWarp(pos, 5);
 				control->clearLanding();
@@ -172,9 +176,9 @@ namespace xenomods {
 		}
 
 		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
-		if (leadHandle != 0) {
+		if(leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
-			if (control != nullptr) {
+			if(control != nullptr) {
 				return reinterpret_cast<glm::quat*>(&control->rotation);
 			}
 		}
@@ -184,7 +188,7 @@ namespace xenomods {
 	void PlayerMovement::SetPartyRotation(glm::quat rot) {
 #if XENOMODS_OLD_ENGINE
 		gf::GfComTransform* trans = gf::GfGameParty::getLeaderTransform();
-		if (trans != nullptr)
+		if(trans != nullptr)
 			trans->setRotation(rot);
 #elif XENOMODS_CODENAME(bfsw)
 		if(DocumentPtr == nullptr) {
@@ -193,9 +197,9 @@ namespace xenomods {
 		}
 
 		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
-		if (leadHandle != 0) {
+		if(leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
-			if (control != nullptr) {
+			if(control != nullptr) {
 				control->setQuat(rot);
 			}
 		}
@@ -234,9 +238,9 @@ namespace xenomods {
 		}
 
 		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
-		if (leadHandle != 0) {
+		if(leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
-			if (control != nullptr) {
+			if(control != nullptr) {
 				return reinterpret_cast<glm::vec3*>(&control->velocity);
 			}
 		}
@@ -253,9 +257,9 @@ namespace xenomods {
 		}
 
 		unsigned int leadHandle = game::ObjUtil::getPartyHandle(*DocumentPtr, 0);
-		if (leadHandle != 0) {
+		if(leadHandle != 0) {
 			game::CharacterController* control = game::ObjUtil::getCharacterController(*DocumentPtr, leadHandle);
-			if (control != nullptr) {
+			if(control != nullptr) {
 				control->clearVelocity();
 				control->addLinearVelocity(vel);
 			}
@@ -289,11 +293,11 @@ namespace xenomods {
 				toml::table& thisone = *el.as_table();
 
 				if(thisone["name"].type() == toml::node_type::string)
-					warp.name = thisone["name"].value_or("no name");
+					warp.name = thisone["name"].value_or<std::string>("no name");
 
 				if(thisone["mapId"].type() == toml::node_type::integer) {
 					warp.mapId = thisone["mapId"].value_or(0);
-					if (detail::IsModuleRegistered(STRINGIFY(DebugStuff)))
+					if(detail::IsModuleRegistered(STRINGIFY(DebugStuff)))
 						warp.mapName = DebugStuff::GetMapName(warp.mapId);
 					else
 						warp.mapName = "bepis";
@@ -322,6 +326,8 @@ namespace xenomods {
 						warp.rotation.z = thisone["rotation"][2].value_or(0.f);
 						warp.rotation.w = thisone["rotation"][2].value_or(0.f);
 					}
+
+					warp.rotationEuler = glm::degrees(glm::eulerAngles(warp.rotation));
 				}
 
 				if(thisone["velocity"].type() == toml::node_type::array) {
@@ -332,10 +338,6 @@ namespace xenomods {
 
 				Warps.push_back(warp);
 			});
-
-			// remember the last warp index
-			WarpIndex = table["lastWarpIndex"].value_or(0);
-			WarpIndex = std::clamp(WarpIndex, 0, (int)Warps.size() - 1);
 
 			g_Logger->ToastInfo("warp", "Loaded {} warp(s)", Warps.size());
 		}
@@ -349,17 +351,14 @@ namespace xenomods {
 		for(auto& warp : Warps) {
 			toml::table thisone;
 
-			thisone.emplace("name", warp.name);
+			thisone.emplace("name", std::string(warp.name));
 			thisone.emplace("mapId", warp.mapId);
 			// save the name of the map to the file so it's clearer what map each warp is for
 			thisone.emplace("mapNameReadOnly", warp.mapName);
 
-			thisone.emplace("position", toml::array{warp.position.x, warp.position.y, warp.position.z});
-
-			glm::vec3 rot = glm::degrees(glm::eulerAngles(warp.rotation));
-			thisone.emplace("rotation", toml::array{rot.x, rot.y, rot.z});
-
-			thisone.emplace("velocity", toml::array{warp.velocity.x, warp.velocity.y, warp.velocity.z});
+			thisone.emplace("position", toml::array { warp.position.x, warp.position.y, warp.position.z });
+			thisone.emplace("rotation", toml::array { warp.rotationEuler.x, warp.rotationEuler.y, warp.rotationEuler.z });
+			thisone.emplace("velocity", toml::array { warp.velocity.x, warp.velocity.y, warp.velocity.z });
 
 			allWarps.emplace_back(thisone);
 		}
@@ -367,13 +366,11 @@ namespace xenomods {
 		toml::table finalTable;
 		finalTable.emplace("warps", allWarps);
 
-		finalTable.emplace("lastWarpIndex", WarpIndex);
-
 		std::stringstream ss;
 		ss << finalTable;
 		std::string out = ss.str();
 
-		if (!NnFile::Preallocate(path, out.size())) {
+		if(!NnFile::Preallocate(path, out.size())) {
 			g_Logger->LogError("Couldn't create/preallocate warps file \"{}\"", path);
 			return;
 		}
@@ -385,93 +382,76 @@ namespace xenomods {
 		file.Close();
 	}
 
-	void PlayerMovement::NewWarp() {
+	PlayerMovement::WarpData* PlayerMovement::NewWarp() {
 		unsigned short mapId = 0;
 		std::string mapName = "bepis";
 
-		if (detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
+		if(detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
 			mapId = DebugStuff::GetMapId();
 			mapName = DebugStuff::GetMapName();
 		}
 
-		Warps.push_back({ .name = "New Warp " + std::to_string(Warps.size()),
-						  .mapId = mapId,
-						  .mapName = mapName });
+		WarpData warp = {
+			.name = mapName + " Warp " + std::to_string(Warps.size()),
+			.mapName = mapName,
+			.mapId = mapId,
+		};
+		Warps.push_back(warp);
 
-		WarpIndex = Warps.size() - 1;
-		OverwriteWarp();
+		// there's probably a better way of doing this...
+		WarpData* pWarp = &Warps[Warps.size() - 1];
+		SetWarp(pWarp);
+		return pWarp;
 	}
-	void PlayerMovement::OverwriteWarp() {
-		if (WarpIndex < 0 || WarpIndex >= Warps.size())
-			return;
-
-		auto warp = &Warps[WarpIndex];
-
-		if (xenomods::detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
+	void PlayerMovement::SetWarp(WarpData* warp) {
+		if(xenomods::detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
 			warp->mapId = DebugStuff::GetMapId();
 			warp->mapName = DebugStuff::GetMapName(warp->mapId);
-		}
-		else {
+		} else {
 			warp->mapId = 0;
 			warp->mapName = "bepis";
 		}
 
-		if (GetPartyPosition() != nullptr)
+		if(GetPartyPosition() != nullptr)
 			warp->position = *GetPartyPosition();
-		if (GetPartyRotation() != nullptr)
+		if(GetPartyRotation() != nullptr)
 			warp->rotation = *GetPartyRotation();
-		if (GetPartyVelocity() != nullptr)
+		if(GetPartyVelocity() != nullptr)
 			warp->velocity = *GetPartyVelocity();
+
+		warp->rotationEuler = glm::degrees(glm::eulerAngles(warp->rotation));
 
 		g_Logger->ToastInfo("warp", "Set {} at {:3}", warp->name, warp->position);
 		g_Logger->ToastInfo("warp2", "(rot {} vel {})", warp->rotation, warp->velocity);
 	}
-	void PlayerMovement::GoToWarp() {
-		if (WarpIndex < 0 || WarpIndex >= Warps.size())
-			return;
+	void PlayerMovement::DeleteWarp(WarpData* warp) {
+		for(auto iter = Warps.begin(); iter != Warps.end(); iter++) {
+			if(iter.base() == warp) {
+				Warps.erase(iter);
+				break;
+			}
+		}
+	}
 
-		auto warp = &Warps[WarpIndex];
-
+	void PlayerMovement::GoToWarp(WarpData* warp) {
 		// lock out warps that have map ids set
 		// if DebugStuff isn't present just let them do whatever
-		if (xenomods::detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
-			if (warp->mapId > 0 && warp->mapId != DebugStuff::GetMapId()) {
+		if(xenomods::detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
+			if(warp->mapId > 0 && warp->mapId != DebugStuff::GetMapId()) {
 				g_Logger->ToastWarning("warp", "Current map ({}) does not match the warp's map ({})", DebugStuff::GetMapName(), DebugStuff::GetMapName(warp->mapId));
 				return;
 			}
 		}
 
-		const glm::quat zero = glm::quat(0,0,0,0);
+		const glm::quat zero = glm::quat(0, 0, 0, 0);
 		glm::quat normalized = glm::normalize(warp->rotation);
 
 		SetPartyPosition(warp->position);
-		if (normalized != zero)
+		if(normalized != zero)
 			SetPartyRotation(normalized); // can cause fun errors
 		SetPartyVelocity(warp->velocity);
 
 		g_Logger->ToastInfo("warp", "Warped party to {}", warp->name);
-	}
-
-	void MenuChangeWarpIndex() {
-		if (xenomods::PlayerMovement::WarpIndex < 0)
-			xenomods::PlayerMovement::WarpIndex = xenomods::PlayerMovement::Warps.size() - 1;
-		else if (xenomods::PlayerMovement::WarpIndex >= xenomods::PlayerMovement::Warps.size())
-			xenomods::PlayerMovement::WarpIndex = 0;
-	}
-
-	std::string MenuGetCurrentWarpInfo() {
-		if (xenomods::PlayerMovement::WarpIndex < 0 || xenomods::PlayerMovement::WarpIndex >= xenomods::PlayerMovement::Warps.size())
-			return "No warp";
-
-		auto warp = xenomods::PlayerMovement::Warps[xenomods::PlayerMovement::WarpIndex];
-		return fmt::format("{} in {}", warp.name, warp.mapName);
-	}
-	std::string MenuGetCurrentWarpInfo2() {
-		if (xenomods::PlayerMovement::WarpIndex < 0 || xenomods::PlayerMovement::WarpIndex >= xenomods::PlayerMovement::Warps.size())
-			return "...";
-
-		auto warp = xenomods::PlayerMovement::Warps[xenomods::PlayerMovement::WarpIndex];
-		return fmt::format("Position: {}", warp.position);
 	}
 
 	std::string cacheMapName = "No Map";
@@ -482,24 +462,110 @@ namespace xenomods {
 
 	std::string MenuCurrentPlayerPosition() {
 		auto pos = xenomods::PlayerMovement::GetPartyPosition();
-		if (pos != nullptr)
+		if(pos != nullptr)
 			return fmt::format("{:2}", *pos);
 		else
 			return "-";
 	}
 	std::string MenuCurrentPlayerRotation() {
 		auto rot = xenomods::PlayerMovement::GetPartyRotation();
-		if (rot != nullptr)
+		if(rot != nullptr)
 			return fmt::format("{:1}", glm::degrees(glm::eulerAngles(*rot)));
 		else
 			return "-";
 	}
 	std::string MenuCurrentPlayerVelocity() {
 		auto vel = xenomods::PlayerMovement::GetPartyVelocity();
-		if (vel != nullptr)
+		if(vel != nullptr)
 			return fmt::format("{:2}", *vel);
 		else
 			return "-";
+	}
+
+	void PlayerMovement::MenuSection() {
+		ImGui::MenuItem("Show Warps Window", "", &ShowWarpsWindow);
+		ImGui::Checkbox("Disable fall damage", &disableFallDamage);
+		ImGui::PushItemWidth(150.f);
+		imguiext::InputFloatExt("Movement speed multiplier", &movementSpeedMult, 1.f, 5.f, 2.f, "%.2f");
+		ImGui::PopItemWidth();
+	}
+
+	void PlayerMovement::MenuState() {
+		ImGui::Text("Current map: %s", MenuCurrentMapInfo().c_str());
+		ImGui::Text("Current pos: %s", MenuCurrentPlayerPosition().c_str());
+		ImGui::Text("Current rot: %s", MenuCurrentPlayerRotation().c_str());
+		ImGui::Text("Current vel: %s", MenuCurrentPlayerVelocity().c_str());
+	}
+
+	void MenuDrawWarp(PlayerMovement::WarpData* warp) {
+		ImGui::Text("Map: %s", warp->mapName.c_str());
+		ImGui::DragFloat3("Position", reinterpret_cast<float*>(&warp->position));
+		if(ImGui::DragFloat3("Rotation", reinterpret_cast<float*>(&warp->rotationEuler)))
+			warp->rotation = glm::quat(glm::radians(warp->rotationEuler));
+		ImGui::DragFloat3("Velocity", reinterpret_cast<float*>(&warp->velocity));
+
+		if(ImGui::Button("Go To Warp"))
+			PlayerMovement::GoToWarp(warp);
+		ImGui::SameLine();
+		if(ImGui::Button("Overwrite Warp"))
+			PlayerMovement::SetWarp(warp);
+		ImGui::SameLine();
+		if(ImGui::Button("Delete Warp"))
+			PlayerMovement::DeleteWarp(warp);
+	}
+
+	void PlayerMovement::MenuWarps() {
+		if(!ShowWarpsWindow)
+			return;
+
+		if(!ImGui::Begin("Warps", &ShowWarpsWindow, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::End();
+			return;
+		}
+
+		if(ImGui::Button("Load Warps From File"))
+			LoadWarpsFromFile();
+		ImGui::SameLine();
+		if(ImGui::Button("Save Warps To File"))
+			SaveWarpsToFile();
+
+		ImGui::Checkbox("Show all warps", &ShowAllWarps);
+		ImGui::SameLine();
+		ImGui::Checkbox("Show warps on map", &ShowWarpsOnMap);
+
+		if(ImGui::BeginTabBar("WarpsBar", ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_TabListPopupButton | ImGuiTabBarFlags_FittingPolicyScroll)) {
+			// new warp button
+			if(ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
+				NewWarp();
+
+			// draw a tab for each warp
+			for(int n = 0; n < Warps.size();) {
+				WarpData* warp = &Warps[n];
+				bool open = true;
+
+				// disabling show all warps will only show the warps that are active on the current map
+				if(!ShowAllWarps && detail::IsModuleRegistered(STRINGIFY(DebugStuff))) {
+					if(warp->mapId > 0 && warp->mapId != DebugStuff::GetMapId()) {
+						n++;
+						continue;
+					}
+				}
+
+				if(ImGui::BeginTabItem(warp->name.c_str(), &open, ImGuiTabItemFlags_None)) {
+					MenuDrawWarp(warp);
+					ImGui::EndTabItem();
+				}
+
+				if(!open)
+					DeleteWarp(warp);
+				else
+					n++;
+			}
+
+			ImGui::EndTabBar();
+		}
+
+		ImGui::End();
 	}
 
 	void PlayerMovement::Initialize() {
@@ -521,41 +587,59 @@ namespace xenomods {
 
 #if !XENOMODS_CODENAME(bf3) // need to find these for 3
 		auto modules = g_Menu->FindSection("modules");
-		if (modules != nullptr) {
+		if(modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(PlayerMovement), "Player Movement");
-			section->RegisterOption<bool>(disableFallDamage, "Disable fall damage");
-			section->RegisterOption<float>(movementSpeedMult, "Movement speed multiplier");
-
-			auto warps = section->RegisterSection(std::string(STRINGIFY(PlayerMovement)) + "_warps", "Warps...");
-			warps->RegisterOption<void>("Load Warps from file", &PlayerMovement::LoadWarpsFromFile);
-			warps->RegisterOption<void>("Save Warps to file", &PlayerMovement::SaveWarpsToFile);
-			warps->RegisterOption<int>(WarpIndex, "Current warp index", &MenuChangeWarpIndex);
-			warps->RegisterOption<void>("New Warp", &PlayerMovement::NewWarp);
-			warps->RegisterOption<void>("Overwrite Warp", &PlayerMovement::OverwriteWarp);
-			warps->RegisterOption<void>("Go To Warp", &PlayerMovement::GoToWarp);
-			warps->RegisterTextual("Current Warp: ", {}, &MenuGetCurrentWarpInfo);
-			warps->RegisterTextual("", {}, &MenuGetCurrentWarpInfo2);
+			section->RegisterRenderCallback(&MenuSection);
 		}
 
 		auto state = g_Menu->FindSection("state");
-		if (state != nullptr) {
-			state->RegisterTextual("Current map: ", {}, &MenuCurrentMapInfo);
-			state->RegisterTextual("Current pos: ", {}, &MenuCurrentPlayerPosition);
-			state->RegisterTextual("Current rot: ", {}, &MenuCurrentPlayerRotation);
-			state->RegisterTextual("Current vel: ", {}, &MenuCurrentPlayerVelocity);
+		if(state != nullptr) {
+			state->RegisterRenderCallback(&MenuState);
 		}
+
+		g_Menu->RegisterRenderCallback(&MenuWarps);
 #endif
 	}
 
 	void PlayerMovement::Update(fw::UpdateInfo* updateInfo) {
 		moonJump = HidInput::GetPlayer(1)->InputHeld(Keybind::MOONJUMP);
+
+#if !XENOMODS_CODENAME(bf3)
+		if(ShowWarpsOnMap) {
+			if(!detail::IsModuleRegistered(STRINGIFY(DebugStuff)))
+				return;
+
+			for(WarpData warp : Warps) {
+				// skip warps that won't work
+				if(warp.mapId > 0 && warp.mapId != DebugStuff::GetMapId())
+					continue;
+
+				// axis/arrow rendering is messed up in DE for some reason, it's all relative to the camera center...
+	#if XENOMODS_OLD_ENGINE
+				float angle = glm::angle(warp.rotation);
+				glm::vec3 axis = glm::axis(warp.rotation);
+
+				glm::mat4 newmat = glm::mat4(1.f);
+				newmat = glm::translate(newmat, warp.position);
+				newmat = glm::rotate(newmat, angle, axis);
+
+				fw::debug::drawCompareZ(false);
+				fw::debug::drawAxis(newmat, 2.f);
+				fw::debug::drawArrow(warp.position, warp.position + (warp.velocity * 0.5f), mm::Col4::yellow);
+				fw::debug::drawCompareZ(true);
+	#endif
+
+				xenomods::debug::drawFontFmtShadow3D(warp.position, mm::Col4::white, "{}", warp.name);
+			}
+		}
+#endif
 	}
 
 	void PlayerMovement::OnMapChange(unsigned short mapId) {
-		if (detail::IsModuleRegistered(STRINGIFY(DebugStuff)))
+		if(detail::IsModuleRegistered(STRINGIFY(DebugStuff)))
 			cacheMapName = DebugStuff::GetMapName(mapId);
 
-		if (!cacheMapName.starts_with("ID"))
+		if(!cacheMapName.starts_with("ID"))
 			cacheMapName += " (ID " + std::to_string(mapId) + ")";
 	}
 

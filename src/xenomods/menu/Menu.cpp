@@ -1,166 +1,222 @@
 // Created by block on 5/28/23.
 
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <imgui_xeno.h>
+
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
+#include <xenomods/ImGuiExtensions.hpp>
 #include <xenomods/Logger.hpp>
+#include <xenomods/NnFile.hpp>
 #include <xenomods/State.hpp>
 #include <xenomods/Utils.hpp>
 #include <xenomods/Version.hpp>
 #include <xenomods/menu/Menu.hpp>
+#include <xenomods/menu/Themes.hpp>
+
+#include "helpers/InputHelper.h"
 
 namespace xenomods {
 
-	mm::Col4 Menu::COLOR_BACKGROUND = { 0, 0, 0, 0.6f };
-	mm::Col4 Menu::COLOR_TITLE = { 1, 1, 1, 1 };
-	mm::Col4 Menu::COLOR_SECTION = { 1, 1, 1, 1 };
-	mm::Col4 Menu::COLOR_OPTION = { 0.9f, 0.9f, 0.9f, 1 };
-	mm::Col4 Menu::COLOR_TEXTUAL = { 0.8f, 0.8f, 0.8f, 1 };
-	mm::Col4 Menu::COLOR_HIGHLIGHT = { 0.75f, 0.75f, 1, 1 };
+	struct NvnBootstrapHook : skylaunch::hook::Trampoline<NvnBootstrapHook> {
+		static void* Hook(const char* name) {
+			return imgui_xeno_bootstrap_hook(name, reinterpret_cast<OrigNvnBootstrap>(Backup()));
+		}
+	};
+
+	void ImGuiPreInitCallback() {
+		ImGuiIO& io = ImGui::GetIO();
+
+		// add as much as we reasonably can from the loaded fonts
+		static const ImWchar ranges[] = {
+			0x0020, 0x00FF, // Basic Latin + Latin Supplement
+			0x0102, 0x0103, // Vietnamese
+			0x0110, 0x0111, // Vietnamese
+			0x0128, 0x0129, // Vietnamese
+			0x0168, 0x0169, // Vietnamese
+			0x01A0, 0x01A1, // Vietnamese
+			0x01AF, 0x01B0, // Vietnamese
+			0x0370, 0x03FF, // Greek and Coptic
+			0x2000, 0x206F, // General Punctuation
+			0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
+			0x3131, 0x3163, // Korean alphabets
+			0x31F0, 0x31FF, // Katakana Phonetic Extensions
+			0x4e00, 0x9FAF, // CJK Ideograms
+			0xAC00, 0xD7A3, // Korean characters
+			0xFF00, 0xFFEF, // Half-width characters
+			0xFFFD, 0xFFFD, // Invalid
+			0,
+		};
+
+		for(std::pair<std::string, float> thingy : GetState().config.menuFonts) {
+			std::string path = thingy.first;
+
+			if (!path.starts_with("sd:"))
+				path = "sd:/config/xenomods/fonts/" + path;
+
+			// check that the file exists first
+			xenomods::NnFile file(path, nn::fs::OpenMode_Read);
+
+			if(file) {
+				file.Close();
+				//g_Logger->LogDebug("{} at {}px", path, thingy.second);
+				io.Fonts->AddFontFromFileTTF(path.c_str(), thingy.second, nullptr, &ranges[0]);
+			}
+		}
+		io.Fonts->AddFontDefault();
+
+		g_Menu->SetTheme(GetState().config.menuTheme);
+
+		// I am fine hardcoding these for now. In the future, if we make support
+		// for full file-based theming, make sure we can do colors and style.
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		style.WindowPadding = ImVec2(6,6);
+		style.FramePadding = ImVec2(2,1);
+		style.ItemSpacing = ImVec2(8,3);
+		style.ItemInnerSpacing = ImVec2(3,4);
+
+		style.ScrollbarSize = 16;
+		style.ScrollbarRounding = 0;
+	}
+
+	void Section_State() {
+		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 10.f);
+
+		if(imguiext::EnumComboBox("Menu Theme", &GetState().config.menuTheme))
+			g_Menu->SetTheme(GetState().config.menuTheme);
+
+		// copied from the demo
+		ImGuiIO& io = ImGui::GetIO();
+		ImFont* font_current = ImGui::GetFont();
+		if(ImGui::BeginCombo("Menu Font", font_current->GetDebugName())) {
+			for(ImFont* font : io.Fonts->Fonts) {
+				ImGui::PushID((void*)font);
+				if(ImGui::Selectable(font->GetDebugName(), font == font_current))
+					io.FontDefault = font;
+				ImGui::PopID();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::PopItemWidth();
+
+		if(ImGui::Button("Reload config/BDAT overrides"))
+			XenomodsState::ReloadConfig();
+
+		ImGui::Separator();
+	}
+
+	std::string about_build {};
+	std::string about_runtime {};
+	std::string about_executable {};
+	void Section_About() {
+		if (about_build.empty())
+			about_build = fmt::format("Compiled on {}", version::BuildTimestamp());
+		if (about_runtime.empty())
+			about_runtime = fmt::format("Currently running {} ({:c}) version {}", version::RuntimeGame(), version::RuntimeGame(), version::RuntimeVersion());
+		if (about_executable.empty()) {
+			if(std::string_view(version::RuntimeBuildRevision()).starts_with("Rev"))
+				about_executable = fmt::format("Game executable {}", version::RuntimeBuildRevision());
+			else
+				about_executable = fmt::format("Game executable version {}", version::RuntimeBuildRevision());
+		}
+
+		ImGui::TextUnformatted(version::XenomodsFullVersion());
+		ImGui::TextUnformatted(about_build.c_str());
+		ImGui::TextUnformatted(about_runtime.c_str());
+		ImGui::TextUnformatted(about_executable.c_str());
+
+		static bool showImGuiAbout = false;
+		if (ImGui::SmallButton("About Dear ImGui"))
+			showImGuiAbout = true;
+		if (showImGuiAbout)
+			ImGui::ShowAboutWindow(&showImGuiAbout);
+	}
 
 	void Menu::Initialize() {
-		// modules
-		auto modules = RegisterSection("modules", "Modules...");
+		// imgui-xeno initialization
+		NvnBootstrapHook::HookAt("nvnBootstrapLoader");
+		imgui_xeno_add_on_pre_init(&ImGuiPreInitCallback);
+		imgui_xeno_init(nullptr, &Render);
 
-		// state
-		auto state = RegisterSection("state", "State...");
+		auto modules = RegisterSection("modules", "Modules");
 
-		state->RegisterOption<bool>(drawBackground, "Draw menu background");
-		state->RegisterOption<void>("Reload config/BDAT overrides", &XenomodsState::ReloadConfig);
+		auto state = RegisterSection("state", "State");
+		state->RegisterRenderCallback(&Section_State);
 
-		// about
-		auto about = RegisterSection("about", "About...");
-		about->RegisterTextual(fmt::format("Compiled on {}", version::BuildTimestamp()));
-		about->RegisterTextual(fmt::format("Currently running {} ({:c}) version {}", version::RuntimeGame(), version::RuntimeGame(), version::RuntimeVersion()));
-
-		// i love grammar
-		if(std::string_view(version::RuntimeBuildRevision()).starts_with("Rev"))
-			about->RegisterTextual(fmt::format("Executable {}", version::RuntimeBuildRevision()));
-		else
-			about->RegisterTextual(fmt::format("Executable version {}", version::RuntimeBuildRevision()));
+		auto about = RegisterSection("about", "About");
+		about->RegisterRenderCallback(&Section_About);
 	}
 
 	void Menu::Update(HidInput* input) {
-		PollMaxIndex();
-
-		pressSelect = false;
-		pressBack = false;
-		bool doSelect = false;
-		bool doBack = false;
-
-		// only update controls when no option is selected
-		if(curSection == nullptr || !curSection->IsSelectingOption()) {
-			if(input->InputDownStrict(Keybind::MENU_UP)) {
-				curIndex--;
-			} else if(input->InputDownStrict(Keybind::MENU_DOWN)) {
-				curIndex++;
-			}
-
-			// wrap around
-			if(maxIndex > 0) {
-				if(curIndex > maxIndex)
-					curIndex = 0;
-				else if(curIndex < 0)
-					curIndex = maxIndex;
-			} else {
-				curIndex = 0;
-			}
-
-			pressSelect = input->InputHeldStrict(Keybind::MENU_SELECT);
-			pressBack = input->InputHeldStrict(Keybind::MENU_BACK);
-
-			if(input->InputUpStrict(Keybind::MENU_SELECT)) {
-				doSelect = true;
-			} else if(input->InputUpStrict(Keybind::MENU_BACK)) {
-				doBack = true;
-			}
-		}
-
-		if(curSection != nullptr)
-			curSection->Update(input);
-
-		Render();
-
-		// intentionally switching sections after rendering, so we draw the selection highlight
-
-		if(doBack) {
-			if(curSection != nullptr) {
-				curSection = curSection->GetParent();
-				if (curSection != nullptr)
-					// set the index to the last one the section had
-					curIndex = curSection->SavedIndex;
-				else
-					// set from the saved index
-					curIndex = savedSectionIndex;
-			}
-		} else if(doSelect) {
-			if(curSection == nullptr) {
-				// on root menu, can just pick
-				curSection = sections[curIndex];
-				savedSectionIndex = curIndex;
-			} else {
-				// let the section handle stuff
-				curSection->PerformSelect();
-			}
-		}
+		InputHelper::setPort(input->padId);
+		InputHelper::toggleInput = g_Menu->IsOpen();
 	}
 
 	void Menu::Render() {
-		if(drawBackground)
-			xenomods::debug::drawFontBackColor(COLOR_BACKGROUND);
+		if (!g_Menu->IsOpen())
+			return;
 
-		const int fontHeight = xenomods::debug::drawFontGetHeight();
-		const mm::Pnt<int> start { .x = 5, .y = 5 };
-		mm::Pnt<int> pnt = start;
-
-		// //xenomods 1234567~ (debug) [???]
-		xenomods::debug::drawFontFmtShadow(start.x, start.y, COLOR_TITLE, "\x81\x61xenomods {}{} [{}]", version::BuildGitVersion(), version::BuildIsDebug ? " (debug)" : "", XENOMODS_CODENAME_STR);
-
-#if 0
-		mm::Pnt<int> dbgpnt = start;
-		dbgpnt.x = 1280/2;
-		dbgpnt.y = -fontHeight;
-
-		xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "Menu: idx {}/{}, savedSectionIndex {}", curIndex, maxIndex, savedSectionIndex);
-
-		if (curSection != nullptr) {
-			dbgpnt.y += fontHeight;
-			xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "curSection @ {}", reinterpret_cast<void*>(curSection));
-			xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "{}: {}", curSection->GetKey(), curSection->GetName());
-			if (curSection->GetParent() != nullptr)
-				xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "Parent: {}", curSection->GetParent()->GetName());
-			xenomods::debug::drawFontFmtShadow(dbgpnt.x, dbgpnt.y += fontHeight, COLOR_TITLE, "SavedIndex: {}", curSection->SavedIndex);
-		}
-#endif
-
-		int renderNum = 0;
-
-		if(curSection == nullptr) {
-			// render the root sections
-			for(auto& sec : sections) {
+		static bool test = false;
+		static bool show_demo = false;
+		if(ImGui::BeginMainMenuBar()) {
+			for(Section* sec : g_Menu->sections) {
 				if (sec == nullptr)
 					continue;
 
-				if(renderNum == curIndex)
-					xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, pressSelect ? COLOR_HIGHLIGHT : COLOR_SECTION, ">{} ", sec->GetName());
-				else
-					xenomods::debug::drawFontFmtShadow(pnt.x, pnt.y += fontHeight, COLOR_SECTION, " {} ", sec->GetName());
-
-				renderNum++;
+				if(ImGui::BeginMenu(sec->GetName().c_str())) {
+					ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+					sec->Render();
+					ImGui::PopItemFlag();
+					ImGui::EndMenu();
+				}
 			}
-		} else
-			// render the current section
-			curSection->Render(pnt);
+#if _DEBUG
+			ImGui::MenuItem("ImGui Demo", "", &show_demo);
+#endif
 
-		if(drawBackground)
-			xenomods::debug::drawFontBackColor({});
+			ImGui::TextDisabled("%s", version::XenomodsVersion());
+			ImGui::EndMainMenuBar();
+		}
+		if(show_demo) {
+			ImGui::ShowDemoWindow();
+		}
+
+		for(auto func : g_Menu->callbacks) {
+			func();
+		}
 	}
 
-	void Menu::PollMaxIndex() {
-		if(curSection == nullptr)
-			maxIndex = sections.size() - 1;
-		else
-			maxIndex = curSection->GetMaxIndex();
+	Menu::Theme Menu::SetTheme(Theme theme) {
+		if (ImGui::GetCurrentContext() == nullptr)
+			return Theme::Auto;
+
+		Theme curTheme = theme;
+
+		if (curTheme == Theme::Auto) {
+#if XENOMODS_CODENAME(bfsw)
+			curTheme = Theme::Titans;
+#elif XENOMODS_OLD_ENGINE
+			curTheme = Theme::Alrest;
+#elif XENOMODS_CODENAME(bf3)
+			curTheme = Theme::Aionios;
+#endif
+		}
+
+		switch (curTheme) {
+			case Theme::Titans: ImGuiStyleColorsXB1(); break;
+			case Theme::Alrest: ImGuiStyleColorsXB2(); break;
+			case Theme::Aionios: ImGuiStyleColorsXB3(); break;
+			case Theme::ImGuiDark: ImGui::StyleColorsDark(); break;
+			case Theme::ImGuiLight: ImGui::StyleColorsLight(); break;
+			case Theme::ImGuiClassic: ImGui::StyleColorsClassic(); break;
+			default: ImGui::StyleColorsDark(); return Theme::ImGuiDark;
+		}
+
+		return curTheme;
 	}
 
 	Section* FindSectionRecurse(Section* section, const std::string& key) {
@@ -197,6 +253,11 @@ namespace xenomods {
 		auto sec = new Section(key, display);
 		sections.push_back(sec);
 		return sec;
+	}
+
+	void Menu::RegisterRenderCallback(void (*func)()) {
+		if (func != nullptr)
+			callbacks.push_back(func);
 	}
 
 	// The menu instance.

@@ -1,5 +1,6 @@
 #include "BdatRandomizer.hpp"
 
+#include "xenomods/ImGuiExtensions.hpp"
 #include "xenomods/engine/bdat/Bdat.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/stuff/utils/util.hpp"
@@ -41,6 +42,12 @@ namespace xenomods {
 
 	BdatRandomizer::BdatMSScrambleType BdatRandomizer::msScrambleType = BdatRandomizer::BdatMSScrambleType::Off;
 
+	void BdatRandomizer::MenuSection() {
+		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 9.f);
+		imguiext::EnumComboBox("Scramble Type", &msScrambleType);
+		ImGui::PopItemWidth();
+	}
+
 	void BdatRandomizer::Initialize() {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up Bdat randomizer...");
@@ -52,7 +59,7 @@ namespace xenomods {
 		auto modules = g_Menu->FindSection("modules");
 		if(modules != nullptr) {
 			auto section = modules->RegisterSection(STRINGIFY(BdatRandomizer), "BDAT Randomizer");
-			section->RegisterOption<BdatMSScrambleType>(msScrambleType, "Scramble type");
+			section->RegisterRenderCallback(&MenuSection);
 		}
 #endif
 	}

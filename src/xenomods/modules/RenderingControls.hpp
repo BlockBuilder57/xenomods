@@ -9,9 +9,13 @@ namespace xenomods {
 		static bool straightenFont;
 		static bool skipUIRendering;
 		static bool skipParticleRendering;
+		static bool skipOverlayRendering;
 		static bool skipCloudRendering;
 		static bool skipSkyDomeRendering;
+
 		static float shadowStrength;
+
+		static bool freezeTextureStreaming;
 
 		struct ForcedRenderParameters {
 			bool DisableDOF;
@@ -23,6 +27,10 @@ namespace xenomods {
 			}
 		};
 		static ForcedRenderParameters ForcedParameters;
+
+		static void MenuSection();
+		static void MenuToggles();
+		static void MenuGBuffer();
 
 		void Initialize() override;
 		void Update(fw::UpdateInfo* updateInfo) override;

@@ -9,3 +9,9 @@
 	path = vendor/tomlpp
 	url = https://github.com/marzer/tomlplusplus.git
 	shallow = true
+[submodule "vendor/magic_enum"]
+	path = vendor/magic_enum
+	url = https://github.com/Neargye/magic_enum
+[submodule "vendor/imgui-xeno"]
+	path = vendor/imgui-xeno
+	url = https://github.com/BlockBuilder57/imgui-xeno

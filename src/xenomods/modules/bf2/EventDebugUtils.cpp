@@ -3,8 +3,8 @@
 //
 
 #include "EventDebugUtils.hpp"
-#include "../DebugStuff.hpp"
 
+#include "../DebugStuff.hpp"
 #include "xenomods/engine/event/Manager.hpp"
 #include "xenomods/engine/gf/BdatData.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
@@ -150,45 +150,21 @@ namespace {
 namespace xenomods {
 
 	int EventDebugUtils::RegistrationIndex = 0;
-	int EventDebugUtils::CurrentIndex = -1;
-	unsigned long EventDebugUtils::ActiveBits = 0;
+	std::uint32_t EventDebugUtils::ActiveBits = 0;
 	std::vector<std::string> EventDebugUtils::FuncNames {};
 
 	bool EventDebugUtils::ShouldUpdate = false;
+
+	void EventDebugUtils::MenuSection() {
+		for (int i = 0; i < RegistrationIndex; i++) {
+			ImGui::CheckboxFlags(FuncNames[i].c_str(), &ActiveBits, 1 << i);
+		}
+	}
 
 	void EventDebugUtils::Update(fw::UpdateInfo* updateInfo) {
 		if(FuncNames.size() != RegistrationIndex) {
 			xenomods::g_Logger->LogError("Event function names not the same size as regist index {} vs {}", FuncNames.size(), RegistrationIndex);
 			return;
-		}
-
-		bool changed = false;
-
-		//xenomods::debug::drawFontFmtShadow(0, 720-16, mm::Col4::white, "Manager bits: {:0b}", ActiveBits);
-
-		if(HidInput::GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_PREV)) {
-			CurrentIndex--;
-			changed = true;
-		} else if(HidInput::GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_NEXT)) {
-			CurrentIndex++;
-			changed = true;
-		}
-
-		if(changed) {
-			if(CurrentIndex < 0)
-				CurrentIndex = RegistrationIndex - 1;
-			else if(CurrentIndex >= RegistrationIndex)
-				CurrentIndex = 0;
-
-			g_Logger->LogInfo("Selected {} (currently {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");
-		}
-
-		if(HidInput::GetPlayer(1)->InputDownStrict(Keybind::EVENT_DEBUG_TOGGLE)) {
-			if(CurrentIndex >= 0 && CurrentIndex < RegistrationIndex) {
-				ActiveBits ^= 1 << CurrentIndex;
-				g_Logger->LogInfo("Toggled debug for {} (now {})", FuncNames[CurrentIndex], (ActiveBits >> CurrentIndex) & 1 ? "on" : "off");
-			} else
-				g_Logger->LogWarning("Tried to toggle invalid debug manager, try another (was index {})", CurrentIndex);
 		}
 	}
 
@@ -236,6 +212,12 @@ namespace xenomods {
 			EventStartInfo::HookAt("_ZN5event7Manager4playEPKcPN2gf13GF_OBJ_HANDLEEjjjjRKN2mm4Vec3Ef");
 
 		ReplaceTitleEvent::HookAt(&tl::TitleMain::playTitleEvent);
+
+		auto modules = g_Menu->FindSection("modules");
+		if(modules != nullptr) {
+			auto section = modules->RegisterSection(STRINGIFY(EventDebugUtils), "Event Debug");
+			section->RegisterRenderCallback(&MenuSection);
+		}
 	}
 
 #if XENOMODS_OLD_ENGINE

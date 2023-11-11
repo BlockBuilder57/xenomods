@@ -2,8 +2,8 @@
 
 #include "FrameratePatch.hpp"
 
-#include "xenomods/engine/ml/DevGraph.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
+#include "xenomods/engine/ml/DevGraph.hpp"
 
 namespace {
 
@@ -26,7 +26,7 @@ namespace {
 		}
 	};
 
-}
+} // namespace
 
 namespace xenomods {
 
@@ -34,10 +34,22 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up framerate patch...");
 
-		if (GetState().config.enable60FPS) {
+		if(GetState().config.enable60FPS) {
 #if XENOMODS_CODENAME(bf3)
-			LayerManagerCtorHook::HookFromBase(0x710100f260);
-			VSyncHook::HookFromBase(0x7101249648);
+			// layer::LayerManager::LayerManager
+			// ml::DevGraph::setVSync
+			if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
+				LayerManagerCtorHook::HookFromBase(0x710100f260);
+				VSyncHook::HookFromBase(0x7101249648);
+			}
+			else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
+				LayerManagerCtorHook::HookFromBase(0x710100f590);
+				VSyncHook::HookFromBase(0x7101249978);
+			}
+			else if (version::RuntimeVersion() == version::SemVer::v2_1_1) {
+				LayerManagerCtorHook::HookFromBase(0x710100f5d0);
+				VSyncHook::HookFromBase(0x71012499b8);
+			}
 #else
 			LayerManagerCtorHook::HookAt("_ZN5layer12LayerManagerC1EPN2ml3ScnEN3mtl12ALLOC_HANDLEEj"); // can't hook ctors yet?
 			VSyncHook::HookAt(&ml::DevGraph::setVSync);

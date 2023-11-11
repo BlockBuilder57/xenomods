@@ -143,8 +143,19 @@ namespace xenomods {
 		ReadFileHook::HookAt("_ZN2ml13DevFileUtilNx8readFileERPNS_12FileHandleThERN2nn2fs10FileHandleEilPvjRNS_14FileReadResultE");
 		ReadFileSliceHook::HookAt("_ZN2ml13DevFileUtilNx13readFileSliceEPNS_12FileHandleThERN2nn2fs10FileHandleEllPvjRNS_14FileReadResultE");
 #else
-		ReadFileHook::HookFromBase(0x71012562a4);
-		ReadFileSliceHook::HookFromBase(0x7101254ab0);
+		// ml::DevFileUtilNx::readFile(Slice)
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
+			ReadFileHook::HookFromBase(0x71012562a4);
+			ReadFileSliceHook::HookFromBase(0x7101254ab0);
+		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
+			ReadFileHook::HookFromBase(0x71012565d4);
+			ReadFileSliceHook::HookFromBase(0x7101254de0);
+		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_1_1) {
+			ReadFileHook::HookFromBase(0x7101256614);
+			ReadFileSliceHook::HookFromBase(0x7101254e20);
+		}
 #endif
 	}
 

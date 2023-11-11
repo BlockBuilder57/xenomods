@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "types.h"
 
 namespace nn {
@@ -106,23 +108,15 @@ namespace nn {
 
 	   template<s32 size, typename T>
 	   struct BitFlagSet {
-		   using inttype = __detail::best_type_for_t<size>;
+		   using type = std::conditional_t<size <= 32, u32, u64>;
+		   static const int storageBits = static_cast<int>(sizeof(type)) * 8;
+		   static const int storageCount = static_cast<int>((size + storageBits - 1)) / storageBits;
+		   type field[storageCount];
 
-		   BitFlagSet() = default;
-
-		   BitFlagSet(inttype val) {
-			   *reinterpret_cast<inttype*>(&bits) = val;
+		   inline bool isBitSet(T index) const {
+			   return (this->field[static_cast<u64>(index) / storageBits] &
+					   (static_cast<type>(1) << static_cast<u64>(index) % storageBits)) != 0;
 		   }
-
-		   T toType() {
-			   return *reinterpret_cast<T*>(&bits);
-
-		   }
-
-		   // bitflag operators. too lazy
-
-		  private:
-		   __detail::bit_size_holder<size> bits{};
 	   };
 
    }; // namespace util

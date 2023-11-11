@@ -17,4 +17,10 @@ namespace fw {
 	};
 #endif
 
+	class EffectManager {
+	   public:
+		static void debugOutputString(const char* str);
+		static void warnOutputString(const char* str);
+	};
+
 }

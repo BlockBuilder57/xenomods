@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Draw.hpp"
+#include "Drivers.hpp"
 #include "WinView.hpp"
 #include "xenomods/Utils.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
@@ -192,6 +192,17 @@ namespace ml {
 		void setGBuffDebug(bool);
 		void setGBuffDebugDefault();
 		void setGBuffDebugParam(GBuffDebugType, float, float);
+
+		void isSeamMapOpenMode() const;
+		void setSeamMapOpenMode(bool);
+	};
+
+	class DebDraw;
+	class WinView;
+
+	class ScnUtil {
+	   public:
+		static void setPerspective(const Scn* scene, ml::DebDraw* debDraw, const ml::WinView* winView);
 	};
 
 } // namespace ml
