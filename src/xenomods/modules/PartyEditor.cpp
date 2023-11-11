@@ -117,7 +117,7 @@ namespace xenomods {
 #elif XENOMODS_CODENAME(bfsw)
 	/*void MenuLoadCharaStatus() {
 		game::DataPc* member = game::DataUtil::getDataPc(*xenomods::DocumentPtr, static_cast<unsigned short>(PartyEditor::CurrentStatus));
-		dbgutil::loadMemory(&member->status, fmt::format("sd:/config/xenomods/memdump/DataCharaStatus - {}.dump", PartyEditor::CurrentStatus));
+		dbgutil::loadMemory(&member->status, fmt::format(XENOMODS_CONFIG_PATH "/memdump/DataCharaStatus - {}.dump", PartyEditor::CurrentStatus));
 	}
 
 	void MenuDumpAllCharaStatuses() {

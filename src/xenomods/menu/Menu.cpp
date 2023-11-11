@@ -54,7 +54,7 @@ namespace xenomods {
 			std::string path = thingy.first;
 
 			if (!path.starts_with("sd:"))
-				path = "sd:/config/xenomods/fonts/" + path;
+				path = XENOMODS_CONFIG_PATH "/fonts/" + path;
 
 			// check that the file exists first
 			xenomods::NnFile file(path, nn::fs::OpenMode_Read);

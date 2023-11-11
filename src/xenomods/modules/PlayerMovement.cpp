@@ -268,7 +268,7 @@ namespace xenomods {
 	}
 
 	void PlayerMovement::LoadWarpsFromFile() {
-		auto path = fmt::format("sd:/config/xenomods/{}/warps.toml", XENOMODS_CODENAME_STR);
+		auto path = fmt::format(XENOMODS_CONFIG_PATH "/{}/warps.toml", XENOMODS_CODENAME_STR);
 		toml::parse_result res = toml::parse_file(path);
 
 		if(!res) {
@@ -344,7 +344,7 @@ namespace xenomods {
 	}
 
 	void PlayerMovement::SaveWarpsToFile() {
-		auto path = fmt::format("sd:/config/xenomods/{}/warps.toml", XENOMODS_CODENAME_STR);
+		auto path = fmt::format(XENOMODS_CONFIG_PATH "/{}/warps.toml", XENOMODS_CODENAME_STR);
 
 		toml::array allWarps;
 

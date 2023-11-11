@@ -91,14 +91,14 @@ namespace {
 
 		// dump data reads to sd card
 		if(xenomods::GetState().config.dumpFileReads) {
-			auto path = fmt::format("sd:/config/xenomods/{}/dump/{}/{:08x}.bin", XENOMODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
+			auto path = fmt::format(XENOMODS_CONFIG_PATH "/{}/dump/{}/{:08x}.bin", XENOMODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			if(EnsurePath(path, true))
 				DumpToFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 
 		// load from loose sd card files
 		if(xenomods::GetState().config.enableFileOverrides) {
-			auto path = fmt::format("sd:/config/xenomods/{}/override/{}/{:08x}.bin", XENOMODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
+			auto path = fmt::format(XENOMODS_CONFIG_PATH "/{}/override/{}/{:08x}.bin", XENOMODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
 			LoadFromFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 	}

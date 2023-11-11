@@ -34,7 +34,7 @@ namespace xenomods {
 	}
 
 	void Config::LoadFromFile() {
-		toml::parse_result res = toml::parse_file("sd:/config/xenomods/config.toml");
+		toml::parse_result res = toml::parse_file(XENOMODS_CONFIG_PATH "/config.toml");
 
 		if(!res) {
 			auto error = std::move(res).error();

@@ -4,6 +4,7 @@
 
 #include <xenomods/stuff/utils/debug_util.hpp>
 #include <xenomods/NnFile.hpp>
+#include <xenomods/State.hpp>
 #include <list>
 #include <sstream>
 #include <unordered_map>
@@ -114,7 +115,7 @@ namespace dbgutil {
 	}
 
 	void dumpMemory(void* address, size_t len, const char* name /*= nullptr*/) {
-		std::string path = "sd:/config/xenomods/memdump/";
+		std::string path = XENOMODS_CONFIG_PATH "/memdump/";
 		if (name == nullptr)
 			path += fmt::format("{:08x}.dump", nn::os::GetSystemTick() & 0xFFFFFFFF);
 		else

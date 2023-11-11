@@ -289,7 +289,7 @@ namespace xenomods {
 	}
 
 	void BdatOverride::LoadFromFile() {
-		auto path = fmt::format("sd:/config/xenomods/{}/bdatOverride.toml", XENOMODS_CODENAME_STR);
+		auto path = fmt::format(XENOMODS_CONFIG_PATH "/{}/bdatOverride.toml", XENOMODS_CODENAME_STR);
 		toml::parse_result res = toml::parse_file(path);
 
 		SheetMaxIDs.clear();

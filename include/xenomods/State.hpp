@@ -12,6 +12,8 @@
 namespace xenomods {
 
 	struct Config {
+#define XENOMODS_CONFIG_PATH "sd:/config/xenomods"
+
 		// very yucky, but this way it's in one spot
 #define CONFIG_PORT_DEFAULT 6969
 #define CONFIG_LOGGING_LEVEL_DEFAULT underlying_value(Logger::Severity::Info)
