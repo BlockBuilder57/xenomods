@@ -8,6 +8,7 @@
 
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/mat4x4.hpp"
+#include "xenomods/ImGuiExtensions.hpp"
 #include "xenomods/engine/apps/FrameworkLauncher.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
@@ -244,7 +245,7 @@ namespace xenomods {
 		ImGui::Checkbox("Freecam", &Freecam.isOn);
 
 		ImGui::PushItemWidth(250.f);
-		ImGui::InputFloat("Freecam speed", &Freecam.camSpeed, 1, 4, "%.3f m/s");
+		imguiext::InputFloatExt("Freecam speed", &Freecam.camSpeed, 1.f, 5.f, 2.f, "%.3f m/s");
 
 		bool shouldUpdate = false;
 

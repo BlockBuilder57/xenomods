@@ -1,6 +1,7 @@
 #include "PlayerMovement.hpp"
-
 #include "DebugStuff.hpp"
+
+#include "xenomods/ImGuiExtensions.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/UpdateInfo.hpp"
 #include "xenomods/engine/game/Controllers.hpp"
@@ -485,7 +486,7 @@ namespace xenomods {
 		ImGui::MenuItem("Show Warps Window", "", &ShowWarpsWindow);
 		ImGui::Checkbox("Disable fall damage", &disableFallDamage);
 		ImGui::PushItemWidth(150.f);
-		ImGui::InputFloat("Movement speed multiplier", &movementSpeedMult, 1.f, 5.f);
+		imguiext::InputFloatExt("Movement speed multiplier", &movementSpeedMult, 1.f, 5.f, 2.f, "%.2f");
 		ImGui::PopItemWidth();
 	}
 

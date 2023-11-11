@@ -38,4 +38,6 @@ namespace xenomods::imguiext {
 		return result;
 	}
 
+	bool InputFloatExt(const char* label, float* v, float step = 0.0f, float step_fast = 0.0f, float step_mult = 2.0f, const char* format = "%.3f", ImGuiInputTextFlags flags = 0);
+
 } // namespace xenomods::imgui

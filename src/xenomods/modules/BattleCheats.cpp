@@ -4,6 +4,7 @@
 
 #include "BattleCheats.hpp"
 
+#include "xenomods/ImGuiExtensions.hpp"
 #include "xenomods/engine/btl/Character.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/game/Actor.hpp"
@@ -85,9 +86,9 @@ namespace xenomods {
 
 	void BattleCheats::MenuSection() {
 		auto config = &GetState().config;
-		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 5.f);
-		ImGui::InputFloat("Player damage multiplier", &config->damagePlayerMult, 1.f, 10.f, "%.1f");
-		ImGui::InputFloat("Enemy damage multiplier", &config->damageEnemyMult, 1.f, 10.f, "%.1f");
+		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 8.f);
+		imguiext::InputFloatExt("Player damage multiplier", &config->damagePlayerMult, 1.f, 10.f, 2.f, "%.2f");
+		imguiext::InputFloatExt("Enemy damage multiplier", &config->damageEnemyMult, 1.f, 10.f, 2.f, "%.2f");
 		ImGui::PopItemWidth();
 
 #if XENOMODS_CODENAME(bfsw)
