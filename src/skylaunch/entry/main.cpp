@@ -3,6 +3,7 @@
 #include <skylaunch/hookng/Hooks.hpp>
 
 #include "../../xenomods/main.hpp"
+#include "skylaunch/plugin/PluginManager.hpp"
 #include "skylaunch/utils/ipc.hpp"
 
 // For handling exceptions
@@ -35,6 +36,11 @@ struct RomMountedHook : skylaunch::hook::Trampoline<RomMountedHook> {
 		skylaunch::logger::s_Instance->Log("[skylaunch] Beginning initialization.\n");
 		skylaunch::logger::s_Instance->StartThread();
 
+		// load plugins
+		// Note: Bypassing the singleton-like system because some older games (Final Fantasy 9) seem to have issues with _cxa_guard_acquire which gcc automatically adds when using the static instance
+		auto manager = new skylaunch::plugin::Manager();
+		manager->LoadPluginsImpl();
+
 		// bring up the rest
 		xenomods::main();
 
@@ -51,10 +57,6 @@ void skylaunch_main() {
 	// init hooking setup
 	A64HookInit();
 
-	// Initialize RO before the game has a chance to, then
-	// hook it so the game can't even try
-	nn::ro::Initialize();
-	skylaunch::hook::StubHook<Result()>::HookAt(nn::ro::Initialize);
 
 	// override exception handler to dump info
 	nn::os::SetUserExceptionHandler(exception_handler, exception_handler_stack, sizeof(exception_handler_stack),

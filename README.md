@@ -23,6 +23,9 @@ Compatible game versions:
 
 If your game is too up-to-date, there may be some success found in copying the executable from an older version and placing it as `/atmosphere/contents/<title id>/exefs/main`. For instance, this allows you to take your 2.0.0 dump of Xenoblade 2 and use it on 2.1.0. Just be aware that this will re-introduce bugs and break some features, notably Massive Melee Mythra and Korean language support.
 
+### A note on Skyline plugins
+Xenomods supports Skyline plugins, acting as its own version of Skyline. However, this means that the `main.npdm` and `subsdk9` files from other mods will overwrite Xenomods. To get plugins to work alongside Xenomods, always use the ones provided in releases. Skyline mods should still function properly when the NSO is placed in `/atmosphere/contents/<title id>/romfs/skyline/plugins/`. 
+
 ## Usage
 
 Documentation for using the mod can be found in the [docs](docs) directory.
@@ -40,7 +43,7 @@ $ cmake --build build
 # profit?
 ```
 
-Once built, copy xenomods.nso (renamed to `subsdk1`) and main.npdm from build/ to the LayeredFS exefs directory.
+Once built, copy xenomods.nso (renamed to `subsdk9`) and main.npdm from build/ to the LayeredFS exefs directory.
 
 For those with sys-ftpd installed, adding `-DXENOMODS_SWITCH_IP=<ip>` to the first CMake command will automatically copy the files to your console when builds finish. (Provided it is configured for anonymous log-in.)
 

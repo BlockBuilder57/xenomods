@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # stuff we gather from
     parser.add_argument('--json', dest='path', required=True, type=str, help='path to npdmtool JSON file to gather information from')
-    parser.add_argument('--subsdk', dest='subsdk_name', required=False, type=str, default="subsdk1", help='subsdk name (default \'subsdk1\')')
+    parser.add_argument('--subsdk', dest='subsdk_name', required=False, type=str, default="subsdk9", help='subsdk name (default \'subsdk9\')')
 
     args = parser.parse_args()
 

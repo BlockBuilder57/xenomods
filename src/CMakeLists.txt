@@ -62,6 +62,8 @@ add_executable(xenomods
 		skylaunch/utils/ipc.cpp
 		skylaunch/utils/utils.c
 
+		skylaunch/plugin/PluginManager.cpp
+
 		skylaunch/nx/kernel/condvar.c
 		skylaunch/nx/kernel/detect.c
 		skylaunch/nx/kernel/jit.c
