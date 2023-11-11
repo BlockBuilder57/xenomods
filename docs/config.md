@@ -21,9 +21,9 @@ menuTheme = 0
 # Example: [["comic.ttf", 20.0], ["sd:/directory/consolas.ttf", 16.0]]
 menuFonts = []
 
-# Dumps files to /config/xenomods/{game}/dump/
+# Dumps files to sd:/config/xenomods/{game}/dump/
 dumpFileReads = false
-# Reads overrides from /config/xenomods/{game}/override/
+# Reads overrides from sd:/config/xenomods/{game}/override/
 enableFileOverrides = true
 # Skips overriding these specific Bdat sheets (due to heavy performance penalties)
 bdatSkipOverrides = ["CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL_Skill_Dr", "CHR_EnArrange"]

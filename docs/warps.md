@@ -2,7 +2,7 @@
 
 Warps are saved locations specific to specific maps. This can be used to warp to a specific location multiple times, useful for practicing speedrunning techniques.
 
-Warps must be manually loaded in game. When creating new warps, they will named according to their index. However, once warps are saved, this file can be edited, and the name for that warp can be changed.
+Warps must be manually loaded in game. When creating new warps, they will named according to the map and the total number of warps. However, once warps are saved, this file can be edited, and the name for that warp can be changed.
 
 The game-specific warp file can be created/found at `sd:/config/xenomods/{game}/warps.toml`.
 
@@ -11,13 +11,9 @@ The game-specific warp file can be created/found at `sd:/config/xenomods/{game}/
 ### Examples
 
 ```toml
-# The index of the last selected warp
-lastWarpIndex = 1
-
-# Each warp is saved as a group like this, and indexes are counted sequentially
 [[warps]]
 mapId = 0                      # The specific map the warp is for. 0 allows a warp to be used on any map
-mapNameReadOnly = 'No Map'     # Changing this value has no effect, it is just for display
+mapNameReadOnly = 'No Map'     # Changing this value has no effect
 name = 'Map Origin'            # The name of the warp
 position = [ 0.0, 0.0, 0.0 ]   # Where the player will be position
 rotation = [ 0.0, 0.0, 180.0 ] # The rotation of the player at that point
