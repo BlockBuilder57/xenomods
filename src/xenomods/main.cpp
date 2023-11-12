@@ -35,21 +35,21 @@ namespace xenomods {
 		std::string p2Buttons = fmt::format("{:#08x} - P2 - {:#08x}", P2->stateCur.Buttons, P2->statePrev.Buttons);
 		int buttonsP1Width = xenomods::debug::drawFontGetWidth(p1Buttons.c_str());
 		int buttonsP2Width = xenomods::debug::drawFontGetWidth(p2Buttons.c_str());
-		xenomods::debug::drawFontShadow(1280-buttonsP1Width-5, 5, mm::Col4::white, p1Buttons.c_str());
-		xenomods::debug::drawFontShadow(1280-buttonsP2Width-5, 5+16, mm::Col4::white, p2Buttons.c_str());
+		xenomods::debug::drawFontShadow((1280/4), 16, {1,1,1,1}, p1Buttons.c_str());
+		xenomods::debug::drawFontShadow((1280*3/4)-buttonsP2Width, 16, {1,1,1,1}, p2Buttons.c_str());
 
-		auto testcombo = nn::hid::KEY_A;
-		if(P2->InputHeld(testcombo))
-			xenomods::debug::drawFontShadow(1280/2, 0, mm::Col4::cyan, "combo held!");
-		if (P2->InputDown(testcombo))
+		nn::hid::NpadButton testcombo = static_cast<nn::hid::NpadButton>(1);
+		if(P1->InputHeld(testcombo))
+			xenomods::debug::drawFontShadow(1280/2, 32, {0,1,1,1}, "combo held!");
+		if (P1->InputDown(testcombo))
 			g_Logger->LogDebug("combo down...");
-		if (P2->InputUp(testcombo))
+		if (P1->InputUp(testcombo))
 			g_Logger->LogDebug("combo up!");
-		if(P2->InputHeldStrict(testcombo))
-			xenomods::debug::drawFontShadow(1280/2, 16, mm::Col4::cyan, "strict combo held!");
-		if (P2->InputDownStrict(testcombo))
+		if(P1->InputHeldStrict(testcombo))
+			xenomods::debug::drawFontShadow(1280/2, 48, {0,1,1,1}, "strict combo held!");
+		if (P1->InputDownStrict(testcombo))
 			g_Logger->LogDebug("strict combo down...");
-		if (P2->InputUpStrict(testcombo))
+		if (P1->InputUpStrict(testcombo))
 			g_Logger->LogDebug("strict combo up!");*/
 
 		/*

@@ -20,6 +20,7 @@ namespace xenomods {
 		State statePrev {};
 
 		int padId {};
+		bool padConnected {};
 
 		constexpr HidInput(int id)
 			: padId(id) {
@@ -30,7 +31,6 @@ namespace xenomods {
 
 		static HidInput* GetPlayer(int player);
 
-		static int GetDebugInputNum();
 		/*
 		 * Gets the controller used for the debug input (like the Menu)
 		 * Uses the last numbered controller if it is connected, otherwise P1.

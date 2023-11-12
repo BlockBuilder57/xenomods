@@ -177,6 +177,7 @@ namespace {
 
 			if(p1State.mAttributes.isBitSet(nn::hid::NpadAttribute::IsConnected)) {
 				// We have a player 1 at this point, so disable single-controller only mode
+				// (Explicitly not considering the handheld here - that is a separate controller)
 				// That way if another controller is connected while the game is running, we can allow it to be P2
 				// Monolib actually passes the (according to switchbrew) default arguments to this,
 				// so we technically get 4 max controllers for free!
