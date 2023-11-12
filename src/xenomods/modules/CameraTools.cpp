@@ -184,14 +184,18 @@ namespace xenomods {
 			fovMult *= std::lerp(0.01f, 1.0f, std::abs(fc->fov) / 20.f);
 
 		if(debugInput->InputHeld(Keybind::CAMERA_COMBO)) {
-			// holding down the button, so modify fov
-			// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
-			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
-			if(fc->fov == 0)
-				fc->fov = 0.001f;
+			if (glm::abs(rStick.y) >= 0.3f) {
+				// holding down the combo, so modify fov
+				// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
+				fc->fov = std::clamp(fc->fov + -rStick.y * fovMult, -179.f, 179.f);
+				if(fc->fov == 0)
+					fc->fov = 0.001f;
+			}
 
-			move = { 0, rStick.y, 0 };
+			// when holding the combo, the left stick moves along X/Y axis (left/right, up/down)
+			move = { lStick.x, lStick.y, 0 };
 		} else {
+			// when not holding the combo, the left stick moves along X/Z axis (left/right, forward/back)
 			move = { lStick.x, 0, -lStick.y };
 		}
 
@@ -207,8 +211,9 @@ namespace xenomods {
 		if(fc->fov != 0.0f && std::abs(fc->fov) < 40.f)
 			lookMult *= fc->fov / 40.f;
 
-		if(debugInput->InputHeld(Keybind::CAMERA_COMBO))
-			look = { 0, 0, -rStick.x * rollMult }; // only roll
+		if(debugInput->InputHeld(Keybind::CAMERA_COMBO)) {
+			look = { 0, 0, -rStick.x * rollMult }; // only roll			
+		}
 		else
 			look = { rStick.y * lookMult, -rStick.x * lookMult, 0 }; // pitch and yaw
 
