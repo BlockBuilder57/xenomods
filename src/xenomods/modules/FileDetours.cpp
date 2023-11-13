@@ -5,7 +5,7 @@
 #include "FileDetours.hpp"
 
 #include "xenomods/engine/ml/Filesystem.hpp"
-#include "xenomods/engine/mm/FixStr.hpp"
+#include "xenomods/engine/mm/mtl/FixStr.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/stuff/utils/util.hpp"
 

@@ -5,12 +5,12 @@
 #pragma once
 
 #include <xenomods/engine/layer/LayerBase.hpp>
-#include <xenomods/engine/mm/FixStr.hpp>
 
 #include "UIDisplayInfo.hpp"
 #include "UIObjectPlugin.hpp"
 #include "UIStr.hpp"
 #include "UITransform.hpp"
+#include "xenomods/engine/mm/mtl/FixStr.hpp"
 #include "xenomods/engine/mm/mtl/RTTI.hpp"
 
 namespace ui {

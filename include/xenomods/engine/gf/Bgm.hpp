@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "xenomods/engine/mm/FixStr.hpp"
+#include "xenomods/engine/mm/mtl/FixStr.hpp"
 #include "xenomods/stuff/utils/util.hpp"
 
 namespace gf {

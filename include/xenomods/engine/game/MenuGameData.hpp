@@ -7,7 +7,6 @@
 #include "xenomods/engine/fw/Document.hpp"
 
 #include "Bdat.hpp"
-#include "DataPC.hpp"
 
 #if XENOMODS_CODENAME(bfsw)
 namespace game {

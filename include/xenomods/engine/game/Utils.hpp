@@ -7,7 +7,7 @@
 #include <xenomods/Utils.hpp>
 
 #include "Controllers.hpp"
-#include "DataPC.hpp"
+#include "Data.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 #include "xenomods/engine/mm/mtl/FixedVector.hpp"
@@ -22,74 +22,6 @@ namespace game {
 		mm::Vec3 jump_pos;
 		mm::Vec3 jump_rot;
 		INSERT_PADDING_BYTES(0x20);
-	};
-
-	class DataItem {
-	   public:
-		struct DataCommon {
-			ushort unk1;
-			ushort unk2;
-			ushort itemId;
-			ushort itemType;
-			ushort stackCount;
-			int addTime;
-			bool isInInventory;
-			bool isFavorite;
-		};
-
-		// Gems and mob crystals
-		struct DataCrystal : public DataCommon {
-			ushort slotSize;
-			byte rankType;
-			byte atrType;
-			byte gemIds;
-			INSERT_PADDING_BYTES(1);
-			byte skillCount;
-			INSERT_PADDING_BYTES(1);
-			ushort unk3;
-			byte arrSkills;
-			byte skillRate;
-			INSERT_PADDING_BYTES(4);
-			byte alsoCountUnk;
-			INSERT_PADDING_BYTES(3);
-		};
-
-		struct DataSlot {
-			uint itemId;
-			ushort skillId;
-			bool isEquipped;
-		};
-
-		// Weapons and armor
-		struct DataEquip : public DataCommon {
-			INSERT_PADDING_BYTES(1);
-			byte slotCount;
-			INSERT_PADDING_BYTES(2);
-			DataSlot slots[3];
-		};
-
-		DataEquip Weapons[500];
-		DataEquip HeadArmor[500];
-		DataEquip BodyArmor[500];
-		DataEquip ArmArmor[500];
-		DataEquip LeggArmor[500];
-		DataEquip FootArmor[500];
-		DataCrystal Crystals[550];
-		DataCrystal Gems[550];
-		DataCommon Collectables[500];
-		DataCommon Materials[500];
-		DataCommon KeyItems[500];
-		DataCommon ArtBooks[500];
-		INSERT_PADDING_BYTES(263279-228000);
-		DataEquip TempWeapons[32];
-		DataEquip TempHeadArmor[32];
-		DataEquip TempBodyArmor[32];
-		DataEquip TempArmArmor[32];
-		DataEquip TempLeggArmor[32];
-		DataEquip TempFootArmor[32];
-		DataCrystal TempGems[35];
-
-		DataCommon* getItem(unsigned int);
 	};
 
 	class DataUtil {

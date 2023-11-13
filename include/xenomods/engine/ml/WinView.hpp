@@ -6,7 +6,7 @@
 
 #include "DebugDrawing.hpp"
 #include "Scene.hpp"
-#include "xenomods/engine/mm/FixStr.hpp"
+#include "xenomods/engine/mm/mtl/FixStr.hpp"
 
 namespace ml {
 

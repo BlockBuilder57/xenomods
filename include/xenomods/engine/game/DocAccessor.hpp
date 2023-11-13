@@ -5,6 +5,8 @@
 #include <xenomods/Utils.hpp>
 
 #include "Controllers.hpp"
+#include "Data.hpp"
+#include "Managers.hpp"
 #include "Sequence.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 
@@ -13,9 +15,14 @@ namespace game {
 
 	class DocAccessor {
 	   public:
-		void* getDataManager();
+		DataManager* getDataManager() const;
 		void* getPartyManager();
 		SeqManager* getSeqManager() const;
+
+		// NOT A REAL FUNCTION
+		static inline DocAccessor* GetFromXenomodsDocument() {
+			return reinterpret_cast<game::DocAccessor*>(&xenomods::DocumentPtr);
+		}
 	};
 
 }

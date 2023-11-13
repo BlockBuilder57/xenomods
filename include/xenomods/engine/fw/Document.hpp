@@ -2,8 +2,6 @@
 // Created by block on 7/21/2022.
 //
 
-// this seems to be DE exclusive
-
 #pragma once
 
 #include "UpdateInfo.hpp"
@@ -24,7 +22,7 @@ namespace fw {
 		ml::Scn* getScn() const;
 	};
 
-	class Document {
+	class Document /*: public game::DocAccessor*/ {
 	   public:
 		Applet* applet;
 	};

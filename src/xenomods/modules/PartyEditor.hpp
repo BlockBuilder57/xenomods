@@ -3,7 +3,7 @@
 #pragma once
 
 #include "UpdatableModule.hpp"
-#include "xenomods/engine/game/DataPC.hpp"
+#include "xenomods/engine/game/Data.hpp"
 #include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/engine/gf/Party.hpp"
 
