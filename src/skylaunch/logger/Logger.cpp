@@ -108,3 +108,11 @@ void Logger::LogFormat(const char* format, ...) {
 #endif  // NOLOG
 
 };  // namespace skylaunch::logger
+
+// Skyline plugins expect this function to exist so that
+// stdout gets sent to the skyline TCP logger.
+// We have our own logger so we'll just send it there.
+void skyline_tcp_send_raw(const char* data, size_t size) {
+	if (!skylaunch::logger::s_Instance) return;
+	skylaunch::logger::s_Instance->Log(data, size);
+}

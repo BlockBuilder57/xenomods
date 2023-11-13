@@ -42,3 +42,6 @@ namespace skylaunch::logger {
 
 	extern Logger* s_Instance;
 }; // namespace skylaunch::logger
+
+// for supporting stdout in Skyline plugins
+extern "C" void skyline_tcp_send_raw(const char*, size_t);
