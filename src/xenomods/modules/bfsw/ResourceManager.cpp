@@ -2,6 +2,7 @@
 
 #include "ResourceManager.hpp"
 
+#include "xenomods/engine/game/DocAccessor.hpp"
 #include "xenomods/engine/game/Utils.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 
@@ -15,17 +16,13 @@ namespace xenomods {
 	mm::mtl::FixStr<256> itemHelp {};
 	mm::mtl::FixStr<256> itemInventory {};
 
-	void ResourceManager::MenuSection() {
-		// everything here needs the document
-		if(xenomods::DocumentPtr == nullptr)
-			return;
-
+	void DrawItems() {
 		const unsigned short u16_one = 1;
 		const unsigned short u16_hundred = 100;
 
 		ImGui::PushItemWidth(100.f);
 
-		ImGui::InputScalar("ID", ImGuiDataType_U16, &ItemId, &u16_one, &u16_hundred, "%u");
+		ImGui::InputScalar("ID", ImGuiDataType_U16, &ResourceManager::ItemId, &u16_one, &u16_hundred, "%u");
 		if(ImGui::IsItemDeactivatedAfterEdit()) {
 			game::DataUtil::getItemName(*xenomods::DocumentPtr, ResourceManager::ItemId, itemName);
 			game::DataUtil::getItemHelp(*xenomods::DocumentPtr, ResourceManager::ItemId, itemHelp, 0);
@@ -42,8 +39,8 @@ namespace xenomods {
 			}
 		}
 		ImGui::SameLine();
-		if(ImGui::InputScalar("Count", ImGuiDataType_U16, &ItemCount, &u16_one, nullptr, "%u"))
-			ItemCount = std::clamp((int)ItemCount, 1, 99);
+		if(ImGui::InputScalar("Count", ImGuiDataType_U16, &ResourceManager::ItemCount, &u16_one, nullptr, "%u"))
+			ResourceManager::ItemCount = std::clamp((int)ResourceManager::ItemCount, 1, 99);
 
 		ImGui::PopItemWidth();
 
@@ -55,7 +52,26 @@ namespace xenomods {
 			ImGui::TextUnformatted(itemInventory.buffer);
 
 		if(ImGui::Button("Give Item"))
-			game::DataUtil::addItem(*xenomods::DocumentPtr, ItemId, ItemCount, true, true, false);
+			game::DataUtil::addItem(*xenomods::DocumentPtr, ResourceManager::ItemId, ResourceManager::ItemCount, true, true, false);
+	}
+
+	void ResourceManager::MenuSection() {
+		// everything here needs the document
+		if(xenomods::DocumentPtr == nullptr)
+			return;
+
+		game::DataManager* dataManager = game::DocAccessor::GetFromXenomodsDocument()->getDataManager();
+
+		if (dataManager != nullptr) {
+			ImGui::PushItemWidth(80.f);
+			ImGui::DragInt("Money", reinterpret_cast<int*>(&dataManager->dataGame.dataGameSave.money), 100.f);
+			ImGui::PopItemWidth();
+		}
+
+
+		if(ImGui::CollapsingHeader("Item Giver")) {
+			DrawItems();
+		}
 	}
 
 	void ResourceManager::Initialize() {

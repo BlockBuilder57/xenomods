@@ -157,6 +157,22 @@ Landmark ids can be found [here](https://xenobladedata.github.io/xb2/bdat/common
 |---------------|------------------------------------------------------------------------------------------------------|----------|
 | Scramble type | Toggles scrambling the text in BDAT tables. Cycles between Disabled, Scramble Index, and Sheet Name. | Disabled |
 
+#### Event Debug
+| Option             | Description                                                                 | Default |
+|--------------------|-----------------------------------------------------------------------------|---------|
+| event::*           | Enables a certain part of 2's event debug. In need of proper documentation. | false   |
+
+#### Resource Manager
+| Option | Description                             | Default |
+|--------|-----------------------------------------|---------|
+| Money  | Sets the amount of money/gold you have. | 0       |
+
+###### Item Giver
+| Option    | Description                           | Default |
+|-----------|---------------------------------------|---------|
+| ID        | Chooses the ID of the item to give.   | 0       |
+| Count     | Chooses how many of the item to give. | 0       |
+| Give Item | Gives {Count} amount of Item #{ID}    | -       |
 
 ### State
 | Option                       | Description                                                    | Default |
