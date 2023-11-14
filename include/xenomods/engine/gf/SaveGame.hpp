@@ -26,4 +26,16 @@ namespace gf {
 		static unsigned int getLocal(unsigned int bitSize, int id);
 	};
 
+	// size 1207696 (0x126D90)
+	struct SDataGame {
+	   public:
+		unsigned int money;
+		INSERT_PADDING_BYTES(0x126D90-4);
+	};
+
+	class GfDataStore {
+	   public:
+		static SDataGame* getDataGame();
+	};
+
 }

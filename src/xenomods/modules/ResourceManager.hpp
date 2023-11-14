@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "../UpdatableModule.hpp"
+#include "UpdatableModule.hpp"
 
-#if XENOMODS_CODENAME(bfsw)
+#if !XENOMODS_CODENAME(bf3)
 namespace xenomods {
 
 	class ResourceManager : public UpdatableModule {

@@ -23,7 +23,8 @@ namespace ui {
 		UIStr();
 		UIStr(const char* text, bool doAllocate);
 
-		char* c_str();
+		char* c_str() const;
+		void release();
 	};
 
 }

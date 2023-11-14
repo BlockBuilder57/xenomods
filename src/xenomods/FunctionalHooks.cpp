@@ -16,7 +16,7 @@
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
 #include "xenomods/engine/game/Sequence.hpp"
-#include "xenomods/engine/gf/BdatData.hpp"
+#include "xenomods/engine/gf/Data.hpp"
 #include "xenomods/engine/gf/Manager.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"

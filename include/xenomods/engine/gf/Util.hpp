@@ -6,8 +6,16 @@
 
 #include <xenomods/engine/mm/MathTypes.hpp>
 
-namespace gf::util {
+#if XENOMODS_OLD_ENGINE
+namespace gf {
 
-	bool getScreenPos(mm::Vec3& point, const mm::Vec3& pos);
+	struct GfItemUtil {
+		static bool addItemBox(unsigned int itemId, int count);
+	};
 
-}
+	namespace util {
+		bool getScreenPos(mm::Vec3& point, const mm::Vec3& pos);
+	}
+
+} // namespace gf
+#endif

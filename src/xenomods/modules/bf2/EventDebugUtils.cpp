@@ -6,7 +6,7 @@
 
 #include "../DebugStuff.hpp"
 #include "xenomods/engine/event/Manager.hpp"
-#include "xenomods/engine/gf/BdatData.hpp"
+#include "xenomods/engine/gf/Data.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/engine/tl/title.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
