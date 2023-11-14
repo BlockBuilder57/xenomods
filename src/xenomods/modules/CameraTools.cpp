@@ -176,7 +176,7 @@ namespace xenomods {
 			rStick = glm::zero<glm::vec2>();
 
 		// movement
-		glm::vec3 move {};
+		glm::vec3 move { 0, 0, 0 };
 		float fovMult = 30.f * deltaTime;
 
 		// slow the zoom at lower fovs
@@ -184,16 +184,23 @@ namespace xenomods {
 			fovMult *= std::lerp(0.01f, 1.0f, std::abs(fc->fov) / 20.f);
 
 		if(debugInput->InputHeld(Keybind::CAMERA_COMBO)) {
-			// holding down the button, so modify fov
+			// holding down the combo, so modify fov
 			// note: game hard crashes during rendering when |fov| >= ~179.5 or == 0, it needs clamping
 			fc->fov = std::clamp(fc->fov + -lStick.y * fovMult, -179.f, 179.f);
 			if(fc->fov == 0)
 				fc->fov = 0.001f;
+
+			// when holding down the combo, the right stick will raise/lower the camera by Y position
+			// we'll still allow the left stick X to move the camera left/right
+			// double the deadzone for the right stick Y here to prevent accidental movement when rolling
+			float yMove = glm::abs(rStick.y) >= 0.3f ? rStick.y : 0.0f;
+			move = { lStick.x, rStick.y, 0 };
 		} else {
 			move = { lStick.x, 0, -lStick.y };
-			move = rot * move * deltaTime; // rotate movement to local space
-			move *= fc->camSpeed;		   // multiply by cam speed
 		}
+
+		move = rot * move * deltaTime; // rotate movement to local space
+		move *= fc->camSpeed;		   // multiply by cam speed
 
 		// rotation
 		glm::vec3 look {};
