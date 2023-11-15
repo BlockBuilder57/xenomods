@@ -10,13 +10,30 @@
 namespace xenomods {
 
 	struct CameraTools : public xenomods::UpdatableModule {
-		struct FreecamState {
-			bool isOn;
+		struct FreecamSettings {
+			enum class MoveAxis {
+				XZ,
+				XY,
+				YZ
+			};
+
+			bool freecamOn;
+			MoveAxis moveAxis;
+			bool isFreezePos[3];
+			bool isGlobalPos[3];
+			bool isGlobalRot[3];
+			float camSpeed;
+			bool enableTargeting;
+			bool targetFollowPlayer;
+			glm::vec3 targetPos;
+		};
+		static FreecamSettings Settings;
+
+		struct CameraState {
 			mm::Mat44 matrix;
 			float fov;
-			float camSpeed;
 		};
-		static FreecamState Freecam;
+		static CameraState CamState;
 
 		struct CameraMeta {
 			glm::vec3 pos;
@@ -26,11 +43,12 @@ namespace xenomods {
 			glm::vec3 up;
 			float fov;
 		};
-		static CameraMeta Meta;
+		static CameraMeta CamMeta;
 
 		static void UpdateMeta();
 
 		static void MenuSection();
+		static void MenuSettings();
 
 		void Initialize() override;
 		bool NeedsUpdate() const override {

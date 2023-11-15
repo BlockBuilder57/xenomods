@@ -27,11 +27,26 @@ Landmark ids can be found [here](https://xenobladedata.github.io/xb2/bdat/common
 | Option                        | Description                                                                                            | Default |
 |-------------------------------|--------------------------------------------------------------------------------------------------------|---------|
 | Freecam                       | Toggles the freecam being on or not.                                                                   | false   |
-| Freecam speed (m/s)           | Controls the movement speed of the freecam.                                                            | 8.0     |
 | Camera pos X/Y/Z              | Displays the position of the camera. Modifying the value will enable the freecam and set its position. | -       |
+| Reset Pos                     | Sets the position of the camera to the origin, (0,0,0).                                                | -       |
 | Camera rot X/Y/Z              | Displays the rotation of the camera. Modifying the value will enable the freecam and set its rotation. | -       |
+| Reset Pos                     | Sets the rotation of the camera to (0,0,0).                                                            | -       |
 | Camera FOV                    | Displays the field of view of the camera. Modifying the value will enable the freecam and set its FOV. | -       |
+| Reset FOV                     | Sets the field of view of the camera to 80.                                                            | -       |
 | Teleport party lead to camera | Sets the position of the party lead to the position of the camera.                                     | -       |
+
+###### Control Options
+| Option                          | Description                                                                                                                | Default             |
+|---------------------------------|----------------------------------------------------------------------------------------------------------------------------|---------------------|
+| Move type                       | Selects which axies the camera moves along with the left stick.                                                            | XZ                  |
+| Freeze X/Y/Z                    | Freezes movement on the specified axis.                                                                                    | false, false, false |
+| Global X/Y/Z                    | Makes movement global (world relative) as opposed to local (view relative) for the specified axis.                         | false, false, false |
+| Freecam speed (m/s)             | Controls the movement speed of the freecam.                                                                                | 8.0                 |
+| Global Roll                     | Whether the roll of the camera is global or local, meaning it can be rotated. (For example, in games like Space Engineers) | true                |
+| Enable Targeting                | Enables a mode where the camera always faces towards the specified position.                                               | false               |
+| Follow Player Position          | Constantly updates the target to be the player's position. (Plus 1 meter up, for centering)                                | false               |
+| Set target from camera position | Updates the target to be the camera's current position.                                                                    | -                   |
+| Target Pos X/Y/Z                | The target position.                                                                                                       | -                   |
 
 #### Rendering Controls
 | Option                   | Description                                                                               | Default |
