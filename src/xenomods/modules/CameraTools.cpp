@@ -116,6 +116,7 @@ namespace xenomods {
 
 	CameraTools::FreecamSettings CameraTools::Settings = {
 		.freecamOn = false,
+		.relativeToPlayer = false,
 		.moveAxis = FreecamSettings::MoveAxis::XZ,
 		.isFreezePos = { false, false, false },
 		.isGlobalPos = { false, false, false },
@@ -131,6 +132,9 @@ namespace xenomods {
 	};
 
 	CameraTools::CameraMeta CameraTools::CamMeta = {};
+
+	glm::vec3 lastPlayerPos = {};
+	glm::vec3 relativePlayerDelta = {};
 
 	void CameraTools::UpdateMeta() {
 		glm::vec3 pos {};
@@ -232,6 +236,8 @@ namespace xenomods {
 
 		move = perAxisMove * deltaTime; // rotate movement to local space
 		move *= set->camSpeed;          // multiply by cam speed
+		if (set->relativeToPlayer)      // add player movement
+			move = move + relativePlayerDelta;
 
 		// rotation
 		if (set->enableTargeting) {
@@ -240,7 +246,8 @@ namespace xenomods {
 				rot = glm::inverse(glm::lookAt(pos + move, set->targetPos, {0, 1, 0}));
 
 			// i hope this fixes the crashes
-			rot = normalize(rot);
+			if (isnan(rot)[0])
+				rot = glm::identity<glm::quat>();
 		}
 		else {
 			glm::vec3 look {};
@@ -271,7 +278,6 @@ namespace xenomods {
 			// apply rotations
 			rot = yawRot * pitchRot * rollRot * rot;
 		}
-
 
 		// get angle+axis to rotate the matrix by
 		float angle = glm::angle(rot);
@@ -326,6 +332,11 @@ namespace xenomods {
 
 	void CameraTools::MenuSettings() {
 		ImGui::SeparatorText("Movement");
+
+#if !XENOMODS_CODENAME(bf3)
+		ImGui::Checkbox("Relative to Player", &Settings.relativeToPlayer);
+#endif
+
 		ImGui::PushItemWidth(64.f);
 		imguiext::EnumComboBox("Move type", &Settings.moveAxis);
 		ImGui::PopItemWidth();
@@ -355,7 +366,9 @@ namespace xenomods {
 		ImGui::SeparatorText("Targeting");
 
 		ImGui::Checkbox("Enable Targeting", &Settings.enableTargeting);
+#if !XENOMODS_CODENAME(bf3)
 		ImGui::Checkbox("Follow Player Position", &Settings.targetFollowPlayer);
+#endif
 
 		if (ImGui::Button("Set target from camera position")) {
 			Settings.targetPos = CamMeta.pos;
@@ -495,13 +508,32 @@ namespace xenomods {
 				ResetState(false, true, false);
 			}
 
-			if (Settings.targetFollowPlayer && xenomods::detail::IsModuleRegistered(STRINGIFY(PlayerMovement))) {
+#if !XENOMODS_CODENAME(bf3)
+			if (xenomods::detail::IsModuleRegistered(STRINGIFY(PlayerMovement))) {
 				glm::vec3* pos = PlayerMovement::GetPartyPosition();
-				if (pos != nullptr)
+
+				if (Settings.targetFollowPlayer && pos != nullptr)
 					Settings.targetPos = *pos + glm::vec3(0, 1, 0);
+
+				if (pos != nullptr) {
+					relativePlayerDelta = *pos - lastPlayerPos;
+				}
+				else {
+					// reset these, the party doesn't exist anymore
+					lastPlayerPos = relativePlayerDelta = glm::zero<glm::vec3>();
+				}
 			}
+#endif
 
 			DoFreeCameraMovement(updateInfo->updateDelta);
+
+#if !XENOMODS_CODENAME(bf3)
+			if (xenomods::detail::IsModuleRegistered(STRINGIFY(PlayerMovement))) {
+				glm::vec3* pos = PlayerMovement::GetPartyPosition();
+				if (pos != nullptr)
+					lastPlayerPos = *pos;
+			}
+#endif
 
 			if(debugInput->InputDownStrict(Keybind::FREECAM_TELEPORT))
 				TeleportPlayerToCamera();
