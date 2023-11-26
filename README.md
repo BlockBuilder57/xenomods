@@ -16,7 +16,7 @@ Compatible game versions:
 | Xenoblade 2                  | `0100E95004038000`<br/>(`0100F3400332C000` for JP) | 1.0.0-2.0.0 (or Torna 1.0.0*) | `bf2`    |
 | Xenoblade 2: Torna           | `0100C9F009F7A000`                                 | 1.0.0 (or XB2 2.0.0)          | `ira`    |
 | Xenoblade Definitive Edition | `0100FF500E34A000`                                 | All versions                  | `bfsw`   |
-| Xenoblade 3                  | `010074F013262000`                                 | 2.0.0-2.1.0**                 | `bf3`    |
+| Xenoblade 3                  | `010074F013262000`                                 | 2.0.0-2.1.1**                 | `bf3`    |
 
 *: Torna 1.0.0 does not load the Torna DLC in Xenoblade 2, or potentially any other add-on content.<br>
 **: Xenoblade 3 has limited features. Only a select few patches work, including the freecam.
