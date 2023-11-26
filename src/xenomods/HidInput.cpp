@@ -4,10 +4,11 @@
 
 #include <nn/oe.h>
 
-#include "FunctionalHooks.hpp"
-
+#include <xenomods/DebugWrappers.hpp>
 #include <xenomods/HidInput.hpp>
 #include <xenomods/Logger.hpp>
+
+#include "FunctionalHooks.hpp"
 
 namespace xenomods {
 
@@ -79,6 +80,33 @@ namespace xenomods {
 
 	HidInput* HidInput::GetDebugInput() {
 		return controllers[CONTROLLER_COUNT - 1].padConnected ? &controllers[CONTROLLER_COUNT - 1] : &controllers[0];
+	}
+
+	void HidInput::DebugDraw() {
+		HidInput* P1 = HidInput::GetPlayer(1);
+		HidInput* P2 = HidInput::GetPlayer(2);
+
+		std::string p1Buttons = P1->padConnected ? fmt::format("{:#08x} - P1 - {:#08x}", P1->stateCur.Buttons, P1->statePrev.Buttons) : "P1 Disconnected";
+		std::string p2Buttons = P2->padConnected ? fmt::format("{:#08x} - P2 - {:#08x}", P2->stateCur.Buttons, P2->statePrev.Buttons) : "P2 Disconnected";
+		int buttonsP1Width = xenomods::debug::drawFontGetWidth(p1Buttons.c_str());
+		int buttonsP2Width = xenomods::debug::drawFontGetWidth(p2Buttons.c_str());
+		xenomods::debug::drawFontShadow((1280*1/4)-(buttonsP1Width/2), 16, {1,1,1,1}, p1Buttons.c_str());
+		xenomods::debug::drawFontShadow((1280*3/4)-(buttonsP2Width/2), 16, {1,1,1,1}, p2Buttons.c_str());
+		xenomods::debug::drawFontShadow((1280*((HidInput::GetDebugInput()->padId * 2) + 1)/4), 32, {0,1,1,1}, "^ debug");
+
+		/*nn::hid::NpadButton testcombo = static_cast<nn::hid::NpadButton>(1);
+		if(P1->InputHeld(testcombo))
+			xenomods::debug::drawFontShadow(1280/2, 32, {0,1,1,1}, "combo held!");
+		if (P1->InputDown(testcombo))
+			g_Logger->LogDebug("combo down...");
+		if (P1->InputUp(testcombo))
+			g_Logger->LogDebug("combo up!");
+		if(P1->InputHeldStrict(testcombo))
+			xenomods::debug::drawFontShadow(1280/2, 48, {0,1,1,1}, "strict combo held!");
+		if (P1->InputDownStrict(testcombo))
+			g_Logger->LogDebug("strict combo down...");
+		if (P1->InputUpStrict(testcombo))
+			g_Logger->LogDebug("strict combo up!");*/
 	}
 
 } // namespace xenomods

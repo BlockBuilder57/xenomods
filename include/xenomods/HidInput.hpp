@@ -37,6 +37,8 @@ namespace xenomods {
 		 */
 		static HidInput* GetDebugInput();
 
+		static void DebugDraw();
+
 		/**
 		 * \defgroup input Input functions
 		 * Standard style input functions. Can take any kind of integer to check.
