@@ -12,18 +12,19 @@ namespace xenomods {
 		static bool skipOverlayRendering;
 		static bool skipCloudRendering;
 		static bool skipSkyDomeRendering;
+		static bool skipFogRendering;
+		static bool skipDepthOfFieldRendering;
 
 		static float shadowStrength;
 
 		static bool freezeTextureStreaming;
 
 		struct ForcedRenderParameters {
-			bool DisableDOF;
 			bool DisableMotionBlur;
 			bool DisableColorFilter;
 
 			bool Any() {
-				return DisableDOF || DisableMotionBlur || DisableColorFilter;
+				return DisableMotionBlur || DisableColorFilter;
 			}
 		};
 		static ForcedRenderParameters ForcedParameters;

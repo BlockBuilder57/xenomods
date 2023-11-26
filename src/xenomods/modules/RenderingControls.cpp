@@ -41,6 +41,19 @@ namespace {
 		}
 	};
 
+	struct SkipFogRendering : skylaunch::hook::Trampoline<SkipFogRendering> {
+		static bool Hook(ml::DrFogMan* this_pointer) {
+			return xenomods::RenderingControls::skipFogRendering ? false : Orig(this_pointer);
+		}
+	};
+
+	struct SkipDepthOfFieldRendering : skylaunch::hook::Trampoline<SkipDepthOfFieldRendering> {
+		static void Hook(void* this_pointer) {
+			if(!xenomods::RenderingControls::skipDepthOfFieldRendering)
+				Orig(this_pointer);
+		}
+	};
+
 	struct FreezeTextureStreaming : skylaunch::hook::Trampoline<FreezeTextureStreaming> {
 		static void Hook(ml::DrResMdoTexList* this_pointer) {
 			if (!xenomods::RenderingControls::freezeTextureStreaming)
@@ -110,6 +123,8 @@ namespace xenomods {
 	bool RenderingControls::skipOverlayRendering = false;
 	bool RenderingControls::skipCloudRendering = false;
 	bool RenderingControls::skipSkyDomeRendering = false;
+	bool RenderingControls::skipFogRendering = false;
+	bool RenderingControls::skipDepthOfFieldRendering = false;
 
 	float RenderingControls::shadowStrength = 1.0;
 
@@ -148,6 +163,10 @@ namespace xenomods {
 
 	void RenderingControls::MenuToggles() {
 		ImGui::Checkbox("Skip UI rendering", &skipUIRendering);
+		ImGui::Checkbox("Skip cloud (sea) rendering", &skipCloudRendering);
+		ImGui::Checkbox("Skip sky dome rendering", &skipSkyDomeRendering);
+		ImGui::Checkbox("Skip fog rendering", &skipFogRendering);
+		ImGui::Checkbox("Skip depth of field rendering", &skipDepthOfFieldRendering);
 #if !XENOMODS_CODENAME(bf3)
 	#if XENOMODS_OLD_ENGINE
 		ImGui::Checkbox("Skip particle+overlay rendering", &skipParticleRendering);
@@ -155,21 +174,16 @@ namespace xenomods {
 		ImGui::Checkbox("Skip particle rendering", &skipParticleRendering);
 		ImGui::Checkbox("Skip overlay rendering", &skipOverlayRendering);
 	#endif
-		ImGui::Checkbox("Skip cloud (sea) rendering", &skipCloudRendering);
-		ImGui::Checkbox("Skip sky dome rendering", &skipSkyDomeRendering);
 
 		auto acc = ml::ScnRenderDrSysParmAcc();
-		static bool hideFog = false, hideBloom = false, hideTonemap = false;
+		static bool hideBloom = false, hideTonemap = false;
 
 		ImGui::Checkbox("Hide map", &acc.drMan->hideMap);
-		if(ImGui::Checkbox("Disable fog", &hideFog))
-			acc.setFogSkip(hideFog);
 		if(ImGui::Checkbox("Disable bloom", &hideBloom))
 			acc.setBloom(!hideBloom);
 		if(ImGui::Checkbox("Disable tonemapping", &hideTonemap))
 			acc.setToneMap(!hideTonemap);
 
-		ImGui::Checkbox("Force disable depth of field", &ForcedParameters.DisableDOF);
 		ImGui::Checkbox("Force disable motion blur", &ForcedParameters.DisableMotionBlur);
 		ImGui::Checkbox("Force disable color filters", &ForcedParameters.DisableColorFilter);
 		ImGui::Checkbox("Enable AA", &acc.PixlPostParm->enableAA);
@@ -203,22 +217,31 @@ namespace xenomods {
 #if !XENOMODS_CODENAME(bf3)
 		SkipLayerRendering::HookAt("_ZN5layer12LayerManager11finalRenderEPKN2ml15IDrDrawWorkInfoE");
 		SkipCloudRendering::HookAt("_ZN5cloud8CloudMan5applyEPKN2ml15IDrDrawWorkInfoEPNS1_13DrMdoZSortManE");
-		SkipSkyDomeRendering::HookAt("_ZN2ml9DrPixlMan13renderSkyDomeEv");
+		SkipSkyDomeRendering::HookAt("_ZN2ml13DrPixlSkyDome10baseRenderEv");
+		SkipDepthOfFieldRendering::HookAt("_ZN2ml25DrPixlPostObjDepthofField10renderCalcEv");
+		SkipFogRendering::HookAt("_ZNK2ml8DrFogMan7isFogOnEv");
 
 		FreezeTextureStreaming::HookAt(&ml::DrResMdoTexList::texStmUpdate);
 #else
-		// layer::LayerManager::finalRender and its cousin
+		// all here match up to the symbols up above
+		// Layer2 is an unnamed function immediately next to the normal finalRender.
 		if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
 			SkipLayerRendering::HookFromBase(0x710100f790);
 			SkipLayer2Rendering::HookFromBase(0x710100f808);
+			// TODO: Cloud, SkyDome, DepthOfField, Fog
 		}
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
 			SkipLayerRendering::HookFromBase(0x710100fac0);
 			SkipLayer2Rendering::HookFromBase(0x710100fb38);
+			// TODO: Cloud, SkyDome, DepthOfField, Fog
 		}
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1) {
 			SkipLayerRendering::HookFromBase(0x710100fb00);
 			SkipLayer2Rendering::HookFromBase(0x710100fb78);
+			SkipCloudRendering::HookFromBase(0x7100ec3908);
+			SkipSkyDomeRendering::HookFromBase(0x7100f6ad58);
+			SkipDepthOfFieldRendering::HookFromBase(0x7100f6e9d8);
+			SkipFogRendering::HookFromBase(0x7100ef60e0);
 		}
 #endif
 
@@ -251,10 +274,6 @@ namespace xenomods {
 		if(ForcedParameters.Any()) {
 			auto acc = ml::ScnRenderDrSysParmAcc();
 
-			if(ForcedParameters.DisableDOF) {
-				acc.setDOFOverride(true);
-				acc.setDOF(false);
-			}
 			if(ForcedParameters.DisableMotionBlur) {
 				acc.setMotBlurOverride(true);
 				acc.setMotBlur(false);

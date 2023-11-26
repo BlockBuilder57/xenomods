@@ -94,4 +94,14 @@ namespace ml {
 		void update();
 	};
 
+	class DrFogMan {
+	   public:
+#if XENOMODS_OLD_ENGINE || XENOMODS_CODENAME(bfsw)
+		INSERT_PADDING_BYTES(0xD0);
+#elif XENOMODS_CODENAME(bf3)
+		INSERT_PADDING_BYTES(0xE8);
+#endif
+		bool isFogOn;
+	};
+
 }

@@ -59,15 +59,15 @@ Landmark ids can be found [here](https://xenobladedata.github.io/xb2/bdat/common
 ###### Toggles...
 | Option                          | Description                                                                                                                                                  | Default |
 |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| Skip UI rendering               | Skips rendering the UI. (Try this on loading screens!)                                                                                                       | false   |
-| Skip particle+overlay rendering | Skips rendering particle effects as well as any screen overlay effects, like visions.                                                                        | false   |
-| Skip cloud (sea) rendering      | Skips rendering the cloud effect, used by skyboxes in 2 and the cloud sea.                                                                                   | false   |
+| Skip UI rendering               | Skips rendering the UI. (Try this on loading screens in 2/Torna/DE!)                                                                                         | false   |
+| Skip cloud (sea) rendering      | Skips rendering the cloud effect, used in skyboxes and the for cloud sea.                                                                                    | false   |
 | Skip sky dome rendering         | Skips rendering the "sky dome," the plain sky gradient in the background.                                                                                    | false   |
+| Skip fog rendering              | Disables rendering of the fog. For some reason, this also includes the sky dome.                                                                             | false   |
+| Skip depth of field rendering   | Skips rendering the depth of field/distance blur effect.                                                                                                     | false   |
+| Skip particle+overlay rendering | Skips rendering particle effects as well as any screen overlay effects, like visions.                                                                        | false   |
 | Hide map                        | Hides rendering of the map geometry. Props are included, but any interactable objects or cutscene props remain.                                              | false   |
-| Disable fog                     | Disables rendering of the fog. For some reason, this also includes the sky dome.                                                                             | false   |
 | Disable bloom                   | Disables the bloom effect.                                                                                                                                   | false   |
 | Disable tonemapping             | Disables tonemapping. This simulates what eyes do when entering dark areas. As a result, turning this off makes many scenes dark (sometimes to cool effect!) | false   |
-| Force disable depth of field    | Forcibly disables the depth of field/blur effect.                                                                                                            | false   |
 | Force disable motion blur       | Forcibly disables motion blur. Not incredibly distracting in this engine, but is often seen in cutscenes.                                                    | false   |
 | Force disable color filter      | Forcibly disables color filters/color correction.                                                                                                            | false   |
 | Enable AA                       | Enables anti-ailasing.                                                                                                                                       | false   |
