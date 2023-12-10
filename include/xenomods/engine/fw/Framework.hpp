@@ -38,11 +38,13 @@ namespace fw {
 		bool isPaused;
 	};
 
+#if !XENOMODS_OLD_ENGINE
 	struct FrameworkUpdater {
 		static void updateStd(const fw::Document& document, fw::FrameworkController* controller);
 
 		static void update(const fw::Document& document, const fw::UpdateInfo& updateInfo, fw::FrameworkController* controller);
 		static void updatePause(const fw::Document& document, const fw::UpdateInfo& updateInfo, fw::FrameworkController* controller);
 	};
+#endif
 
 }
