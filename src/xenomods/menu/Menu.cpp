@@ -151,9 +151,15 @@ namespace xenomods {
 		about->RegisterRenderCallback(&Section_About);
 	}
 
+	static double lastUpdateSeconds = 0;
+	static double lastUpdateDiff = 0;
 	void Menu::Update(HidInput* input) {
 		InputHelper::setPort(input->padId);
 		InputHelper::toggleInput = g_Menu->IsOpen();
+
+		auto seconds = nn::os::GetSystemTick()/19200000.;
+		lastUpdateDiff = seconds - lastUpdateSeconds;
+		lastUpdateSeconds = seconds;
 	}
 
 	void Menu::Render() {
@@ -179,6 +185,7 @@ namespace xenomods {
 #endif
 
 			ImGui::TextDisabled("%s", version::XenomodsVersion());
+			ImGui::TextDisabled("FPS: %d (%.4fms)", (int)(1.f/lastUpdateDiff), lastUpdateDiff);
 			ImGui::EndMainMenuBar();
 		}
 		if(show_demo) {
