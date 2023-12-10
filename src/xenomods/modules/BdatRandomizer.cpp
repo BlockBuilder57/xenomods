@@ -44,7 +44,15 @@ namespace xenomods {
 
 	void BdatRandomizer::MenuSection() {
 		ImGui::PushItemWidth(ImGui::GetFrameHeight() * 9.f);
-		imguiext::EnumComboBox("Scramble Type", &msScrambleType);
+		if (imguiext::EnumComboBox("Scramble Type", &msScrambleType)) {
+			// we only register our callback when scramble type is not off
+			if(detail::IsModuleRegistered(STRINGIFY(BdatOverride))) {
+				if (msScrambleType == BdatMSScrambleType::Off)
+					std::erase(BdatOverride::Callbacks, &MsOverride());
+				else
+					BdatOverride::RegisterCallback(&MsOverride());
+			}
+		}
 		ImGui::PopItemWidth();
 	}
 
@@ -52,13 +60,9 @@ namespace xenomods {
 		UpdatableModule::Initialize();
 		g_Logger->LogDebug("Setting up Bdat randomizer...");
 
-		if(detail::IsModuleRegistered(STRINGIFY(BdatOverride)))
-			BdatOverride::RegisterCallback(&MsOverride());
-
 #if !XENOMODS_CODENAME(bf3)
-		auto modules = g_Menu->FindSection("modules");
-		if(modules != nullptr) {
-			auto section = modules->RegisterSection(STRINGIFY(BdatRandomizer), "BDAT Randomizer");
+		auto section = g_Menu->FindSection(STRINGIFY(BdatOverride));
+		if(section != nullptr) {
 			section->RegisterRenderCallback(&MenuSection);
 		}
 #endif

@@ -8,7 +8,39 @@
 
 namespace {
 
-	// TODO: deduplicate
+	xenomods::BdatOverrideBase::Access process(unsigned char* pBdat, char* sheetName, char* memberName, int idx) {
+		//xenomods::g_Logger->LogInfo("[Bdat] {}/{}:{}", sheetName, memberName, idx);
+
+		//xenomods::BdatOverride::HotPath[sheetName]++;
+
+		auto& skips = xenomods::GetState().config.bdatSkipOverrides;
+		for(auto& it : skips) {
+			if(it.starts_with(sheetName)) {
+				//xenomods::g_Logger->LogInfo("[Bdat] Skipping {} ({})", sheetName, it);
+				// we need the index for the return value
+				return {.sheet = {.row = static_cast<unsigned short>(idx)}};
+			}
+		}
+
+		xenomods::BdatOverrideBase::Access access {
+			.sheet = {
+			.buffer = pBdat,
+			.name = sheetName,
+			.member = memberName,
+			.row = static_cast<unsigned short>(idx)
+			},
+			.data = 0,
+			.ignoreEmptyData = false
+		};
+
+		// run all applicable callbacks
+		for(xenomods::BdatOverrideBase* callback : xenomods::BdatOverride::Callbacks) {
+			if(callback->IsApplicable(access.sheet))
+				(*callback)(access);
+		}
+
+		return access;
+	}
 
 	struct GetValHook : skylaunch::hook::Trampoline<GetValHook> {
 		static unsigned long Hook(unsigned char* pBdat, unsigned char* pMember, int idx) {
@@ -17,34 +49,7 @@ namespace {
 
 			auto sheetName = Bdat::getSheetName(pBdat);
 			auto memberName = reinterpret_cast<char*>(pBdat + *reinterpret_cast<short*>(pMember + 4));
-			//xenomods::g_Logger->LogInfo("[Bdat] {}/{}:{}", sheetName, memberName, idx);
-
-			//xenomods::BdatOverride::HotPath[sheetName]++;
-
-			auto& skips = xenomods::GetState().config.bdatSkipOverrides;
-			for(auto& it : skips) {
-				if(it.starts_with(sheetName)) {
-					//xenomods::g_Logger->LogInfo("[Bdat] Skipping {} ({})", sheetName, it);
-					return Orig(pBdat, pMember, idx);
-				}
-			}
-
-			xenomods::BdatOverrideBase::Access access {
-				.sheet = {
-				.buffer = pBdat,
-				.name = sheetName,
-				.member = memberName,
-				.row = static_cast<unsigned short>(idx)
-				},
-				.data = 0,
-				.ignoreEmptyData = false
-			};
-
-			// run all applicable callbacks
-			for(xenomods::BdatOverrideBase* callback : xenomods::BdatOverride::Callbacks) {
-				if(callback->IsApplicable(access.sheet))
-					(*callback)(access);
-			}
+			auto access = process(pBdat, sheetName, memberName, idx);
 
 			if(access.ignoreEmptyData || access.data != 0)
 				return access.data;
@@ -60,34 +65,7 @@ namespace {
 
 			auto sheetName = Bdat::getSheetName(pBdat);
 			auto memberName = pMemberName;
-			//xenomods::g_Logger->LogInfo("[Bdat] {}/{}:{}", sheetName, memberName, idx);
-
-			//xenomods::BdatOverride::HotPath[sheetName]++;
-
-			auto& skips = xenomods::GetState().config.bdatSkipOverrides;
-			for(auto& it : skips) {
-				if(it.starts_with(sheetName)) {
-					//xenomods::g_Logger->LogInfo("[Bdat] Skipping {} ({})", sheetName, it);
-					return Orig(pBdat, pMemberName, idx);
-				}
-			}
-
-			xenomods::BdatOverrideBase::Access access {
-				.sheet = {
-				.buffer = pBdat,
-				.name = sheetName,
-				.member = pMemberName,
-				.row = static_cast<unsigned short>(idx)
-				},
-				.data = 0,
-				.ignoreEmptyData = false
-			};
-
-			// run all applicable callbacks
-			for(xenomods::BdatOverrideBase* callback : xenomods::BdatOverride::Callbacks) {
-				if(callback->IsApplicable(access.sheet))
-					(*callback)(access);
-			}
+			auto access = process(pBdat, sheetName, memberName, idx);
 
 			if(access.ignoreEmptyData || access.data != 0)
 				return access.data;
@@ -103,34 +81,7 @@ namespace {
 
 			auto sheetName = Bdat::getSheetName(pBdat);
 			auto memberName = reinterpret_cast<char*>(pBdat + *reinterpret_cast<short*>(pVarName + 4));
-			//xenomods::g_Logger->LogInfo("[Check] {}/{}:{}", sheetName, memberName, idx);
-
-			//xenomods::BdatOverride::HotPath[sheetName]++;
-
-			auto& skips = xenomods::GetState().config.bdatSkipOverrides;
-			for(auto& it : skips) {
-				if(it.starts_with(sheetName)) {
-					//xenomods::g_Logger->LogInfo("[Bdat] Skipping {} ({})", sheetName, it);
-					return Orig(pBdat, pVarName, idx, param_4);
-				}
-			}
-
-			xenomods::BdatOverrideBase::Access access {
-				.sheet = {
-				.buffer = pBdat,
-				.name = sheetName,
-				.member = memberName,
-				.row = static_cast<unsigned short>(idx)
-				},
-				.data = 0,
-				.ignoreEmptyData = false
-			};
-
-			// run all applicable callbacks
-			for(xenomods::BdatOverrideBase* callback : xenomods::BdatOverride::Callbacks) {
-				if(callback->IsApplicable(access.sheet))
-					(*callback)(access);
-			}
+			auto access = process(pBdat, sheetName, memberName, idx);
 
 			if(access.ignoreEmptyData || access.data != 0)
 				return access.data;
@@ -256,8 +207,17 @@ namespace xenomods {
 	//std::unordered_map<std::string_view, unsigned long> BdatOverride::HotPath = {};
 
 	void BdatOverride::RegisterCallback(xenomods::BdatOverrideBase* override) {
-		g_Logger->LogDebug("Registering Bdat callback @ {}", reinterpret_cast<void*>(override));
-		Callbacks.push_back(override);
+		if (std::find(Callbacks.begin(), Callbacks.end(), override) == Callbacks.end()) {
+			g_Logger->LogDebug("Registering Bdat callback @ {}", reinterpret_cast<void*>(override));
+			Callbacks.push_back(override);
+		}
+	}
+
+	void BdatOverride::MenuSection() {
+#if _DEBUG
+		ImGui::Text("Number of BDAT callbacks: %zu", Callbacks.size());
+		ImGui::Text("(TOML) Number of affected sheets: %zu", SheetMaxIDs.size());
+#endif
 	}
 
 	void BdatOverride::Initialize() {
@@ -269,6 +229,14 @@ namespace xenomods {
 		GetValCheckHook::HookAt(&Bdat::getValCheck);
 		IDCountOverride::HookAt(&Bdat::getIdCount);
 		IDEndOverride::HookAt(&Bdat::getIdEnd);
+
+#if !XENOMODS_CODENAME(bf3)
+		auto modules = g_Menu->FindSection("modules");
+		if(modules != nullptr) {
+			auto section = modules->RegisterSection(STRINGIFY(BdatOverride), "BDAT Overrides");
+			section->RegisterRenderCallback(&MenuSection);
+		}
+#endif
 
 		LoadFromFile();
 	}
@@ -294,7 +262,7 @@ namespace xenomods {
 
 		SheetMaxIDs.clear();
 		TOMLTable.clear();
-		std::remove(Callbacks.begin(), Callbacks.end(), &TomlOverride());
+		std::erase(Callbacks, &TomlOverride());
 
 		if(!res) {
 			auto error = std::move(res).error();
