@@ -1,5 +1,6 @@
 #include "DebugStuff.hpp"
 
+#include "xenomods/engine/apps/FrameworkLauncher.hpp"
 #include "xenomods/engine/bdat/Bdat.hpp"
 #include "xenomods/engine/fw/Debug.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
@@ -119,10 +120,12 @@ namespace {
 
 namespace xenomods {
 
-	bool DebugStuff::enableDebugRendering = true;
+	bool DebugStuff::enableDebugRendering = false;
 	bool DebugStuff::enableDebugUnlockAll = false;
 	bool DebugStuff::accessClosedLandmarks = false;
+	bool DebugStuff::pauseEnable = false;
 
+	std::int8_t DebugStuff::pauseStepForward = 0;
 	int DebugStuff::tempInt = 0;
 	int DebugStuff::bgmTrackIndex = 0;
 
@@ -243,6 +246,14 @@ namespace xenomods {
 		if(ImGui::Checkbox("Enable debug rendering", &DebugStuff::enableDebugRendering))
 			DebugStuff::UpdateDebugRendering();
 
+		/*ImGui::Checkbox("Pause updates", &DebugStuff::pauseEnable);
+		ImGui::SameLine();
+		if (ImGui::Button("Step Frame"))
+			pauseStepForward = 1;
+		ImGui::SameLine();
+		if (ImGui::Button("Step Sec"))
+			pauseStepForward = 30;*/
+
 #if XENOMODS_CODENAME(bfsw)
 		ImGui::Checkbox("Debug unlock all", &DebugStuff::enableDebugUnlockAll);
 #endif
@@ -297,6 +308,10 @@ namespace xenomods {
 
 	void DebugStuff::Update(fw::UpdateInfo* updateInfo) {
 		bgmTrackIndex = 0;
+
+		if (pauseEnable && pauseStepForward > 0) {
+			pauseStepForward--;
+		}
 	}
 
 	XENOMODS_REGISTER_MODULE(DebugStuff);

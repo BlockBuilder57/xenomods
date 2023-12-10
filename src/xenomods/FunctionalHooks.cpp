@@ -1,6 +1,7 @@
 // Created by block on 6/17/23.
 
 #include "FunctionalHooks.hpp"
+#include "modules/DebugStuff.hpp"
 
 #include <skylaunch/hookng/Hooks.hpp>
 #include <xenomods/DebugWrappers.hpp>
@@ -12,6 +13,7 @@
 #include <xenomods/menu/Menu.hpp>
 
 #include "main.hpp"
+#include "xenomods/engine/apps/FrameworkLauncher.hpp"
 #include "xenomods/engine/fw/Document.hpp"
 #include "xenomods/engine/fw/Framework.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
@@ -29,18 +31,33 @@
 namespace {
 
 #if XENOMODS_OLD_ENGINE
-	struct FrameworkUpdateHook : skylaunch::hook::Trampoline<FrameworkUpdateHook> {
-		static void Hook(fw::Framework* framework) {
-			Orig(framework);
+	struct FrameworkLauncherUpdateHook : skylaunch::hook::Trampoline<FrameworkLauncherUpdateHook> {
+		static void Hook(apps::FrameworkLauncher* this_pointer) {
+			/*bool skipUpdating = false;
+			if (xenomods::detail::IsModuleRegistered(STRINGIFY(xenomods::DebugStuff))) {
+				if (xenomods::DebugStuff::pauseEnable && xenomods::DebugStuff::pauseStepForward <= 0)
+					skipUpdating = true;
+			}
 
-			if(framework != nullptr)
-				xenomods::update(framework->getUpdateInfo());
+			if (!skipUpdating)*/
+				Orig(this_pointer);
+
+			auto ptr = *skylaunch::hook::detail::ResolveSymbol<fw::Framework**>("_ZZN2mm3mtl12PtrSingletonIN2fw9FrameworkEE3sysEvE10s_instance");
+			if(ptr != nullptr)
+				xenomods::update(ptr->getUpdateInfo());
 		}
 	};
 #else
 	struct FrameworkUpdater_updateStdHook : skylaunch::hook::Trampoline<FrameworkUpdater_updateStdHook> {
-		static void Hook(fw::Document* doc, void* FrameworkController) {
-			Orig(doc, FrameworkController);
+		static void Hook(fw::Document* doc, fw::FrameworkController* controller) {
+			/*if (xenomods::detail::IsModuleRegistered(STRINGIFY(xenomods::DebugStuff))) {
+				bool skipUpdating = false;
+				if (xenomods::DebugStuff::pauseEnable)
+					skipUpdating = true;
+				controller->isPaused = skipUpdating;
+			}*/
+
+			Orig(doc, controller);
 
 			if(doc != nullptr && doc->applet != nullptr) {
 				xenomods::DocumentPtr = doc;
@@ -270,7 +287,7 @@ namespace xenomods {
 
 		// hook our updater
 #if XENOMODS_OLD_ENGINE
-		FrameworkUpdateHook::HookAt("_ZN2fw9Framework6updateEv");
+		FrameworkLauncherUpdateHook::HookAt(&apps::FrameworkLauncher::update);
 #elif XENOMODS_CODENAME(bfsw)
 		FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #elif XENOMODS_CODENAME(bf3)

@@ -9,7 +9,9 @@ namespace xenomods {
 		static bool enableDebugRendering;
 		static bool enableDebugUnlockAll;
 		static bool accessClosedLandmarks;
+		static bool pauseEnable;
 
+		static std::int8_t pauseStepForward;
 		static int tempInt;
 		static int bgmTrackIndex;
 
