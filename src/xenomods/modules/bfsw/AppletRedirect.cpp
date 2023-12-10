@@ -34,8 +34,7 @@ namespace xenomods {
 		typedef nn::fs::DirectoryEntry DirEntry;
 
 		nn::fs::DirectoryHandle dir {};
-		if(R_FAILED(nn::fs::OpenDirectory(&dir, "save:/",
-										  nn::fs::OpenDirectoryMode::OpenDirectoryMode_File))) {
+		if(R_FAILED(nn::fs::OpenDirectory(&dir, "save:/", nn::fs::OpenDirectoryMode::OpenDirectoryMode_File))) {
 			xenomods::g_Logger->LogWarning("Could not open save dir");
 			return false;
 		}
@@ -52,25 +51,37 @@ namespace xenomods {
 		}
 		nn::fs::CloseDirectory(dir);
 
+		if (entries.empty())
+			return false;
+
+		std::vector<std::pair<std::string, unsigned long>> times;
+
 		// Add the "save:/" prefix to all entries
 		std::string prefix { "save:/" };
-		auto iter = entries.begin();
-		while(iter != entries.end()) {
-			auto& entry = *iter;
+		for(auto& entry : entries) {
 			auto name_str = std::string(entry.name);
 			if(!name_str.ends_with(".sav") || !name_str.starts_with("bfs") || name_str.starts_with("bfssystem")) {
-				entries.erase(iter);
 				continue;
 			}
-			std::rotate(std::begin(entry.name), std::end(entry.name) + prefix.size(), std::end(entry.name));
-			std::copy(prefix.begin(), prefix.end(), std::begin(entry.name));
-			++iter;
+
+			ml::TimeInfo time;
+			xenomods::NnFile file(prefix + name_str, nn::fs::OpenMode_Read);
+			file.Seek(0x8, NnFile::SeekDirection::Beg); // offsetof(game::DataGameSave, timeInfo)
+			file.ReadOne<ml::TimeInfo>(&time);
+			times.push_back(std::pair(prefix + name_str, ml::TimeUtil::GetUnixTimestamp(time)));
+			//g_Logger->LogInfo("ALL FILES {}: {}", name_str, ml::TimeUtil::GetFullInfo(time));
 		}
 
-		auto mostRecent = std::max_element(entries.begin(), entries.end(), [](const DirEntry& e1, const DirEntry& e2) {
-			return xenomods::NnFile::GetLastModified(e1.name) < xenomods::NnFile::GetLastModified(e2.name);
+		// sort them so the largest is at the end
+		std::sort(times.begin(), times.end(), [=](std::pair<std::string, unsigned long>& a, std::pair<std::string, unsigned long>& b) {
+			return a.second < b.second;
 		});
-		return mostRecent != entries.end() && std::string(mostRecent[0].name).starts_with("save:/bfsmeria");
+
+		/*for(auto& entry : times) {
+			g_Logger->LogInfo("SORTED {}: {}", entry.first, entry.second);
+		}*/
+
+		return std::string(times[times.size() - 1].first).starts_with("save:/bfsmeria");
 	}
 
 	XENOMODS_REGISTER_MODULE(AppletRedirect);

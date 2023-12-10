@@ -63,7 +63,26 @@ namespace xenomods {
 		 * \param[out] buffer The buffer to read into.
 		 * \param[in]  length Size to read from the file.
 		 */
-		void Read(void* buffer, s64 length);
+		bool Read(void* buffer, s64 length);
+
+		/**
+		 * Read data from the file.
+		 *
+		 * \param[out] buffer The buffer to read into.
+		 */
+		template <typename T>
+		bool ReadOne(T* buffer) {
+			if(!Ok())
+				return false;
+
+			if(R_SUCCEEDED(nn::fs::ReadFile(fh, filePointer, buffer, sizeof(T)))) {
+				// this is dirty but the minimum sdk version doesn't have the overload which can actually
+				// signal short reads.... so this will have to do. i guess i could do some min() stuff
+				filePointer += sizeof(T);
+			}
+
+			return true;
+		}
 
 		/**
 		 * Write data into the file.

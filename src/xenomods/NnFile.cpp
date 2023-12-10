@@ -24,15 +24,17 @@ namespace xenomods {
 		}
 	}
 
-	void NnFile::Read(void* buffer, s64 length) {
+	bool NnFile::Read(void* buffer, s64 length) {
 		if(!Ok())
-			return;
+			return false;
 
 		if(R_SUCCEEDED(nn::fs::ReadFile(fh, filePointer, buffer, length))) {
 			// this is dirty but the minimum sdk version doesn't have the overload which can actually
 			// signal short reads.... so this will have to do. i guess i could do some min() stuff
 			filePointer += length;
 		}
+
+		return true;
 	}
 
 	void NnFile::Write(const void* buffer, s64 length) {
