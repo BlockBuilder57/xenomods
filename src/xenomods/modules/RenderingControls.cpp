@@ -228,12 +228,18 @@ namespace xenomods {
 		if (version::RuntimeVersion() == version::SemVer::v2_0_0) {
 			SkipLayerRendering::HookFromBase(0x710100f790);
 			SkipLayer2Rendering::HookFromBase(0x710100f808);
-			// TODO: Cloud, SkyDome, DepthOfField, Fog
+			SkipCloudRendering::HookFromBase(0x7100ec3598);
+			SkipSkyDomeRendering::HookFromBase(0x7100f6a9e8);
+			SkipDepthOfFieldRendering::HookFromBase(0x7100f6e668);
+			SkipFogRendering::HookFromBase(0x7100ef5d70);
 		}
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_0) {
 			SkipLayerRendering::HookFromBase(0x710100fac0);
 			SkipLayer2Rendering::HookFromBase(0x710100fb38);
-			// TODO: Cloud, SkyDome, DepthOfField, Fog
+			SkipCloudRendering::HookFromBase(0x7100ec38c8);
+			SkipSkyDomeRendering::HookFromBase(0x7100f6ad18);
+			SkipDepthOfFieldRendering::HookFromBase(0x7100f6e998);
+			SkipFogRendering::HookFromBase(0x7100ef60a0);
 		}
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1) {
 			SkipLayerRendering::HookFromBase(0x710100fb00);
