@@ -118,6 +118,7 @@ namespace xenomods {
 		.freecamOn = false,
 		.relativeToPlayer = false,
 		.moveAxis = FreecamSettings::MoveAxis::XZ,
+		.comboMoveAxis = FreecamSettings::MoveAxis::XY,
 		.isFreezePos = { false, false, false },
 		.isGlobalPos = { false, false, false },
 		.isGlobalRot = { false, true, false },
@@ -211,7 +212,9 @@ namespace xenomods {
 		glm::vec3 move { 0, 0, 0 };
 		glm::vec3 perAxisMove { 0, 0, 0 };
 
-		switch(set->moveAxis) {
+		CameraTools::FreecamSettings::MoveAxis moveAxis = debugInput->InputHeld(Keybind::CAMERA_COMBO) ? set->comboMoveAxis : set->moveAxis;
+
+		switch(moveAxis) {
 			case CameraTools::FreecamSettings::MoveAxis::XZ:
 				move = { lStick.x, 0, -lStick.y };
 				break;
@@ -339,6 +342,8 @@ namespace xenomods {
 
 		ImGui::PushItemWidth(64.f);
 		imguiext::EnumComboBox("Move type", &Settings.moveAxis);
+		ImGui::SameLine();
+		imguiext::EnumComboBox("L+R Move type", &Settings.comboMoveAxis);
 		ImGui::PopItemWidth();
 
 		ImGui::Checkbox("Freeze X", &Settings.isFreezePos[0]);
