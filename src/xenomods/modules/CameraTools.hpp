@@ -20,6 +20,7 @@ namespace xenomods {
 			bool freecamOn;
 			bool relativeToPlayer;
 			MoveAxis moveAxis;
+			MoveAxis comboMoveAxis;
 			bool isFreezePos[3];
 			bool isGlobalPos[3];
 			bool isGlobalRot[3];

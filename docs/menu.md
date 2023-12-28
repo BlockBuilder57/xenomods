@@ -38,7 +38,8 @@ Landmark ids can be found [here](https://xenobladedata.github.io/xb2/bdat/common
 ###### Control Options
 | Option                          | Description                                                                                                                | Default             |
 |---------------------------------|----------------------------------------------------------------------------------------------------------------------------|---------------------|
-| Move type                       | Selects which axies the camera moves along with the left stick.                                                            | XZ                  |
+| Move type                       | Selects which axes the camera moves along with the left stick.                                                             | XZ                  |
+| L+R Move type                   | Selects which axes the camera moves along with the left stick when L+R is held down.                                       | XY                  |
 | Freeze X/Y/Z                    | Freezes movement on the specified axis.                                                                                    | false, false, false |
 | Global X/Y/Z                    | Makes movement global (world relative) as opposed to local (view relative) for the specified axis.                         | false, false, false |
 | Freecam speed (m/s)             | Controls the movement speed of the freecam.                                                                                | 8.0                 |
