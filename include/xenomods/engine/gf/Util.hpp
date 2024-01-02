@@ -9,6 +9,12 @@
 #if XENOMODS_OLD_ENGINE
 namespace gf {
 
+	struct GfGameUtil {
+		// base form means not using the condition model
+		static char* getBladeModel(unsigned int bladeId, bool baseForm = false);
+		static char* getDriverModel(unsigned int driverId, bool unk1, bool unk2);
+	};
+
 	struct GfItemUtil {
 		static bool addItemBox(unsigned int itemId, int count);
 	};

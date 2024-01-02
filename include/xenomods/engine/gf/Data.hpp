@@ -13,6 +13,21 @@ namespace gf {
 		static char* getNameMapInfo(unsigned int);
 	};
 
+	class GfBdatItem {
+	   public:
+		char* getEquipOrbModel(unsigned int itemId) const;
+	};
+
+	class GfBdatChrBl {
+	   public:
+		char* getChrBlModel(unsigned int bladeId) const;
+	};
+
+	class GfBdatChrDr {
+	   public:
+		char* getChrDrModel(unsigned int driverId) const;
+	};
+
 	class GfDataMap {
 	   public:
 		static char* getName(unsigned int);
@@ -43,6 +58,11 @@ namespace gf {
 		static void getItemTypeName(unsigned char itemType, ui::UIStr& uistr);
 		static int getItemNum(unsigned char itemType, unsigned int itemId);
 		static bool isModelChangeItem(unsigned int, unsigned int);
+	};
+
+	class GfDataBlade {
+	   public:
+		static char* getName(unsigned int bladeId, unsigned int nameIdx = 0);
 	};
 
 	class GfDataItem {

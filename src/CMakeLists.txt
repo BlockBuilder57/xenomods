@@ -29,6 +29,7 @@ add_executable(xenomods
 		xenomods/modules/BdatRandomizer.cpp
 		xenomods/modules/ResourceManager.cpp
 		xenomods/modules/bf2/EventDebugUtils.cpp
+		xenomods/modules/bf2/CompatabilityFix.cpp
 		xenomods/modules/bfsw/AppletRedirect.cpp
 
         xenomods/stuff/utils/debug_util.cpp
