@@ -60,6 +60,11 @@ namespace gf {
 		static bool isModelChangeItem(unsigned int, unsigned int);
 	};
 
+	class GfDataDriver {
+	   public:
+		static bool isIra(unsigned int driverId);
+	};
+
 	class GfDataBlade {
 	   public:
 		static char* getName(unsigned int bladeId, unsigned int nameIdx = 0);

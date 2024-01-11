@@ -52,6 +52,18 @@ namespace gf {
 	class GfObjUtil {
 	   public:
 		static void* getProperty(GF_OBJ_HANDLE* handle);
+		static char* getModelResourceName(GF_OBJ_HANDLE* handle);
+	};
+
+	struct GfInitParamDriver { // size at least 0x1b0 (
+		INSERT_PADDING_BYTES(0x10);
+		unsigned int driverIndex;
+		INSERT_PADDING_BYTES(412);
+	};
+
+	class GfObjFactory {
+	   public:
+		static GF_OBJ_HANDLE* createDriver(GfInitParamDriver& param);
 	};
 
 } // namespace gf
