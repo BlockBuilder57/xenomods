@@ -37,6 +37,12 @@ namespace gf {
 	   public:
 	};
 
+	enum class PTPOS {
+		Vanguard = 0,
+		RearGuard1,
+		RearGuard2
+	};
+
 	class GfGameParty {
 	   public:
 		static void setPartyLeader(gf::GF_OBJ_HANDLE*);
@@ -49,8 +55,10 @@ namespace gf {
 		static void getCurrentPartyInfo(gf::RQ_SETUP_PARTY_DRIVER&);
 		static void getCurrentPartyInfo(gf::RQ_SETUP_PARTY&);
 
-		static gf::GF_OBJ_HANDLE getLeader();
-		static gf::GF_OBJ_HANDLE getHandleMover(unsigned int);
+		static gf::GF_OBJ_HANDLE* getLeader();
+		static gf::GF_OBJ_HANDLE* getHandleMover(unsigned int);
+		static gf::GF_OBJ_HANDLE* getHandleDriverByBdatID(unsigned int driverId);
+		static gf::GF_OBJ_HANDLE* getHandleBladeByBdatID(unsigned int bladeId);
 		static GfComTransform* getLeaderTransform();
 	};
 

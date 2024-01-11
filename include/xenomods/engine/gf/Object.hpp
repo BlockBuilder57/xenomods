@@ -12,7 +12,7 @@ namespace gf {
 
 		// xenomods from here
 		inline bool IsValid() {
-			return actual != -1ul;
+			return reinterpret_cast<unsigned long>(this) != -1ul;
 		}
 		inline GF_OBJ_HANDLE* Ptr() {
 			return reinterpret_cast<GF_OBJ_HANDLE*>(actual);

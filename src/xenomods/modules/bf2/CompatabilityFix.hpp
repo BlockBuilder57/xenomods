@@ -12,6 +12,7 @@ namespace xenomods {
 		bool NeedsUpdate() const override {
 			return false;
 		}
+		void OnMapChange(unsigned short mapId) override;
 	};
 
 } // namespace xenomods
