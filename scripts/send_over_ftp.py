@@ -6,6 +6,7 @@ import os
 import sys
 import json
 from ftplib import FTP
+from pathlib import Path
 
 ftpConnection = None
 
@@ -49,8 +50,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Send and update xenomods binary output to Switch console, via FTP.')
 
     # stuff we gather from
-    parser.add_argument('--codename', dest='codename', required=True, type=str, help='codename of the build type')
-    parser.add_argument('--npdmjson', dest='npdm', required=True, type=str, help='path to npdmtool JSON file to gather information from')
+    parser.add_argument('--codename', dest='codename', required=True, type=str, help='codename(s) of the build type')
     parser.add_argument('--subsdk', dest='subsdk_name', required=False, type=str, default="subsdk9", help='subsdk name (default \'subsdk9\')')
 
     # ftp site arguments
@@ -62,23 +62,6 @@ if __name__ == "__main__":
     if '.' not in args.ip:
         Bail("Invalid Switch IP address provided")
 
-    if not os.path.exists(args.npdm):
-        Bail("JSON file doesn't exist")
-
-    file = open(args.npdm, mode='r')
-
-    # additionaly if it doesn't have json data, it probably shouldn't be used either, bail there too.
-    try:
-        jsondata = json.loads(file.read())
-    except:
-        Bail("JSON file contains invalid data")
-
-    file.close()
-
-    programid = jsondata['program_id'][2:].upper()
-
-    print(f"Gathered program id is {programid}")
-
     ftpConnection = FTP()
     print(f'Connecting to Switch console @ {args.ip}:{args.port} ...', end='')
     ftpConnection.connect(args.ip, args.port)
@@ -87,13 +70,33 @@ if __name__ == "__main__":
 
     ftpConnection.login()
 
-    # Ensure required directories exist on the console; if not, create them
-    EnsureDirectory('/atmosphere', 'contents')
-    EnsureDirectory('/atmosphere/contents', programid)
-    EnsureDirectory(f'/atmosphere/contents/{programid}', 'exefs')
+    for codename in args.codename.split(';'):
+        print(f"Codename: {codename}")
+        npdmPath = Path(os.getcwd()) / f"../npdm/{codename}.json"
 
-    ftpConnection.cwd(f'/atmosphere/contents/{programid}/exefs')
+        if not os.path.exists(npdmPath):
+            Bail("NPDM JSON file doesn't exist")
 
-    # Send xenomods to the console
-    SendFile('./xenomods.nso', f'{args.subsdk_name}')
-    SendFile(f'./{args.codename}.npdm', 'main.npdm')
+        with open(npdmPath, mode='r') as file:
+            # additionaly if it doesn't have json data, it probably shouldn't be used either, bail there too.
+            try:
+                jsondata = json.loads(file.read())
+            except:
+                Bail("NPDM JSON file contains invalid data")
+
+        programid = jsondata['program_id'][2:].upper()
+
+        print(f"Gathered program id is {programid}")
+
+        # Ensure required directories exist on the console; if not, create them
+        EnsureDirectory('/atmosphere', 'contents')
+        EnsureDirectory('/atmosphere/contents', programid)
+        EnsureDirectory(f'/atmosphere/contents/{programid}', 'exefs')
+
+        ftpConnection.cwd(f'/atmosphere/contents/{programid}/exefs')
+
+        # Send xenomods to the console
+        SendFile('./xenomods.nso', f'{args.subsdk_name}')
+        SendFile(f'./{codename}.npdm', 'main.npdm')
+
+    ftpConnection.quit()

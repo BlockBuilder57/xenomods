@@ -148,18 +148,18 @@ foreach(THIS_CODENAME ${XENOMODS_MULTIBUILD_LIST})
 		add_npdm(xenomods ${PROJECT_SOURCE_DIR}/npdm/${THIS_CODENAME}.json ${THIS_CODENAME}-unpatched)
 		patch_npdm(${THIS_CODENAME}-unpatched ${THIS_CODENAME})
 	endif()
-
-	# FTP transfer
-	if(NOT " ${XENOMODS_SWITCH_IP}" STREQUAL " ")
-		message(STATUS "Enabling FTP transfer")
-
-		add_custom_command(TARGET xenomods
-				POST_BUILD
-				COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/send_over_ftp.py --switchip ${XENOMODS_SWITCH_IP} --codename ${THIS_CODENAME} --npdmjson ${PROJECT_SOURCE_DIR}/npdm/${THIS_CODENAME}.json
-				WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-				USES_TERMINAL
-				VERBATIM
-				COMMENT "Sending xenomods to console"
-				)
-	endif()
 endforeach()
+
+# FTP transfer
+if(NOT " ${XENOMODS_SWITCH_IP}" STREQUAL " ")
+	message(STATUS "Enabling FTP transfer")
+
+	add_custom_command(TARGET xenomods
+			POST_BUILD
+			COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/send_over_ftp.py --switchip ${XENOMODS_SWITCH_IP} --codename "${XENOMODS_MULTIBUILD_LIST}"
+			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+			USES_TERMINAL
+			VERBATIM
+			COMMENT "Sending xenomods to console"
+			)
+endif()
