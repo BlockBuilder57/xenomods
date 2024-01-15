@@ -2,6 +2,7 @@
 
 #include "xenomods/Version.hpp"
 
+#include "gitversion.h"
 #include "nn/oe.h"
 #include "skylaunch/nx/kernel/svc.h"
 

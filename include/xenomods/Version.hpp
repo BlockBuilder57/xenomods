@@ -5,7 +5,6 @@
 #include <string_view>
 
 #include "fmt/core.h"
-#include "gitversion.h"
 #include "skylaunch/utils/cpputils.hpp"
 #include <xenomods/Utils.hpp>
 #include <xenomods/Logger.hpp>
