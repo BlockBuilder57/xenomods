@@ -7,6 +7,7 @@
 #include "../DebugStuff.hpp"
 #include "xenomods/engine/event/Manager.hpp"
 #include "xenomods/engine/gf/Data.hpp"
+#include "xenomods/engine/gf/Manager.hpp"
 #include "xenomods/engine/ml/Rand.hpp"
 #include "xenomods/engine/tl/title.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
@@ -115,9 +116,8 @@ namespace {
 			// get the clear count from the save because that's what everything else seems to do
 			uint clearCount = *reinterpret_cast<uint*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
 			uint chapter = this_pointer->getChapterIdFromSaveData();
-#if XENOMODS_CODENAME(ira)
-			chapter = 0; // it's always 10!
-#endif
+			if (gf::GfGameManager::isGameTypeIra())
+				chapter = 0; // it's always 10!
 			chapter |= clearCount << 16; // "encodes" as 0x00010006 for 1 clear on ch6
 
 			//xenomods::g_Logger->LogDebug("Chapter info: {:#x}", chapter);

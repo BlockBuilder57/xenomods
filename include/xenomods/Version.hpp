@@ -15,10 +15,13 @@ namespace xenomods::version {
 
 	enum class GameType {
 		Invalid,
-		BF2,
-		IRA,
-		BFSW,
-		BF3
+		SpaceTravel = (1 << 0),
+		BF2         = (1 << 1),
+		IRA         = (1 << 2),
+		BFSW        = (1 << 3),
+		BF3         = (1 << 4),
+		// multibuild psuedo types
+		BF2_IRA = BF2 | IRA
 	};
 
 	struct SemVer {
@@ -116,6 +119,10 @@ namespace xenomods::version {
 	GameType::BFSW;
 #elif XENOMODS_CODENAME(bf3)
 	GameType::BF3;
+#elif XENOMODS_CODENAME(bf2_ira)
+	GameType::BF2_IRA;
+#else
+	GameType::Invalid;
 #endif
 	const bool BuildIsDebug =
 #if _DEBUG

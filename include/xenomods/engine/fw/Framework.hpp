@@ -38,7 +38,7 @@ namespace fw {
 		bool isPaused;
 	};
 
-#if !XENOMODS_OLD_ENGINE
+#if XENOMODS_NEW_ENGINE
 	struct FrameworkUpdater {
 		static void updateStd(const fw::Document& document, fw::FrameworkController* controller);
 

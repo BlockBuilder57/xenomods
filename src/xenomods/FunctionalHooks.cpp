@@ -47,7 +47,7 @@ namespace {
 				xenomods::update(ptr->getUpdateInfo());
 		}
 	};
-#else
+#elif XENOMODS_NEW_ENGINE
 	struct FrameworkUpdater_updateStdHook : skylaunch::hook::Trampoline<FrameworkUpdater_updateStdHook> {
 		static void Hook(fw::Document* doc, fw::FrameworkController* controller) {
 			/*if (xenomods::detail::IsModuleRegistered(STRINGIFY(xenomods::DebugStuff))) {
@@ -69,7 +69,7 @@ namespace {
 
 	// Game-specific
 
-#if XENOMODS_CODENAME(bf2)
+#if XENOMODS_OLD_ENGINE
 	struct FixIraOnBF2Mount : skylaunch::hook::Trampoline<FixIraOnBF2Mount> {
 		static bool Hook(const char* path) {
 			auto view = std::string_view(path);
@@ -259,18 +259,16 @@ namespace xenomods {
 
 	void FunctionalHooks::Hook() {
 #if XENOMODS_OLD_ENGINE
-	#if XENOMODS_CODENAME(bf2)
-		if(GetState().config.mountTornaContent) {
-			NnFile file("rom:/ira-xm.arh", nn::fs::OpenMode_Read);
+	if(version::RuntimeGame() == version::GameType::BF2 && GetState().config.mountTornaContent) {
+		NnFile file("rom:/ira-xm.arh", nn::fs::OpenMode_Read);
 
-			if(file) {
-				file.Close(); // gotta let the game read it lol
-				FixIraOnBF2Mount::HookAt(&ml::DevFileTh::checkValidFileBlock);
-				ml::DevFileTh::registArchive(ml::MEDIA::Default, "ira-xm.arh", "ira-xm.ard", "aoc1:/");
-			}
+		if(file) {
+			file.Close(); // gotta let the game read it lol
+			FixIraOnBF2Mount::HookAt(&ml::DevFileTh::checkValidFileBlock);
+			ml::DevFileTh::registArchive(ml::MEDIA::Default, "ira-xm.arh", "ira-xm.ard", "aoc1:/");
 		}
-	#endif
-		MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
+	}
+	MainMenuVersionInfo::HookAt(&gf::GfMenuObjTitle::initialize);
 #endif
 
 #if XENOMODS_CODENAME(bfsw)

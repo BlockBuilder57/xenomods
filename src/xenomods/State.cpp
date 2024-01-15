@@ -14,6 +14,8 @@ namespace xenomods {
 		menuFonts = CONFIG_MENU_FONTS_DEFAULT;
 
 		titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
+		if (version::RuntimeGame() == version::GameType::BF2)
+			titleEvents = CONFIG_TITLEEVENTS_DEFAULT_BF2;
 
 		eventDebugBits = CONFIG_EVENT_DEBUG_BITS_DEFAULT;
 
@@ -153,8 +155,11 @@ namespace xenomods {
 			} else
 				load_failed = true;
 
-			if(load_failed && respectDefaults)
+			if(load_failed && respectDefaults) {
 				titleEvents = CONFIG_TITLEEVENTS_DEFAULT;
+				if (version::RuntimeGame() == version::GameType::BF2)
+					titleEvents = CONFIG_TITLEEVENTS_DEFAULT_BF2;
+			}
 		}
 
 		if(respectDefaults || table[STRINGIFY(eventDebugBits)].type() != toml::node_type::none)
