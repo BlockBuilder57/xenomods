@@ -49,7 +49,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Send and update xenomods binary output to Switch console, via FTP.')
 
     # stuff we gather from
-    parser.add_argument('--json', dest='path', required=True, type=str, help='path to npdmtool JSON file to gather information from')
+    parser.add_argument('--codename', dest='codename', required=True, type=str, help='codename of the build type')
+    parser.add_argument('--npdmjson', dest='npdm', required=True, type=str, help='path to npdmtool JSON file to gather information from')
     parser.add_argument('--subsdk', dest='subsdk_name', required=False, type=str, default="subsdk9", help='subsdk name (default \'subsdk9\')')
 
     # ftp site arguments
@@ -61,10 +62,10 @@ if __name__ == "__main__":
     if '.' not in args.ip:
         Bail("Invalid Switch IP address provided")
 
-    if not os.path.exists(args.path):
+    if not os.path.exists(args.npdm):
         Bail("JSON file doesn't exist")
 
-    file = open(args.path, mode='r')
+    file = open(args.npdm, mode='r')
 
     # additionaly if it doesn't have json data, it probably shouldn't be used either, bail there too.
     try:
@@ -95,4 +96,4 @@ if __name__ == "__main__":
 
     # Send xenomods to the console
     SendFile('./xenomods.nso', f'{args.subsdk_name}')
-    SendFile('./main.npdm', 'main.npdm')
+    SendFile(f'./{args.codename}.npdm', 'main.npdm')

@@ -42,6 +42,26 @@
       }
     },
     {
+      "name": "debug-bf2_ira",
+      "generator": "Ninja",
+      "toolchainFile": "cmake/NintendoSwitch.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "XENOMODS_CODENAME": "bf2_ira",
+        "XENOMODS_MULTIBUILD_LIST": "bf2;ira"
+      }
+    },
+    {
+      "name": "release-bf2_ira",
+      "generator": "Ninja",
+      "toolchainFile": "cmake/NintendoSwitch.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "XENOMODS_CODENAME": "bf2_ira",
+        "XENOMODS_MULTIBUILD_LIST": "bf2;ira"
+      }
+    },
+    {
       "name": "debug-bfsw",
       "generator": "Ninja",
       "toolchainFile": "cmake/NintendoSwitch.cmake",

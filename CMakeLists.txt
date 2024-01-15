@@ -19,6 +19,11 @@ if(" ${XENOMODS_CODENAME}" STREQUAL " ")
 	set(XENOMODS_CODENAME "bf2")
 endif()
 
+# if there's no multibuild list, set it to the codename.
+if(" ${XENOMODS_MULTIBUILD_LIST}" STREQUAL " ")
+	set(XENOMODS_MULTIBUILD_LIST ${XENOMODS_CODENAME})
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/vendor/imgui-xeno/cmake)
 include(MakeNso)
