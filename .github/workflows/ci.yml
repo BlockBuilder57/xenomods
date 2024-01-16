@@ -37,18 +37,12 @@ jobs:
       # These run in parallel.
       matrix:
         build:
-          - name: debug-bf2
-            preset: debug-bf2
-            codename: bf2
-          - name: release-bf2
-            preset: release-bf2
-            codename: bf2
-          - name: debug-ira
-            preset: debug-ira
-            codename: ira
-          - name: release-ira
-            preset: release-ira
-            codename: ira
+          - name: debug-bf2_ira
+            preset: debug-bf2_ira
+            codename: bf2;ira
+          - name: release-bf2_ira
+            preset: release-bf2_ira
+            codename: bf2;ira
           - name: debug-bfsw
             preset: debug-bfsw
             codename: bfsw
@@ -95,7 +89,7 @@ jobs:
         id: package
         run: |
           cd build-${{matrix.build.preset}}
-          python3 ../scripts/makePackage.py --json ../npdm/${{matrix.build.codename}}.json
+          python3 ../scripts/makePackage.py --codename "${{matrix.build.codename}}"
           cd pkg
           zip -9r ../xenomods-${{matrix.build.preset}}.zip .
 

@@ -136,19 +136,27 @@ target_compile_definitions(xenomods PUBLIC
 		_XENOMODS_CODENAME_STR="${XENOMODS_CODENAME}"
 		)
 
-# NPDM/NSO output.
-add_npdm(xenomods ${PROJECT_SOURCE_DIR}/npdm/${XENOMODS_CODENAME}.json main-unpatched)
+# NSO output.
 add_nso_target(xenomods)
-patch_npdm(main-unpatched main)
+
+# "multibuilds" are just one specific build being used multiple times
+# we want to loop through the list of them and do all the npdm stuff/ftp uploading per codename
+
+foreach(THIS_CODENAME ${XENOMODS_MULTIBUILD_LIST})
+	if (NOT EXISTS ${PROJECT_BINARY_DIR}/${THIS_CODENAME}.npdm)
+		# NPDM output.
+		add_npdm(xenomods ${PROJECT_SOURCE_DIR}/npdm/${THIS_CODENAME}.json ${THIS_CODENAME}-unpatched)
+		patch_npdm(${THIS_CODENAME}-unpatched ${THIS_CODENAME})
+	endif()
+endforeach()
 
 # FTP transfer
-
 if(NOT " ${XENOMODS_SWITCH_IP}" STREQUAL " ")
 	message(STATUS "Enabling FTP transfer")
 
 	add_custom_command(TARGET xenomods
 			POST_BUILD
-			COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/send_over_ftp.py --switchip ${XENOMODS_SWITCH_IP} --json ${PROJECT_SOURCE_DIR}/npdm/${XENOMODS_CODENAME}.json
+			COMMAND $<TARGET_FILE:Python3::Interpreter> ${PROJECT_SOURCE_DIR}/scripts/send_over_ftp.py --switchip ${XENOMODS_SWITCH_IP} --codename "${XENOMODS_MULTIBUILD_LIST}"
 			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 			USES_TERMINAL
 			VERBATIM

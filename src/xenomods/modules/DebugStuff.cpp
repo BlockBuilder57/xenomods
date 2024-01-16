@@ -176,6 +176,8 @@ namespace xenomods {
 		Bdat::getFP("SYS_MapJumpList");
 	#elif XENOMODS_CODENAME(bfsw)
 		Bdat::getFP("landmarklist");
+	#else
+		"invalid";
 	#endif
 		if(pBdat != nullptr)
 			end = Bdat::getIdEnd(pBdat);

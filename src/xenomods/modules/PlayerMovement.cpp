@@ -66,7 +66,7 @@ namespace {
 		}
 	};
 
-#else
+#elif XENOMODS_NEW_ENGINE
 
 	bool ValidToChange(game::CharacterController* cc) {
 		if(cc->actorAccessor != nullptr && cc->actorAccessor->isValid()) {
