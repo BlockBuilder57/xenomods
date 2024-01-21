@@ -249,6 +249,14 @@ namespace xenomods {
 			SkipDepthOfFieldRendering::HookFromBase(0x7100f6e9d8);
 			SkipFogRendering::HookFromBase(0x7100ef60e0);
 		}
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0) {
+			SkipLayerRendering::HookFromBase(0x7101010670);
+			SkipLayer2Rendering::HookFromBase(0x71010106e8);
+			SkipCloudRendering::HookFromBase(0x7100ec4478);
+			SkipSkyDomeRendering::HookFromBase(0x7100f6b8c8);
+			SkipDepthOfFieldRendering::HookFromBase(0x7100f6f548);
+			SkipFogRendering::HookFromBase(0x7100ef6c50);
+		}
 #endif
 
 #if XENOMODS_OLD_ENGINE

@@ -10,7 +10,8 @@
 
 namespace ml {
 
-	struct WinView {
+	class WinView {
+	   public:
 		INSERT_PADDING_BYTES(0x8);
 		mm::mtl::FixStr<64> windowName;
 		int idk;
@@ -18,7 +19,19 @@ namespace ml {
 		INSERT_PADDING_BYTES(0x150);
 		void* fontLayer;
 		INSERT_PADDING_BYTES(0x200);
-		unsigned int renderingFlags;
+#if !XENOMODS_CODENAME(bf3)
+		INSERT_PADDING_BYTES(0x8);
+#endif
+		// bit 6 (32) - full toggle?
+		// bit 8 (256) - debug font rendering?
+		unsigned int renderingFlags; // 0x3b8 (952), 0x3b0 in 3
+
+		void renderView();
+	};
+
+	class WinViewRoot {
+	   public:
+		static WinView* getCurrent();
 	};
 
 } // namespace ml

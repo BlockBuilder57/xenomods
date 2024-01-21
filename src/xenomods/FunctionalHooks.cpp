@@ -96,21 +96,22 @@ namespace {
 			Orig(this_pointer, callback);
 
 			mm::Mat44 identity = {};
-			if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_0_0) {
-				((void (*)(unsigned int))(skylaunch::utils::AddrFromBase(0x7101248774)))(0); // ml::DevGraph::cmdOpenDisplayList
-				((void (*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::AddrFromBase(0x710124bdec)))(-1, identity, identity); // ml::DebDraw::flushPrio
-				((void (*)())(skylaunch::utils::AddrFromBase(0x7101248798)))(); // ml::DevGraph::cmdCloseDisplayList
-			}
-			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_1_0) {
-				((void (*)(unsigned int))(skylaunch::utils::AddrFromBase(0x7101248aa4)))(0); // ml::DevGraph::cmdOpenDisplayList
-				((void (*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::AddrFromBase(0x710124c11c)))(-1, identity, identity); // ml::DebDraw::flushPrio
-				((void (*)())(skylaunch::utils::AddrFromBase(0x7101248ac8)))(); // ml::DevGraph::cmdCloseDisplayList
-			}
-			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_1_1) {
-				((void (*)(unsigned int))(skylaunch::utils::AddrFromBase(0x7101248ae4)))(0); // ml::DevGraph::cmdOpenDisplayList
-				((void (*)(int, const mm::Mat44&, const mm::Mat44&))(skylaunch::utils::AddrFromBase(0x710124c15c)))(-1, identity, identity); // ml::DebDraw::flushPrio
-				((void (*)())(skylaunch::utils::AddrFromBase(0x7101248b08)))(); // ml::DevGraph::cmdCloseDisplayList
-			}
+
+			// ml::DevGraph::cmdOpenDisplayList, ml::DevGraph::cmdCloseDisplayList, ml::DebDraw::flushPrio
+			auto doIt = [&](uintptr_t cmdOpenDisplayList, uintptr_t cmdCloseDisplayList, uintptr_t flushPrio) {
+				((void (*)(unsigned int))cmdOpenDisplayList)(0);
+				((void (*)(int, const mm::Mat44&, const mm::Mat44&))flushPrio)(-1, identity, identity);
+				((void (*)())cmdCloseDisplayList)();
+			};
+
+			if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_0_0)
+				doIt(skylaunch::utils::AddrFromBase(0x7101248774), skylaunch::utils::AddrFromBase(0x7101248798), skylaunch::utils::AddrFromBase(0x710124bdec));
+			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_1_0)
+				doIt(skylaunch::utils::AddrFromBase(0x7101248aa4), skylaunch::utils::AddrFromBase(0x7101248ac8), skylaunch::utils::AddrFromBase(0x710124c11c));
+			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_1_1)
+				doIt(skylaunch::utils::AddrFromBase(0x7101248ae4), skylaunch::utils::AddrFromBase(0x7101248b08), skylaunch::utils::AddrFromBase(0x710124c15c));
+			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_2_0)
+				doIt(skylaunch::utils::AddrFromBase(0x7101249654), skylaunch::utils::AddrFromBase(0x7101249678), skylaunch::utils::AddrFromBase(0x710124cccc));
 		}
 	};
 #endif
@@ -281,6 +282,8 @@ namespace xenomods {
 			EnableDebugDrawing::HookFromBase(0x710126e068);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			EnableDebugDrawing::HookFromBase(0x710126e0a8);
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0)
+			EnableDebugDrawing::HookFromBase(0x710126ec18);
 #endif
 
 		// hook our updater
@@ -290,7 +293,7 @@ namespace xenomods {
 		FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #elif XENOMODS_CODENAME(bf3)
 		// fw::FrameworkUpdater::updateStd
-		if (version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0)
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_2_0)
 			FrameworkUpdater_updateStdHook::HookFromBase(0x710006734c);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			FrameworkUpdater_updateStdHook::HookFromBase(0x710006735c);
@@ -309,6 +312,8 @@ namespace xenomods {
 			ClampNumberOfControllers::HookFromBase(0x7101251efc);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			ClampNumberOfControllers::HookFromBase(0x7101251f3c);
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0)
+			ClampNumberOfControllers::HookFromBase(0x7101252aac);
 #endif
 
 		// Disable inputs from P1 when the Menu is open
@@ -322,6 +327,8 @@ namespace xenomods {
 			DisableControllerUpdatingForMenu::HookFromBase(0x710124fd64);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			DisableControllerUpdatingForMenu::HookFromBase(0x710124fda4);
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0)
+			DisableControllerUpdatingForMenu::HookFromBase(0x7101250914);
 #endif
 
 		// Map change events

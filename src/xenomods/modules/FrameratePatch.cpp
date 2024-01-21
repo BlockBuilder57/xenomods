@@ -50,6 +50,10 @@ namespace xenomods {
 				LayerManagerCtorHook::HookFromBase(0x710100f5d0);
 				VSyncHook::HookFromBase(0x71012499b8);
 			}
+			else if (version::RuntimeVersion() == version::SemVer::v2_2_0) {
+				LayerManagerCtorHook::HookFromBase(0x7101010140);
+				VSyncHook::HookFromBase(0x710124a528);
+			}
 #else
 			LayerManagerCtorHook::HookAt("_ZN5layer12LayerManagerC1EPN2ml3ScnEN3mtl12ALLOC_HANDLEEj"); // can't hook ctors yet?
 			VSyncHook::HookAt(&ml::DevGraph::setVSync);

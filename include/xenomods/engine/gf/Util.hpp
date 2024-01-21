@@ -16,7 +16,17 @@ namespace gf {
 		static char* getBladeModel(unsigned int bladeId, bool baseForm = false);
 		static char* getDriverModel(unsigned int driverId, bool unk1, bool unk2);
 
-		static void dispHomuraCrystal(gf::GF_OBJ_HANDLE* handle, bool on);
+		static bool isDispHomuraCrystal();
+		static bool isDispLauraMedal();
+		static bool isDispMetsuCrystal();
+		static bool isDispRexCrystal();
+		static bool isDispSinMask();
+
+		static void dispHomuraCrystal(GF_OBJ_HANDLE* handle, bool set);
+		static void dispLauraMedal(GF_OBJ_HANDLE* handle, bool set);
+		static void dispMetsuCrystal(GF_OBJ_HANDLE* handle, bool set);
+		static void dispRexCrystal(GF_OBJ_HANDLE* handle, bool set);
+		static void dispSinMask(GF_OBJ_HANDLE* handle, bool set);
 	};
 
 	struct GfItemUtil {

@@ -49,6 +49,7 @@ namespace xenomods::version {
 		static const SemVer v2_0_2;
 		static const SemVer v2_1_0;
 		static const SemVer v2_1_1;
+		static const SemVer v2_2_0;
 
 		inline bool IsValid() const {
 			return major != 0 && minor != 0 && patch != 0;
@@ -141,7 +142,7 @@ namespace xenomods::version {
 		// ml::_dsk::s_revision
 		if (RuntimeVersion() == SemVer::v2_0_0)
 			return reinterpret_cast<mm::mtl::FixStr<128>*>(skylaunch::utils::AddrFromBase(0x7101b6f500))->buffer;
-		else if (RuntimeVersion() == SemVer::v2_1_0 || RuntimeVersion() == SemVer::v2_1_1)
+		else if (RuntimeVersion() == SemVer::v2_1_0 || RuntimeVersion() == SemVer::v2_1_1 || RuntimeVersion() == SemVer::v2_2_0)
 			return reinterpret_cast<mm::mtl::FixStr<128>*>(skylaunch::utils::AddrFromBase(0x7101b70500))->buffer;
 
 		return nullptr;
@@ -181,28 +182,34 @@ struct fmt::formatter<xenomods::version::GameType> : fmt::formatter<std::string_
 		// clang-format off
 		if (parsetype == ParseType::Default) {
 			switch(type) {
+				case SpaceTravel: name = "Xenoblade X"; break;
 				case BF2: name = "Xenoblade 2"; break;
 				case IRA: name = "Xenoblade 2: Torna"; break;
 				case BFSW: name = "Xenoblade: Definitive Edition"; break;
 				case BF3: name = "Xenoblade 3"; break;
+				case BF2_IRA: name = "Xenoblade 2/Torna"; break;
 				default: name = "Invalid game"; break;
 			}
 		}
 		else if (parsetype == ParseType::Shorter) {
 			switch(type) {
+				case SpaceTravel: name = "XBX"; break;
 				case BF2: name = "XB2"; break;
 				case IRA: name = "Torna"; break;
 				case BFSW: name = "XBDE"; break;
 				case BF3: name = "XB3"; break;
+				case BF2_IRA: name = "XB2/Torna"; break;
 				default: name = "Invalid"; break;
 			}
 		}
 		else if (parsetype == ParseType::Codename) {
 			switch(type) {
+				case SpaceTravel: name = "SpaceTravel"; break;
 				case BF2: name = "bf2"; break;
 				case IRA: name = "ira"; break;
 				case BFSW: name = "bfsw"; break;
 				case BF3: name = "bf3"; break;
+				case BF2_IRA: name = "bf2/ira"; break;
 				default: name = "???"; break;
 			}
 		}
