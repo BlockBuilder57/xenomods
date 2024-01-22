@@ -14,6 +14,7 @@ namespace xenomods {
 		static bool skipSkyDomeRendering;
 		static bool skipFogRendering;
 		static bool skipDepthOfFieldRendering;
+		static bool enableAutoReduction;
 
 		static float shadowStrength;
 

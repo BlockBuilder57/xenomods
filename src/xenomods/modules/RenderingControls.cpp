@@ -125,6 +125,7 @@ namespace xenomods {
 	bool RenderingControls::skipSkyDomeRendering = false;
 	bool RenderingControls::skipFogRendering = false;
 	bool RenderingControls::skipDepthOfFieldRendering = false;
+	bool RenderingControls::enableAutoReduction = true;
 
 	float RenderingControls::shadowStrength = 1.0;
 
@@ -188,6 +189,8 @@ namespace xenomods {
 		ImGui::Checkbox("Force disable color filters", &ForcedParameters.DisableColorFilter);
 		ImGui::Checkbox("Enable AA", &acc.PixlPostParm->enableAA);
 		ImGui::Checkbox("Enable TMAA", &acc.PixlPostParm->enableTMAA);
+		if(ImGui::Checkbox("Enable resolution scaling", &enableAutoReduction))
+			acc.setAutoReduction(enableAutoReduction);
 #endif
 	}
 
