@@ -7,6 +7,7 @@
 #include "xenomods/engine/bdat/Bdat.hpp"
 #include "xenomods/engine/event/Objects.hpp"
 #include "xenomods/engine/gf/Data.hpp"
+#include "xenomods/engine/gf/Manager.hpp"
 #include "xenomods/engine/gf/Party.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 
@@ -29,6 +30,9 @@ namespace {
 	};
 
 	void DoCrystalFix(gf::GF_OBJ_HANDLE* handle = nullptr) {
+		if (!gf::GfGameManager::isGameTypeIra())
+			return;
+
 		if (handle == nullptr)
 			handle = gf::GfGameParty::getHandleDriverByBdatID(22);
 
