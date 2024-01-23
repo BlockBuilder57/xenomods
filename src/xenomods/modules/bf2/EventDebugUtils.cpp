@@ -116,8 +116,9 @@ namespace {
 			// get the clear count from the save because that's what everything else seems to do
 			uint clearCount = *reinterpret_cast<uint*>(reinterpret_cast<char*>(this_pointer->getSaveBuffer()) + 0x109b3c);
 			uint chapter = this_pointer->getChapterIdFromSaveData();
-			if (gf::GfGameManager::isGameTypeIra())
-				chapter = 0; // it's always 10!
+			if (xenomods::version::RuntimeGame() == xenomods::version::GameType::IRA || xenomods::version::RuntimeVersion() >= xenomods::version::SemVer::v2_0_0)
+				if (gf::GfGameManager::isGameTypeIra())
+					chapter = 0; // it's always 10!
 			chapter |= clearCount << 16; // "encodes" as 0x00010006 for 1 clear on ch6
 
 			//xenomods::g_Logger->LogDebug("Chapter info: {:#x}", chapter);
