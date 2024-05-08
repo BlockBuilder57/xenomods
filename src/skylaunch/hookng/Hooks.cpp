@@ -4,7 +4,7 @@
 
 namespace skylaunch::hook::detail {
 
-	void* HookFunctionBase(void* function, void* replacement) {
+	void* HookFunctionBase(void* function, void* replacement, bool logSymbol/* = true*/) {
 		void* backup;
 
 		if (function == reinterpret_cast<void*>(INVALID_FUNCTION_PTR)) {
@@ -12,7 +12,10 @@ namespace skylaunch::hook::detail {
 			return nullptr;
 		}
 
-		xenomods::g_Logger->LogDebug("[hook-ng] Attempting to hook {}...", dbgutil::getSymbol(reinterpret_cast<uintptr_t>(function)));
+		if (logSymbol)
+			xenomods::g_Logger->LogDebug("[hook-ng] Attempting to hook {}...", dbgutil::getSymbol(reinterpret_cast<uintptr_t>(function)));
+		else
+			xenomods::g_Logger->LogDebug("[hook-ng] Attempting to hook {:#016x}...", reinterpret_cast<uintptr_t>(function));
 
 		A64HookFunction(function, replacement, &backup);
 		return backup;

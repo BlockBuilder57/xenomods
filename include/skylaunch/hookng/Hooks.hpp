@@ -17,13 +17,14 @@ namespace skylaunch::hook {
 
 	namespace detail {
 
-		void* HookFunctionBase(void* function, void* replacement);
+		// logSymbol either logs the nearest symbol, or an address
+		void* HookFunctionBase(void* function, void* replacement, bool logSymbol = true);
 		void InlineHookBase(void* addr, void* handler);
 		uintptr_t ResolveSymbolBase(std::string_view symbolName);
 
 		template<class Func, class FuncHook>
-		constexpr Func HookFunction(Func function, FuncHook hook) {
-			return std::bit_cast<Func>(HookFunctionBase(std::bit_cast<void*>(function), std::bit_cast<void*>(hook)));
+		constexpr Func HookFunction(Func function, FuncHook hook, bool logSymbol = true) {
+			return std::bit_cast<Func>(HookFunctionBase(std::bit_cast<void*>(function), std::bit_cast<void*>(hook), logSymbol));
 		}
 
 		template<class SymType>
@@ -64,7 +65,7 @@ namespace skylaunch::hook {
 		}
 
 		static inline void HookFromBase(uintptr_t address) {
-			(void)detail::HookFunction(reinterpret_cast<ReplaceHookType<>>(skylaunch::utils::AddrFromBase(address)), &Impl::Hook);
+			(void)detail::HookFunction(reinterpret_cast<ReplaceHookType<>>(skylaunch::utils::AddrFromBase(address)), &Impl::Hook, false);
 		}
 	};
 
@@ -108,7 +109,7 @@ namespace skylaunch::hook {
 		}
 
 		static inline void HookFromBase(uintptr_t address) {
-			Backup() = detail::HookFunction(reinterpret_cast<TrampolineHookType<>>(skylaunch::utils::AddrFromBase(address)), &Impl::Hook);
+			Backup() = detail::HookFunction(reinterpret_cast<TrampolineHookType<>>(skylaunch::utils::AddrFromBase(address)), &Impl::Hook, false);
 		}
 
 		static auto& Backup() {

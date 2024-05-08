@@ -36,7 +36,7 @@ namespace dbgutil {
 		auto mangledLength = strlen(symbolStrBuffer.data());
 
 		if(mangledLength <= 0) {
-			return fmt::format("{:#016x} (no symbol name)", address);
+			return fmt::format("{:#016x} (no symbol found)", address);
 		}
 
 		if (leaveMangled)
