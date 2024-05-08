@@ -9,25 +9,6 @@
 
 namespace xenomods {
 
-	static mm::Col4 ColorForSeverity(const Logger::Severity& severity) {
-		// we have all these fancy mm::Col4 constants, but cannot use them easily in 3
-
-		switch(severity) {
-			case Logger::Severity::Debug:
-				return { 0.25f, 0.5f, 1.f, 1.f }; // blueish
-			case Logger::Severity::Info:
-				return { 1.f, 1.f, 1.f, 1.f }; // white
-			case Logger::Severity::Warning:
-				return { 1.f, 1.f, 0.f, 1.f }; // yellow
-			case Logger::Severity::Error:
-				return { 1.f, 0.f, 0.f, 1.f }; // red
-			case Logger::Severity::Fatal:
-				return { 1.f, 0.f, 1.f, 1.f }; // magenta
-		};
-		assert(false && "You shouldn't get here!!!");
-		return { 0.f, 0.f, 0.f, 1.f }; // black
-	}
-
 	Logger::Logger() {
 		// Allocate space for logger messages upfront,
 		// so the logger doesn't actually allocate memory while in use.
@@ -51,7 +32,9 @@ namespace xenomods {
 
 		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[xenomods|%s] %s", fmt::format("{}", severity).c_str(), formatted.c_str());
 
-		// Don't post messages that are less severe than our logging level
+		// All messages will be displayed in the log
+		g_Menu->Log.Add(severity, formatted);
+		// But don't post messages that are less severe than our logging level
 		if(severity < loggingLevel)
 			return;
 
@@ -62,15 +45,29 @@ namespace xenomods {
 		auto formatted = fmt::vformat(format, args);
 
 		// by god I wish I didn't have to deal with this
-		skylaunch::logger::s_Instance->LogFormat("[xenomods|%s~%s] %s", group.data(), fmt::format("{}", severity).c_str(), formatted.c_str());
+		skylaunch::logger::s_Instance->LogFormat("[xenomods|%s~%s] %s", fmt::format("{}", severity).c_str(), group.data(), formatted.c_str());
 
-		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[xenomods|%s~%s] %s", group.data(), fmt::format("{}", severity).c_str(), formatted.c_str());
+		NN_DIAG_LOG(nn::diag::LogSeverity::Info, "[xenomods|%s~%s] %s", fmt::format("{}", severity).c_str(), group.data(), formatted.c_str());
 
-		// Don't post messages that are less severe than our logging level
+		// All messages will be displayed in the log
+		g_Menu->Log.Add(severity, group, formatted);
+		// But don't post messages that are less severe than our logging level
 		if(severity < loggingLevel)
 			return;
 
 		AddToastInternal(std::string(group), severity, formatted);
+	}
+
+	void Logger::LoggerTest() {
+		LogDebug("test debug message! {}", nn::os::GetSystemTick() / 19200000.);
+		LogInfo("test info message! {}", nn::os::GetSystemTick() / 19200000.);
+		LogWarning("test warning message! {}", nn::os::GetSystemTick() / 19200000.);
+		LogError("test error message! {}", nn::os::GetSystemTick() / 19200000.);
+		LogFatal("test fatal message! {}", nn::os::GetSystemTick());
+
+		int group = nn::os::GetSystemTick() % 10;
+		ToastWarning(fmt::format("{}", group), "random group ({})", group);
+		ToastMessage("logger test", Logger::Severity::Info, "system tick in seconds: {:2f}", nn::os::GetSystemTick() / 19200000.);
 	}
 
 	void Logger::Draw(fw::UpdateInfo* updateInfo) {
@@ -184,6 +181,25 @@ namespace xenomods {
 									.lifetime = Logger::TOAST_LIFETIME,
 									.severity = severity });
 		}
+	}
+
+	mm::Col4 Logger::ColorForSeverity(const Logger::Severity& severity) {
+		// we have all these fancy mm::Col4 constants, but cannot use them easily in 3
+
+		switch(severity) {
+			case Logger::Severity::Debug:
+				return { 0.25f, 0.5f, 1.f, 1.f }; // blueish
+			case Logger::Severity::Info:
+				return { 1.f, 1.f, 1.f, 1.f }; // white
+			case Logger::Severity::Warning:
+				return { 1.f, 1.f, 0.f, 1.f }; // yellow
+			case Logger::Severity::Error:
+				return { 1.f, 0.f, 0.f, 1.f }; // red
+			case Logger::Severity::Fatal:
+				return { 1.f, 0.f, 1.f, 1.f }; // magenta
+		};
+		assert(false && "You shouldn't get here!!!");
+		return { 0.f, 0.f, 0.f, 1.f }; // black
 	}
 
 	// The logger instance.

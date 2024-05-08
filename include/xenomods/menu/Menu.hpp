@@ -3,9 +3,9 @@
 #pragma once
 
 #include <magic_enum.hpp>
-
 #include <xenomods/HidInput.hpp>
 
+#include "MenuLog.hpp"
 #include "Section.hpp"
 
 namespace xenomods {
@@ -13,6 +13,7 @@ namespace xenomods {
 	class Menu {
 	   private:
 		bool isOpen { false };
+		bool logOpen { false };
 
 		std::vector<Section*> sections {};
 		std::vector<void(*)()> callbacks {};
@@ -28,6 +29,10 @@ namespace xenomods {
 		};
 		bool IsOpen() {
 			return isOpen;
+		};
+
+		void ToggleLog() {
+			logOpen = !logOpen;
 		};
 
 		enum class Theme {
@@ -47,6 +52,8 @@ namespace xenomods {
 		void RegisterRenderCallback(void(*func)());
 
 		friend class Section;
+
+		MenuLog Log {};
 	};
 
 	extern Menu* g_Menu;

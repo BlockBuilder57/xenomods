@@ -16,6 +16,7 @@ add_executable(xenomods
 
 		xenomods/menu/Menu.cpp
 		xenomods/menu/Section.cpp
+		xenomods/menu/MenuLog.cpp
 
         xenomods/modules/DebugStuff.cpp
 		xenomods/modules/CameraTools.cpp

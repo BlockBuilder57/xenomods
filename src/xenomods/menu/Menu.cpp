@@ -94,8 +94,10 @@ namespace xenomods {
 		if(ImGui::BeginCombo("Menu Font", font_current->GetDebugName())) {
 			for(ImFont* font : io.Fonts->Fonts) {
 				ImGui::PushID((void*)font);
+				ImGui::PushFont(font);
 				if(ImGui::Selectable(font->GetDebugName(), font == font_current))
 					io.FontDefault = font;
+				ImGui::PopFont();
 				ImGui::PopID();
 			}
 			ImGui::EndCombo();
@@ -105,6 +107,14 @@ namespace xenomods {
 
 		if(ImGui::Button("Reload config/BDAT overrides"))
 			XenomodsState::ReloadConfig();
+
+		if (ImGui::Button("Toggle Log"))
+			g_Menu->ToggleLog();
+#if _DEBUG
+		ImGui::SameLine();
+		if (ImGui::Button("Logger Test"))
+			g_Logger->LoggerTest();
+#endif
 
 		ImGui::Separator();
 	}
@@ -166,6 +176,9 @@ namespace xenomods {
 		if (!g_Menu->IsOpen())
 			return;
 
+		if (g_Menu->logOpen)
+			g_Menu->Log.Draw(&g_Menu->logOpen);
+
 		static bool test = false;
 		static bool show_demo = false;
 		if(ImGui::BeginMainMenuBar()) {
@@ -188,9 +201,11 @@ namespace xenomods {
 			ImGui::TextDisabled("FPS: %d (%.4fms)", (int)(1.f/lastUpdateDiff), lastUpdateDiff);
 			ImGui::EndMainMenuBar();
 		}
+#if _DEBUG
 		if(show_demo) {
 			ImGui::ShowDemoWindow();
 		}
+#endif
 
 		for(auto func : g_Menu->callbacks) {
 			func();

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <xenomods/Logger.hpp>
 #include <nn/fs.h>
 
 #include <bit>
@@ -131,6 +132,24 @@ namespace xenomods {
 		 * \return true if able to preallocate; false otherwise
 		 */
 		[[nodiscard]] static bool Preallocate(std::string_view path, s64 size);
+
+		/**
+		 * Ensures a path is clean of invalid characters.
+		 * Specifically, /'s and :'s are replaced with _, and // is replaced with /.
+		 *
+		 * \param[in] path The path to clean.
+		 * \param[in] flat If enabled, folder separators are replaced with _.
+		 */
+		static void CleanPath(std::string& path, bool flat = false);
+
+		/**
+		 * Ensures the directory structure up to this point.
+		 *
+		 * \param[in] path The path to ensure.
+		 * \param[in] createPaths Create the paths, or just return false?
+		 * \return true If the path is (now) valid.
+		 */
+		static bool EnsurePath(std::string_view& path, bool createPaths = true);
 
 		/**
 		 * Get the time the file was last modified.

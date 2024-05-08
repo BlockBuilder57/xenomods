@@ -8,8 +8,8 @@
 
 #include "Utils.hpp"
 #include "fmt/format.h"
-
 #include "xenomods/engine/fw/UpdateInfo.hpp"
+#include "xenomods/engine/mm/MathTypes.hpp"
 
 namespace xenomods {
 
@@ -104,6 +104,11 @@ namespace xenomods {
 		}
 
 		/**
+		 * Performs a logger test.
+		 */
+		void LoggerTest();
+
+		/**
 		 * Draw all current logger lines (toasts and messages.)
 		 */
 		void Draw(fw::UpdateInfo* updateInfo);
@@ -130,6 +135,14 @@ namespace xenomods {
 		 * \param[in] debug_enabled Whether or not to enable Debug severity messages.
 		 */
 		void SetLoggingLevel(Severity level);
+
+		/**
+		 * Returns a Col4 representing the color of the given severity.
+		 *
+		 * \param[in] severity The type of logger severity.
+		 * \return A Col4 with the proper color.
+		 */
+		static mm::Col4 ColorForSeverity(const Logger::Severity& severity);
 
 	   private:
 		/**
@@ -172,8 +185,8 @@ namespace xenomods {
 		 */
 		void AddToastInternal(const std::string& group, Severity severity, const std::string& message);
 
-		std::vector<LoggerMessage> lines;
-		std::vector<LoggerMessage> toastLines;
+		std::vector<LoggerMessage> lines {};
+		std::vector<LoggerMessage> toastLines {};
 		Severity loggingLevel = Severity::Info;
 	};
 

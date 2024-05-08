@@ -11,50 +11,7 @@
 
 namespace {
 
-	void CleanPath(std::string& path, bool flat = false) {
-		if(path.starts_with("/"))
-			path.erase(0, 1);
 
-		if(flat)
-			xenomods::StringReplace(path, "/", "_");
-		xenomods::StringReplace(path, ":", "_");
-		xenomods::StringReplace(path, "//", "/");
-	}
-
-	bool EnsurePath(std::string& path, bool createPaths = true) {
-		auto splits = xenomods::StringSplit(path, "/");
-
-		std::stringstream ss;
-
-		for(int i = 0; i < splits.size(); i++) {
-			ss << splits[i];
-
-			if(i != splits.size() - 1) {
-				ss << "/";
-
-				Result res {};
-				nn::fs::DirectoryHandle dh {};
-				res = nn::fs::OpenDirectory(&dh, ss.str().c_str(), nn::fs::OpenDirectoryMode::OpenDirectoryMode_All);
-
-				if(R_FAILED(res)) {
-					if(res == 0x202 && createPaths) { // Path does not exist
-						res = nn::fs::CreateDirectory(ss.str().c_str());
-						if(R_FAILED(res) && res != 0x402) {
-							xenomods::g_Logger->LogError("Failed to create dump directory \"{}\" for reason {}", ss.str(), res);
-							return false;
-						}
-					} else {
-						xenomods::g_Logger->LogError("Failed to open dump directory \"{}\" for reason {}", ss.str(), res);
-						return false;
-					}
-				} else {
-					nn::fs::CloseDirectory(dh);
-				}
-			}
-		}
-
-		return true;
-	}
 
 	bool DumpToFilesystem(std::string_view path, const void* buffer, std::size_t length) {
 		if(!xenomods::NnFile::Preallocate(path, length)) {
@@ -87,13 +44,12 @@ namespace {
 
 	void FileDetourImpl(ml::FileHandleTh* fileHandle, ml::FileReadResult& readResult) {
 		auto filename = std::string(fileHandle->filename.buffer);
-		CleanPath(filename);
+		xenomods::NnFile::CleanPath(filename);
 
 		// dump data reads to sd card
 		if(xenomods::GetState().config.dumpFileReads) {
 			auto path = fmt::format(XENOMODS_CONFIG_PATH "/{}/dump/{}/{:08x}.bin", XENOMODS_CODENAME_STR, filename, reinterpret_cast<uint32_t>(fileHandle->readStartOffset));
-			if(EnsurePath(path, true))
-				DumpToFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
+			DumpToFilesystem(path, fileHandle->mMemBuffer, readResult.bytesRead);
 		}
 
 		// load from loose sd card files
