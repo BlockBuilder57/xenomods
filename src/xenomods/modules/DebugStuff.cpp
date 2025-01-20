@@ -22,6 +22,9 @@
 #include "xenomods/engine/ml/WinView.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 #include "xenomods/engine/mm/StdBase.hpp"
+#include "xenomods/engine/mtl/Allocator.hpp"
+#include "xenomods/engine/mtl/MemManager.hpp"
+#include "xenomods/engine/mtl/MemoryInfo.hpp"
 #include "xenomods/engine/tl/title.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/stuff/utils/util.hpp"
@@ -124,6 +127,7 @@ namespace xenomods {
 	bool DebugStuff::enableDebugUnlockAll = false;
 	bool DebugStuff::accessClosedLandmarks = false;
 	bool DebugStuff::pauseEnable = false;
+	bool DebugStuff::enableMemoryDebug = false;
 
 	std::int8_t DebugStuff::pauseStepForward = 0;
 	int DebugStuff::tempInt = 0;
@@ -245,6 +249,66 @@ namespace xenomods {
 #endif
 	}
 
+	void DebugStuff::MemoryDebugRendering() {
+		if (!DebugStuff::enableMemoryDebug)
+			return;
+
+		mtl::MemoryInfo memInfo {};
+		mtl::AllocHandle allocHandle {0};
+		bool open = true;
+
+		if (!ImGui::Begin("Memory", &open)) {
+			ImGui::End();
+			return;
+		}
+
+		if (ImGui::BeginTable("mem", 4)) {
+			// Headers
+			ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 20.0);
+			ImGui::TableSetupColumn("Name");
+			ImGui::TableSetupColumn("Used %");
+			ImGui::TableSetupColumn("Allocated (MB)");
+			ImGui::TableHeadersRow();
+
+			for (int i = 1; i < 512; i++) {
+				allocHandle.regionId = i;
+				if (!mtl::MemManager::getMemoryInfo(&allocHandle, &memInfo)) {
+					break;
+				}
+				ImGui::TableNextRow();
+
+				ImGui::TableNextColumn();
+				ImGui::Text("%d", i);
+
+				ImGui::TableNextColumn();
+				ImGui::Text(memInfo.regionName);
+
+				// Used % progress bar
+				ImU32 color;
+				if (memInfo.usedPercent >= 90) 
+					color = IM_COL32(161, 21, 13, 255);
+				else if (memInfo.usedPercent >= 50)
+					color = IM_COL32(163, 108, 13, 255);
+				else
+					color = IM_COL32(28, 82, 52, 255);
+				ImGui::TableNextColumn();
+				ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
+				ImGui::ProgressBar(
+					memInfo.usedPercent / 100, 
+					ImVec2(ImGui::GetFontSize() * 10, 0.0f), 
+					std::format("{:.1f}%", memInfo.usedPercent).c_str()
+				);
+				ImGui::PopStyleColor(1);
+
+				ImGui::TableNextColumn();
+				ImGui::Text("%.4f", memInfo.allocatedSize / 1e6);
+			}
+            ImGui::EndTable();
+        }
+
+		ImGui::End();
+	}
+
 	void DebugStuff::MenuSection() {
 		if(ImGui::Checkbox("Enable debug rendering", &DebugStuff::enableDebugRendering))
 			DebugStuff::UpdateDebugRendering();
@@ -277,6 +341,7 @@ namespace xenomods {
 		if(ImGui::Button("Return to Title"))
 			DebugStuff::ReturnTitle();
 #endif
+		ImGui::Checkbox("Memory debug rendering", &DebugStuff::enableMemoryDebug);
 	}
 
 	void DebugStuff::Initialize() {
@@ -307,6 +372,8 @@ namespace xenomods {
 		}
 
 		UpdateDebugRendering();
+
+		xenomods::g_Menu->RegisterRenderCallback(&DebugStuff::MemoryDebugRendering, false);
 	}
 
 	void DebugStuff::Update(fw::UpdateInfo* updateInfo) {

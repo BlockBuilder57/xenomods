@@ -173,6 +173,10 @@ namespace xenomods {
 	}
 
 	void Menu::Render() {
+		for(auto func : g_Menu->backgroundCallbacks) {
+			func();
+		}
+
 		if (!g_Menu->IsOpen())
 			return;
 
@@ -277,9 +281,14 @@ namespace xenomods {
 		return sec;
 	}
 
-	void Menu::RegisterRenderCallback(void (*func)()) {
-		if (func != nullptr)
+	void Menu::RegisterRenderCallback(void (*func)(), bool foregroundOnly) {
+		if (func == nullptr)
+			return;
+		
+		if (foregroundOnly)
 			callbacks.push_back(func);
+		else
+			backgroundCallbacks.push_back(func);
 	}
 
 	// The menu instance.

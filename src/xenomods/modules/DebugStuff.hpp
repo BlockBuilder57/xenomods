@@ -10,6 +10,7 @@ namespace xenomods {
 		static bool enableDebugUnlockAll;
 		static bool accessClosedLandmarks;
 		static bool pauseEnable;
+		static bool enableMemoryDebug;
 
 		static std::int8_t pauseStepForward;
 		static int tempInt;
@@ -26,6 +27,7 @@ namespace xenomods {
 		static void ReturnTitle(unsigned int slot = -1);
 
 		static void UpdateDebugRendering();
+		static void MemoryDebugRendering();
 
 		static void MenuSection();
 
