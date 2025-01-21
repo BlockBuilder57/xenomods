@@ -177,7 +177,7 @@ namespace xenomods {
 			func();
 		}
 
-		if (!g_Menu->IsOpen())
+		if(!g_Menu->IsOpen())
 			return;
 
 		if (g_Menu->logOpen)
@@ -282,10 +282,10 @@ namespace xenomods {
 	}
 
 	void Menu::RegisterRenderCallback(void (*func)(), bool foregroundOnly) {
-		if (func == nullptr)
+		if(func == nullptr)
 			return;
-		
-		if (foregroundOnly)
+
+		if(foregroundOnly)
 			callbacks.push_back(func);
 		else
 			backgroundCallbacks.push_back(func);

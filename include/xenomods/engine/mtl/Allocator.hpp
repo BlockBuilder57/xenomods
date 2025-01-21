@@ -6,22 +6,24 @@ namespace mtl {
 
 	// Unofficial name
 	struct AllocHandle {
-		public:
-			uint32_t regionId;
+	   public:
+		uint32_t regionId;
 
-			// xenomods from here
-			inline bool IsValid() {
-				return regionId > 0;
-			}
+		// xenomods from here
+		inline bool IsValid() {
+			return regionId > 0;
+		}
 	};
 
 	struct ALLOC_HANDLE {
-		private:
-			const AllocHandle* handle;
+	   private:
+		const AllocHandle* handle;
 
-		public:
-			// xenomods
-			ALLOC_HANDLE(const AllocHandle* handle) : handle(handle) {}
+	   public:
+		// xenomods
+		ALLOC_HANDLE(const AllocHandle* handle)
+			: handle(handle) {
+		}
 	};
 
 	enum AllocatorType {
@@ -36,4 +38,4 @@ namespace mtl {
 		ALLOCATOR_BF3 = 3
 	};
 
-}
+} // namespace mtl

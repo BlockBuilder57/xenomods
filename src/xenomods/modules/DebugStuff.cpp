@@ -238,31 +238,31 @@ namespace xenomods {
 #if XENOMODS_CODENAME(bf3)
 		unsigned int* s_flg = nullptr; //ml::_dsk::s_flg
 
-		if (version::RuntimeVersion() == version::SemVer::v2_0_0)
+		if(version::RuntimeVersion() == version::SemVer::v2_0_0)
 			s_flg = reinterpret_cast<unsigned int*>(skylaunch::utils::AddrFromBase(0x7101c49c60));
-		else if (version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_1_1 || version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if(version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_1_1 || version::RuntimeVersion() == version::SemVer::v2_2_0)
 			s_flg = reinterpret_cast<unsigned int*>(skylaunch::utils::AddrFromBase(0x7101c4ac60));
 
 		// sets the system info print to display
-		if (s_flg != nullptr)
+		if(s_flg != nullptr)
 			*s_flg ^= (-enableDebugRendering ^ *s_flg) & (1 << 6);
 #endif
 	}
 
 	void DebugStuff::MemoryDebugRendering() {
-		if (!DebugStuff::enableMemoryDebug)
+		if(!DebugStuff::enableMemoryDebug)
 			return;
 
 		mtl::MemoryInfo memInfo {};
-		mtl::AllocHandle allocHandle {0};
+		mtl::AllocHandle allocHandle { 0 };
 		bool open = true;
 
-		if (!ImGui::Begin("Memory", &open)) {
+		if(!ImGui::Begin("Memory", &open)) {
 			ImGui::End();
 			return;
 		}
 
-		if (ImGui::BeginTable("memdbg", 5)) {
+		if(ImGui::BeginTable("memdbg", 5)) {
 			// Headers
 			ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 20.0);
 			ImGui::TableSetupColumn("Name");
@@ -271,9 +271,9 @@ namespace xenomods {
 			ImGui::TableSetupColumn("Total (MB)");
 			ImGui::TableHeadersRow();
 
-			for (int i = 1; i < 512; i++) {
+			for(int i = 1; i < 512; i++) {
 				allocHandle.regionId = i;
-				if (!mtl::MemManager::GET_MEMORY_INFO(&allocHandle, &memInfo)) {
+				if(!mtl::MemManager::GET_MEMORY_INFO(&allocHandle, &memInfo)) {
 					break;
 				}
 				ImGui::TableNextRow();
@@ -286,28 +286,24 @@ namespace xenomods {
 
 				// Used % progress bar
 				ImU32 color;
-				if (memInfo.usedPercent >= 90) 
+				if(memInfo.usedPercent >= 90)
 					color = IM_COL32(161, 21, 13, 255);
-				else if (memInfo.usedPercent >= 50)
+				else if(memInfo.usedPercent >= 50)
 					color = IM_COL32(163, 108, 13, 255);
 				else
 					color = IM_COL32(28, 82, 52, 255);
 				ImGui::TableNextColumn();
 				ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
-				ImGui::ProgressBar(
-					memInfo.usedPercent / 100, 
-					ImVec2(ImGui::GetFontSize() * 10, 0.0f), 
-					std::format("{:.1f}%", memInfo.usedPercent).c_str()
-				);
+				ImGui::ProgressBar(memInfo.usedPercent / 100, ImVec2(ImGui::GetFontSize() * 10, 0.0f), std::format("{:.1f}%", memInfo.usedPercent).c_str());
 				ImGui::PopStyleColor(1);
 
 				ImGui::TableNextColumn();
 				ImGui::Text("%.4f", memInfo.allocatedSize / 1e6);
 				ImGui::TableNextColumn();
-				ImGui::Text("%d %.4f", memInfo.allocatorType, memInfo.totalSize / 1e6);
+				ImGui::Text("%.4f", memInfo.totalSize / 1e6);
 			}
-            ImGui::EndTable();
-        }
+			ImGui::EndTable();
+		}
 
 		ImGui::End();
 	}
@@ -382,7 +378,7 @@ namespace xenomods {
 	void DebugStuff::Update(fw::UpdateInfo* updateInfo) {
 		bgmTrackIndex = 0;
 
-		if (pauseEnable && pauseStepForward > 0) {
+		if(pauseEnable && pauseStepForward > 0) {
 			pauseStepForward--;
 		}
 	}
