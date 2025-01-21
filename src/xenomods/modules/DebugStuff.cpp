@@ -262,17 +262,18 @@ namespace xenomods {
 			return;
 		}
 
-		if (ImGui::BeginTable("mem", 4)) {
+		if (ImGui::BeginTable("memdbg", 5)) {
 			// Headers
 			ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 20.0);
 			ImGui::TableSetupColumn("Name");
 			ImGui::TableSetupColumn("Used %");
 			ImGui::TableSetupColumn("Allocated (MB)");
+			ImGui::TableSetupColumn("Total (MB)");
 			ImGui::TableHeadersRow();
 
 			for (int i = 1; i < 512; i++) {
 				allocHandle.regionId = i;
-				if (!mtl::MemManager::getMemoryInfo(&allocHandle, &memInfo)) {
+				if (!mtl::MemManager::GET_MEMORY_INFO(&allocHandle, &memInfo)) {
 					break;
 				}
 				ImGui::TableNextRow();
@@ -302,6 +303,8 @@ namespace xenomods {
 
 				ImGui::TableNextColumn();
 				ImGui::Text("%.4f", memInfo.allocatedSize / 1e6);
+				ImGui::TableNextColumn();
+				ImGui::Text("%d %.4f", memInfo.allocatorType, memInfo.totalSize / 1e6);
 			}
             ImGui::EndTable();
         }
@@ -312,6 +315,7 @@ namespace xenomods {
 	void DebugStuff::MenuSection() {
 		if(ImGui::Checkbox("Enable debug rendering", &DebugStuff::enableDebugRendering))
 			DebugStuff::UpdateDebugRendering();
+		ImGui::Checkbox("Memory debug window", &DebugStuff::enableMemoryDebug);
 
 		/*ImGui::Checkbox("Pause updates", &DebugStuff::pauseEnable);
 		ImGui::SameLine();
@@ -341,7 +345,6 @@ namespace xenomods {
 		if(ImGui::Button("Return to Title"))
 			DebugStuff::ReturnTitle();
 #endif
-		ImGui::Checkbox("Memory debug rendering", &DebugStuff::enableMemoryDebug);
 	}
 
 	void DebugStuff::Initialize() {
