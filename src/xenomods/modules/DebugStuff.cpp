@@ -257,9 +257,8 @@ namespace xenomods {
 		static int lastActiveRegions;
 
 		mtl::AllocHandle allocHandle { 0 };
-		bool open = true;
 
-		if(!ImGui::Begin("Memory", &open)) {
+		if(!ImGui::Begin("Memory", &DebugStuff::enableMemoryDebug)) {
 			ImGui::End();
 			return;
 		}
