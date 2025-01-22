@@ -22,11 +22,12 @@ namespace mtl {
 		///
 		/// This is always zero for `ALLOCATOR_BF3`.
 		size_t largestFreeSize;
-		///
+		/// Percentage ratio of allocated size vs total size, i.e. `allocatedSize * 100 / totalSize`.
+        ///
 		/// Normally ranges from 0.0 to 100.0, but due to the inconsistencies explained above
 		/// it could be higher for `ALLOCATOR_BF3`.
 		float usedPercent;
-		/// Percentage ratio of occupied chunks vs total chunks in the region.
+		/// Percentage ratio of occupied chunks vs total chunks in the region. (0-100)
 		/// A low value indicates many short-lived allocations, high fragmentation, or both.
 		///
 		/// This is always zero for `ALLOCATOR_BF3`.

@@ -253,7 +253,9 @@ namespace xenomods {
 		if(!DebugStuff::enableMemoryDebug)
 			return;
 
-		mtl::MemoryInfo memInfo {};
+		static std::array<std::pair<int, mtl::MemoryInfo>, 511> memInfos;
+		static int lastActiveRegions;
+
 		mtl::AllocHandle allocHandle { 0 };
 		bool open = true;
 
@@ -262,48 +264,85 @@ namespace xenomods {
 			return;
 		}
 
-		if(ImGui::BeginTable("memdbg", 5)) {
+		size_t activeRegions = 0;
+		for(int i = 0; i < memInfos.max_size(); i++) {
+			allocHandle.regionId = i + 1;
+			if(!mtl::MemManager::GET_MEMORY_INFO(&allocHandle, &memInfos[i].second)) {
+				break;
+			}
+			memInfos[i].first = i + 1;
+			activeRegions++;
+		}
+
+		if(ImGui::BeginTable("memdbg", 5, ImGuiTableFlags_Sortable)) {
 			// Headers
-			ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 20.0);
-			ImGui::TableSetupColumn("Name");
-			ImGui::TableSetupColumn("Used %");
-			ImGui::TableSetupColumn("Allocated (MB)");
-			ImGui::TableSetupColumn("Total (MB)");
+			ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 20.0, 1);
+			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None, 0.0, 2);
+			ImGui::TableSetupColumn("Used %", ImGuiTableColumnFlags_None, 0.0, 3);
+			ImGui::TableSetupColumn("Allocated (MB)", ImGuiTableColumnFlags_None, 0.0, 4);
+			ImGui::TableSetupColumn("Total (MB)", ImGuiTableColumnFlags_None, 0.0, 5);
 			ImGui::TableHeadersRow();
 
-			for(int i = 1; i < 512; i++) {
-				allocHandle.regionId = i;
-				if(!mtl::MemManager::GET_MEMORY_INFO(&allocHandle, &memInfo)) {
-					break;
-				}
+			auto sortSpecs = ImGui::TableGetSortSpecs();
+			// Only sort when a sort key is chosen, and only sort when necessary
+			if(sortSpecs != nullptr && (lastActiveRegions != activeRegions || sortSpecs->SpecsDirty || sortSpecs->Specs[0].ColumnUserID >= 2)) {
+				std::sort(memInfos.begin(), memInfos.begin() + activeRegions, [&sortSpecs](const auto& a, const auto& b) -> bool {
+					bool cmp;
+					switch(sortSpecs->Specs[0].ColumnUserID) {
+						case 1:
+							cmp = a.first < b.first;
+							break;
+						case 2:
+							cmp = std::strcmp(a.second.regionName, b.second.regionName) < 0;
+							break;
+						case 3:
+							cmp = a.second.usedPercent < b.second.usedPercent;
+							break;
+						case 4:
+							cmp = a.second.allocatedSize < b.second.allocatedSize;
+							break;
+						case 5:
+							cmp = a.second.totalSize < b.second.totalSize;
+							break;
+						default:
+							IM_ASSERT(0);
+							break;
+					}
+					return sortSpecs->Specs[0].SortDirection == ImGuiSortDirection_Ascending ? cmp : !cmp;
+				});
+			}
+
+			for(int i = 0; i < activeRegions; i++) {
+				auto memInfo = &memInfos[i].second;
 				ImGui::TableNextRow();
 
 				ImGui::TableNextColumn();
-				ImGui::Text("%d", i);
+				ImGui::Text("%d", memInfos[i].first);
 
 				ImGui::TableNextColumn();
-				ImGui::Text(memInfo.regionName);
+				ImGui::Text(memInfo->regionName);
 
 				// Used % progress bar
 				ImU32 color;
-				if(memInfo.usedPercent >= 90)
+				if(memInfo->usedPercent >= 90)
 					color = IM_COL32(161, 21, 13, 255);
-				else if(memInfo.usedPercent >= 50)
+				else if(memInfo->usedPercent >= 50)
 					color = IM_COL32(163, 108, 13, 255);
 				else
 					color = IM_COL32(28, 82, 52, 255);
 				ImGui::TableNextColumn();
 				ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
-				ImGui::ProgressBar(memInfo.usedPercent / 100, ImVec2(ImGui::GetFontSize() * 10, 0.0f), std::format("{:.1f}%", memInfo.usedPercent).c_str());
+				ImGui::ProgressBar(memInfo->usedPercent / 100, ImVec2(ImGui::GetFontSize() * 10, 0.0f), std::format("{:.1f}%", memInfo->usedPercent).c_str());
 				ImGui::PopStyleColor(1);
 
 				ImGui::TableNextColumn();
-				ImGui::Text("%.4f", memInfo.allocatedSize / 1e6);
+				ImGui::Text("%.4f", memInfo->allocatedSize / 1e6);
 				ImGui::TableNextColumn();
-				ImGui::Text("%.4f", memInfo.totalSize / 1e6);
+				ImGui::Text("%.4f", memInfo->totalSize / 1e6);
 			}
 			ImGui::EndTable();
 		}
+		lastActiveRegions = activeRegions;
 
 		ImGui::End();
 	}
