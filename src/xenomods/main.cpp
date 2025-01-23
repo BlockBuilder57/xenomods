@@ -15,6 +15,7 @@
 #include <imgui_xeno.h>
 #include <imgui.h>
 #include "modules/RenderingControls.hpp"
+#include "helpers/InputHelper.h"
 
 namespace xenomods {
 
@@ -47,7 +48,8 @@ namespace xenomods {
 		xenomods::UpdateAllRegisteredModules(updateInfo);
 
 		// render the menu if open
-		if(g_Menu->IsOpen())
+		InputHelper::toggleInput = g_Menu->IsOpen();
+		if (g_Menu->IsOpen())
 			g_Menu->Update(menuInput);
 
 		// draw logger messages and toasts

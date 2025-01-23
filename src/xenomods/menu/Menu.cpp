@@ -165,8 +165,7 @@ namespace xenomods {
 	static double lastUpdateDiff = 0;
 	void Menu::Update(HidInput* input) {
 		InputHelper::setPort(input->padId);
-		InputHelper::toggleInput = g_Menu->IsOpen();
-
+		
 		auto seconds = nn::os::GetSystemTick()/19200000.;
 		lastUpdateDiff = seconds - lastUpdateSeconds;
 		lastUpdateSeconds = seconds;
