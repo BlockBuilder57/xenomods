@@ -17,6 +17,7 @@ namespace xenomods {
 
 		std::vector<Section*> sections {};
 		std::vector<void(*)()> callbacks {};
+		std::vector<void(*)()> backgroundCallbacks {};
 
 	   public:
 		void Initialize();
@@ -49,7 +50,7 @@ namespace xenomods {
 
 		Section* FindSection(const std::string& key);
 		Section* RegisterSection(const std::string& key, const std::string& display);
-		void RegisterRenderCallback(void(*func)());
+		void RegisterRenderCallback(void(*func)(), bool foregroundOnly);
 
 		friend class Section;
 

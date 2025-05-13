@@ -22,6 +22,9 @@
 #include "xenomods/engine/ml/WinView.hpp"
 #include "xenomods/engine/mm/MathTypes.hpp"
 #include "xenomods/engine/mm/StdBase.hpp"
+#include "xenomods/engine/mtl/Allocator.hpp"
+#include "xenomods/engine/mtl/MemManager.hpp"
+#include "xenomods/engine/mtl/MemoryInfo.hpp"
 #include "xenomods/engine/tl/title.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/stuff/utils/util.hpp"
@@ -124,6 +127,7 @@ namespace xenomods {
 	bool DebugStuff::enableDebugUnlockAll = false;
 	bool DebugStuff::accessClosedLandmarks = false;
 	bool DebugStuff::pauseEnable = false;
+	bool DebugStuff::enableMemoryDebug = false;
 
 	std::int8_t DebugStuff::pauseStepForward = 0;
 	int DebugStuff::tempInt = 0;
@@ -234,20 +238,118 @@ namespace xenomods {
 #if XENOMODS_CODENAME(bf3)
 		unsigned int* s_flg = nullptr; //ml::_dsk::s_flg
 
-		if (version::RuntimeVersion() == version::SemVer::v2_0_0)
+		if(version::RuntimeVersion() == version::SemVer::v2_0_0)
 			s_flg = reinterpret_cast<unsigned int*>(skylaunch::utils::AddrFromBase(0x7101c49c60));
-		else if (version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_1_1 || version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if(version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_1_1 || version::RuntimeVersion() == version::SemVer::v2_2_0)
 			s_flg = reinterpret_cast<unsigned int*>(skylaunch::utils::AddrFromBase(0x7101c4ac60));
 
 		// sets the system info print to display
-		if (s_flg != nullptr)
+		if(s_flg != nullptr)
 			*s_flg ^= (-enableDebugRendering ^ *s_flg) & (1 << 6);
 #endif
+	}
+
+	void DebugStuff::MemoryDebugRendering() {
+		if(!DebugStuff::enableMemoryDebug)
+			return;
+
+		static std::array<std::pair<int, mtl::MemoryInfo>, 511> memInfos;
+		static int lastActiveRegions;
+
+		mtl::AllocHandle allocHandle { 0 };
+
+		if(!ImGui::Begin("Memory", &DebugStuff::enableMemoryDebug)) {
+			ImGui::End();
+			return;
+		}
+
+		size_t activeRegions = 0;
+		for(int i = 0; i < memInfos.max_size(); i++) {
+			allocHandle.regionId = i + 1;
+			if(!mtl::MemManager::GET_MEMORY_INFO(&allocHandle, &memInfos[i].second)) {
+				break;
+			}
+			memInfos[i].first = i + 1;
+			activeRegions++;
+		}
+
+		if(ImGui::BeginTable("memdbg", 5, ImGuiTableFlags_Sortable)) {
+			// Headers
+			ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 20.0, 1);
+			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None, 0.0, 2);
+			ImGui::TableSetupColumn("Used %", ImGuiTableColumnFlags_None, 0.0, 3);
+			ImGui::TableSetupColumn("Allocated (MB)", ImGuiTableColumnFlags_None, 0.0, 4);
+			ImGui::TableSetupColumn("Total (MB)", ImGuiTableColumnFlags_None, 0.0, 5);
+			ImGui::TableHeadersRow();
+
+			auto sortSpecs = ImGui::TableGetSortSpecs();
+			// Only sort when a sort key is chosen, and only sort when necessary
+			if(sortSpecs != nullptr && (lastActiveRegions != activeRegions || sortSpecs->SpecsDirty || sortSpecs->Specs[0].ColumnUserID >= 2)) {
+				std::sort(memInfos.begin(), memInfos.begin() + activeRegions, [&sortSpecs](const auto& a, const auto& b) -> bool {
+					bool cmp;
+					switch(sortSpecs->Specs[0].ColumnUserID) {
+						case 1:
+							cmp = a.first < b.first;
+							break;
+						case 2:
+							cmp = std::strcmp(a.second.regionName, b.second.regionName) < 0;
+							break;
+						case 3:
+							cmp = a.second.usedPercent < b.second.usedPercent;
+							break;
+						case 4:
+							cmp = a.second.allocatedSize < b.second.allocatedSize;
+							break;
+						case 5:
+							cmp = a.second.totalSize < b.second.totalSize;
+							break;
+						default:
+							IM_ASSERT(0);
+							break;
+					}
+					return sortSpecs->Specs[0].SortDirection == ImGuiSortDirection_Ascending ? cmp : !cmp;
+				});
+			}
+
+			for(int i = 0; i < activeRegions; i++) {
+				auto memInfo = &memInfos[i].second;
+				ImGui::TableNextRow();
+
+				ImGui::TableNextColumn();
+				ImGui::Text("%d", memInfos[i].first);
+
+				ImGui::TableNextColumn();
+				ImGui::Text(memInfo->regionName);
+
+				// Used % progress bar
+				ImU32 color;
+				if(memInfo->usedPercent >= 90)
+					color = IM_COL32(161, 21, 13, 255);
+				else if(memInfo->usedPercent >= 50)
+					color = IM_COL32(163, 108, 13, 255);
+				else
+					color = IM_COL32(28, 82, 52, 255);
+				ImGui::TableNextColumn();
+				ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
+				ImGui::ProgressBar(memInfo->usedPercent / 100, ImVec2(ImGui::GetFontSize() * 10, 0.0f), std::format("{:.1f}%", memInfo->usedPercent).c_str());
+				ImGui::PopStyleColor(1);
+
+				ImGui::TableNextColumn();
+				ImGui::Text("%.4f", memInfo->allocatedSize / 1e6);
+				ImGui::TableNextColumn();
+				ImGui::Text("%.4f", memInfo->totalSize / 1e6);
+			}
+			ImGui::EndTable();
+		}
+		lastActiveRegions = activeRegions;
+
+		ImGui::End();
 	}
 
 	void DebugStuff::MenuSection() {
 		if(ImGui::Checkbox("Enable debug rendering", &DebugStuff::enableDebugRendering))
 			DebugStuff::UpdateDebugRendering();
+		ImGui::Checkbox("Memory debug window", &DebugStuff::enableMemoryDebug);
 
 		/*ImGui::Checkbox("Pause updates", &DebugStuff::pauseEnable);
 		ImGui::SameLine();
@@ -307,12 +409,14 @@ namespace xenomods {
 		}
 
 		UpdateDebugRendering();
+
+		xenomods::g_Menu->RegisterRenderCallback(&DebugStuff::MemoryDebugRendering, false);
 	}
 
 	void DebugStuff::Update(fw::UpdateInfo* updateInfo) {
 		bgmTrackIndex = 0;
 
-		if (pauseEnable && pauseStepForward > 0) {
+		if(pauseEnable && pauseStepForward > 0) {
 			pauseStepForward--;
 		}
 	}

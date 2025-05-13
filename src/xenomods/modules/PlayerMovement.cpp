@@ -597,7 +597,7 @@ namespace xenomods {
 			state->RegisterRenderCallback(&MenuState);
 		}
 
-		g_Menu->RegisterRenderCallback(&MenuWarps);
+		g_Menu->RegisterRenderCallback(&MenuWarps, true);
 #endif
 	}
 

@@ -165,15 +165,18 @@ namespace xenomods {
 	static double lastUpdateDiff = 0;
 	void Menu::Update(HidInput* input) {
 		InputHelper::setPort(input->padId);
-		InputHelper::toggleInput = g_Menu->IsOpen();
-
+		
 		auto seconds = nn::os::GetSystemTick()/19200000.;
 		lastUpdateDiff = seconds - lastUpdateSeconds;
 		lastUpdateSeconds = seconds;
 	}
 
 	void Menu::Render() {
-		if (!g_Menu->IsOpen())
+		for(auto func : g_Menu->backgroundCallbacks) {
+			func();
+		}
+
+		if(!g_Menu->IsOpen())
 			return;
 
 		if (g_Menu->logOpen)
@@ -277,9 +280,14 @@ namespace xenomods {
 		return sec;
 	}
 
-	void Menu::RegisterRenderCallback(void (*func)()) {
-		if (func != nullptr)
+	void Menu::RegisterRenderCallback(void (*func)(), bool foregroundOnly) {
+		if(func == nullptr)
+			return;
+
+		if(foregroundOnly)
 			callbacks.push_back(func);
+		else
+			backgroundCallbacks.push_back(func);
 	}
 
 	// The menu instance.
