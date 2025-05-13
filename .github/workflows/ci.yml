@@ -57,7 +57,7 @@ jobs:
             codename: bf3
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -95,7 +95,7 @@ jobs:
 
       - name: Upload artifact
         id: upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
             name: xenomods-${{matrix.build.preset}}
             path: |
