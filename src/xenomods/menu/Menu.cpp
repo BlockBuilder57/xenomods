@@ -187,7 +187,7 @@ namespace xenomods {
 					continue;
 
 				if(ImGui::BeginMenu(sec->GetName().c_str())) {
-					ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+					ImGui::PushItemFlag(ImGuiItemFlags_AutoClosePopups, false);
 					sec->Render();
 					ImGui::PopItemFlag();
 					ImGui::EndMenu();

@@ -177,7 +177,7 @@ namespace xenomods {
 	#elif XENOMODS_CODENAME(bfsw)
 		Bdat::getFP("landmarklist");
 	#else
-		"invalid";
+		nullptr;
 	#endif
 		if(pBdat != nullptr)
 			end = Bdat::getIdEnd(pBdat);

@@ -4,7 +4,7 @@
 
 #include <imgui.h>
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <string_view>
 
 #include <xenomods/menu/Themes.hpp>

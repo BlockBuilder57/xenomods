@@ -6,7 +6,9 @@
 
 #include "DebugStuff.hpp"
 #include "PlayerMovement.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/matrix_decompose.hpp"
+#undef GLM_ENABLE_EXPERIMENTAL
 #include "glm/mat4x4.hpp"
 #include "xenomods/ImGuiExtensions.hpp"
 #include "xenomods/engine/apps/FrameworkLauncher.hpp"

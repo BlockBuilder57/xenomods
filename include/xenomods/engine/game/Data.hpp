@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <xenomods/Utils.hpp>
 
 #include "xenomods/engine/fw/Document.hpp"
