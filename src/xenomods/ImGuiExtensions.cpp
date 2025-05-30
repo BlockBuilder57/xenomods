@@ -24,7 +24,7 @@ namespace xenomods::imguiext {
 		char buf[64];
 		ImGui::DataTypeFormatString(buf, IM_ARRAYSIZE(buf), ImGuiDataType_Float, v, format);
 
-		flags |= ImGuiInputTextFlags_AutoSelectAll; // We call MarkItemEdited() ourselves by comparing the actual data rather than the string.
+		flags |= ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_NoMarkEdited; // We call MarkItemEdited() ourselves by comparing the actual data rather than the string.
 
 		bool value_changed = false;
 		const float button_size = ImGui::GetFrameHeight();
@@ -39,36 +39,29 @@ namespace xenomods::imguiext {
 		// Step buttons
 		const ImVec2 backup_frame_padding = style.FramePadding;
 		style.FramePadding.x = style.FramePadding.y;
-
+		ImGuiButtonFlags button_flags = ImGuiButtonFlags_Repeat | ImGuiButtonFlags_DontClosePopups;
 		if(flags & ImGuiInputTextFlags_ReadOnly)
 			ImGui::BeginDisabled();
-
 		ImGui::SameLine(0, style.ItemInnerSpacing.x);
-
-		ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
-		ImGui::PushItemFlag(ImGuiItemFlags_AutoClosePopups, false);
-		if(ImGui::ButtonEx("-", ImVec2(button_size, button_size))) {
+		if(ImGui::ButtonEx("-", ImVec2(button_size, button_size), button_flags)) {
 			*v -= g.IO.KeyCtrl && step_fast > 0.0f ? step_fast : step;
 			value_changed = true;
 		}
 		ImGui::SameLine(0, style.ItemInnerSpacing.x);
-		if(ImGui::ButtonEx("+", ImVec2(button_size, button_size))) {
+		if(ImGui::ButtonEx("+", ImVec2(button_size, button_size), button_flags)) {
 			*v += g.IO.KeyCtrl && step_fast > 0.0f ? step_fast : step;
 			value_changed = true;
 		}
 		ImGui::SameLine(0, style.ItemInnerSpacing.x);
-		if(ImGui::ButtonEx("/", ImVec2(button_size, button_size))) {
+		if(ImGui::ButtonEx("/", ImVec2(button_size, button_size), button_flags)) {
 			*v /= g.IO.KeyCtrl && step_fast > 0.0f ? step_fast : step_mult;
 			value_changed = true;
 		}
 		ImGui::SameLine(0, style.ItemInnerSpacing.x);
-		if(ImGui::ButtonEx("*", ImVec2(button_size, button_size))) {
+		if(ImGui::ButtonEx("*", ImVec2(button_size, button_size), button_flags)) {
 			*v *= g.IO.KeyCtrl && step_fast > 0.0f ? step_fast : step_mult;
 			value_changed = true;
 		}
-		ImGui::PopItemFlag();
-		ImGui::PopItemFlag();
-
 		if(flags & ImGuiInputTextFlags_ReadOnly)
 			ImGui::EndDisabled();
 
