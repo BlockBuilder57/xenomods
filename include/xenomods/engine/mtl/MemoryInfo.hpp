@@ -37,7 +37,7 @@ namespace mtl {
 		/// First address in the region.
 		///
 		/// This seems to be zero for `ALLOCATOR_BF3`.
-		size_t topAddress;
+		uintptr_t topAddress;
 		/// The name assigned to the memory region.
 		///
 		/// As is common in that game, all names are empty in Xenoblade 3.

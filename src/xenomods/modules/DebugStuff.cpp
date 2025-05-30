@@ -253,7 +253,10 @@ namespace xenomods {
 		if(!DebugStuff::enableMemoryDebug)
 			return;
 
-		static std::array<std::pair<int, mtl::MemoryInfo>, 511> memInfos;
+		// 511 handles are possible, but from what I can tell no game ever initially allocates more than 66
+		// There is a "leak" in 2 with certain cutscenes, but that is negligible
+		// Let's use 127 just in case
+		static std::array<std::pair<int, mtl::MemoryInfo>, 127> memInfos {};
 		static int lastActiveRegions;
 
 		mtl::AllocHandle allocHandle { 0 };
@@ -267,7 +270,9 @@ namespace xenomods {
 		for(int i = 0; i < memInfos.max_size(); i++) {
 			allocHandle.regionId = i + 1;
 			if(!mtl::MemManager::GET_MEMORY_INFO(&allocHandle, &memInfos[i].second)) {
-				break;
+				memInfos[i].first = 0;
+				activeRegions++;
+				continue;
 			}
 			memInfos[i].first = i + 1;
 			activeRegions++;
@@ -286,6 +291,8 @@ namespace xenomods {
 			// Only sort when a sort key is chosen, and only sort when necessary
 			if(sortSpecs != nullptr && (lastActiveRegions != activeRegions || sortSpecs->SpecsDirty || sortSpecs->Specs[0].ColumnUserID >= 2)) {
 				std::sort(memInfos.begin(), memInfos.begin() + activeRegions, [&sortSpecs](const auto& a, const auto& b) -> bool {
+			        if (a.first == 0 || b.first == 0)
+						return false; // value unimportant
 					bool cmp;
 					switch(sortSpecs->Specs[0].ColumnUserID) {
 						case 1:
@@ -312,26 +319,35 @@ namespace xenomods {
 			}
 
 			for(int i = 0; i < activeRegions; i++) {
+				if (memInfos[i].first == 0)
+					continue;
+
 				auto memInfo = &memInfos[i].second;
+
 				ImGui::TableNextRow();
 
 				ImGui::TableNextColumn();
 				ImGui::Text("%d", memInfos[i].first);
 
+				// some kind of memory corruption thing happening here? clamp this
+				float usedPercent = memInfo->usedPercent;
+				if (usedPercent > 100.0f)
+					usedPercent = 100.0f;
+
 				ImGui::TableNextColumn();
-				ImGui::Text(memInfo->regionName);
+				ImGui::Text("%s", memInfo->regionName);
 
 				// Used % progress bar
 				ImU32 color;
-				if(memInfo->usedPercent >= 90)
+				if(usedPercent >= 90)
 					color = IM_COL32(161, 21, 13, 255);
-				else if(memInfo->usedPercent >= 50)
+				else if(usedPercent >= 50)
 					color = IM_COL32(163, 108, 13, 255);
 				else
 					color = IM_COL32(28, 82, 52, 255);
 				ImGui::TableNextColumn();
 				ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
-				ImGui::ProgressBar(memInfo->usedPercent / 100, ImVec2(ImGui::GetFontSize() * 10, 0.0f), std::format("{:.1f}%", memInfo->usedPercent).c_str());
+				ImGui::ProgressBar(usedPercent / 100, ImVec2(ImGui::GetFontSize() * 10, 0.0f), std::format("{:.1f}%", usedPercent).c_str());
 				ImGui::PopStyleColor(1);
 
 				ImGui::TableNextColumn();
