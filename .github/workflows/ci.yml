@@ -21,6 +21,16 @@ on:
       - linkerscripts/**
       - src/**
       - include/**
+  workflow_dispatch:
+    paths:
+      - .github/workflows/ci.yml
+      - cmake/**
+      - CMakeLists.txt
+      - CMakePresets.json
+      - scripts/**
+      - linkerscripts/**
+      - src/**
+      - include/**
 
 jobs:
   build:
