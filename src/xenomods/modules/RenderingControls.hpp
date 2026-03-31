@@ -6,6 +6,8 @@
 namespace xenomods {
 
 	struct RenderingControls : public xenomods::UpdatableModule {
+		static int framesNoticed;
+
 		static bool straightenFont;
 		static bool skipUIRendering;
 		static bool skipParticleRendering;
@@ -30,6 +32,12 @@ namespace xenomods {
 			}
 		};
 		static ForcedRenderParameters ForcedParameters;
+
+		struct PanoramaParameters {
+			bool Dump;
+			int DumpBeginFrame;
+		};
+		static PanoramaParameters PanoParameters;
 
 		static void MenuSection();
 		static void MenuToggles();

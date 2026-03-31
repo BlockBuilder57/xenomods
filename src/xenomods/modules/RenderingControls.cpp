@@ -1,16 +1,18 @@
 #include "RenderingControls.hpp"
 
 #include "DebugStuff.hpp"
-#include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/engine/effect/SystemManager.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
+#include "xenomods/engine/grlib/CGLibDisplay.hpp"
+#include "xenomods/engine/grlib/CGLibRenderTarget.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
 #include "xenomods/engine/mm/mtl/PtrSingleton.hpp"
 #include "xenomods/engine/ptlib/Emitter.hpp"
 #include "xenomods/engine/ui/UIObjectAcc.hpp"
 #include "xenomods/engine/xefb/Effect.hpp"
+#include "xenomods/stuff/utils/debug_util.hpp"
 
 namespace {
 
@@ -113,7 +115,6 @@ namespace {
 
 	struct DisableFadeMode : skylaunch::hook::Trampoline<DisableFadeMode> {
 		static void Hook(gf::GfObjAcc* objAcc, bool param) {
-			//dbgutil::logStackTrace();
 			if (!xenomods::RenderingControls::disableModelFade)
 				return Orig(objAcc, param);
 			Orig(objAcc, false);
@@ -122,7 +123,6 @@ namespace {
 
 	struct DisableFadeAlpha : skylaunch::hook::Trampoline<DisableFadeAlpha> {
 		static bool Hook(gf::GfObjAcc* objAcc) {
-			//dbgutil::logStackTrace();
 			if (!xenomods::RenderingControls::disableModelFade)
 				return Orig(objAcc);
 			return false;
@@ -130,11 +130,43 @@ namespace {
 	};
 #endif
 
+#if XENOMODS_CODENAME(bfsw)
+	// hooking ml::DrMdlObj::setCallSpAlphaMode makes parts of a model fade out independently
+	struct DisableFade1DE : skylaunch::hook::Trampoline<DisableFade1DE> {
+		static void Hook(ml::DrMdlObj* mdlObj, bool param) {
+			if (!xenomods::RenderingControls::disableModelFade)
+				return Orig(mdlObj, param);
+			Orig(mdlObj, false);
+		}
+	};
+#endif
+
+	#if !XENOMODS_CODENAME(bf3)
+	struct TestResolutionChange : skylaunch::hook::Trampoline<TestResolutionChange> {
+		static void Hook(void* this_pointer, int w, int h) {
+			//Orig(this_pointer, w, h);
+			Orig(this_pointer, 1024, 1024);
+		}
+	};
+
+	struct TestFBHook : skylaunch::hook::Trampoline<TestFBHook> {
+		static void Hook(grlib::CGLibDisplay* this_pointer, void* NVNqueue) {
+			Orig(this_pointer, NVNqueue);
+			if (xenomods::RenderingControls::PanoParameters.Dump) {
+				//xenomods::g_Logger->LogDebug("0x{:x} at {}, format {:x}", this_pointer->rtRender0.textureBuf.storageSize, this_pointer->rtRender0.textureBuf.storageBuffer, this_pointer->rtRender0.textureBuf.grlSurfaceFormat);
+				xenomods::RenderingControls::PanoParameters.Dump = false;
+				dbgutil::dumpMemory(this_pointer->rtRender0.textureBuf.storageBuffer, this_pointer->rtRender0.textureBuf.storageSize, "renderTarget0.dump");
+			}
+		}
+	};
+	#endif
+
 } // namespace
 
 namespace xenomods {
 
 	RenderingControls::ForcedRenderParameters RenderingControls::ForcedParameters = {};
+	RenderingControls::PanoramaParameters RenderingControls::PanoParameters = {};
 
 	bool RenderingControls::straightenFont = false;
 	bool RenderingControls::skipUIRendering = false;
@@ -180,6 +212,8 @@ namespace xenomods {
 
 		ImGui::Checkbox("Freeze texture streaming", &freezeTextureStreaming);
 #endif
+		if (ImGui::Button("Dump next frame"))
+			PanoParameters.Dump = true;
 	}
 
 	void RenderingControls::MenuToggles() {
@@ -189,9 +223,9 @@ namespace xenomods {
 		ImGui::Checkbox("Skip fog rendering", &skipFogRendering);
 		ImGui::Checkbox("Skip depth of field rendering", &skipDepthOfFieldRendering);
 #if !XENOMODS_CODENAME(bf3)
+		ImGui::Checkbox("Disable model fading", &disableModelFade);
 	#if XENOMODS_OLD_ENGINE
 		ImGui::Checkbox("Skip particle+overlay rendering", &skipParticleRendering);
-		ImGui::Checkbox("Disable model fading", &disableModelFade);
 	#else
 		ImGui::Checkbox("Skip particle rendering", &skipParticleRendering);
 		ImGui::Checkbox("Skip overlay rendering", &skipOverlayRendering);
@@ -246,6 +280,8 @@ namespace xenomods {
 		SkipFogRendering::HookAt("_ZNK2ml8DrFogMan7isFogOnEv");
 
 		FreezeTextureStreaming::HookAt(&ml::DrResMdoTexList::texStmUpdate);
+		TestResolutionChange::HookAt(&grlib::CGLibDisplay::resize);
+		TestFBHook::HookAt("_ZN5grlib12CGLibDisplay14updateSignaledEv");
 #else
 		// all here match up to the symbols up above
 		// Layer2 is an unnamed function immediately next to the normal finalRender.
@@ -290,6 +326,7 @@ namespace xenomods {
 		DisableFadeAlpha::HookAt("_ZNK2gf8GfObjAcc17isCameraFadeAllOKEv");
 #elif XENOMODS_CODENAME(bfsw)
 		SkipParticleRendering::HookAt("_ZN4xefb14CEParticlelist4drawEPNS_5CEResE");
+		DisableFade1DE::HookAt("_ZN2ml8DrMdlObj18setCallSpAlphaModeEb");
 #endif
 
 		auto modules = g_Menu->FindSection("modules");
@@ -325,6 +362,13 @@ namespace xenomods {
 				acc.setColorFilterFrm(0);
 			}
 		}
+
+		// PANO DUMPING:
+		// face in all directions
+		// wait until next frame to take a pic
+		// (how do I get that pic)
+		// deswizzle?
+		// write to file
 #endif
 	}
 
