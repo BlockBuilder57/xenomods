@@ -32,8 +32,14 @@ bdatSkipOverrides = ["CHR_Ir", "FLD_Condition", "FLD_Quest", "BTL_Enhance", "BTL
 damagePlayerMult = 1.0
 damageEnemyMult = 1.0
 
-# Disables music changes during battles, eg Visions, low tension,  (2/Torna/DE only)
+# Disables music changes during battles, eg visions, low tension (2/Torna/DE only)
 disableBattleBGMChanges = false
+
+# Changes the render resolution of the game. Will appear stretched, and large values are prone to crashing.
+customRes = [1280, 720]
+
+# Changes the format of screenshots/framebuffer captures. (Raw RGBA8 = 0, QOI = 1)
+captureFormat = 1
 
 # Using a header can set configs for specific games
 # Headers can also overwrite "globally" defined settings

@@ -27,6 +27,9 @@ namespace xenomods {
 #define CONFIG_DAMAGE_ENEMY_MULT_DEFAULT 1.0
 #define CONFIG_ENABLE_60FPS_DEFAULT false
 #define CONFIG_DISABLE_BATTLE_BGM_CHANGES false
+#define CONFIG_CUSTOM_RES_X_DEFAULT 1280
+#define CONFIG_CUSTOM_RES_Y_DEFAULT 720
+#define CONFIG_CAPTURE_FORMAT_DEFAULT 1
 #define CONFIG_TITLEEVENTS_DEFAULT \
 	{}
 #define CONFIG_TITLEEVENTS_DEFAULT_BF2 \
@@ -58,6 +61,9 @@ namespace xenomods {
 		bool enable60FPS {};
 
 		bool disableBattleBGMChanges {};
+
+		unsigned int customRes[2] {};
+		int captureFormat {};
 
 		// 2/Torna exclusive
 		std::vector<uint16_t> titleEvents {};

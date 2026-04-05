@@ -6,6 +6,8 @@
 namespace xenomods {
 
 	struct RenderingControls : public xenomods::UpdatableModule {
+		static int framesNoticed;
+
 		static bool straightenFont;
 		static bool skipUIRendering;
 		static bool skipParticleRendering;
@@ -30,6 +32,24 @@ namespace xenomods {
 			}
 		};
 		static ForcedRenderParameters ForcedParameters;
+
+		struct CaptureParameters {
+			std::string PathSuffix = "";
+			int WaitFrames = -1;
+			bool WasMenuOpen = true;
+			bool WasUIEnabled = true;
+			bool ShouldDisableUI = true;
+
+			void Reset() {
+				WaitFrames = -1;
+				WasMenuOpen = true;
+				WasUIEnabled = true;
+				PathSuffix = "";
+			}
+		};
+		static CaptureParameters CapParameters;
+
+		static void QueueScreenshot(std::string suffix = "", int wait_frames = 2);
 
 		static void MenuSection();
 		static void MenuToggles();

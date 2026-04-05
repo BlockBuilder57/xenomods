@@ -48,6 +48,13 @@ namespace xenomods {
 		};
 		static CameraMeta CamMeta;
 
+		struct PanoramaParameters {
+			int State = -1;
+			int Wait = -1;
+			bool StartedPanorama;
+		};
+		static PanoramaParameters PanoParameters;
+
 		static void UpdateMeta();
 
 		static void MenuSection();

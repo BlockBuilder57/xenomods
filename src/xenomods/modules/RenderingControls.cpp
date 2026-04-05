@@ -1,16 +1,21 @@
 #include "RenderingControls.hpp"
 
 #include "DebugStuff.hpp"
-#include "xenomods/stuff/utils/debug_util.hpp"
 #include "xenomods/engine/effect/SystemManager.hpp"
 #include "xenomods/engine/fw/Managers.hpp"
 #include "xenomods/engine/gf/MenuObject.hpp"
+#include "xenomods/engine/grlib/CGLibDisplay.hpp"
+#include "xenomods/engine/grlib/CGLibRenderTarget.hpp"
 #include "xenomods/engine/layer/LayerManager.hpp"
 #include "xenomods/engine/layer/LayerObj.hpp"
 #include "xenomods/engine/mm/mtl/PtrSingleton.hpp"
 #include "xenomods/engine/ptlib/Emitter.hpp"
 #include "xenomods/engine/ui/UIObjectAcc.hpp"
 #include "xenomods/engine/xefb/Effect.hpp"
+#include "xenomods/stuff/utils/debug_util.hpp"
+
+#define QOI_IMPLEMENTATION
+#include <qoi.h>
 
 namespace {
 
@@ -113,7 +118,6 @@ namespace {
 
 	struct DisableFadeMode : skylaunch::hook::Trampoline<DisableFadeMode> {
 		static void Hook(gf::GfObjAcc* objAcc, bool param) {
-			//dbgutil::logStackTrace();
 			if (!xenomods::RenderingControls::disableModelFade)
 				return Orig(objAcc, param);
 			Orig(objAcc, false);
@@ -122,7 +126,6 @@ namespace {
 
 	struct DisableFadeAlpha : skylaunch::hook::Trampoline<DisableFadeAlpha> {
 		static bool Hook(gf::GfObjAcc* objAcc) {
-			//dbgutil::logStackTrace();
 			if (!xenomods::RenderingControls::disableModelFade)
 				return Orig(objAcc);
 			return false;
@@ -130,11 +133,192 @@ namespace {
 	};
 #endif
 
+#if XENOMODS_CODENAME(bfsw)
+	// hooking ml::DrMdlObj::setCallSpAlphaMode makes parts of a model fade out independently
+	struct DisableFade1DE : skylaunch::hook::Trampoline<DisableFade1DE> {
+		static void Hook(ml::DrMdlObj* mdlObj, bool param) {
+			if (!xenomods::RenderingControls::disableModelFade)
+				return Orig(mdlObj, param);
+			Orig(mdlObj, false);
+		}
+	};
+#endif
+
+	int SWIZZLE_LOOKUP[] = {
+	     0,  4,  1,  5,
+	     8, 12,  9, 13,
+	    16, 20, 17, 21,
+	    24, 28, 25, 29,
+	     2,  6,  3,  7,
+	    10, 14, 11, 15,
+	    18, 22, 19, 23,
+	    26, 30, 27, 31
+	};
+
+	const int TILE_WIDTH = 4;
+	const int TILE_HEIGHT = 8;
+
+	// adapted from XBC2ModelDecomp! jeez
+	void deswizzle(void* swizBuf, void* deswizBuf, int width, int height) {
+		if (!swizBuf || !deswizBuf) {
+			xenomods::g_Logger->LogError("Couldn't deswizzle because a buffer was missing!");
+			return;
+		}
+
+	    const int bytesPerPixel = 4;
+	    const int dataSize = width * height * bytesPerPixel;
+
+	    // these aren't really "row" or "column". I don't know what these are actually called
+	    // for the resolutions/types this uses, these are constant
+	    const int tileRowCount = 16;
+	    const int tileColumnCount = 4;
+
+	    // these loops are in proper order! don't touch them!
+
+	    int dataOrigIdx = 0;
+	    for (int tileY = 0; tileY < (height / TILE_HEIGHT) / tileRowCount; tileY++) {
+	        for (int tileX = 0; tileX < (width / TILE_WIDTH) / tileColumnCount; tileX++) {
+	            for (int curTileX = 0; curTileX < tileRowCount; curTileX++) {
+	                for (int SwizzleIndex = 0; SwizzleIndex < 32; SwizzleIndex++) {
+	                    for (int curTileY = 0; curTileY < tileColumnCount; curTileY++) {
+	                        int l = SWIZZLE_LOOKUP[SwizzleIndex];
+
+	                        int deswizzledHeight = (tileY * tileRowCount + curTileX) * TILE_HEIGHT + (l / TILE_WIDTH);
+	                        int deswizzledWidth = (tileX * bytesPerPixel + (l % TILE_WIDTH)) * tileColumnCount + curTileY;
+	                        // bytesPerPixel above may be wrong, was 4
+
+	                        int destIdx = bytesPerPixel * (deswizzledHeight * width + deswizzledWidth);
+
+	                    	if (destIdx > dataSize || dataOrigIdx > dataSize) {
+	                    		xenomods::g_Logger->LogError("Tried to deswizzle out of bounds, something's wrong");
+	                    		return;
+	                    	}
+
+	                    	memcpy(deswizBuf + destIdx, swizBuf + dataOrigIdx, bytesPerPixel);
+	                        dataOrigIdx += bytesPerPixel;
+	                    }
+	                }
+	            }
+	        }
+	    }
+	}
+
+#if !XENOMODS_CODENAME(bf3)
+	struct CustomResolution : skylaunch::hook::Trampoline<CustomResolution> {
+		static void Hook(void* this_pointer, int w, int h) {
+			Orig(this_pointer, xenomods::GetState().config.customRes[0], xenomods::GetState().config.customRes[1]);
+		}
+	};
+
+	struct FramebufferHook : skylaunch::hook::Trampoline<FramebufferHook> {
+		static void Hook(grlib::CGLibDisplay* this_pointer, void* NVNqueue) {
+			Orig(this_pointer, NVNqueue);
+
+			auto& capParam = xenomods::RenderingControls::CapParameters;
+
+			if (capParam.WaitFrames == 0) {
+				std::size_t storageSize = this_pointer->rtRender0.textureBuf.storageSize;
+				void* storageBuf = this_pointer->rtRender0.textureBuf.storageBuffer;
+
+				//xenomods::g_Logger->LogDebug("0x{:x} at {}, format {:x}", storageSize, this_pointer->rtRender0.textureBuf.storageBuffer, this_pointer->rtRender0.textureBuf.grlSurfaceFormat);
+				//dbgutil::dumpMemory(this_pointer->rtRender0.textureBuf.storageBuffer, storageSize, "renderTarget0.dump");
+
+				// we have to do the actual dumping here
+
+				std::string filename = capParam.PathSuffix;
+				std::string path = "";
+				{
+					bool shouldMakeTimestamp = filename.empty() || filename.find_first_of("{}") != 0;
+
+					if (shouldMakeTimestamp) {
+						// see MenuLog::SaveToFile for notes about this timestamp nonsense
+						nn::time::PosixTime time {};
+						nn::time::StandardUserSystemClock::GetCurrentTime(&time);
+						std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> tp { std::chrono::seconds { time.time } };
+						std::string timestamp = std::format("{:%F-%H-%M-%S}", tp);
+
+						xenomods::StringReplace(filename, "{}", timestamp);
+					}
+
+					// append extension
+					switch (xenomods::GetState().config.captureFormat) {
+						case 0:
+						default:
+							filename += ".data";
+							break;
+						case 1:
+							filename += ".qoi";
+							break;
+					}
+
+					path = XENOMODS_CONFIG_PATH "/screenshots/" + filename;
+				}
+
+				void* deswizBuf = static_cast<char*>(malloc(storageSize));
+				memset(deswizBuf, 0, storageSize);
+
+				unsigned int* res = &xenomods::GetState().config.customRes[0];
+
+				deswizzle(storageBuf, deswizBuf, res[0], res[1]);
+
+				// (imgui_xeno? ImGui?) writes alpha values, we don't want those
+				for (int i = 0; i < storageSize; i += 4) {
+					static_cast<uint8_t*>(deswizBuf)[i+3] = 255;
+				}
+
+				qoi_desc qoiDesc = {
+					.width = res[0],
+					.height = res[1],
+					.channels = 4,
+					.colorspace = QOI_SRGB
+				};
+				int qoiSize = 0;
+				void* qoiBuf = qoi_encode(deswizBuf, &qoiDesc, &qoiSize);
+
+				free(deswizBuf);
+
+				if(!xenomods::NnFile::Preallocate(path, qoiSize)) {
+					xenomods::g_Logger->LogError("Couldn't create/preallocate screenshot \"{}\"", path);
+					return;
+				}
+
+				xenomods::NnFile file(path, nn::fs::OpenMode_Write);
+
+				if(!file) {
+					xenomods::g_Logger->LogError("Couldn't open screenshot \"{}\"", path);
+				} else {
+					file.Write(qoiBuf, qoiSize);
+				}
+				file.Flush();
+				file.Close();
+
+				free(qoiBuf);
+
+				xenomods::g_Logger->LogDebug("Saved screenshot as \"{}\"", filename);
+
+				// re-open menu if it was closed
+				if (xenomods::RenderingControls::CapParameters.WasMenuOpen && !xenomods::g_Menu->IsOpen())
+					xenomods::g_Menu->Toggle();
+				if (xenomods::RenderingControls::CapParameters.WasUIEnabled && xenomods::RenderingControls::skipUIRendering)
+					xenomods::RenderingControls::skipUIRendering = false;
+
+				xenomods::RenderingControls::CapParameters.Reset();
+			}
+			else {
+				xenomods::RenderingControls::CapParameters.WaitFrames--;
+				if (xenomods::RenderingControls::CapParameters.WaitFrames < -1)
+					xenomods::RenderingControls::CapParameters.WaitFrames = -1;
+			}
+		}
+	};
+	#endif
+
 } // namespace
 
 namespace xenomods {
 
 	RenderingControls::ForcedRenderParameters RenderingControls::ForcedParameters = {};
+	RenderingControls::CaptureParameters RenderingControls::CapParameters = {};
 
 	bool RenderingControls::straightenFont = false;
 	bool RenderingControls::skipUIRendering = false;
@@ -152,6 +336,19 @@ namespace xenomods {
 	bool RenderingControls::freezeTextureStreaming = false;
 
 	const std::string toggleKey = std::string(STRINGIFY(RenderingControls)) + "_Toggles";
+
+	void RenderingControls::QueueScreenshot(std::string suffix /*= ""*/, int wait_frames /*= 2*/) {
+		CapParameters.PathSuffix = suffix;
+		CapParameters.WaitFrames = 2;
+		CapParameters.WasMenuOpen = g_Menu->IsOpen();
+		CapParameters.WasUIEnabled = !skipUIRendering;
+
+		// hide menu
+		if (CapParameters.WasMenuOpen)
+			g_Menu->Toggle();
+		// disable ui rendering
+		skipUIRendering = true;
+	}
 
 	void RenderingControls::MenuSection() {
 #if XENOMODS_OLD_ENGINE
@@ -180,6 +377,14 @@ namespace xenomods {
 
 		ImGui::Checkbox("Freeze texture streaming", &freezeTextureStreaming);
 #endif
+
+		if (ImGui::Button("Queue screenshot"))
+			QueueScreenshot();
+		ImGui::SameLine();
+		ImGui::Checkbox("Disable UI while capturing", &CapParameters.ShouldDisableUI);
+		if (xenomods::version::BuildIsDebug && CapParameters.WaitFrames > 0) {
+			ImGui::Text("%d frames to cap", CapParameters.WaitFrames);
+		}
 	}
 
 	void RenderingControls::MenuToggles() {
@@ -189,9 +394,9 @@ namespace xenomods {
 		ImGui::Checkbox("Skip fog rendering", &skipFogRendering);
 		ImGui::Checkbox("Skip depth of field rendering", &skipDepthOfFieldRendering);
 #if !XENOMODS_CODENAME(bf3)
+		ImGui::Checkbox("Disable model fading", &disableModelFade);
 	#if XENOMODS_OLD_ENGINE
 		ImGui::Checkbox("Skip particle+overlay rendering", &skipParticleRendering);
-		ImGui::Checkbox("Disable model fading", &disableModelFade);
 	#else
 		ImGui::Checkbox("Skip particle rendering", &skipParticleRendering);
 		ImGui::Checkbox("Skip overlay rendering", &skipOverlayRendering);
@@ -246,6 +451,8 @@ namespace xenomods {
 		SkipFogRendering::HookAt("_ZNK2ml8DrFogMan7isFogOnEv");
 
 		FreezeTextureStreaming::HookAt(&ml::DrResMdoTexList::texStmUpdate);
+		CustomResolution::HookAt(&grlib::CGLibDisplay::resize);
+		FramebufferHook::HookAt("_ZN5grlib12CGLibDisplay14updateSignaledEv");
 #else
 		// all here match up to the symbols up above
 		// Layer2 is an unnamed function immediately next to the normal finalRender.
@@ -290,6 +497,7 @@ namespace xenomods {
 		DisableFadeAlpha::HookAt("_ZNK2gf8GfObjAcc17isCameraFadeAllOKEv");
 #elif XENOMODS_CODENAME(bfsw)
 		SkipParticleRendering::HookAt("_ZN4xefb14CEParticlelist4drawEPNS_5CEResE");
+		DisableFade1DE::HookAt("_ZN2ml8DrMdlObj18setCallSpAlphaModeEb");
 #endif
 
 		auto modules = g_Menu->FindSection("modules");

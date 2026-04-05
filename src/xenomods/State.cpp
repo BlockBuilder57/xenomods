@@ -28,6 +28,11 @@ namespace xenomods {
 
 		disableBattleBGMChanges = CONFIG_DISABLE_BATTLE_BGM_CHANGES;
 
+		customRes[0] = CONFIG_CUSTOM_RES_X_DEFAULT;
+		customRes[1] = CONFIG_CUSTOM_RES_Y_DEFAULT;
+
+		captureFormat = CONFIG_CAPTURE_FORMAT_DEFAULT;
+
 		enable60FPS = CONFIG_ENABLE_60FPS_DEFAULT;
 
 		mountTornaContent = CONFIG_MOUNT_TORNA_CONTENT_DEFAULT;
@@ -136,6 +141,18 @@ namespace xenomods {
 
 		if(respectDefaults || table[STRINGIFY(disableBattleBGMChanges)].type() != toml::node_type::none)
 			disableBattleBGMChanges = table[STRINGIFY(disableBattleBGMChanges)].value_or(CONFIG_DISABLE_BATTLE_BGM_CHANGES);
+
+		if(respectDefaults || table[STRINGIFY(customRes)].is_array()) {
+			const toml::array* arr = table[STRINGIFY(customRes)].as_array();
+
+			if (arr != nullptr && arr->size() == 2) {
+				customRes[0] = arr->get(0)->value_or(CONFIG_CUSTOM_RES_X_DEFAULT);
+				customRes[1] = arr->get(1)->value_or(CONFIG_CUSTOM_RES_Y_DEFAULT);
+			}
+		}
+
+		if(respectDefaults || table[STRINGIFY(captureFormat)].type() != toml::node_type::none)
+			captureFormat = table[STRINGIFY(captureFormat)].value_or(CONFIG_CAPTURE_FORMAT_DEFAULT);
 
 		// 2/Torna exclusive
 		if(table[STRINGIFY(titleEvents)].is_array()) {
