@@ -33,11 +33,16 @@ namespace xenomods {
 		};
 		static ForcedRenderParameters ForcedParameters;
 
-		struct PanoramaParameters {
-			bool Dump;
-			int DumpBeginFrame;
+		struct CaptureParameters {
+			int DumpBeginFrame = -1;
+			int DumpState;
+			bool WasMenuOpen;
+			std::string DumpSuffix;
 		};
-		static PanoramaParameters PanoParameters;
+		static CaptureParameters CapParameters;
+		static int ObservedUpdates;
+
+		static void QueueScreenshot(std::string suffix = "");
 
 		static void MenuSection();
 		static void MenuToggles();

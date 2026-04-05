@@ -140,8 +140,67 @@ namespace {
 		}
 	};
 #endif
+Queue
+	int SWIZZLE_LOOKUP[] = {
+	     0,  4,  1,  5,
+	     8, 12,  9, 13,
+	    16, 20, 17, 21,
+	    24, 28, 25, 29,
+	     2,  6,  3,  7,
+	    10, 14, 11, 15,
+	    18, 22, 19, 23,
+	    26, 30, 27, 31
+	};
 
-	#if !XENOMODS_CODENAME(bf3)
+	const int TILE_WIDTH = 4;
+	const int TILE_HEIGHT = 8;
+
+	// adapted from XBC2ModelDecomp! jeez
+	void deswizzle(void* swizBuf, void* deswizBuf, int width, int height) {
+		if (!swizBuf || !deswizBuf) {
+			xenomods::g_Logger->LogError("Couldn't deswizzle because a buffer was missing!");
+			return;
+		}
+
+	    const int bytesPerPixel = 4;
+	    const int dataSize = width * height * bytesPerPixel;
+
+	    // these aren't really "row" or "column". I don't know what these are actually called
+	    // for the resolutions/types this uses, these are constant
+	    const int tileRowCount = 16;
+	    const int tileColumnCount = 4;
+
+	    // these loops are in proper order! don't touch them!
+
+	    int dataOrigIdx = 0;
+	    for (int tileY = 0; tileY < (height / TILE_HEIGHT) / tileRowCount; tileY++) {
+	        for (int tileX = 0; tileX < (width / TILE_WIDTH) / tileColumnCount; tileX++) {
+	            for (int curTileX = 0; curTileX < tileRowCount; curTileX++) {
+	                for (int SwizzleIndex = 0; SwizzleIndex < 32; SwizzleIndex++) {
+	                    for (int curTileY = 0; curTileY < tileColumnCount; curTileY++) {
+	                        int l = SWIZZLE_LOOKUP[SwizzleIndex];
+
+	                        int deswizzledHeight = (tileY * tileRowCount + curTileX) * TILE_HEIGHT + (l / TILE_WIDTH);
+	                        int deswizzledWidth = (tileX * bytesPerPixel + (l % TILE_WIDTH)) * tileColumnCount + curTileY;
+	                        // bytesPerPixel above may be wrong, was 4
+
+	                        int destIdx = bytesPerPixel * (deswizzledHeight * width + deswizzledWidth);
+
+	                    	if (destIdx > dataSize || dataOrigIdx > dataSize) {
+	                    		xenomods::g_Logger->LogError("Tried to deswizzle out of bounds, something's wrong");
+	                    		return;
+	                    	}
+
+	                    	memcpy(deswizBuf + destIdx, swizBuf + dataOrigIdx, bytesPerPixel);
+	                        dataOrigIdx += bytesPerPixel;
+	                    }
+	                }
+	            }
+	        }
+	    }
+	}
+
+#if !XENOMODS_CODENAME(bf3)
 	struct TestResolutionChange : skylaunch::hook::Trampoline<TestResolutionChange> {
 		static void Hook(void* this_pointer, int w, int h) {
 			//Orig(this_pointer, w, h);
@@ -152,10 +211,67 @@ namespace {
 	struct TestFBHook : skylaunch::hook::Trampoline<TestFBHook> {
 		static void Hook(grlib::CGLibDisplay* this_pointer, void* NVNqueue) {
 			Orig(this_pointer, NVNqueue);
-			if (xenomods::RenderingControls::PanoParameters.Dump) {
-				//xenomods::g_Logger->LogDebug("0x{:x} at {}, format {:x}", this_pointer->rtRender0.textureBuf.storageSize, this_pointer->rtRender0.textureBuf.storageBuffer, this_pointer->rtRender0.textureBuf.grlSurfaceFormat);
-				xenomods::RenderingControls::PanoParameters.Dump = false;
-				dbgutil::dumpMemory(this_pointer->rtRender0.textureBuf.storageBuffer, this_pointer->rtRender0.textureBuf.storageSize, "renderTarget0.dump");
+
+			auto dumpFrame = xenomods::RenderingControls::CapParameters.DumpBeginFrame;
+
+			if (dumpFrame == xenomods::RenderingControls::ObservedUpdates) {
+				std::size_t storageSize = this_pointer->rtRender0.textureBuf.storageSize;
+				void* storageBuf = this_pointer->rtRender0.textureBuf.storageBuffer;
+
+				xenomods::g_Logger->LogDebug("0x{:x} at {}, format {:x}", storageSize, this_pointer->rtRender0.textureBuf.storageBuffer, this_pointer->rtRender0.textureBuf.grlSurfaceFormat);
+				//dbgutil::dumpMemory(this_pointer->rtRender0.textureBuf.storageBuffer, storageSize, "renderTarget0.dump");
+
+				// we have to do the actual dumping here
+
+				std::string filename;
+				std::string path;
+				{
+					// see MenuLog::SaveToFile for notes about this timestamp nonsense
+					nn::time::PosixTime time {};
+					nn::time::StandardUserSystemClock::GetCurrentTime(&time);
+					std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> tp { std::chrono::seconds { time.time } };
+					std::string timestamp = std::format("{:%F %H-%M-%S}", tp);
+
+					filename = xenomods::RenderingControls::CapParameters.DumpSuffix.empty() ? timestamp : (timestamp + "_" + xenomods::RenderingControls::CapParameters.DumpSuffix);
+					// extension (temp)
+					filename += ".data";
+
+					path = XENOMODS_CONFIG_PATH "/screenshots/" + filename;
+				}
+
+				void* deswizBuf = static_cast<char*>(malloc(storageSize));
+				memset(deswizBuf, 0, storageSize);
+
+				if(!xenomods::NnFile::Preallocate(path, storageSize)) {
+					xenomods::g_Logger->LogError("Couldn't create/preallocate screenshot \"{}\"", path);
+					return;
+				}
+
+				xenomods::NnFile file(path, nn::fs::OpenMode_Write);
+
+				if(!file) {
+					xenomods::g_Logger->LogError("Couldn't open screenshot \"{}\"", path);
+				} else {
+					deswizzle(storageBuf, deswizBuf, 1024, 1024);
+
+					// (imgui_xeno? ImGui?) writes alpha values, we don't want those
+					for (int i = 0; i < storageSize; i += 4) {
+						static_cast<uint8_t*>(deswizBuf)[i+3] = 255;
+					}
+
+					file.Write(deswizBuf, storageSize);
+				}
+				file.Flush();
+				file.Close();
+
+				xenomods::g_Logger->LogInfo("Saved screenshot as \"{}\"", filename);
+
+				// re-open menu if it was closed
+				if (xenomods::RenderingControls::CapParameters.WasMenuOpen && !xenomods::g_Menu->IsOpen())
+					xenomods::g_Menu->Toggle();
+
+				// reset pano parameters
+				xenomods::RenderingControls::CapParameters = {};
 			}
 		}
 	};
@@ -166,7 +282,8 @@ namespace {
 namespace xenomods {
 
 	RenderingControls::ForcedRenderParameters RenderingControls::ForcedParameters = {};
-	RenderingControls::PanoramaParameters RenderingControls::PanoParameters = {};
+	RenderingControls::CaptureParameters RenderingControls::CapParameters = {};
+	int RenderingControls::ObservedUpdates = 0;
 
 	bool RenderingControls::straightenFont = false;
 	bool RenderingControls::skipUIRendering = false;
@@ -184,6 +301,16 @@ namespace xenomods {
 	bool RenderingControls::freezeTextureStreaming = false;
 
 	const std::string toggleKey = std::string(STRINGIFY(RenderingControls)) + "_Toggles";
+
+	void RenderingControls::QueueScreenshot(std::string suffix /*= ""*/) {
+		CapParameters.DumpSuffix = suffix;
+		CapParameters.DumpBeginFrame = ObservedUpdates + 3;
+		CapParameters.WasMenuOpen = g_Menu->IsOpen();
+
+		// hide menu
+		if (CapParameters.WasMenuOpen)
+			g_Menu->Toggle();
+	}
 
 	void RenderingControls::MenuSection() {
 #if XENOMODS_OLD_ENGINE
@@ -212,8 +339,14 @@ namespace xenomods {
 
 		ImGui::Checkbox("Freeze texture streaming", &freezeTextureStreaming);
 #endif
-		if (ImGui::Button("Dump next frame"))
-			PanoParameters.Dump = true;
+
+		if (ImGui::Button("Queue screenshot"))
+			QueueScreenshot();
+		if (CapParameters.DumpBeginFrame >= ObservedUpdates) {
+			int diff = CapParameters.DumpBeginFrame - ObservedUpdates;
+			ImGui::SameLine();
+			ImGui::Text("%d frames to cap", diff);
+		}
 	}
 
 	void RenderingControls::MenuToggles() {
@@ -362,6 +495,8 @@ namespace xenomods {
 				acc.setColorFilterFrm(0);
 			}
 		}
+
+		ObservedUpdates++;
 
 		// PANO DUMPING:
 		// face in all directions
