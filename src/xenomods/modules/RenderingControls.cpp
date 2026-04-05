@@ -14,6 +14,9 @@
 #include "xenomods/engine/xefb/Effect.hpp"
 #include "xenomods/stuff/utils/debug_util.hpp"
 
+#define QOI_IMPLEMENTATION
+#include <qoi.h>
+
 namespace {
 
 	struct SkipLayerRendering : skylaunch::hook::Trampoline<SkipLayerRendering> {
@@ -140,7 +143,7 @@ namespace {
 		}
 	};
 #endif
-Queue
+
 	int SWIZZLE_LOOKUP[] = {
 	     0,  4,  1,  5,
 	     8, 12,  9, 13,
@@ -212,13 +215,11 @@ Queue
 		static void Hook(grlib::CGLibDisplay* this_pointer, void* NVNqueue) {
 			Orig(this_pointer, NVNqueue);
 
-			auto dumpFrame = xenomods::RenderingControls::CapParameters.DumpBeginFrame;
-
-			if (dumpFrame == xenomods::RenderingControls::ObservedUpdates) {
+			if (xenomods::RenderingControls::CapParameters.WaitFrames == 0) {
 				std::size_t storageSize = this_pointer->rtRender0.textureBuf.storageSize;
 				void* storageBuf = this_pointer->rtRender0.textureBuf.storageBuffer;
 
-				xenomods::g_Logger->LogDebug("0x{:x} at {}, format {:x}", storageSize, this_pointer->rtRender0.textureBuf.storageBuffer, this_pointer->rtRender0.textureBuf.grlSurfaceFormat);
+				//xenomods::g_Logger->LogDebug("0x{:x} at {}, format {:x}", storageSize, this_pointer->rtRender0.textureBuf.storageBuffer, this_pointer->rtRender0.textureBuf.grlSurfaceFormat);
 				//dbgutil::dumpMemory(this_pointer->rtRender0.textureBuf.storageBuffer, storageSize, "renderTarget0.dump");
 
 				// we have to do the actual dumping here
@@ -230,11 +231,11 @@ Queue
 					nn::time::PosixTime time {};
 					nn::time::StandardUserSystemClock::GetCurrentTime(&time);
 					std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> tp { std::chrono::seconds { time.time } };
-					std::string timestamp = std::format("{:%F %H-%M-%S}", tp);
+					std::string timestamp = std::format("{:%F-%H-%M-%S}", tp);
 
-					filename = xenomods::RenderingControls::CapParameters.DumpSuffix.empty() ? timestamp : (timestamp + "_" + xenomods::RenderingControls::CapParameters.DumpSuffix);
+					filename = xenomods::RenderingControls::CapParameters.FilenameSuffix.empty() ? timestamp : (timestamp + "_" + xenomods::RenderingControls::CapParameters.FilenameSuffix);
 					// extension (temp)
-					filename += ".data";
+					filename += ".qoi";
 
 					path = XENOMODS_CONFIG_PATH "/screenshots/" + filename;
 				}
@@ -242,7 +243,26 @@ Queue
 				void* deswizBuf = static_cast<char*>(malloc(storageSize));
 				memset(deswizBuf, 0, storageSize);
 
-				if(!xenomods::NnFile::Preallocate(path, storageSize)) {
+				deswizzle(storageBuf, deswizBuf, 1024, 1024);
+
+				// (imgui_xeno? ImGui?) writes alpha values, we don't want those
+				for (int i = 0; i < storageSize; i += 4) {
+					static_cast<uint8_t*>(deswizBuf)[i+3] = 255;
+				}
+
+				qoi_desc qoiDesc = {
+					.width = 1024,
+					.height = 1024,
+					.channels = 4,
+					.colorspace = QOI_SRGB
+				};
+				int qoiSize = 0;
+				void* qoiBuf = qoi_encode(deswizBuf, &qoiDesc, &qoiSize);
+
+				free(deswizBuf);
+				free(qoiBuf);
+
+				if(!xenomods::NnFile::Preallocate(path, qoiSize)) {
 					xenomods::g_Logger->LogError("Couldn't create/preallocate screenshot \"{}\"", path);
 					return;
 				}
@@ -252,19 +272,12 @@ Queue
 				if(!file) {
 					xenomods::g_Logger->LogError("Couldn't open screenshot \"{}\"", path);
 				} else {
-					deswizzle(storageBuf, deswizBuf, 1024, 1024);
-
-					// (imgui_xeno? ImGui?) writes alpha values, we don't want those
-					for (int i = 0; i < storageSize; i += 4) {
-						static_cast<uint8_t*>(deswizBuf)[i+3] = 255;
-					}
-
-					file.Write(deswizBuf, storageSize);
+					file.Write(qoiBuf, qoiSize);
 				}
 				file.Flush();
 				file.Close();
 
-				xenomods::g_Logger->LogInfo("Saved screenshot as \"{}\"", filename);
+				xenomods::g_Logger->LogDebug("Saved screenshot as \"{}\"", filename);
 
 				// re-open menu if it was closed
 				if (xenomods::RenderingControls::CapParameters.WasMenuOpen && !xenomods::g_Menu->IsOpen())
@@ -272,6 +285,11 @@ Queue
 
 				// reset pano parameters
 				xenomods::RenderingControls::CapParameters = {};
+			}
+			else {
+				xenomods::RenderingControls::CapParameters.WaitFrames--;
+				if (xenomods::RenderingControls::CapParameters.WaitFrames < -1)
+					xenomods::RenderingControls::CapParameters.WaitFrames = -1;
 			}
 		}
 	};
@@ -283,7 +301,6 @@ namespace xenomods {
 
 	RenderingControls::ForcedRenderParameters RenderingControls::ForcedParameters = {};
 	RenderingControls::CaptureParameters RenderingControls::CapParameters = {};
-	int RenderingControls::ObservedUpdates = 0;
 
 	bool RenderingControls::straightenFont = false;
 	bool RenderingControls::skipUIRendering = false;
@@ -303,8 +320,8 @@ namespace xenomods {
 	const std::string toggleKey = std::string(STRINGIFY(RenderingControls)) + "_Toggles";
 
 	void RenderingControls::QueueScreenshot(std::string suffix /*= ""*/) {
-		CapParameters.DumpSuffix = suffix;
-		CapParameters.DumpBeginFrame = ObservedUpdates + 3;
+		CapParameters.FilenameSuffix = suffix;
+		CapParameters.WaitFrames = 2;
 		CapParameters.WasMenuOpen = g_Menu->IsOpen();
 
 		// hide menu
@@ -342,10 +359,9 @@ namespace xenomods {
 
 		if (ImGui::Button("Queue screenshot"))
 			QueueScreenshot();
-		if (CapParameters.DumpBeginFrame >= ObservedUpdates) {
-			int diff = CapParameters.DumpBeginFrame - ObservedUpdates;
+		if (CapParameters.WaitFrames > 0) {
 			ImGui::SameLine();
-			ImGui::Text("%d frames to cap", diff);
+			ImGui::Text("%d frames to cap", CapParameters.WaitFrames);
 		}
 	}
 
@@ -495,15 +511,6 @@ namespace xenomods {
 				acc.setColorFilterFrm(0);
 			}
 		}
-
-		ObservedUpdates++;
-
-		// PANO DUMPING:
-		// face in all directions
-		// wait until next frame to take a pic
-		// (how do I get that pic)
-		// deswizzle?
-		// write to file
 #endif
 	}
 

@@ -34,13 +34,12 @@ namespace xenomods {
 		static ForcedRenderParameters ForcedParameters;
 
 		struct CaptureParameters {
-			int DumpBeginFrame = -1;
-			int DumpState;
+			int WaitFrames = -1;
 			bool WasMenuOpen;
-			std::string DumpSuffix;
+			bool WasUIDisabled;
+			std::string FilenameSuffix;
 		};
 		static CaptureParameters CapParameters;
-		static int ObservedUpdates;
 
 		static void QueueScreenshot(std::string suffix = "");
 
