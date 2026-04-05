@@ -6,6 +6,7 @@
 
 #include "DebugStuff.hpp"
 #include "PlayerMovement.hpp"
+#include "RenderingControls.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/matrix_decompose.hpp"
 #undef GLM_ENABLE_EXPERIMENTAL
@@ -135,6 +136,8 @@ namespace xenomods {
 	};
 
 	CameraTools::CameraMeta CameraTools::CamMeta = {};
+
+	CameraTools::PanoramaParameters CameraTools::PanoParameters = {};
 
 	glm::vec3 lastPlayerPos = {};
 	glm::vec3 relativePlayerDelta = {};
@@ -426,6 +429,15 @@ namespace xenomods {
 			AXIS_BUTTON("D/Y-", -up);
 			AXIS_BUTTON("F/Z+", forward);
 			AXIS_BUTTON("B/Z-", -forward);
+
+			if (ImGui::Button("Take panorama")) {
+				PanoParameters.StartedPanorama = true;
+				PanoParameters.Wait = 4;
+			}
+			if (version::BuildIsDebug && PanoParameters.StartedPanorama) {
+				ImGui::SameLine();
+				ImGui::Text("State %d, Wait %d", PanoParameters.State, PanoParameters.Wait);
+			}
 		}
 
 		{
@@ -603,6 +615,38 @@ namespace xenomods {
 					lastPlayerPos = *pos;
 			}
 #endif
+
+			if (detail::IsModuleRegistered(STRINGIFY(RenderingControls)) && PanoParameters.StartedPanorama) {
+				const glm::vec3 forward(0, 0, 1);
+				const glm::vec3 up(0, 1, 0);
+				const glm::vec3 left(1, 0, 0);
+
+				const glm::vec3 dirs[] = {left, forward, -left, -forward, up, -up};
+				const char* dirNames[] = {"left", "forward", "right", "back", "up", "down"};
+
+				if (PanoParameters.Wait >= 0) {
+					PanoParameters.Wait--;
+					RotateTowardsDirection(dirs[std::max(0, PanoParameters.State + 1)]);
+					CamState.fov = 90;
+
+					if (PanoParameters.Wait == 0 && RenderingControls::CapParameters.WaitFrames < 0) {
+						PanoParameters.State++;
+
+						if (PanoParameters.State >= 0 && PanoParameters.State < 6) {
+							RenderingControls::QueueScreenshot(std::format("panoramas/{{}}_{}_{}", PanoParameters.State + 1, dirNames[PanoParameters.State]), 2);
+							PanoParameters.Wait = 4;
+						}
+						else {
+							PanoParameters.State = -1;
+							PanoParameters.StartedPanorama = false;
+						}
+					}
+
+					if (PanoParameters.Wait < -1)
+						PanoParameters.Wait = -1;
+				}
+
+			}
 
 			if(debugInput->InputDownStrict(Keybind::FREECAM_TELEPORT))
 				TeleportPlayerToCamera();
