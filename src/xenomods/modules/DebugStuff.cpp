@@ -240,7 +240,7 @@ namespace xenomods {
 
 		if(version::RuntimeVersion() == version::SemVer::v2_0_0)
 			s_flg = reinterpret_cast<unsigned int*>(skylaunch::utils::AddrFromBase(0x7101c49c60));
-		else if(version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_1_1 || version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if(version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_1_1 || version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			s_flg = reinterpret_cast<unsigned int*>(skylaunch::utils::AddrFromBase(0x7101c4ac60));
 
 		// sets the system info print to display

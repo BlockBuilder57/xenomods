@@ -273,7 +273,7 @@ namespace xenomods {
 			SkipDepthOfFieldRendering::HookFromBase(0x7100f6e9d8);
 			SkipFogRendering::HookFromBase(0x7100ef60e0);
 		}
-		else if (version::RuntimeVersion() == version::SemVer::v2_2_0) {
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1) {
 			SkipLayerRendering::HookFromBase(0x7101010670);
 			SkipLayer2Rendering::HookFromBase(0x71010106e8);
 			SkipCloudRendering::HookFromBase(0x7100ec4478);

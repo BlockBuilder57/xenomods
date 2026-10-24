@@ -459,7 +459,7 @@ namespace xenomods {
 		PilotCameraLayers::HookAt(&fw::CameraLayer::update);
 #elif XENOMODS_CODENAME(bf3)
 		// fw::CameraLayer::update
-		if(version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_2_0)
+		if(version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			PilotCameraLayers::HookFromBase(0x7100013708);
 		else if(version::RuntimeVersion() == version::SemVer::v2_1_1)
 			PilotCameraLayers::HookFromBase(0x7100013718);
@@ -475,7 +475,7 @@ namespace xenomods {
 			CopyCurrentCameraState::HookFromBase(0x710127061c);
 		else if(version::RuntimeVersion() == version::SemVer::v2_1_1)
 			CopyCurrentCameraState::HookFromBase(0x710127065c);
-		else if(version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if(version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			CopyCurrentCameraState::HookFromBase(0x71012711cc);
 #endif
 

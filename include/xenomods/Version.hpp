@@ -50,6 +50,7 @@ namespace xenomods::version {
 		static const SemVer v2_1_0;
 		static const SemVer v2_1_1;
 		static const SemVer v2_2_0;
+		static const SemVer v2_2_1;
 
 		inline bool IsValid() const {
 			return major != 0 && minor != 0 && patch != 0;
@@ -142,7 +143,7 @@ namespace xenomods::version {
 		// ml::_dsk::s_revision
 		if (RuntimeVersion() == SemVer::v2_0_0)
 			return reinterpret_cast<mm::mtl::FixStr<128>*>(skylaunch::utils::AddrFromBase(0x7101b6f500))->buffer;
-		else if (RuntimeVersion() == SemVer::v2_1_0 || RuntimeVersion() == SemVer::v2_1_1 || RuntimeVersion() == SemVer::v2_2_0)
+		else if (RuntimeVersion() == SemVer::v2_1_0 || RuntimeVersion() == SemVer::v2_1_1 || RuntimeVersion() == SemVer::v2_2_0 || RuntimeVersion() == SemVer::v2_2_1)
 			return reinterpret_cast<mm::mtl::FixStr<128>*>(skylaunch::utils::AddrFromBase(0x7101b70500))->buffer;
 
 		return nullptr;

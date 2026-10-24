@@ -23,7 +23,7 @@ namespace mtl {
 				getMemoryInfo = skylaunch::utils::AddrFromBase(0x710128a9a0);
 			else if(xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_1_1)
 				getMemoryInfo = skylaunch::utils::AddrFromBase(0x710128a9e0);
-			else if(xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_2_0)
+			else if(xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_2_0 || xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_2_1)
 				getMemoryInfo = skylaunch::utils::AddrFromBase(0x710128b550);
 
 			return ((bool (*)(mtl::ALLOC_HANDLE, mtl::MemoryInfo*))getMemoryInfo)(handle, out);

@@ -110,7 +110,7 @@ namespace {
 				doIt(skylaunch::utils::AddrFromBase(0x7101248aa4), skylaunch::utils::AddrFromBase(0x7101248ac8), skylaunch::utils::AddrFromBase(0x710124c11c));
 			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_1_1)
 				doIt(skylaunch::utils::AddrFromBase(0x7101248ae4), skylaunch::utils::AddrFromBase(0x7101248b08), skylaunch::utils::AddrFromBase(0x710124c15c));
-			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_2_0)
+			else if (xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_2_0 || xenomods::version::RuntimeVersion() == xenomods::version::SemVer::v2_2_1)
 				doIt(skylaunch::utils::AddrFromBase(0x7101249654), skylaunch::utils::AddrFromBase(0x7101249678), skylaunch::utils::AddrFromBase(0x710124cccc));
 		}
 	};
@@ -282,7 +282,7 @@ namespace xenomods {
 			EnableDebugDrawing::HookFromBase(0x710126e068);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			EnableDebugDrawing::HookFromBase(0x710126e0a8);
-		else if (version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			EnableDebugDrawing::HookFromBase(0x710126ec18);
 #endif
 
@@ -293,7 +293,7 @@ namespace xenomods {
 		FrameworkUpdater_updateStdHook::HookAt("_ZN2fw16FrameworkUpdater9updateStdERKNS_8DocumentEPNS_19FrameworkControllerE");
 #elif XENOMODS_CODENAME(bf3)
 		// fw::FrameworkUpdater::updateStd
-		if (version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_2_0)
+		if (version::RuntimeVersion() == version::SemVer::v2_0_0 || version::RuntimeVersion() == version::SemVer::v2_1_0 || version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			FrameworkUpdater_updateStdHook::HookFromBase(0x710006734c);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			FrameworkUpdater_updateStdHook::HookFromBase(0x710006735c);
@@ -312,7 +312,7 @@ namespace xenomods {
 			ClampNumberOfControllers::HookFromBase(0x7101251efc);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			ClampNumberOfControllers::HookFromBase(0x7101251f3c);
-		else if (version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			ClampNumberOfControllers::HookFromBase(0x7101252aac);
 #endif
 
@@ -327,7 +327,7 @@ namespace xenomods {
 			DisableControllerUpdatingForMenu::HookFromBase(0x710124fd64);
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			DisableControllerUpdatingForMenu::HookFromBase(0x710124fda4);
-		else if (version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			DisableControllerUpdatingForMenu::HookFromBase(0x7101250914);
 #endif
 

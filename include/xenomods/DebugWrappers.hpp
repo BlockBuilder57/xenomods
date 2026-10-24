@@ -32,7 +32,7 @@ namespace xenomods::debug {
 			doIt(skylaunch::utils::AddrFromBase(0x7101243bc0), skylaunch::utils::AddrFromBase(0x7101245408));
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			doIt(skylaunch::utils::AddrFromBase(0x7101243c00), skylaunch::utils::AddrFromBase(0x7101245448));
-		else if (version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			doIt(skylaunch::utils::AddrFromBase(0x7101244770), skylaunch::utils::AddrFromBase(0x7101245fb8));
 #else
 		auto cacheDraw = ml::DebDraw::getCacheDraw();
@@ -85,7 +85,7 @@ namespace xenomods::debug {
 			doIt(skylaunch::utils::AddrFromBase(0x7101243bc0), skylaunch::utils::AddrFromBase(0x710124528c), skylaunch::utils::AddrFromBase(0x710124f5c8));
 		else if (version::RuntimeVersion() == version::SemVer::v2_1_1)
 			doIt(skylaunch::utils::AddrFromBase(0x7101243c00), skylaunch::utils::AddrFromBase(0x71012452cc), skylaunch::utils::AddrFromBase(0x7101245a38));
-		else if (version::RuntimeVersion() == version::SemVer::v2_2_0)
+		else if (version::RuntimeVersion() == version::SemVer::v2_2_0 || version::RuntimeVersion() == version::SemVer::v2_2_1)
 			doIt(skylaunch::utils::AddrFromBase(0x7101244770), skylaunch::utils::AddrFromBase(0x7101245e3c), skylaunch::utils::AddrFromBase(0x71012465a8));
 #else
 		fw::debug::drawFont(x, y, color, fmt, std::forward<Args>(args)...);
