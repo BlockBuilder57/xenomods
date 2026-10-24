@@ -110,6 +110,7 @@ target_compile_options(imgui_xeno PUBLIC
 		)
 
 target_include_directories(xenomods PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(xenomods PUBLIC ${PROJECT_SOURCE_DIR}/vendor/qoi)
 target_include_directories(xenomods PUBLIC ${PROJECT_BINARY_DIR}/)
 
 target_include_directories(xenomods PRIVATE

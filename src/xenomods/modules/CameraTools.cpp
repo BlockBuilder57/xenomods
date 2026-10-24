@@ -6,6 +6,7 @@
 
 #include "DebugStuff.hpp"
 #include "PlayerMovement.hpp"
+#include "RenderingControls.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/matrix_decompose.hpp"
 #undef GLM_ENABLE_EXPERIMENTAL
@@ -136,6 +137,8 @@ namespace xenomods {
 
 	CameraTools::CameraMeta CameraTools::CamMeta = {};
 
+	CameraTools::PanoramaParameters CameraTools::PanoParameters = {};
+
 	glm::vec3 lastPlayerPos = {};
 	glm::vec3 relativePlayerDelta = {};
 
@@ -153,8 +156,8 @@ namespace xenomods {
 		CamMeta.rot = rot;
 		CamMeta.euler = glm::degrees(glm::eulerAngles(rot));
 
-		glm::vec3 forward = { 0, 0, 1 };
-		glm::vec3 up = { 0, 1, 0 };
+		glm::vec3 forward(0, 0, 1);
+		glm::vec3 up(0, 1, 0);
 		CamMeta.forward = rot * forward;
 		CamMeta.up = rot * up;
 
@@ -335,53 +338,122 @@ namespace xenomods {
 			PlayerMovement::SetPartyPosition(CameraTools::CamMeta.pos);
 	}
 
+	void RotateTowardsDirection(glm::vec3 dir) {
+		dir = glm::normalize(dir);
+		glm::vec3 up(0, 1, 0);
+		glm::vec3 forward(0, 0, 1);
+
+		glm::vec3 pos {};
+		glm::quat rot {};
+		glm::vec3 scale {};
+		glm::vec3 skew {};
+		glm::vec4 perspective {};
+
+		// decompose existing matrix
+		glm::decompose(static_cast<const glm::mat4&>(xenomods::CameraTools::CamState.matrix), scale, rot, pos, skew, perspective);
+
+		glm::mat4 newmat = glm::identity<glm::mat4>();
+		newmat = glm::translate(newmat, pos);
+
+		// if our dir is colinear to our up, it'll break. use forward instead
+		float dot = glm::dot(dir, up);
+		float sign = glm::sign(dot);
+
+		glm::vec3 dirUp = fabs(dot) != 1 ? up : forward * -sign;
+
+		// make a lookAt matrix to steal rotation from
+		glm::mat4 lookAt = glm::lookAt(glm::vec3(0, 0, 0), dir, dirUp);
+		glm::decompose(lookAt, scale, rot, pos, skew, perspective);
+
+		// get angle+axis to rotate the matrix by
+		float angle = glm::angle(rot);
+		glm::vec3 axis = glm::axis(rot);
+
+		newmat = glm::rotate(newmat, angle, axis);
+
+		if (!isnan(rot)[0])
+			xenomods::CameraTools::CamState.matrix = newmat;
+		else
+			g_Logger->LogError("Rotation causes a NaN! (Why?)");
+	}
+
 	void CameraTools::MenuSettings() {
-		ImGui::SeparatorText("Movement");
+		{
+			ImGui::SeparatorText("Movement");
 
 #if !XENOMODS_CODENAME(bf3)
-		ImGui::Checkbox("Relative to Player", &Settings.relativeToPlayer);
+			ImGui::Checkbox("Relative to Player", &Settings.relativeToPlayer);
 #endif
 
-		ImGui::PushItemWidth(64.f);
-		imguiext::EnumComboBox("Move type", &Settings.moveAxis);
-		ImGui::SameLine();
-		imguiext::EnumComboBox("L+R Move type", &Settings.comboMoveAxis);
-		ImGui::PopItemWidth();
+			ImGui::PushItemWidth(64.f);
+			imguiext::EnumComboBox("Move type", &Settings.moveAxis);
+			ImGui::SameLine();
+			imguiext::EnumComboBox("L+R Move type", &Settings.comboMoveAxis);
+			ImGui::PopItemWidth();
 
-		ImGui::Checkbox("Freeze X", &Settings.isFreezePos[0]);
-		ImGui::SameLine();
-		ImGui::Checkbox("Freeze Y", &Settings.isFreezePos[1]);
-		ImGui::SameLine();
-		ImGui::Checkbox("Freeze Z", &Settings.isFreezePos[2]);
+			ImGui::Checkbox("Freeze X", &Settings.isFreezePos[0]);
+			ImGui::SameLine();
+			ImGui::Checkbox("Freeze Y", &Settings.isFreezePos[1]);
+			ImGui::SameLine();
+			ImGui::Checkbox("Freeze Z", &Settings.isFreezePos[2]);
 
-		ImGui::Checkbox("Global X", &Settings.isGlobalPos[0]);
-		ImGui::SameLine();
-		ImGui::Checkbox("Global Y", &Settings.isGlobalPos[1]);
-		ImGui::SameLine();
-		ImGui::Checkbox("Global Z", &Settings.isGlobalPos[2]);
+			ImGui::Checkbox("Global X", &Settings.isGlobalPos[0]);
+			ImGui::SameLine();
+			ImGui::Checkbox("Global Y", &Settings.isGlobalPos[1]);
+			ImGui::SameLine();
+			ImGui::Checkbox("Global Z", &Settings.isGlobalPos[2]);
 
-		imguiext::InputFloatExt("Freecam speed", &Settings.camSpeed, 1.f, 5.f, 2.f, "%.3f m/s");
-
-		ImGui::SeparatorText("Rotation");
-
-		//ImGui::Checkbox("Global Pitch", &Settings.isGlobalRot[0]);
-		//ImGui::SameLine();
-		ImGui::Checkbox("Global Roll", &Settings.isGlobalRot[1]);
-		//ImGui::SameLine();
-		//ImGui::Checkbox("Global Yaw", &Settings.isGlobalRot[2]);
-
-		ImGui::SeparatorText("Targeting");
-
-		ImGui::Checkbox("Enable Targeting", &Settings.enableTargeting);
-#if !XENOMODS_CODENAME(bf3)
-		ImGui::Checkbox("Follow Player Position", &Settings.targetFollowPlayer);
-#endif
-
-		if (ImGui::Button("Set target from camera position")) {
-			Settings.targetPos = CamMeta.pos;
+			imguiext::InputFloatExt("Freecam speed", &Settings.camSpeed, 1.f, 5.f, 2.f, "%.3f m/s");
 		}
 
-		ImGui::DragFloat3("Target Pos", reinterpret_cast<float*>(&Settings.targetPos));
+		{
+			ImGui::SeparatorText("Rotation");
+
+			//ImGui::Checkbox("Global Pitch", &Settings.isGlobalRot[0]);
+			//ImGui::SameLine();
+			ImGui::Checkbox("Global Roll", &Settings.isGlobalRot[1]);
+			//ImGui::SameLine();
+			//ImGui::Checkbox("Global Yaw", &Settings.isGlobalRot[2]);
+
+			glm::vec3 forward(0, 0, 1);
+			glm::vec3 up(0, 1, 0);
+			glm::vec3 right(1, 0, 0);
+
+			#define AXIS_BUTTON(text, rot) ImGui::SameLine(); if (ImGui::Button(text)) { RotateTowardsDirection(rot); }
+
+			ImGui::Text("Rotate to face:");
+
+			AXIS_BUTTON("L/X-", -right);
+			AXIS_BUTTON("R/X+", right);
+			AXIS_BUTTON("U/Y+", up);
+			AXIS_BUTTON("D/Y-", -up);
+			AXIS_BUTTON("F/Z+", forward);
+			AXIS_BUTTON("B/Z-", -forward);
+
+			if (ImGui::Button("Take panorama")) {
+				PanoParameters.StartedPanorama = true;
+				PanoParameters.Wait = 4;
+			}
+			if (version::BuildIsDebug && PanoParameters.StartedPanorama) {
+				ImGui::SameLine();
+				ImGui::Text("State %d, Wait %d", PanoParameters.State, PanoParameters.Wait);
+			}
+		}
+
+		{
+			ImGui::SeparatorText("Targeting");
+
+			ImGui::Checkbox("Enable Targeting", &Settings.enableTargeting);
+#if !XENOMODS_CODENAME(bf3)
+			ImGui::Checkbox("Follow Player Position", &Settings.targetFollowPlayer);
+#endif
+
+			if (ImGui::Button("Set target from camera position")) {
+				Settings.targetPos = CamMeta.pos;
+			}
+
+			ImGui::DragFloat3("Target Pos", reinterpret_cast<float*>(&Settings.targetPos));
+		}
 
 		ImGui::Separator();
 	}
@@ -543,6 +615,38 @@ namespace xenomods {
 					lastPlayerPos = *pos;
 			}
 #endif
+
+			if (detail::IsModuleRegistered(STRINGIFY(RenderingControls)) && PanoParameters.StartedPanorama) {
+				const glm::vec3 forward(0, 0, 1);
+				const glm::vec3 up(0, 1, 0);
+				const glm::vec3 left(1, 0, 0);
+
+				const glm::vec3 dirs[] = {left, forward, -left, -forward, up, -up};
+				const char* dirNames[] = {"left", "forward", "right", "back", "up", "down"};
+
+				if (PanoParameters.Wait >= 0) {
+					PanoParameters.Wait--;
+					RotateTowardsDirection(dirs[std::max(0, PanoParameters.State + 1)]);
+					CamState.fov = 90;
+
+					if (PanoParameters.Wait == 0 && RenderingControls::CapParameters.WaitFrames < 0) {
+						PanoParameters.State++;
+
+						if (PanoParameters.State >= 0 && PanoParameters.State < 6) {
+							RenderingControls::QueueScreenshot(std::format("panoramas/{{}}_{}_{}", PanoParameters.State + 1, dirNames[PanoParameters.State]), 2);
+							PanoParameters.Wait = 4;
+						}
+						else {
+							PanoParameters.State = -1;
+							PanoParameters.StartedPanorama = false;
+						}
+					}
+
+					if (PanoParameters.Wait < -1)
+						PanoParameters.Wait = -1;
+				}
+
+			}
 
 			if(debugInput->InputDownStrict(Keybind::FREECAM_TELEPORT))
 				TeleportPlayerToCamera();
